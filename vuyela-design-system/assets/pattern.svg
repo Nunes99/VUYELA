@@ -1,0 +1,18 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.16" stroke="#00A6A6" stroke-width="5">
+    <path d="M20 60L60 20L100 60L60 100L20 60Z"/>
+    <path d="M120 60L160 20L200 60L160 100L120 60Z"/>
+    <path d="M220 60L260 20L300 60L260 100L220 60Z"/>
+    <path d="M20 160L60 120L100 160L60 200L20 160Z"/>
+    <path d="M120 160L160 120L200 160L160 200L120 160Z"/>
+    <path d="M220 160L260 120L300 160L260 200L220 160Z"/>
+    <path d="M20 260L60 220L100 260L60 300L20 260Z"/>
+    <path d="M120 260L160 220L200 260L160 300L120 260Z"/>
+    <path d="M220 260L260 220L300 260L260 300L220 260Z"/>
+  </g>
+  <g opacity="0.20" fill="#F2B544">
+    <circle cx="60" cy="60" r="8"/><circle cx="160" cy="60" r="8"/><circle cx="260" cy="60" r="8"/>
+    <circle cx="60" cy="160" r="8"/><circle cx="160" cy="160" r="8"/><circle cx="260" cy="160" r="8"/>
+    <circle cx="60" cy="260" r="8"/><circle cx="160" cy="260" r="8"/><circle cx="260" cy="260" r="8"/>
+  </g>
+</svg>

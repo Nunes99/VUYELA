@@ -1,0 +1,121 @@
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --vy-color-indigo: #073b4c;
+  --vy-color-indigo-900: #032b38;
+  --vy-color-indigo-950: #021f29;
+  --vy-color-teal: #00a6a6;
+  --vy-color-teal-600: #078b91;
+  --vy-color-gold: #f2b544;
+  --vy-color-coral: #d95d4f;
+  --vy-color-sand: #f7f2e8;
+  --vy-color-graphite: #172126;
+
+  /* Semantic light theme */
+  --vy-bg: #fbfcfc;
+  --vy-surface: #ffffff;
+  --vy-surface-subtle: #f5f8f8;
+  --vy-surface-elevated: #ffffff;
+  --vy-text: #172126;
+  --vy-text-muted: #64747d;
+  --vy-text-inverse: #ffffff;
+  --vy-border: #dfe7e9;
+  --vy-border-strong: #b9cbcf;
+  --vy-primary: #073b4c;
+  --vy-primary-hover: #032b38;
+  --vy-accent: #00a6a6;
+  --vy-accent-hover: #078b91;
+  --vy-reward: #f2b544;
+  --vy-reward-hover: #ffc85c;
+  --vy-success: #2aa876;
+  --vy-warning: #e69b19;
+  --vy-danger: #cb4b4b;
+  --vy-info: #247ba0;
+
+  /* Typography */
+  --vy-font-display: Sora, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --vy-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --vy-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --vy-text-xs: 0.75rem;
+  --vy-text-sm: 0.875rem;
+  --vy-text-md: 1rem;
+  --vy-text-lg: 1.125rem;
+  --vy-text-xl: 1.25rem;
+  --vy-text-2xl: 1.5rem;
+  --vy-text-3xl: 2rem;
+  --vy-text-4xl: 2.5rem;
+  --vy-text-5xl: 3rem;
+  --vy-text-display: clamp(3rem, 6vw, 5.4rem);
+
+  --vy-leading-tight: 1.08;
+  --vy-leading-body: 1.55;
+  --vy-tracking-tight: -0.035em;
+  --vy-tracking-wide: 0.08em;
+
+  /* Spacing: 4 px base */
+  --vy-space-0: 0;
+  --vy-space-1: 0.25rem;
+  --vy-space-2: 0.5rem;
+  --vy-space-3: 0.75rem;
+  --vy-space-4: 1rem;
+  --vy-space-5: 1.25rem;
+  --vy-space-6: 1.5rem;
+  --vy-space-8: 2rem;
+  --vy-space-10: 2.5rem;
+  --vy-space-12: 3rem;
+  --vy-space-16: 4rem;
+  --vy-space-20: 5rem;
+  --vy-space-24: 6rem;
+
+  /* Shape */
+  --vy-radius-xs: 0.5rem;
+  --vy-radius-sm: 0.75rem;
+  --vy-radius-md: 1rem;
+  --vy-radius-lg: 1.5rem;
+  --vy-radius-xl: 2rem;
+  --vy-radius-full: 9999px;
+
+  /* Depth */
+  --vy-shadow-xs: 0 2px 8px rgba(3, 43, 56, 0.06);
+  --vy-shadow-sm: 0 12px 40px rgba(3, 43, 56, 0.09);
+  --vy-shadow-md: 0 24px 80px rgba(3, 43, 56, 0.14);
+  --vy-shadow-focus: 0 0 0 4px rgba(0, 166, 166, 0.2);
+
+  /* Layout */
+  --vy-container: 73.75rem;
+  --vy-header-height: 5.125rem;
+  --vy-sidebar-width: 16.25rem;
+  --vy-touch-target: 2.75rem;
+
+  /* Motion */
+  --vy-motion-fast: 150ms;
+  --vy-motion-normal: 220ms;
+  --vy-motion-slow: 400ms;
+  --vy-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Layering */
+  --vy-z-sticky: 40;
+  --vy-z-header: 50;
+  --vy-z-sidebar: 80;
+  --vy-z-modal: 100;
+  --vy-z-toast: 120;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --vy-bg: #021f29;
+  --vy-surface: #073b4c;
+  --vy-surface-subtle: #032b38;
+  --vy-surface-elevated: #0a4a5b;
+  --vy-text: #f8fbfb;
+  --vy-text-muted: #b8c9cd;
+  --vy-text-inverse: #172126;
+  --vy-border: rgba(255, 255, 255, 0.14);
+  --vy-border-strong: rgba(255, 255, 255, 0.28);
+  --vy-primary: #00a6a6;
+  --vy-primary-hover: #23bcbc;
+  --vy-accent: #f2b544;
+  --vy-accent-hover: #ffc85c;
+}

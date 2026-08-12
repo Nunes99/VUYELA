@@ -1,0 +1,20 @@
+<svg width="560" height="140" viewBox="0 0 560 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vg" x1="35" y1="108" x2="132" y2="34" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00A6A6"/>
+      <stop offset="1" stop-color="#0E6D78"/>
+    </linearGradient>
+  </defs>
+  <path d="M38 45L77 112C81 119 91 119 95 112L139 34" stroke="url(#vg)" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M92 111L139 33" stroke="#073B4C" stroke-width="16" stroke-linecap="round"/>
+  <path d="M48 34C64 8 101 1 127 18" stroke="#F2B544" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="37" cy="44" r="10" fill="#00A6A6"/>
+  <circle cx="134" cy="22" r="10" fill="#F2B544"/>
+  <path d="M131 23L123 18L123 29L131 23Z" fill="#F2B544"/>
+  <text x="166" y="79" fill="#073B4C" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="750" letter-spacing="8">VUYELA</text>
+  <text x="168" y="111" fill="#00A6A6" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Volte.</text>
+  <text x="227" y="111" fill="#F2B544" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Ganhe.</text>
+  <text x="297" y="111" fill="#073B4C" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Cresça.</text>
+  <path d="M383 102H433" stroke="#F2B544" stroke-width="2"/>
+  <text x="443" y="111" fill="#073B4C" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600">by LEMOTE</text>
+</svg>

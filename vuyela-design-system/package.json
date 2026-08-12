@@ -1,0 +1,25 @@
+{
+  "name": "@lemote/vuyela-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Design system da plataforma VUYELA by LEMOTE.",
+  "sideEffects": ["**/*.css"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "assets", "tokens"],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "preview": "python3 -m http.server 8080 -d preview"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.8.0"
+  },
+  "license": "UNLICENSED"
+}

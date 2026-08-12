@@ -1,0 +1,3 @@
+@import "./src/styles/index.css";
+
+/* Importar este ficheiro depois do CSS legado durante a migração gradual. */

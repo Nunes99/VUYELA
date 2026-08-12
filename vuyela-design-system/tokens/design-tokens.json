@@ -1,0 +1,142 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "meta": {
+    "name": "VUYELA Design System",
+    "version": "0.1.0",
+    "owner": "LEMOTE"
+  },
+  "color": {
+    "brand": {
+      "indigoDeep": {
+        "value": "#073B4C",
+        "description": "Cor principal; confiança, tecnologia e Oceano Índico."
+      },
+      "indigo900": {
+        "value": "#032B38",
+        "description": "Fundos profundos e navegação."
+      },
+      "indigo950": {
+        "value": "#021F29",
+        "description": "Fundos de elevado contraste."
+      },
+      "tealDigital": {
+        "value": "#00A6A6",
+        "description": "Acções, links e estados activos."
+      },
+      "teal600": {
+        "value": "#078B91",
+        "description": "Hover e texto teal acessível."
+      },
+      "goldSolar": {
+        "value": "#F2B544",
+        "description": "Pontos, recompensas e CTA principal."
+      },
+      "coralEarth": {
+        "value": "#D95D4F",
+        "description": "Campanhas e acentos humanos."
+      },
+      "sandLight": {
+        "value": "#F7F2E8",
+        "description": "Fundo acolhedor da marca."
+      },
+      "graphite": {
+        "value": "#172126",
+        "description": "Texto principal."
+      }
+    },
+    "semantic": {
+      "background": "#FBFCFC",
+      "surface": "#FFFFFF",
+      "surfaceSubtle": "#F5F8F8",
+      "text": "#172126",
+      "textMuted": "#64747D",
+      "border": "#DFE7E9",
+      "success": "#2AA876",
+      "warning": "#E69B19",
+      "danger": "#CB4B4B",
+      "info": "#247BA0"
+    }
+  },
+  "font": {
+    "family": {
+      "display": "Sora, Inter, ui-sans-serif, system-ui, sans-serif",
+      "body": "Inter, ui-sans-serif, system-ui, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, monospace"
+    },
+    "weight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800,
+      "black": 900
+    },
+    "size": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "md": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "2rem",
+      "4xl": "2.5rem",
+      "5xl": "3rem",
+      "display": "clamp(3rem, 6vw, 5.4rem)"
+    }
+  },
+  "space": {
+    "0": "0",
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "10": "2.5rem",
+    "12": "3rem",
+    "16": "4rem",
+    "20": "5rem",
+    "24": "6rem"
+  },
+  "radius": {
+    "xs": "0.5rem",
+    "sm": "0.75rem",
+    "md": "1rem",
+    "lg": "1.5rem",
+    "xl": "2rem",
+    "full": "9999px"
+  },
+  "shadow": {
+    "xs": "0 2px 8px rgba(3,43,56,.06)",
+    "sm": "0 12px 40px rgba(3,43,56,.09)",
+    "md": "0 24px 80px rgba(3,43,56,.14)",
+    "focus": "0 0 0 4px rgba(0,166,166,.2)"
+  },
+  "motion": {
+    "fast": "150ms",
+    "normal": "220ms",
+    "slow": "400ms",
+    "easing": "cubic-bezier(.2,.8,.2,1)"
+  },
+  "breakpoint": {
+    "xs": "30rem",
+    "sm": "47.5rem",
+    "md": "67.5rem",
+    "lg": "80rem"
+  },
+  "layout": {
+    "container": "73.75rem",
+    "headerHeight": "5.125rem",
+    "sidebarWidth": "16.25rem",
+    "touchTarget": "2.75rem"
+  },
+  "zIndex": {
+    "base": 0,
+    "sticky": 40,
+    "header": 50,
+    "sidebar": 80,
+    "modal": 100,
+    "toast": 120
+  }
+}
