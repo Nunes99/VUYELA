@@ -1,0 +1,2 @@
+-- Demo seed data will be added after the initial schema migrations exist.
+-- Never load demonstration data into production.

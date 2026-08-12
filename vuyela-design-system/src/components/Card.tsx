@@ -6,7 +6,21 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   dark?: boolean;
 }
 
-export function Card({ padded = true, interactive = false, dark = false, className = "", ...props }: CardProps) {
-  const classes = ["vy-card", padded ? "vy-card--padded" : "", interactive ? "vy-card--interactive" : "", dark ? "vy-card--dark" : "", className].filter(Boolean).join(" ");
+export function Card({
+  padded = true,
+  interactive = false,
+  dark = false,
+  className = "",
+  ...props
+}: CardProps) {
+  const classes = [
+    "vy-card",
+    padded ? "vy-card--padded" : "",
+    interactive ? "vy-card--interactive" : "",
+    dark ? "vy-card--dark" : "",
+    className
+  ]
+    .filter(Boolean)
+    .join(" ");
   return <div className={classes} {...props} />;
 }

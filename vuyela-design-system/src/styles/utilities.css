@@ -1,12 +1,55 @@
-.vy-text-display { font-family: var(--vy-font-display); font-size: var(--vy-text-display); font-weight: 800; line-height: .98; letter-spacing: -.055em; }
-.vy-text-h1 { font-family: var(--vy-font-display); font-size: var(--vy-text-5xl); font-weight: 800; line-height: 1.02; letter-spacing: -.045em; }
-.vy-text-h2 { font-family: var(--vy-font-display); font-size: var(--vy-text-4xl); font-weight: 750; line-height: 1.08; letter-spacing: var(--vy-tracking-tight); }
-.vy-text-h3 { font-family: var(--vy-font-display); font-size: var(--vy-text-3xl); font-weight: 750; line-height: 1.15; letter-spacing: -.025em; }
-.vy-text-body-lg { font-size: var(--vy-text-lg); }
-.vy-text-muted { color: var(--vy-text-muted); }
-.vy-text-brand { color: var(--vy-accent); }
-.vy-text-reward { color: var(--vy-reward); }
-.vy-bg-brand { background: linear-gradient(135deg, var(--vy-color-indigo-950), var(--vy-color-indigo)); color: #fff; }
-.vy-divider { height: 1px; background: var(--vy-border); border: 0; }
-.vy-full-width { width: 100%; }
-.vy-hidden { display: none !important; }
+.vy-text-display {
+  font-family: var(--vy-font-display);
+  font-size: var(--vy-text-display);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+.vy-text-h1 {
+  font-family: var(--vy-font-display);
+  font-size: var(--vy-text-5xl);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+.vy-text-h2 {
+  font-family: var(--vy-font-display);
+  font-size: var(--vy-text-4xl);
+  font-weight: 750;
+  line-height: 1.08;
+  letter-spacing: var(--vy-tracking-tight);
+}
+.vy-text-h3 {
+  font-family: var(--vy-font-display);
+  font-size: var(--vy-text-3xl);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+.vy-text-body-lg {
+  font-size: var(--vy-text-lg);
+}
+.vy-text-muted {
+  color: var(--vy-text-muted);
+}
+.vy-text-brand {
+  color: var(--vy-accent);
+}
+.vy-text-reward {
+  color: var(--vy-reward);
+}
+.vy-bg-brand {
+  background: linear-gradient(135deg, var(--vy-color-indigo-950), var(--vy-color-indigo));
+  color: #fff;
+}
+.vy-divider {
+  height: 1px;
+  background: var(--vy-border);
+  border: 0;
+}
+.vy-full-width {
+  width: 100%;
+}
+.vy-hidden {
+  display: none !important;
+}

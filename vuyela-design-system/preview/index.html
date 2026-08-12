@@ -1,78 +1,183 @@
 <!doctype html>
 <html lang="pt-MZ">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VUYELA Design System</title>
-  <link rel="stylesheet" href="preview.css" />
-</head>
-<body>
-  <header class="preview-header">
-    <div class="vy-container preview-header__row">
-      <img class="preview-logo" src="../assets/logo.svg" alt="VUYELA by LEMOTE" />
-      <nav class="preview-nav" aria-label="Navegação da documentação"><a href="#cores">Cores</a><a href="#componentes">Componentes</a><a href="#cartao">Cartão</a></nav>
-    </div>
-  </header>
-
-  <section class="preview-hero">
-    <div class="vy-container vy-stack" style="gap:1.5rem">
-      <span class="vy-badge vy-badge--reward">Design system 0.1</span>
-      <h1 class="vy-text-display">Tecnologia moçambicana para relações que duram.</h1>
-      <p class="vy-text-body-lg">Tokens e componentes para construir a experiência VUYELA de forma consistente em páginas públicas, área do cliente, POS e painel empresarial.</p>
-      <div class="vy-cluster"><button class="vy-button vy-button--reward">Quero um cartão</button><button class="vy-button vy-button--outline" style="color:#fff;border-color:rgba(255,255,255,.35)">Sou um negócio</button></div>
-    </div>
-  </section>
-
-  <main class="vy-container preview-demo">
-    <section id="cores" class="preview-block">
-      <h2 class="preview-block__title">Cores da marca</h2>
-      <div class="swatches">
-        <article class="swatch"><div class="swatch__color" style="background:#073B4C"></div><div class="swatch__meta"><strong>Índico profundo</strong><br>#073B4C</div></article>
-        <article class="swatch"><div class="swatch__color" style="background:#00A6A6"></div><div class="swatch__meta"><strong>Turquesa digital</strong><br>#00A6A6</div></article>
-        <article class="swatch"><div class="swatch__color" style="background:#F2B544"></div><div class="swatch__meta"><strong>Dourado solar</strong><br>#F2B544</div></article>
-        <article class="swatch"><div class="swatch__color" style="background:#D95D4F"></div><div class="swatch__meta"><strong>Coral terra</strong><br>#D95D4F</div></article>
-        <article class="swatch"><div class="swatch__color" style="background:#F7F2E8"></div><div class="swatch__meta"><strong>Areia clara</strong><br>#F7F2E8</div></article>
-        <article class="swatch"><div class="swatch__color" style="background:#172126"></div><div class="swatch__meta"><strong>Grafite</strong><br>#172126</div></article>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>VUYELA Design System</title>
+    <link rel="stylesheet" href="preview.css" />
+  </head>
+  <body>
+    <header class="preview-header">
+      <div class="vy-container preview-header__row">
+        <img class="preview-logo" src="../assets/logo.svg" alt="VUYELA by LEMOTE" />
+        <nav class="preview-nav" aria-label="Navegação da documentação">
+          <a href="#cores">Cores</a><a href="#componentes">Componentes</a
+          ><a href="#cartao">Cartão</a>
+        </nav>
       </div>
-    </section>
+    </header>
 
-    <section id="componentes" class="preview-block">
-      <h2 class="preview-block__title">Componentes essenciais</h2>
-      <div class="vy-card vy-card--padded vy-stack">
+    <section class="preview-hero">
+      <div class="vy-container vy-stack" style="gap: 1.5rem">
+        <span class="vy-badge vy-badge--reward">Design system 0.1</span>
+        <h1 class="vy-text-display">Tecnologia moçambicana para relações que duram.</h1>
+        <p class="vy-text-body-lg">
+          Tokens e componentes para construir a experiência VUYELA de forma consistente em páginas
+          públicas, área do cliente, POS e painel empresarial.
+        </p>
         <div class="vy-cluster">
-          <button class="vy-button">Acção principal</button>
-          <button class="vy-button vy-button--reward">Recompensa</button>
-          <button class="vy-button vy-button--secondary">Secundário</button>
-          <button class="vy-button vy-button--outline">Contorno</button>
-          <button class="vy-button vy-button--danger">Eliminar</button>
+          <button class="vy-button vy-button--reward">Quero um cartão</button
+          ><button
+            class="vy-button vy-button--outline"
+            style="color: #fff; border-color: rgba(255, 255, 255, 0.35)"
+          >
+            Sou um negócio
+          </button>
         </div>
-        <div class="vy-cluster"><span class="vy-badge vy-badge--brand">Activo</span><span class="vy-badge vy-badge--reward">Ouro</span><span class="vy-badge vy-badge--success">Concluído</span><span class="vy-badge vy-badge--warning">Pendente</span><span class="vy-badge vy-badge--danger">Expirado</span></div>
+      </div>
+    </section>
+
+    <main class="vy-container preview-demo">
+      <section id="cores" class="preview-block">
+        <h2 class="preview-block__title">Cores da marca</h2>
+        <div class="swatches">
+          <article class="swatch">
+            <div class="swatch__color" style="background: #073b4c"></div>
+            <div class="swatch__meta"><strong>Índico profundo</strong><br />#073B4C</div>
+          </article>
+          <article class="swatch">
+            <div class="swatch__color" style="background: #00a6a6"></div>
+            <div class="swatch__meta"><strong>Turquesa digital</strong><br />#00A6A6</div>
+          </article>
+          <article class="swatch">
+            <div class="swatch__color" style="background: #f2b544"></div>
+            <div class="swatch__meta"><strong>Dourado solar</strong><br />#F2B544</div>
+          </article>
+          <article class="swatch">
+            <div class="swatch__color" style="background: #d95d4f"></div>
+            <div class="swatch__meta"><strong>Coral terra</strong><br />#D95D4F</div>
+          </article>
+          <article class="swatch">
+            <div class="swatch__color" style="background: #f7f2e8"></div>
+            <div class="swatch__meta"><strong>Areia clara</strong><br />#F7F2E8</div>
+          </article>
+          <article class="swatch">
+            <div class="swatch__color" style="background: #172126"></div>
+            <div class="swatch__meta"><strong>Grafite</strong><br />#172126</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="componentes" class="preview-block">
+        <h2 class="preview-block__title">Componentes essenciais</h2>
+        <div class="vy-card vy-card--padded vy-stack">
+          <div class="vy-cluster">
+            <button class="vy-button">Acção principal</button>
+            <button class="vy-button vy-button--reward">Recompensa</button>
+            <button class="vy-button vy-button--secondary">Secundário</button>
+            <button class="vy-button vy-button--outline">Contorno</button>
+            <button class="vy-button vy-button--danger">Eliminar</button>
+          </div>
+          <div class="vy-cluster">
+            <span class="vy-badge vy-badge--brand">Activo</span
+            ><span class="vy-badge vy-badge--reward">Ouro</span
+            ><span class="vy-badge vy-badge--success">Concluído</span
+            ><span class="vy-badge vy-badge--warning">Pendente</span
+            ><span class="vy-badge vy-badge--danger">Expirado</span>
+          </div>
+          <div class="two-col">
+            <label class="vy-field"
+              ><span class="vy-field__label">Número de telefone</span
+              ><input class="vy-field__control" placeholder="+258 84 000 0000" /><span
+                class="vy-field__hint"
+                >Utilizado para identificar o cartão.</span
+              ></label
+            >
+            <label class="vy-field"
+              ><span class="vy-field__label">Valor da compra</span
+              ><input class="vy-field__control" value="1 000 MZN" /><span class="vy-field__hint"
+                >Pontos calculados apenas sobre o valor pago.</span
+              ></label
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="preview-block">
+        <h2 class="preview-block__title">Indicadores empresariais</h2>
+        <div class="vy-grid vy-grid--4">
+          <article class="vy-stat">
+            <div class="vy-stat__header">
+              <span class="vy-stat__label">Clientes activos</span
+              ><span class="vy-stat__icon">👥</span>
+            </div>
+            <strong class="vy-stat__value">1 284</strong
+            ><span class="vy-stat__delta vy-stat__delta--up">↑ 12% nos últimos 30 dias</span>
+          </article>
+          <article class="vy-stat">
+            <div class="vy-stat__header">
+              <span class="vy-stat__label">Compras registadas</span
+              ><span class="vy-stat__icon">🧾</span>
+            </div>
+            <strong class="vy-stat__value">3 842</strong
+            ><span class="vy-stat__delta vy-stat__delta--up">↑ 8,4%</span>
+          </article>
+          <article class="vy-stat">
+            <div class="vy-stat__header">
+              <span class="vy-stat__label">Pontos utilizados</span
+              ><span class="vy-stat__icon">★</span>
+            </div>
+            <strong class="vy-stat__value">85 400</strong
+            ><span class="vy-stat__delta vy-stat__delta--neutral">→ 61% da emissão</span>
+          </article>
+          <article class="vy-stat">
+            <div class="vy-stat__header">
+              <span class="vy-stat__label">Retenção</span><span class="vy-stat__icon">↻</span>
+            </div>
+            <strong class="vy-stat__value">43%</strong
+            ><span class="vy-stat__delta vy-stat__delta--up">↑ 5,2 pp</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="cartao" class="preview-block">
+        <h2 class="preview-block__title">Cartão de fidelização</h2>
         <div class="two-col">
-          <label class="vy-field"><span class="vy-field__label">Número de telefone</span><input class="vy-field__control" placeholder="+258 84 000 0000" /><span class="vy-field__hint">Utilizado para identificar o cartão.</span></label>
-          <label class="vy-field"><span class="vy-field__label">Valor da compra</span><input class="vy-field__control" value="1 000 MZN" /><span class="vy-field__hint">Pontos calculados apenas sobre o valor pago.</span></label>
+          <article
+            class="vy-loyalty-card"
+            style="--vy-loyalty-pattern: url(&quot;../assets/pattern.svg&quot;)"
+          >
+            <div class="vy-loyalty-card__top">
+              <span class="vy-loyalty-card__brand">Restaurante Marés</span
+              ><span class="vy-loyalty-card__status">Cartão digital</span>
+            </div>
+            <div class="vy-loyalty-card__balance">
+              <span class="vy-loyalty-card__label">Saldo disponível</span>
+              <div class="vy-loyalty-card__points">250 <small>pontos</small></div>
+              <span class="vy-loyalty-card__value">Equivalente a 250 MZN</span>
+            </div>
+            <div class="vy-loyalty-card__bottom">
+              <span class="vy-loyalty-card__meta">Cliente<strong>Maria da Silva</strong></span
+              ><span class="vy-loyalty-card__meta"
+                >N.º do cartão<strong>VUY 0001 2345 6789</strong></span
+              >
+            </div>
+          </article>
+          <article class="vy-card vy-card--padded vy-stack">
+            <span class="vy-badge vy-badge--brand">Regra central</span>
+            <h3 class="vy-text-h3">Os pontos pertencem ao estabelecimento.</h3>
+            <p class="vy-text-muted">
+              O cliente pode utilizá-los como desconto numa compra futura no mesmo negócio. A
+              interface apresenta sempre os pontos e o equivalente em meticais.
+            </p>
+            <button class="vy-button vy-button--reward">Utilizar pontos</button>
+          </article>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <section class="preview-block">
-      <h2 class="preview-block__title">Indicadores empresariais</h2>
-      <div class="vy-grid vy-grid--4">
-        <article class="vy-stat"><div class="vy-stat__header"><span class="vy-stat__label">Clientes activos</span><span class="vy-stat__icon">👥</span></div><strong class="vy-stat__value">1 284</strong><span class="vy-stat__delta vy-stat__delta--up">↑ 12% nos últimos 30 dias</span></article>
-        <article class="vy-stat"><div class="vy-stat__header"><span class="vy-stat__label">Compras registadas</span><span class="vy-stat__icon">🧾</span></div><strong class="vy-stat__value">3 842</strong><span class="vy-stat__delta vy-stat__delta--up">↑ 8,4%</span></article>
-        <article class="vy-stat"><div class="vy-stat__header"><span class="vy-stat__label">Pontos utilizados</span><span class="vy-stat__icon">★</span></div><strong class="vy-stat__value">85 400</strong><span class="vy-stat__delta vy-stat__delta--neutral">→ 61% da emissão</span></article>
-        <article class="vy-stat"><div class="vy-stat__header"><span class="vy-stat__label">Retenção</span><span class="vy-stat__icon">↻</span></div><strong class="vy-stat__value">43%</strong><span class="vy-stat__delta vy-stat__delta--up">↑ 5,2 pp</span></article>
-      </div>
-    </section>
-
-    <section id="cartao" class="preview-block">
-      <h2 class="preview-block__title">Cartão de fidelização</h2>
-      <div class="two-col">
-        <article class="vy-loyalty-card" style="--vy-loyalty-pattern:url('../assets/pattern.svg')"><div class="vy-loyalty-card__top"><span class="vy-loyalty-card__brand">Restaurante Marés</span><span class="vy-loyalty-card__status">Cartão digital</span></div><div class="vy-loyalty-card__balance"><span class="vy-loyalty-card__label">Saldo disponível</span><div class="vy-loyalty-card__points">250 <small>pontos</small></div><span class="vy-loyalty-card__value">Equivalente a 250 MZN</span></div><div class="vy-loyalty-card__bottom"><span class="vy-loyalty-card__meta">Cliente<strong>Maria da Silva</strong></span><span class="vy-loyalty-card__meta">N.º do cartão<strong>VUY 0001 2345 6789</strong></span></div></article>
-        <article class="vy-card vy-card--padded vy-stack"><span class="vy-badge vy-badge--brand">Regra central</span><h3 class="vy-text-h3">Os pontos pertencem ao estabelecimento.</h3><p class="vy-text-muted">O cliente pode utilizá-los como desconto numa compra futura no mesmo negócio. A interface apresenta sempre os pontos e o equivalente em meticais.</p><button class="vy-button vy-button--reward">Utilizar pontos</button></article>
-      </div>
-    </section>
-  </main>
-
-  <footer class="preview-footer"><div class="vy-container">VUYELA Design System · desenvolvido pela LEMOTE</div></footer>
-</body>
+    <footer class="preview-footer">
+      <div class="vy-container">VUYELA Design System · desenvolvido pela LEMOTE</div>
+    </footer>
+  </body>
 </html>

@@ -18,7 +18,7 @@ const variantClass: Record<ButtonVariant, string> = {
   secondary: "vy-button--secondary",
   outline: "vy-button--outline",
   ghost: "vy-button--ghost",
-  danger: "vy-button--danger",
+  danger: "vy-button--danger"
 };
 
 export function Button({
@@ -39,11 +39,18 @@ export function Button({
     size === "sm" ? "vy-button--sm" : "",
     size === "lg" ? "vy-button--lg" : "",
     fullWidth ? "vy-button--block" : "",
-    className,
-  ].filter(Boolean).join(" ");
+    className
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <button className={classes} disabled={disabled || loading} aria-busy={loading || undefined} {...props}>
+    <button
+      className={classes}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
       {loading ? <span className="vy-button__spinner" aria-hidden="true" /> : leadingIcon}
       <span>{children}</span>
       {!loading && trailingIcon}

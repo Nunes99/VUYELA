@@ -3,10 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "description": "Design system da plataforma VUYELA by LEMOTE.",
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "assets", "tokens"],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./styles.css": "./src/styles/index.css",
+    "./assets/*": "./assets/*",
+    "./tokens/*": "./tokens/*"
+  },
+  "files": [
+    "dist",
+    "assets",
+    "tokens"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",

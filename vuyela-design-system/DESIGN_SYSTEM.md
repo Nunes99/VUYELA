@@ -14,14 +14,14 @@
 
 ## 2. Cores
 
-| Papel | Token | Valor | Uso |
-|---|---|---:|---|
-| Marca principal | `--vy-color-indigo` | `#073B4C` | Navegação, títulos, fundos institucionais |
-| Acção digital | `--vy-color-teal` | `#00A6A6` | Estados activos, links e interacções |
-| Recompensa | `--vy-color-gold` | `#F2B544` | Pontos, saldo e CTA principal |
-| Campanha | `--vy-color-coral` | `#D95D4F` | Promoções e comunicação humana |
-| Base cultural | `--vy-color-sand` | `#F7F2E8` | Fundos acolhedores |
-| Texto | `--vy-color-graphite` | `#172126` | Conteúdo principal |
+| Papel           | Token                 |     Valor | Uso                                       |
+| --------------- | --------------------- | --------: | ----------------------------------------- |
+| Marca principal | `--vy-color-indigo`   | `#073B4C` | Navegação, títulos, fundos institucionais |
+| Acção digital   | `--vy-color-teal`     | `#00A6A6` | Estados activos, links e interacções      |
+| Recompensa      | `--vy-color-gold`     | `#F2B544` | Pontos, saldo e CTA principal             |
+| Campanha        | `--vy-color-coral`    | `#D95D4F` | Promoções e comunicação humana            |
+| Base cultural   | `--vy-color-sand`     | `#F7F2E8` | Fundos acolhedores                        |
+| Texto           | `--vy-color-graphite` | `#172126` | Conteúdo principal                        |
 
 Nunca utilizar dourado como cor de sucesso ou erro. O dourado é reservado ao conceito de recompensa.
 
@@ -38,12 +38,12 @@ A escala utiliza base de 4 px. Preferir 8, 12, 16, 24, 32, 48, 64 e 96 px. Não 
 
 ## 5. Responsividade
 
-| Nome | Largura | Uso principal |
-|---|---:|---|
-| `xs` | 480 px | Telemóveis compactos |
-| `sm` | 760 px | Telemóveis grandes e tablets verticais |
+| Nome | Largura | Uso principal                            |
+| ---- | ------: | ---------------------------------------- |
+| `xs` |  480 px | Telemóveis compactos                     |
+| `sm` |  760 px | Telemóveis grandes e tablets verticais   |
 | `md` | 1080 px | Tablets horizontais e portáteis pequenos |
-| `lg` | 1280 px | Computadores |
+| `lg` | 1280 px | Computadores                             |
 
 - Container máximo: 1180 px.
 - Gutter: 20 px no desktop; 14 px no mobile.

@@ -9,5 +9,10 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 export function Badge({ tone = "neutral", icon, className = "", children, ...props }: BadgeProps) {
   const toneClass = tone === "neutral" ? "" : `vy-badge--${tone}`;
-  return <span className={["vy-badge", toneClass, className].filter(Boolean).join(" ")} {...props}>{icon}{children}</span>;
+  return (
+    <span className={["vy-badge", toneClass, className].filter(Boolean).join(" ")} {...props}>
+      {icon}
+      {children}
+    </span>
+  );
 }
