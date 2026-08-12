@@ -3,53 +3,54 @@
 ## Implementados no pacote React
 
 - `Button`
+- `IconButton`
 - `Badge`
+- `Chip`
+- `Avatar`
 - `Card`
 - `Input`
 - `Textarea`
 - `Select`
+- `Checkbox`
+- `Radio`
+- `Switch`
+- `Tooltip`
+- `Popover`
+- `DropdownMenu`
 - `StatCard`
 - `LoyaltyCard`
 - `Modal`
-
-## Prioridade seguinte
-
-### Navegação
-
-- `PublicHeader`
-- `DashboardSidebar`
-- `BottomNavigation`
-- `Breadcrumbs`
+- `Drawer`
 - `Tabs`
-
-### Feedback
-
+- `Accordion`
 - `Toast`
 - `Alert`
 - `EmptyState`
-- `Progress`
 - `Skeleton`
-
-### Dados
-
-- `DataTable`
 - `Pagination`
+- `Table`
+- `DataTable`
+- `SearchInput`
 - `FilterBar`
+- `Breadcrumb`
+- `Navbar`
+- `Sidebar`
+- `BottomNavigation`
+- `PointsBalance`
+- `RewardBadge`
+- `TransactionItem`
+- `BusinessCard`
+- `OfferCard`
+- `QRScanner`
+- `QRDisplay`
+
+## Prioridade seguinte
+
 - `DateRangePicker`
 - `ChartContainer`
-
-### Fidelização
-
-- `PointsBalance`
-- `TransactionSummary`
 - `RedemptionPanel`
 - `TierProgress`
 - `CampaignCard`
-- `BusinessCard`
-- `QrDisplay`
-
-### Administração
-
 - `AppShell`
 - `PermissionGate`
 - `AuditTimeline`

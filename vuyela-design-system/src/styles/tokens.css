@@ -49,7 +49,7 @@
   --vy-text-3xl: 2rem;
   --vy-text-4xl: 2.5rem;
   --vy-text-5xl: 3rem;
-  --vy-text-display: clamp(3rem, 6vw, 5.4rem);
+  --vy-text-display: 4.5rem;
 
   --vy-leading-tight: 1.08;
   --vy-leading-body: 1.55;
@@ -73,10 +73,10 @@
 
   /* Shape */
   --vy-radius-xs: 0.5rem;
-  --vy-radius-sm: 0.75rem;
-  --vy-radius-md: 1rem;
-  --vy-radius-lg: 1.5rem;
-  --vy-radius-xl: 2rem;
+  --vy-radius-sm: 0.5rem;
+  --vy-radius-md: 0.5rem;
+  --vy-radius-lg: 0.5rem;
+  --vy-radius-xl: 0.5rem;
   --vy-radius-full: 9999px;
 
   /* Depth */

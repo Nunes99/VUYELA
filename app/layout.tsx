@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-import "@lemote/vuyela-design-system/styles.css";
+import "../vuyela-design-system/src/styles/tokens.css";
+import "../vuyela-design-system/src/styles/base.css";
+import "../vuyela-design-system/src/styles/components.css";
+import "../vuyela-design-system/src/styles/utilities.css";
 import "./globals.css";
 import { getSiteUrl } from "@/lib/env";
 
