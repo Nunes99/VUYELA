@@ -99,3 +99,16 @@ A feature is complete only when:
 - sensitive operations write audit logs;
 - unit tests cover calculation rules and static integration tests cover the RPC contract;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 07 Customer Card Acceptance
+
+- `/cliente` renders digital loyalty cards for the authenticated customer;
+- card data is loaded server-side through Supabase session queries and RLS;
+- no demo card data is used outside development seed environments;
+- each card shows business identity, customer name, card number, QR fallback code, available points, MZN equivalent, tier, and expiry information;
+- identification QR does not include wallet balance or MZN equivalent;
+- empty, error, loading, and populated states exist;
+- layout remains readable on 320-375px screens without horizontal scrolling;
+- unit tests cover card view-model calculations and QR privacy;
+- E2E covers the protected customer-card route fallback;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

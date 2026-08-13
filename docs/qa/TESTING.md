@@ -51,6 +51,16 @@ Phase 06 includes unit and static integration tests that verify:
 - redemption requests above the maximum are rejected;
 - loyalty RPCs use `SECURITY DEFINER`, tenant/branch guards, wallet `FOR UPDATE` locks, transactions, ledger entries, audit logs, and explicit execute grants.
 
+## Current Customer Card Coverage
+
+Phase 07 includes tests that verify:
+
+- MZN equivalent uses the configured point value;
+- current tier and next-tier progress are derived from lifetime points;
+- expiry labels handle configured and non-configured expiration;
+- identification QR codes omit balance and MZN values;
+- `/cliente` keeps a stable protected-route fallback when Supabase is not configured.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:

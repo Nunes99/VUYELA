@@ -1177,10 +1177,167 @@
   margin-top: var(--vy-space-5);
 }
 
+.customer-cards {
+  display: grid;
+  gap: var(--vy-space-5);
+}
+
+.customer-cards__header {
+  max-width: 42rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.customer-cards__header p {
+  margin: 0;
+}
+
+.customer-cards__list {
+  display: grid;
+  gap: var(--vy-space-4);
+}
+
+.customer-card-row {
+  display: grid;
+  grid-template-columns: minmax(15rem, 22rem) minmax(0, 1fr) minmax(10rem, 13rem);
+  gap: var(--vy-space-5);
+  align-items: stretch;
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: var(--vy-surface);
+  padding: var(--vy-space-5);
+  color: var(--vy-text);
+  box-shadow: var(--vy-shadow-sm);
+}
+
+.customer-card-row__main {
+  min-width: 0;
+}
+
+.customer-card-row__main .vy-loyalty-card {
+  min-height: 100%;
+  border-radius: var(--vy-radius-xs);
+}
+
+.customer-card-row__details {
+  display: grid;
+  align-content: start;
+  gap: var(--vy-space-4);
+  min-width: 0;
+}
+
+.customer-card-row__eyebrow {
+  color: var(--vy-color-teal-600);
+  font-size: var(--vy-text-xs);
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer-card-row__details h2 {
+  overflow-wrap: anywhere;
+  margin: var(--vy-space-1) 0 var(--vy-space-2);
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-2xl);
+}
+
+.customer-card-row__details p {
+  margin: 0;
+  color: var(--vy-text-muted);
+}
+
+.customer-card-row__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vy-space-3);
+}
+
+.customer-card-row__facts span {
+  min-width: 0;
+  color: var(--vy-text-muted);
+  font-size: var(--vy-text-xs);
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.customer-card-row__facts strong {
+  display: block;
+  overflow-wrap: anywhere;
+  margin-top: 0.15rem;
+  color: var(--vy-text);
+  font-size: var(--vy-text-sm);
+  text-transform: none;
+}
+
+.customer-card-row__qr {
+  min-width: 0;
+  align-self: stretch;
+}
+
+.customer-card-row__qr .vy-qr-display__matrix {
+  width: min(9rem, 100%);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.customer-card-row__qr > strong {
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.customer-cards-notice,
+.customer-cards-loading {
+  display: grid;
+  gap: var(--vy-space-3);
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: var(--vy-surface);
+  padding: var(--vy-space-6);
+  color: var(--vy-text);
+  box-shadow: var(--vy-shadow-sm);
+}
+
+.customer-cards-notice--error {
+  border-color: rgba(239, 68, 68, 0.32);
+  background: #fff7f7;
+}
+
+.customer-cards-notice h2 {
+  margin: 0;
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-xl);
+}
+
+.customer-cards-notice p,
+.customer-cards-loading p {
+  max-width: 42rem;
+  margin: 0;
+  color: var(--vy-text-muted);
+}
+
+.customer-cards-loading span {
+  display: block;
+  height: 1rem;
+  max-width: 28rem;
+  border-radius: var(--vy-radius-full);
+  background: linear-gradient(90deg, #e7eef0, #f7fafb, #e7eef0);
+}
+
+.customer-cards-loading span:nth-child(1) {
+  width: 70%;
+}
+
+.customer-cards-loading span:nth-child(2) {
+  width: 100%;
+}
+
+.customer-cards-loading span:nth-child(3) {
+  width: 46%;
+}
+
 @media (max-width: 67.5rem) {
   .auth-shell,
   .auth-shell--compact,
-  .dashboard-grid {
+  .dashboard-grid,
+  .customer-card-row {
     grid-template-columns: 1fr;
   }
 
@@ -1197,12 +1354,46 @@
   }
 
   .auth-panel,
-  .dashboard-card {
+  .dashboard-card,
+  .customer-card-row,
+  .customer-cards-notice,
+  .customer-cards-loading {
     padding: var(--vy-space-4);
   }
 
   .auth-panel h1,
   .dashboard-shell h1 {
     font-size: var(--vy-text-3xl);
+  }
+
+  .customer-cards__header {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: var(--vy-text-sm);
+  }
+
+  .customer-card-row__main .vy-loyalty-card {
+    padding: var(--vy-space-4);
+  }
+
+  .customer-card-row__main .vy-loyalty-card__top,
+  .customer-card-row__main .vy-loyalty-card__bottom {
+    display: grid;
+    gap: var(--vy-space-2);
+  }
+
+  .customer-card-row__main .vy-loyalty-card__balance {
+    margin-block: var(--vy-space-6) var(--vy-space-5);
+  }
+
+  .customer-card-row__main .vy-loyalty-card__points {
+    font-size: var(--vy-text-3xl);
+  }
+
+  .customer-card-row__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .customer-card-row__qr .vy-qr-display__matrix {
+    width: min(8rem, 100%);
   }
 }

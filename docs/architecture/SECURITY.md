@@ -46,6 +46,12 @@ The current sensitive write RPCs are:
 - `redeem_purchase_points`
 - `refund_loyalty_transaction`
 
+## Customer Card Privacy
+
+Digital card reads use the authenticated Supabase session and RLS policies. Customers can read only their own cards, wallets, and ledger-derived balances.
+
+Identification QR display must not encode balances, MZN equivalent, tier benefits, or other confidential account state. It may identify the card and issuing business so POS flows can look up the protected record server-side.
+
 ## Test Areas
 
 Security tests must cover:

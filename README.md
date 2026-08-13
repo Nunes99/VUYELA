@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 06 — Loyalty engine**.
+This repository has completed **FASE 07 — Customer Card**.
 
 Completed foundation work includes:
 
@@ -27,8 +27,9 @@ Completed foundation work includes:
 - Row Level Security migration for customer, business, branch, and public marketplace access
 - Supabase auth helpers, centralized RBAC, protected route states, and customer/business onboarding routes
 - pure loyalty calculation helpers and transactional PostgreSQL RPCs for earning, redeeming, and refunding points
+- database-backed customer digital cards with identification QR, balance, MZN equivalent, tier, and expiry information
 
-Product features such as production POS flows, dashboards with real data, marketplace data, and digital cards are intentionally not implemented yet.
+Product features such as production POS flows, dashboards with real data beyond cards, and marketplace data are intentionally not implemented yet.
 
 ## Scripts
 

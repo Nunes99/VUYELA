@@ -88,3 +88,5 @@ There are two QR concepts:
 - Usage QR: authorizes point use, must be temporary, signed, short-lived, and ideally single-use.
 
 Never place confidential information or balances directly in a QR code.
+
+FASE 07 implements identification QR display for digital customer cards. The displayed code contains the card identity and issuing business scope; it does not include wallet balance or MZN equivalent.

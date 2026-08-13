@@ -34,6 +34,21 @@ VUYELA calculates points, stores the ledger, validates rules, presents balances,
 - POS for earning and using points.
 - Platform administration.
 
+## Customer Cards
+
+Digital customer cards show:
+
+- issuing business identity;
+- customer display name;
+- card number;
+- identification QR fallback code;
+- available points;
+- MZN promotional equivalent;
+- current tier and next-tier progress where configured;
+- point expiry rule for the issuing business.
+
+Card balances remain business-specific and read through authenticated server-side paths protected by RLS.
+
 ## Content Language
 
 Portuguese is the primary product language. Copy should be simple, direct, and clear about the promotional nature of points.
