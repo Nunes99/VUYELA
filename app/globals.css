@@ -453,10 +453,12 @@
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 31rem);
   gap: var(--vy-space-12);
   align-items: center;
-  padding-block: var(--vy-space-16) var(--vy-space-20);
+  padding-block: var(--vy-space-12) var(--vy-space-16);
 }
 
 .home-hero__copy {
+  position: relative;
+  z-index: 2;
   max-width: 45rem;
 }
 
@@ -541,7 +543,6 @@
   right: 0;
   bottom: 1.25rem;
   width: min(94%, 25rem);
-  transform: translateX(18%);
 }
 
 .home-points-note {
@@ -555,7 +556,7 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--vy-radius-full);
   padding: 0.65rem 0.9rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(2, 31, 41, 0.86);
   color: #fff;
   font-size: var(--vy-text-sm);
   font-weight: 800;
@@ -775,7 +776,6 @@
 @media (min-width: 90rem) {
   .home-hero__inner {
     grid-template-columns: minmax(0, 1fr) minmax(25rem, 34rem);
-    padding-block: var(--vy-space-16);
   }
 }
 
@@ -870,6 +870,20 @@
   }
 }
 
+@media (min-width: 48rem) and (max-width: 67.5rem) {
+  .home-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+  }
+
+  .home-hero h1 {
+    font-size: var(--vy-text-3xl);
+  }
+
+  .home-product-visual {
+    min-height: 27rem;
+  }
+}
+
 @media (max-width: 47.5rem) {
   .home-header__inner {
     min-height: 4.25rem;
@@ -877,7 +891,8 @@
 
   .home-hero__inner {
     gap: var(--vy-space-6);
-    padding-block: var(--vy-space-8);
+    min-height: calc(100svh - 8.25rem);
+    padding-block: var(--vy-space-6);
   }
 
   .home-hero h1,
@@ -892,10 +907,13 @@
     font-size: var(--vy-text-md);
   }
 
-  .home-hero__actions,
-  .home-trust-list {
+  .home-hero__actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .home-trust-list {
+    gap: var(--vy-space-2);
   }
 
   .home-link-button {
@@ -903,11 +921,20 @@
   }
 
   .home-trust-list li {
-    width: 100%;
+    min-height: 2.25rem;
+    padding: 0.4rem 0.625rem;
+    font-size: var(--vy-text-xs);
   }
 
   .home-product-visual {
-    min-height: 24rem;
+    position: absolute;
+    right: var(--vy-space-4);
+    bottom: -10rem;
+    z-index: 1;
+    width: 13rem;
+    min-height: 14rem;
+    opacity: 0.22;
+    pointer-events: none;
   }
 
   .home-phone {
@@ -920,19 +947,20 @@
     display: none;
   }
 
+  .home-phone .vy-transaction {
+    display: none;
+  }
+
   .home-floating-card {
     display: none;
   }
 
   .home-points-note {
-    position: static;
-    max-width: 18.75rem;
-    margin-top: var(--vy-space-3);
-    background: rgba(255, 255, 255, 0.12);
+    display: none;
   }
 
   .home-section {
-    padding-block: var(--vy-space-14, 3.5rem);
+    padding-block: var(--vy-space-12);
   }
 
   .home-step-grid,

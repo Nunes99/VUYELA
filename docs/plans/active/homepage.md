@@ -30,12 +30,12 @@ The homepage remains a Server Component. Product visuals are built as semantic H
 
 # Tasks
 
-- [ ] Replace homepage placeholder with brand/product sections.
-- [ ] Add page metadata, canonical, OpenGraph, and Organization JSON-LD.
-- [ ] Add responsive homepage CSS using VUYELA tokens.
-- [ ] Update homepage E2E smoke test.
-- [ ] Run format, lint, typecheck, unit tests, build, E2E, and design-system build.
-- [ ] Verify responsive screenshots at 375px, 768px, 1280px, and 1440px.
+- [x] Replace homepage placeholder with brand/product sections.
+- [x] Add page metadata, canonical, OpenGraph, and Organization JSON-LD.
+- [x] Add responsive homepage CSS using VUYELA tokens.
+- [x] Update homepage E2E smoke test.
+- [x] Run format, lint, typecheck, unit tests, build, E2E, and design-system build.
+- [x] Verify responsive screenshots at 375px, 768px, 1280px, and 1440px.
 
 # Risks
 
@@ -59,7 +59,16 @@ pnpm test:e2e
 
 - Use product mock visuals in HTML/CSS because there are no approved public image assets yet.
 - Keep CTA anchors pointed at existing page sections until auth/onboarding routes are implemented.
+- Import only server-safe design-system component modules in the homepage. The package barrel also exports client-only overlays and modals, which must not be pulled into a Server Component.
+- Keep pricing copy directional instead of listing hard-coded plans until subscription plans are backed by database configuration.
 
 # Progress
 
-Started.
+Completed Phase 02 implementation.
+
+- Replaced the Phase 00 technical placeholder with a public VUYELA homepage.
+- Added hero, navigation, product mock visual, trust indicators, "Como funciona", customer, business, pricing-direction, and FAQ sections.
+- Added page metadata, canonical, OpenGraph, and Organization JSON-LD.
+- Updated Playwright coverage for the homepage.
+- Verified 375px, 768px, 1280px, and 1440px. The hero leaves a hint of the next section visible, has no horizontal body overflow, and no interactive text is clipped.
+- Final checks passed: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm ds:build`, `pnpm build`, and `pnpm test:e2e`.

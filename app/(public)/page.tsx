@@ -13,14 +13,14 @@ import {
   WalletCards
 } from "lucide-react";
 
+import { Badge } from "../../vuyela-design-system/src/components/Badge";
 import {
-  Badge,
-  LoyaltyCard,
   PointsBalance,
   QRDisplay,
   RewardBadge,
   TransactionItem
-} from "@lemote/vuyela-design-system";
+} from "../../vuyela-design-system/src/components/Loyalty";
+import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
 import { getSiteUrl } from "@/lib/env";
 
 const siteUrl = getSiteUrl();

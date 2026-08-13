@@ -28,3 +28,29 @@ A feature is complete only when:
 - production build passes;
 - architecture decisions are documented;
 - no product feature is implemented prematurely.
+
+## Phase 02 Homepage Acceptance
+
+- homepage is server-rendered or statically generated;
+- approved VUYELA brand hierarchy is visible in the first viewport;
+- Portuguese copy is real and does not use lorem ipsum;
+- no unavailable partner/customer claims are presented;
+- page metadata, canonical URL, OpenGraph, and valid Organization structured data exist;
+- CTA targets point to existing sections until auth/onboarding routes exist;
+- screenshots are checked at 375px, 768px, 1280px, and 1440px;
+- no horizontal body overflow exists;
+- lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 03 Database Acceptance
+
+- initial Supabase migration exists under `supabase/migrations`;
+- core product tables exist for profiles, businesses, branches, memberships, loyalty programs, customer cards, wallets, ledger, transactions, campaigns, notifications, subscriptions, support, audit, and fraud events;
+- tenant-owned records carry `business_id` for later RLS policies;
+- cross-tenant relationships use composite foreign keys where business-owned records reference other business-owned records;
+- money is stored as integer MZN minor units;
+- wallet balances are operational state and point history is append-only through `point_ledger`;
+- ledger entries require non-zero amounts and enforce positive earn-like movements plus negative redeem/expire movements;
+- lookup, tenant, status, and date indexes exist for expected access paths;
+- RLS policies are intentionally left for Phase 04;
+- database architecture documentation is updated;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
