@@ -125,3 +125,21 @@ A feature is complete only when:
 - unit tests cover dashboard summary and activity mapping;
 - E2E covers the protected dashboard route fallback;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 09 POS Acceptance
+
+- `/pos` renders a mobile-first cashier workflow, not a placeholder;
+- authorized cashier, branch manager, business admin, and business owner roles use centralized RBAC before rendering POS data;
+- POS context is loaded server-side from active business memberships and active branches;
+- customer identification accepts card number or identification QR payload through a tenant/branch-scoped RPC;
+- purchase quote shows points and MZN equivalent before confirmation;
+- earning and redemption calculations use shared loyalty helpers outside presentation components;
+- customer authorization is required before confirmation;
+- transaction confirmation calls `record_purchase_points` or `redeem_purchase_points` server-side;
+- the UI disables pending submissions and sends an idempotency key through `external_reference`;
+- no browser code mutates `point_wallets`, `point_ledger`, or `transactions` directly;
+- loading, empty, error, quote, confirmation, and success states exist;
+- unit tests cover POS amount, quote, idempotency, and server-action validation;
+- static integration tests cover the POS lookup RPC contract;
+- E2E covers the protected POS route fallback;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

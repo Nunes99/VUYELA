@@ -61,6 +61,19 @@ The authenticated customer dashboard is mobile-first and includes:
 
 All populated states use database-backed reads. Empty states explain what appears after the customer joins businesses or starts transacting.
 
+## POS
+
+The authenticated POS is built for low-friction cashier use:
+
+- select the active business and branch context available to the cashier;
+- identify a customer by card number or identification QR payload;
+- enter the transaction value and optional discount/points to use;
+- show the points and MZN equivalent before confirmation;
+- require explicit customer authorization before writing a redemption;
+- confirm the transaction through server-side loyalty RPCs.
+
+The normal path keeps wallet writes out of browser code. Duplicate submissions are reduced by disabled pending buttons and an idempotency key sent as the transaction external reference.
+
 ## Content Language
 
 Portuguese is the primary product language. Copy should be simple, direct, and clear about the promotional nature of points.

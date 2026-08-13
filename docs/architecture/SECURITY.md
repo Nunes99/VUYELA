@@ -54,6 +54,14 @@ Identification QR display must not encode balances, MZN equivalent, tier benefit
 
 The customer dashboard follows the same boundary: private customer cards, wallets, transactions, and profile data are read server-side through the authenticated session and RLS. Public offers remain limited by their public/active policy.
 
+## POS Security
+
+The POS route uses centralized protected-route helpers and is limited to active cashier, branch manager, business admin, and business owner memberships.
+
+FASE 09 adds `lookup_pos_customer_card` for identifying active cards through a server-side RPC guarded by `can_access_transaction`. Transaction completion still uses the FASE 06 loyalty RPCs, so wallet balances and ledger rows are never written directly from browser code.
+
+The POS confirm action requires customer authorization before calling the transaction RPC. Duplicate submission protection uses disabled pending buttons plus a stable idempotency key sent as `transactions.external_reference`, which is unique per business.
+
 ## Test Areas
 
 Security tests must cover:

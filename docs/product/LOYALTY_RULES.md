@@ -90,3 +90,5 @@ There are two QR concepts:
 Never place confidential information or balances directly in a QR code.
 
 FASE 07 implements identification QR display for digital customer cards. The displayed code contains the card identity and issuing business scope; it does not include wallet balance or MZN equivalent.
+
+FASE 09 implements the first POS consumer of this QR concept. The POS resolves the identification QR through a server-side lookup and still requires explicit customer authorization before any redemption is confirmed.

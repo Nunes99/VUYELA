@@ -24,6 +24,16 @@ These functions validate tenant/branch access with the RLS helper functions, loc
 
 Future application routes for POS, customer cards, and dashboards must call these server-side boundaries instead of directly mutating `point_wallets`, `point_ledger`, or `transactions`.
 
+## POS Flow
+
+FASE 09 adds the POS application boundary:
+
+- `lookup_pos_customer_card`: resolves a card number or identification QR payload for a business/branch context after `can_access_transaction` validation.
+- `features/pos/actions.ts`: server actions for identify, quote, and confirm.
+- `/pos`: protected UI for cashier, branch manager, business admin, and business owner roles.
+
+The quote step uses pure loyalty helpers and never writes wallet state. The confirm step requires customer authorization, sends an idempotency key as `external_reference`, and calls either `record_purchase_points` or `redeem_purchase_points` server-side.
+
 ## Customer Card Reads
 
 FASE 07 reads customer cards server-side from the authenticated Supabase session. The `/cliente` route loads customer-owned `customer_cards`, then resolves business identity, loyalty program configuration, wallet balances, and tiers through RLS-protected queries.

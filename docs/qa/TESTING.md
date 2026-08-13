@@ -70,6 +70,15 @@ Phase 08 includes tests that verify:
 - `/cliente` remains stable in protected-route fallback mode;
 - E2E runs serially to avoid `next dev` cold-compile navigation flakes.
 
+## Current POS Coverage
+
+Phase 09 includes tests that verify:
+
+- POS money parsing, MZN formatting, quote capping, earned points, and duplicate-submission keys;
+- POS server actions keep identified customer state on validation errors, preserve client idempotency keys, require customer authorization, and route reset intent;
+- POS lookup RPC uses `SECURITY DEFINER`, tenant/branch guards, active-card and active-program filters, explicit execute grants, and does not mutate wallets or ledger;
+- `/pos` remains stable in protected-route fallback mode.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:
