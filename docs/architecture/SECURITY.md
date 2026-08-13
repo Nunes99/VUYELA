@@ -70,6 +70,20 @@ FASE 10 adds `get_business_dashboard`, a read-only `SECURITY DEFINER` RPC that v
 
 Dashboard metrics are rendered server-side. The browser does not query private tables directly and cannot mutate wallet, ledger, transaction, campaign, employee, or settings data through this phase.
 
+## Public Marketplace Security
+
+FASE 11 public discovery uses Supabase anon reads plus RLS public policies. The server-side public client has no service-role key and does not attach an authenticated session.
+
+Marketplace pages render only active public records from marketplace-safe tables:
+
+- active businesses;
+- active branches for active businesses;
+- active categories;
+- active loyalty programs for active businesses;
+- public active offers inside their valid date window.
+
+Private customer, wallet, ledger, transaction, membership, campaign audience, subscription, audit, support, and fraud data is not queried by the marketplace feature. Low-value dynamic pages return 404 or `noindex` instead of exposing thin duplicate pages.
+
 ## Test Areas
 
 Security tests must cover:

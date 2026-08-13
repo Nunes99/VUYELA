@@ -55,3 +55,17 @@ FASE 10 adds the `/negocio` dashboard and a read-only PostgreSQL RPC:
 - `features/business-dashboard/model.ts`: derives overview, liability, redemption, retention, and report metrics outside presentation components.
 
 The RPC validates `can_manage_business` and `can_access_branch`. Branch managers must pass a branch scope; business admins and owners may view whole-business or branch-scoped metrics.
+
+## Public Marketplace Reads
+
+FASE 11 adds server-rendered public discovery pages backed by read-only Supabase anon queries through `lib/supabase/public.ts`.
+
+The marketplace data boundary in `features/public-marketplace/data.ts` reads only marketplace-safe public tables:
+
+- active `businesses`;
+- active `business_categories`;
+- active `branches`;
+- active `loyalty_programs`;
+- active public `offers`.
+
+The model layer builds indexable snapshots for establishments, business detail pages, categories, cities, city/category combinations, active offers, canonical paths, and sitemap entries. No public marketplace route mutates loyalty state or reads private customer, wallet, transaction, membership, campaign audience, subscription, audit, or employee-only data.

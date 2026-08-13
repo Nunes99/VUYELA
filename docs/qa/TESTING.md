@@ -89,6 +89,19 @@ Phase 10 includes tests that verify:
 - manager-scoped campaign and subscription settings remain restricted;
 - `/negocio` remains stable in protected-route fallback mode.
 
+## Current Public Marketplace Coverage
+
+Phase 11 includes tests that verify:
+
+- city slugs, point-value labels, and marketplace list/detail canonical paths;
+- categories and cities aggregate only indexable public businesses;
+- low-value city/category combinations are not generated;
+- active offer detail pages require globally unique public slugs;
+- marketplace data reads use the public Supabase anon client and public active filters;
+- sitemap generation uses the same indexability helpers and excludes protected routes;
+- SEO helpers produce canonical metadata, robots directives, OpenGraph, breadcrumbs, item lists, local business, offer, and FAQ structured data;
+- `/estabelecimentos` renders a public empty-state fallback when Supabase is not configured.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:

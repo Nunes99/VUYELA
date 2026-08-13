@@ -1,0 +1,598 @@
+import Link from "next/link";
+import Image from "next/image";
+import type { ReactNode } from "react";
+import {
+  ArrowRight,
+  CalendarClock,
+  Gift,
+  Globe,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Store,
+  Tag
+} from "lucide-react";
+
+import {
+  getBusinessCityLabel,
+  getBusinessPrimaryCity,
+  getExpiryLabel,
+  getPointValueLabel,
+  getProgramEarnRateLabel
+} from "./model";
+import type {
+  MarketplaceBreadcrumb,
+  MarketplaceBusiness,
+  MarketplaceDetailViewModel,
+  MarketplaceListViewModel,
+  MarketplaceOffer,
+  MarketplaceOfferViewModel
+} from "./model";
+
+export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListViewModel }) {
+  return (
+    <main className="marketplace-page">
+      <MarketplaceHeader />
+      <MarketplaceHero
+        eyebrow="Descoberta publica"
+        title={viewModel.title}
+        description={viewModel.description}
+        breadcrumbs={viewModel.breadcrumbs}
+      />
+      <section className="marketplace-section" aria-labelledby="marketplace-results-title">
+        <div className="vy-container marketplace-results">
+          <div className="marketplace-results__main">
+            <SectionHeader
+              eyebrow="Estabelecimentos"
+              title={
+                viewModel.businesses.length > 0
+                  ? `${viewModel.businesses.length.toLocaleString("pt-MZ")} negocios encontrados`
+                  : "Ainda sem estabelecimentos para publicar"
+              }
+              description={
+                viewModel.businesses.length > 0
+                  ? "Cada perfil mostra pontos, beneficios, localizacao e ofertas publicas activas."
+                  : "Esta pagina fica fora do indice enquanto nao houver conteudo publico suficiente."
+              }
+              id="marketplace-results-title"
+            />
+            {viewModel.businesses.length > 0 ? (
+              <div className="marketplace-business-grid">
+                {viewModel.businesses.map((business) => (
+                  <BusinessCard business={business} key={business.id} />
+                ))}
+              </div>
+            ) : (
+              <MarketplaceEmptyState />
+            )}
+          </div>
+          <aside className="marketplace-sidebar" aria-label="Explorar marketplace">
+            <MarketplaceFacetSection
+              title="Categorias"
+              items={viewModel.categories.map((category) => ({
+                href: `/categorias/${category.slug}`,
+                label: category.name,
+                meta: `${category.businessCount.toLocaleString("pt-MZ")} negocios`
+              }))}
+            />
+            <MarketplaceFacetSection
+              title="Cidades"
+              items={viewModel.cities.map((city) => ({
+                href: `/locais/${city.slug}`,
+                label: city.name,
+                meta: `${city.businessCount.toLocaleString("pt-MZ")} negocios`
+              }))}
+            />
+          </aside>
+        </div>
+      </section>
+      <OffersBand offers={viewModel.offers} />
+    </main>
+  );
+}
+
+export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetailViewModel }) {
+  const { business } = viewModel;
+  const primaryBranch =
+    business.branches.find((branch) => branch.isPrimary) ?? business.branches[0];
+
+  return (
+    <main className="marketplace-page">
+      <MarketplaceHeader />
+      <MarketplaceHero
+        eyebrow={business.category?.name ?? "Estabelecimento VUYELA"}
+        title={business.name}
+        description={business.description}
+        breadcrumbs={viewModel.breadcrumbs}
+        imageUrl={business.coverUrl}
+      />
+      <section className="marketplace-section marketplace-section--detail">
+        <div className="vy-container marketplace-detail-layout">
+          <article className="marketplace-detail">
+            <div className="marketplace-detail__identity">
+              <BusinessLogo business={business} />
+              <div>
+                <span>{business.category?.name ?? "Negocio VUYELA"}</span>
+                <h2>{business.name}</h2>
+                <p>
+                  {getBusinessCityLabel(business)} · {getProgramEarnRateLabel(business.program)}
+                </p>
+              </div>
+            </div>
+
+            <div className="marketplace-benefit-grid" aria-label="Beneficios publicados">
+              <BenefitTile
+                icon={<Gift size={20} />}
+                title={getProgramEarnRateLabel(business.program)}
+                body="Pontos promocionais acumulados no proprio negocio."
+              />
+              <BenefitTile
+                icon={<ShieldCheck size={20} />}
+                title={getPointValueLabel(business.program)}
+                body="O saldo tem valor promocional claro no emissor."
+              />
+              <BenefitTile
+                icon={<CalendarClock size={20} />}
+                title={getExpiryLabel(business.program)}
+                body="As regras publicadas ajudam o cliente a saber quando voltar."
+              />
+            </div>
+
+            <DetailSection title="Sobre">
+              <p>{business.description}</p>
+            </DetailSection>
+
+            {business.program?.terms ? (
+              <DetailSection title="Regras do programa">
+                <p>{business.program.terms}</p>
+              </DetailSection>
+            ) : null}
+
+            <DetailSection title="Filiais">
+              <div className="marketplace-branch-list">
+                {business.branches.map((branch) => (
+                  <article key={branch.id}>
+                    <h3>{branch.name}</h3>
+                    <p>
+                      {branch.addressLine ? `${branch.addressLine}, ` : ""}
+                      {branch.city}
+                      {branch.province ? `, ${branch.province}` : ""}
+                    </p>
+                    <div>
+                      {branch.phone ? (
+                        <a href={`tel:${branch.phone}`}>
+                          <Phone size={16} />
+                          {branch.phone}
+                        </a>
+                      ) : null}
+                      {branch.email ? (
+                        <a href={`mailto:${branch.email}`}>
+                          <Mail size={16} />
+                          {branch.email}
+                        </a>
+                      ) : null}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </DetailSection>
+
+            <DetailSection title="Perguntas frequentes">
+              <div className="marketplace-faq">
+                <details>
+                  <summary>Posso usar estes pontos noutro negocio?</summary>
+                  <p>Nao. Os pontos sao promocionais e pertencem ao negocio que os emitiu.</p>
+                </details>
+                <details>
+                  <summary>Os pontos podem ser levantados em dinheiro?</summary>
+                  <p>
+                    Nao. Pontos VUYELA nao sao saldo bancario, dinheiro electronico ou valor
+                    transferivel.
+                  </p>
+                </details>
+              </div>
+            </DetailSection>
+          </article>
+
+          <aside className="marketplace-detail-aside" aria-label="Resumo do estabelecimento">
+            <div className="marketplace-action-panel">
+              <h2>Adesao ao programa</h2>
+              <p>Entre ou crie uma conta para ver o seu cartao digital deste negocio.</p>
+              <Link className="marketplace-button marketplace-button--reward" href="/cadastrar">
+                Quero aderir
+                <ArrowRight size={18} />
+              </Link>
+              <Link className="marketplace-button marketplace-button--ghost" href="/entrar">
+                Ja tenho conta
+              </Link>
+            </div>
+
+            {primaryBranch ? (
+              <div className="marketplace-map-box">
+                <MapPin size={22} />
+                <h2>{primaryBranch.city}</h2>
+                <p>
+                  {primaryBranch.addressLine ?? primaryBranch.name}
+                  {primaryBranch.province ? `, ${primaryBranch.province}` : ""}
+                </p>
+                {business.websiteUrl ? (
+                  <a href={business.websiteUrl} rel="noreferrer" target="_blank">
+                    <Globe size={16} />
+                    Site do negocio
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
+          </aside>
+        </div>
+      </section>
+      <OffersBand offers={viewModel.relatedOffers} />
+      <RelatedBusinesses businesses={viewModel.relatedBusinesses} />
+    </main>
+  );
+}
+
+export function OfferDetailPage({ viewModel }: { viewModel: MarketplaceOfferViewModel }) {
+  return (
+    <main className="marketplace-page">
+      <MarketplaceHeader />
+      <MarketplaceHero
+        eyebrow="Oferta activa"
+        title={viewModel.offer.title}
+        description={viewModel.offer.description}
+        breadcrumbs={viewModel.breadcrumbs}
+        imageUrl={viewModel.business.coverUrl}
+      />
+      <section className="marketplace-section marketplace-section--detail">
+        <div className="vy-container marketplace-detail-layout">
+          <article className="marketplace-detail">
+            <div className="marketplace-detail__identity">
+              <BusinessLogo business={viewModel.business} />
+              <div>
+                <span>{viewModel.business.name}</span>
+                <h2>{viewModel.offer.title}</h2>
+                <p>{getOfferMeta(viewModel.offer)}</p>
+              </div>
+            </div>
+            <DetailSection title="Descricao da oferta">
+              <p>{viewModel.offer.description}</p>
+            </DetailSection>
+            <DetailSection title="Onde aproveitar">
+              <BusinessCard business={viewModel.business} />
+            </DetailSection>
+          </article>
+          <aside className="marketplace-detail-aside" aria-label="Acao da oferta">
+            <div className="marketplace-action-panel">
+              <h2>Ver estabelecimento</h2>
+              <p>Consulte as regras de pontos e as filiais onde esta oferta pode ser relevante.</p>
+              <Link
+                className="marketplace-button marketplace-button--reward"
+                href={`/estabelecimentos/${viewModel.business.slug}`}
+              >
+                Abrir perfil
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+          </aside>
+        </div>
+      </section>
+      <OffersBand offers={viewModel.relatedOffers} />
+    </main>
+  );
+}
+
+export function MarketplaceJsonLd({ data }: { data: Record<string, unknown> }) {
+  return (
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+  );
+}
+
+export function MarketplaceHeader() {
+  return (
+    <header className="marketplace-header">
+      <div className="vy-container marketplace-header__inner">
+        <Link className="marketplace-logo" href="/">
+          <span>VUYELA</span>
+          <small>by LEMOTE</small>
+        </Link>
+        <nav aria-label="Navegacao publica">
+          <Link href="/estabelecimentos">Estabelecimentos</Link>
+          <Link href="/categorias">Categorias</Link>
+          <Link href="/locais">Locais</Link>
+          <Link href="/ofertas">Ofertas</Link>
+        </nav>
+        <Link className="marketplace-header__cta" href="/entrar">
+          Entrar
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+export function MarketplaceHero({
+  eyebrow,
+  title,
+  description,
+  breadcrumbs,
+  imageUrl
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  breadcrumbs: MarketplaceBreadcrumb[];
+  imageUrl?: string | null;
+}) {
+  return (
+    <section className="marketplace-hero" aria-labelledby="marketplace-title">
+      {imageUrl ? (
+        <Image
+          className="marketplace-hero__image"
+          src={imageUrl}
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          sizes="100vw"
+          unoptimized
+        />
+      ) : null}
+      <div className="vy-container marketplace-hero__inner">
+        <Breadcrumbs items={breadcrumbs} />
+        <span>{eyebrow}</span>
+        <h1 id="marketplace-title">{title}</h1>
+        <p>{description}</p>
+        <div className="marketplace-hero__links" aria-label="Atalhos de descoberta">
+          <Link href="/estabelecimentos">Estabelecimentos</Link>
+          <Link href="/categorias">Categorias</Link>
+          <Link href="/locais">Locais</Link>
+          <Link href="/ofertas">Ofertas</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BusinessCard({ business }: { business: MarketplaceBusiness }) {
+  const primaryCity = getBusinessPrimaryCity(business) ?? "Mocambique";
+
+  return (
+    <article className="marketplace-business-card">
+      <Link href={`/estabelecimentos/${business.slug}`} aria-label={`Abrir ${business.name}`}>
+        <div className="marketplace-business-card__media">
+          {business.coverUrl ? (
+            <Image
+              src={business.coverUrl}
+              alt=""
+              fill
+              sizes="(max-width: 760px) 100vw, (max-width: 1080px) 50vw, 33vw"
+              unoptimized
+            />
+          ) : (
+            <BusinessLogo business={business} />
+          )}
+        </div>
+        <div className="marketplace-business-card__body">
+          <span>{business.category?.name ?? "Estabelecimento"}</span>
+          <h2>{business.name}</h2>
+          <p>{business.description}</p>
+          <div className="marketplace-business-card__meta">
+            <span>
+              <MapPin size={15} />
+              {primaryCity}
+            </span>
+            <span>
+              <Gift size={15} />
+              {getProgramEarnRateLabel(business.program)}
+            </span>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
+function BusinessLogo({ business }: { business: MarketplaceBusiness }) {
+  if (business.logoUrl) {
+    return (
+      <Image
+        className="marketplace-business-logo"
+        src={business.logoUrl}
+        alt=""
+        width={72}
+        height={72}
+        unoptimized
+      />
+    );
+  }
+
+  return (
+    <span className="marketplace-business-logo marketplace-business-logo--fallback">
+      {business.name.slice(0, 2).toLocaleUpperCase("pt-MZ")}
+    </span>
+  );
+}
+
+function OffersBand({ offers }: { offers: MarketplaceOffer[] }) {
+  if (offers.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      className="marketplace-section marketplace-section--offers"
+      aria-labelledby="offers-title"
+    >
+      <div className="vy-container">
+        <SectionHeader
+          eyebrow="Ofertas"
+          title="Ofertas publicas activas"
+          description="Promocoes publicadas pelos negocios participantes."
+          id="offers-title"
+        />
+        <div className="marketplace-offer-grid">
+          {offers.map((offer) => (
+            <OfferCard offer={offer} key={offer.id} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function OfferCard({ offer }: { offer: MarketplaceOffer }) {
+  const href = offer.uniquePublicSlug
+    ? `/ofertas/${offer.slug}`
+    : `/estabelecimentos/${offer.businessSlug}`;
+
+  return (
+    <article className="marketplace-offer-card">
+      <Link href={href}>
+        <span>
+          <Tag size={16} />
+          {offer.categoryName ?? "Oferta VUYELA"}
+        </span>
+        <h3>{offer.title}</h3>
+        <p>{offer.description}</p>
+        <small>{offer.businessName}</small>
+      </Link>
+    </article>
+  );
+}
+
+function MarketplaceFacetSection({
+  title,
+  items
+}: {
+  title: string;
+  items: Array<{ href: string; label: string; meta: string }>;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <section>
+      <h2>{title}</h2>
+      <div>
+        {items.map((item) => (
+          <Link href={item.href} key={item.href}>
+            <span>{item.label}</span>
+            <small>{item.meta}</small>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RelatedBusinesses({ businesses }: { businesses: MarketplaceBusiness[] }) {
+  if (businesses.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="marketplace-section" aria-labelledby="related-businesses-title">
+      <div className="vy-container">
+        <SectionHeader
+          eyebrow="Tambem pode gostar"
+          title="Estabelecimentos relacionados"
+          description="Outras opcoes com beneficios VUYELA."
+          id="related-businesses-title"
+        />
+        <div className="marketplace-business-grid marketplace-business-grid--compact">
+          {businesses.map((business) => (
+            <BusinessCard business={business} key={business.id} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BenefitTile({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
+  return (
+    <article>
+      {icon}
+      <h3>{title}</h3>
+      <p>{body}</p>
+    </article>
+  );
+}
+
+function DetailSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="marketplace-detail-section">
+      <h2>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  id
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  id: string;
+}) {
+  return (
+    <div className="marketplace-section-header">
+      <span>{eyebrow}</span>
+      <h2 id={id}>{title}</h2>
+      <p>{description}</p>
+    </div>
+  );
+}
+
+function Breadcrumbs({ items }: { items: MarketplaceBreadcrumb[] }) {
+  return (
+    <nav className="marketplace-breadcrumbs" aria-label="Breadcrumb">
+      <ol>
+        {items.map((item, index) => (
+          <li key={item.path}>
+            {index < items.length - 1 ? (
+              <Link href={item.path}>{item.name}</Link>
+            ) : (
+              <span>{item.name}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
+function MarketplaceEmptyState() {
+  return (
+    <div className="marketplace-empty">
+      <Store size={24} />
+      <h2>Conteudo publico em preparacao</h2>
+      <p>
+        Assim que houver estabelecimentos activos com categoria, programa de pontos e filial
+        publicada, esta pagina passa a ser indexavel.
+      </p>
+      <Link className="marketplace-button marketplace-button--reward" href="/onboarding/negocio">
+        Cadastrar negocio
+      </Link>
+    </div>
+  );
+}
+
+function getOfferMeta(offer: MarketplaceOffer): string {
+  const pieces = [offer.businessName];
+
+  if (offer.city) {
+    pieces.push(offer.city);
+  }
+
+  if (offer.endsAt) {
+    pieces.push(`activa ate ${new Date(offer.endsAt).toLocaleDateString("pt-MZ")}`);
+  }
+
+  return pieces.join(" · ");
+}

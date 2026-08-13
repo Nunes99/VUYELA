@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   ArrowRight,
   CheckCircle2,
@@ -47,6 +48,7 @@ const navLinks = [
   { href: "#como-funciona", label: "Como funciona" },
   { href: "#clientes", label: "Para clientes" },
   { href: "#negocios", label: "Para negocios" },
+  { href: "/estabelecimentos", label: "Estabelecimentos" },
   { href: "#precos", label: "Precos" },
   { href: "#faq", label: "FAQ" }
 ];
@@ -194,6 +196,13 @@ export default function HomePage() {
                   <Store size={18} />
                   Sou um negocio
                 </a>
+                <Link
+                  className="home-link-button home-link-button--outline"
+                  href="/estabelecimentos"
+                >
+                  <MapPin size={18} />
+                  Explorar beneficios
+                </Link>
               </div>
               <ul className="home-trust-list" aria-label="Indicadores de confianca">
                 {trustIndicators.map((item) => (
@@ -303,6 +312,12 @@ export default function HomePage() {
                   <p>{benefit}</p>
                 </article>
               ))}
+            </div>
+            <div className="home-marketplace-links" aria-label="Links de descoberta publica">
+              <Link href="/estabelecimentos">Ver estabelecimentos</Link>
+              <Link href="/categorias">Explorar categorias</Link>
+              <Link href="/locais">Explorar locais</Link>
+              <Link href="/ofertas">Ver ofertas activas</Link>
             </div>
           </div>
         </section>

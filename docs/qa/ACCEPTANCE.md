@@ -160,3 +160,17 @@ A feature is complete only when:
 - static integration tests cover the dashboard RPC permission and mutation contract;
 - E2E covers the protected business dashboard route fallback;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 11 SEO Marketplace Acceptance
+
+- public discovery routes exist for establishments, business detail pages, categories, cities, city/category combinations, and active offers;
+- pages are server-rendered and backed by public Supabase/RLS reads rather than hard-coded marketplace data;
+- indexable pages include title, description, canonical URL, OpenGraph metadata, structured internal links, and relevant structured data;
+- empty list pages use `noindex`;
+- missing, duplicate, or low-value dynamic pages return 404;
+- sitemap includes the homepage and meaningful public marketplace URLs only;
+- dashboards, POS, admin, auth internals, and low-value generated combinations are excluded from the sitemap;
+- offer detail pages are indexable only when the active public offer slug is unique across the marketplace;
+- public pages do not read private customer, wallet, ledger, transaction, membership, subscription, audit, support, or fraud data;
+- E2E covers the public marketplace empty-state fallback when Supabase is not configured;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

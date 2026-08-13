@@ -93,6 +93,26 @@ It includes:
 
 Branch managers receive branch-scoped data. Business admins and owners can view whole-business metrics and branch-specific views.
 
+## Public Marketplace
+
+The public marketplace is server-rendered and SEO-first.
+
+It includes:
+
+- `/estabelecimentos`;
+- `/estabelecimentos/[slug]`;
+- `/categorias`;
+- `/categorias/[slug]`;
+- `/locais`;
+- `/locais/[cidade]`;
+- `/locais/[cidade]/[categoria]`;
+- `/ofertas`;
+- `/ofertas/[slug]`.
+
+Only active public records are rendered. Business detail pages require a public active business with description, category, active loyalty program, and at least one active branch. Category and city pages are indexable only when they have establishments. City/category combinations require a higher threshold to avoid thin duplicate pages. Offer detail pages use `/ofertas/[slug]` only when the active public offer slug is unique across the public marketplace; otherwise offers link back to the establishment profile.
+
+Public pages show benefits, points and MZN promotional equivalent where relevant, locations, contacts, active offers, join CTAs, FAQs, metadata, OpenGraph, breadcrumbs, and structured data.
+
 ## Content Language
 
 Portuguese is the primary product language. Copy should be simple, direct, and clear about the promotional nature of points.

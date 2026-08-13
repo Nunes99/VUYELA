@@ -6,6 +6,8 @@ VUYELA is a hybrid-rendered SaaS/PWA built with Next.js, React, TypeScript, Supa
 
 The public surface is SEO-first and should use static generation or server rendering. Authenticated areas such as the customer dashboard, business dashboard, POS, cards, campaigns, and analytics can use client-side interactivity where it improves the workflow.
 
+Public marketplace pages use server rendering with anon Supabase reads. Sitemap and metadata generation share the same indexability rules so empty, duplicate, or low-value generated pages are not published.
+
 ## Repository Foundation Decisions
 
 - The existing `vuyela-design-system` package is preserved as a workspace package.
@@ -75,3 +77,4 @@ The Supabase service-role key must never be exposed to browser code. Balance-cha
 - Confirm initial deployment target and Vercel project settings.
 - Confirm whether phone + OTP or email + password is the first authentication flow to ship.
 - Confirm future commercial limits around configurable point value; the database and engine already default to `1 point = 1 MZN` while allowing per-business configuration.
+- Confirm the future canonical URL shape for offer slugs if offers need to remain unique per business rather than globally.
