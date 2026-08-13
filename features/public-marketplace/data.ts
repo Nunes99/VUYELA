@@ -4,6 +4,12 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 
 import {
+  buildMarketplaceSearch,
+  parseMarketplaceSearchParams,
+  type SearchParamRecord
+} from "./search";
+import type { MarketplaceSearchViewModel } from "./search";
+import {
   buildBusinessDetail,
   buildCategoryList,
   buildCategoriesIndex,
@@ -17,6 +23,8 @@ import {
   normalizeCityName
 } from "./model";
 import type {
+  BranchOpeningHours,
+  BranchOpeningPeriod,
   MarketplaceBranch,
   MarketplaceBusiness,
   MarketplaceCategory,
@@ -62,6 +70,8 @@ interface BranchRow {
   latitude: number | string | null;
   longitude: number | string | null;
   is_primary: boolean;
+  opening_hours: unknown;
+  timezone: string | null;
 }
 
 interface ProgramRow {
@@ -126,7 +136,7 @@ export async function getPublicMarketplaceSnapshot(): Promise<PublicMarketplaceS
     supabase
       .from("branches")
       .select(
-        "id, business_id, slug, name, phone, email, address_line, city, province, latitude, longitude, is_primary"
+        "id, business_id, slug, name, phone, email, address_line, city, province, latitude, longitude, is_primary, opening_hours, timezone"
       )
       .eq("is_active", true)
       .order("is_primary", { ascending: false })
@@ -246,6 +256,15 @@ export async function getOfferPage(slug: string): Promise<MarketplaceOfferViewMo
   return buildOfferDetail(state.snapshot, slug);
 }
 
+export async function getMarketplaceSearchPage(
+  searchParams: SearchParamRecord
+): Promise<MarketplaceSearchViewModel> {
+  const state = await getPublicMarketplaceSnapshot();
+  const params = parseMarketplaceSearchParams(searchParams);
+
+  return buildMarketplaceSearch(state.snapshot, params);
+}
+
 function mapCategory(row: CategoryRow): MarketplaceCategory {
   return {
     id: row.id,
@@ -295,7 +314,9 @@ function mapBranch(row: BranchRow): MarketplaceBranch {
     email: row.email?.trim() || null,
     latitude: toNullableNumber(row.latitude),
     longitude: toNullableNumber(row.longitude),
-    isPrimary: row.is_primary
+    isPrimary: row.is_primary,
+    openingHours: mapOpeningHours(row.opening_hours),
+    timezone: row.timezone?.trim() || "Africa/Maputo"
   };
 }
 
@@ -372,4 +393,61 @@ function toNullableNumber(value: number | string | null): number | null {
   const parsed = toNumber(value);
 
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+const weekdays = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday"
+] as const;
+
+function mapOpeningHours(value: unknown): BranchOpeningHours | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const source = value as Record<string, unknown>;
+  const openingHours: BranchOpeningHours = {};
+
+  for (const weekday of weekdays) {
+    const periods = source[weekday];
+
+    if (!Array.isArray(periods)) {
+      continue;
+    }
+
+    const mappedPeriods = periods
+      .map(mapOpeningPeriod)
+      .filter((period): period is BranchOpeningPeriod => period !== null);
+
+    if (mappedPeriods.length > 0) {
+      openingHours[weekday] = mappedPeriods;
+    }
+  }
+
+  return Object.keys(openingHours).length > 0 ? openingHours : null;
+}
+
+function mapOpeningPeriod(value: unknown): BranchOpeningPeriod | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const period = value as Record<string, unknown>;
+  const open = typeof period.open === "string" ? period.open : "";
+  const close = typeof period.close === "string" ? period.close : "";
+
+  if (!isTime(open) || !isTime(close)) {
+    return null;
+  }
+
+  return { open, close };
+}
+
+function isTime(value: string): boolean {
+  return /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(value);
 }

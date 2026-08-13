@@ -113,6 +113,23 @@ Only active public records are rendered. Business detail pages require a public 
 
 Public pages show benefits, points and MZN promotional equivalent where relevant, locations, contacts, active offers, join CTAs, FAQs, metadata, OpenGraph, breadcrumbs, and structured data.
 
+## Public Search
+
+The public search page `/pesquisar` helps visitors find establishments and offers without creating unlimited SEO pages.
+
+Supported filters:
+
+- text query;
+- category;
+- city;
+- establishments with active offers;
+- location when the visitor grants browser location permission;
+- open-now status only when branches publish opening hours.
+
+Search URLs are shareable, for example `/pesquisar?q=cafe&city=maputo&ofertas=1`, but they are not indexable. When a filter combination has SEO value, the UI points visitors to the canonical category, city, city/category, or offers pages instead.
+
+Open status is never inferred when opening hours are absent. Branches can publish optional weekly `opening_hours`; an empty value means the open state is unknown.
+
 ## Content Language
 
 Portuguese is the primary product language. Copy should be simple, direct, and clear about the promotional nature of points.

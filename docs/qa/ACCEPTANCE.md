@@ -174,3 +174,19 @@ A feature is complete only when:
 - public pages do not read private customer, wallet, ledger, transaction, membership, subscription, audit, support, or fraud data;
 - E2E covers the public marketplace empty-state fallback when Supabase is not configured;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 12 Search Acceptance
+
+- `/pesquisar` exists for public establishment and offer search;
+- search supports text query, category, city, active-offer filtering, location ordering when permission exists, and open-now filtering where branch opening-hour data supports it;
+- search reads the same public marketplace data boundary and does not access private customer, wallet, ledger, transaction, membership, subscription, audit, support, or fraud data;
+- browser location is requested only by explicit user action and is not persisted by the search feature;
+- search URLs are shareable through query parameters;
+- search query URLs are `noindex, follow` with canonical `/pesquisar`;
+- sitemap does not include query parameter combinations;
+- filters with SEO value link to canonical category, city, city/category, or offers pages;
+- open-now status is unknown when opening hours are absent and must not be inferred;
+- unit tests cover parsing, filtering, distance ordering, and open-now evaluation;
+- static integration tests cover search SEO and opening-hour database contract;
+- E2E covers public search fallback without Supabase;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

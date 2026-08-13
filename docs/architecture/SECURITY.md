@@ -84,6 +84,8 @@ Marketplace pages render only active public records from marketplace-safe tables
 
 Private customer, wallet, ledger, transaction, membership, campaign audience, subscription, audit, support, and fraud data is not queried by the marketplace feature. Low-value dynamic pages return 404 or `noindex` instead of exposing thin duplicate pages.
 
+The public search page uses the same anon/RLS read boundary. Browser geolocation is requested only by an explicit client-side button and sent as query coordinates for ordering; it is not persisted by the search feature. Search URLs are shareable but `noindex` to avoid unbounded crawlable combinations.
+
 ## Test Areas
 
 Security tests must cover:

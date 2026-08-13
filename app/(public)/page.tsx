@@ -196,10 +196,7 @@ export default function HomePage() {
                   <Store size={18} />
                   Sou um negocio
                 </a>
-                <Link
-                  className="home-link-button home-link-button--outline"
-                  href="/estabelecimentos"
-                >
+                <Link className="home-link-button home-link-button--outline" href="/pesquisar">
                   <MapPin size={18} />
                   Explorar beneficios
                 </Link>
@@ -318,6 +315,7 @@ export default function HomePage() {
               <Link href="/categorias">Explorar categorias</Link>
               <Link href="/locais">Explorar locais</Link>
               <Link href="/ofertas">Ver ofertas activas</Link>
+              <Link href="/pesquisar">Pesquisar beneficios</Link>
             </div>
           </div>
         </section>

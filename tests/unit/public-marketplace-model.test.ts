@@ -63,7 +63,9 @@ function business(
         email: null,
         latitude: null,
         longitude: null,
-        isPrimary: true
+        isPrimary: true,
+        openingHours: null,
+        timezone: "Africa/Maputo"
       }
     ],
     offers: [],
@@ -118,7 +120,9 @@ describe("public marketplace model", () => {
               email: null,
               latitude: null,
               longitude: null,
-              isPrimary: true
+              isPrimary: true,
+              openingHours: null,
+              timezone: "Africa/Maputo"
             }
           ]
         })

@@ -70,3 +70,23 @@ Every indexable marketplace page has canonical metadata, OpenGraph metadata, bre
 - `Offer` for unique active offer pages.
 
 The sitemap includes only meaningful public marketplace URLs and excludes dashboards, POS, admin, auth internals, and low-value generated combinations.
+
+## Search SEO
+
+FASE 12 adds `/pesquisar` for establishment and offer search.
+
+Search supports:
+
+- text query;
+- category;
+- city;
+- active-offer filter;
+- browser-provided location coordinates;
+- open-now filter when public branch opening hours exist.
+
+Search result URLs are shareable but always `noindex, follow` with canonical `/pesquisar`. Query parameter combinations are not added to the sitemap. When a filter has durable SEO value, search links to the canonical marketplace route instead:
+
+- category pages under `/categorias/[slug]`;
+- city pages under `/locais/[cidade]`;
+- city/category pages under `/locais/[cidade]/[categoria]`;
+- offers index under `/ofertas`.

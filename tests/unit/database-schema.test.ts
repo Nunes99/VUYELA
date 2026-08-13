@@ -7,6 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/202608130001_initial_schema.sql"),
   "utf8"
 );
+const searchMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/202608130006_branch_opening_hours.sql"),
+  "utf8"
+);
 
 const requiredTables = [
   "profiles",
@@ -108,5 +112,12 @@ describe("initial database schema migration", () => {
   it("leaves RLS policy implementation to the next phase", () => {
     expect(migration).not.toMatch(/create policy/i);
     expect(migration).not.toMatch(/enable row level security/i);
+  });
+
+  it("adds optional public branch opening hours for search", () => {
+    expect(searchMigration).toContain("alter table public.branches");
+    expect(searchMigration).toContain("opening_hours jsonb not null default '{}'::jsonb");
+    expect(searchMigration).toContain("timezone text not null default 'Africa/Maputo'");
+    expect(searchMigration).toContain("branches_opening_hours_object");
   });
 });

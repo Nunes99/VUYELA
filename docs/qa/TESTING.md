@@ -102,6 +102,20 @@ Phase 11 includes tests that verify:
 - SEO helpers produce canonical metadata, robots directives, OpenGraph, breadcrumbs, item lists, local business, offer, and FAQ structured data;
 - `/estabelecimentos` renders a public empty-state fallback when Supabase is not configured.
 
+## Current Public Search Coverage
+
+Phase 12 includes tests that verify:
+
+- shareable search params are parsed safely;
+- text, category, city, and active-offer filters work together;
+- offers are included in business text search;
+- distance ordering uses browser-provided coordinates without persistence;
+- open-now filtering only uses public opening-hour data;
+- `/pesquisar` is `noindex, follow` with canonical `/pesquisar`;
+- sitemap excludes query parameter combinations;
+- the branch opening-hours migration keeps missing hours as unknown;
+- `/pesquisar` renders a public fallback with filters when Supabase is not configured.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:

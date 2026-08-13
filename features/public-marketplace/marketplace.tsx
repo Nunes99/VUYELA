@@ -29,6 +29,8 @@ import type {
   MarketplaceOffer,
   MarketplaceOfferViewModel
 } from "./model";
+import { LocationSearchButton } from "./location-search-button";
+import type { MarketplaceSearchViewModel } from "./search";
 
 export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListViewModel }) {
   return (
@@ -282,6 +284,165 @@ export function OfferDetailPage({ viewModel }: { viewModel: MarketplaceOfferView
   );
 }
 
+export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSearchViewModel }) {
+  const resultCount = viewModel.businesses.length + viewModel.offers.length;
+
+  return (
+    <main className="marketplace-page">
+      <MarketplaceHeader />
+      <MarketplaceHero
+        eyebrow="Busca publica"
+        title={viewModel.title}
+        description={viewModel.description}
+        breadcrumbs={[
+          { name: "Inicio", path: "/" },
+          { name: "Pesquisar", path: "/pesquisar" }
+        ]}
+      />
+      <section className="marketplace-section" aria-labelledby="marketplace-search-title">
+        <div className="vy-container marketplace-search-layout">
+          <aside className="marketplace-search-panel" aria-label="Filtros de busca">
+            <form action="/pesquisar" className="marketplace-filter-form">
+              <div>
+                <label htmlFor="search-q">Texto</label>
+                <input
+                  defaultValue={viewModel.params.q}
+                  id="search-q"
+                  maxLength={80}
+                  name="q"
+                  placeholder="Nome, oferta ou bairro"
+                  type="search"
+                />
+              </div>
+              <div>
+                <label htmlFor="search-category">Categoria</label>
+                <select
+                  defaultValue={viewModel.params.category}
+                  id="search-category"
+                  name="category"
+                >
+                  <option value="">Todas</option>
+                  {viewModel.categories.map((category) => (
+                    <option key={category.slug} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="search-city">Cidade</label>
+                <select defaultValue={viewModel.params.city} id="search-city" name="city">
+                  <option value="">Todas</option>
+                  {viewModel.cities.map((city) => (
+                    <option key={city.slug} value={city.slug}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <label className="marketplace-filter-check">
+                <input
+                  defaultChecked={viewModel.params.offersOnly}
+                  name="ofertas"
+                  type="checkbox"
+                  value="1"
+                />
+                <span>Com ofertas activas</span>
+              </label>
+              <label
+                className={
+                  viewModel.supportsOpenNow
+                    ? "marketplace-filter-check"
+                    : "marketplace-filter-check marketplace-filter-check--disabled"
+                }
+              >
+                <input
+                  defaultChecked={viewModel.params.openNow && viewModel.supportsOpenNow}
+                  disabled={!viewModel.supportsOpenNow}
+                  name="aberto"
+                  type="checkbox"
+                  value="1"
+                />
+                <span>Aberto agora</span>
+              </label>
+              {viewModel.params.latitude !== null && viewModel.params.longitude !== null ? (
+                <>
+                  <input name="lat" type="hidden" value={viewModel.params.latitude.toFixed(5)} />
+                  <input name="lng" type="hidden" value={viewModel.params.longitude.toFixed(5)} />
+                </>
+              ) : null}
+              <button className="marketplace-button marketplace-button--reward" type="submit">
+                Filtrar resultados
+              </button>
+            </form>
+            <LocationSearchButton />
+            {viewModel.activeFilters.length > 0 ? (
+              <div className="marketplace-active-filters" aria-label="Filtros activos">
+                {viewModel.activeFilters.map((filter) => (
+                  <Link href={filter.href} key={`${filter.key}-${filter.label}`}>
+                    {filter.label}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+            {viewModel.seoLinks.length > 0 ? (
+              <div className="marketplace-seo-links">
+                <h2>Paginas relacionadas</h2>
+                {viewModel.seoLinks.map((link) => (
+                  <Link href={link.href} key={link.href}>
+                    <span>{link.label}</span>
+                    <small>{link.description}</small>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+          </aside>
+          <div className="marketplace-search-results">
+            <SectionHeader
+              eyebrow="Resultados"
+              title={
+                resultCount > 0
+                  ? `${resultCount.toLocaleString("pt-MZ")} resultados encontrados`
+                  : "Sem resultados para estes filtros"
+              }
+              description={
+                viewModel.supportsLocation
+                  ? "Resultados com coordenadas publicadas aparecem ordenados por proximidade."
+                  : "Use filtros ou permita localizacao para refinar os resultados publicos."
+              }
+              id="marketplace-search-title"
+            />
+            {viewModel.businesses.length > 0 ? (
+              <div className="marketplace-business-grid">
+                {viewModel.businesses.map((business) => (
+                  <BusinessCard business={business} key={business.id} />
+                ))}
+              </div>
+            ) : (
+              <MarketplaceNoSearchResults />
+            )}
+            {viewModel.offers.length > 0 ? (
+              <div className="marketplace-search-offers">
+                <SectionHeader
+                  eyebrow="Ofertas"
+                  title="Ofertas encontradas"
+                  description="Ofertas publicas que combinam com a sua busca."
+                  id="marketplace-search-offers-title"
+                />
+                <div className="marketplace-offer-grid">
+                  {viewModel.offers.map((offer) => (
+                    <OfferCard offer={offer} key={offer.id} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export function MarketplaceJsonLd({ data }: { data: Record<string, unknown> }) {
   return (
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
@@ -301,6 +462,7 @@ export function MarketplaceHeader() {
           <Link href="/categorias">Categorias</Link>
           <Link href="/locais">Locais</Link>
           <Link href="/ofertas">Ofertas</Link>
+          <Link href="/pesquisar">Pesquisar</Link>
         </nav>
         <Link className="marketplace-header__cta" href="/entrar">
           Entrar
@@ -347,14 +509,19 @@ export function MarketplaceHero({
           <Link href="/categorias">Categorias</Link>
           <Link href="/locais">Locais</Link>
           <Link href="/ofertas">Ofertas</Link>
+          <Link href="/pesquisar">Pesquisar</Link>
         </div>
       </div>
     </section>
   );
 }
 
-function BusinessCard({ business }: { business: MarketplaceBusiness }) {
+export function BusinessCard({ business }: { business: MarketplaceBusiness }) {
   const primaryCity = getBusinessPrimaryCity(business) ?? "Mocambique";
+  const searchBusiness = business as MarketplaceBusiness & {
+    distanceKm?: number | null;
+    isOpenNow?: boolean | null;
+  };
 
   return (
     <article className="marketplace-business-card">
@@ -379,11 +546,15 @@ function BusinessCard({ business }: { business: MarketplaceBusiness }) {
           <div className="marketplace-business-card__meta">
             <span>
               <MapPin size={15} />
-              {primaryCity}
+              {searchBusiness.distanceKm !== undefined && searchBusiness.distanceKm !== null
+                ? `${searchBusiness.distanceKm.toLocaleString("pt-MZ")} km`
+                : primaryCity}
             </span>
             <span>
               <Gift size={15} />
-              {getProgramEarnRateLabel(business.program)}
+              {searchBusiness.isOpenNow === true
+                ? "Aberto agora"
+                : getProgramEarnRateLabel(business.program)}
             </span>
           </div>
         </div>
@@ -440,7 +611,7 @@ function OffersBand({ offers }: { offers: MarketplaceOffer[] }) {
   );
 }
 
-function OfferCard({ offer }: { offer: MarketplaceOffer }) {
+export function OfferCard({ offer }: { offer: MarketplaceOffer }) {
   const href = offer.uniquePublicSlug
     ? `/ofertas/${offer.slug}`
     : `/estabelecimentos/${offer.businessSlug}`;
@@ -578,6 +749,19 @@ function MarketplaceEmptyState() {
       </p>
       <Link className="marketplace-button marketplace-button--reward" href="/onboarding/negocio">
         Cadastrar negocio
+      </Link>
+    </div>
+  );
+}
+
+function MarketplaceNoSearchResults() {
+  return (
+    <div className="marketplace-empty">
+      <Store size={24} />
+      <h2>Nenhum resultado encontrado</h2>
+      <p>Remova algum filtro ou procure por outra cidade, categoria, negocio ou oferta.</p>
+      <Link className="marketplace-button marketplace-button--ghost" href="/pesquisar">
+        Limpar busca
       </Link>
     </div>
   );

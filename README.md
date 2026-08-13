@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 11 — SEO marketplace**.
+This repository has completed **FASE 12 — Search**.
 
 Completed foundation work includes:
 
@@ -32,8 +32,9 @@ Completed foundation work includes:
 - low-friction POS flow for identifying customers, calculating earn/redeem results, confirming customer authorization, and writing transactions through loyalty RPCs with duplicate-submission protection
 - business dashboard with overview, customers, transactions, points, campaigns, program, branches, employees, reports, settings, liability, and retention metrics
 - public marketplace discovery pages for establishments, business profiles, categories, cities, city/category combinations, active offers, SEO metadata, structured data, and sitemap inclusion only for meaningful indexable pages
+- public establishment and offer search with text, category, city, active-offer, location, and open-now filters where branch data supports them, using shareable noindex URLs
 
-Product features such as search, campaign mutation workflows, and advanced analytics are intentionally not implemented yet.
+Product features such as campaign mutation workflows and advanced analytics are intentionally not implemented yet.
 
 ## Scripts
 

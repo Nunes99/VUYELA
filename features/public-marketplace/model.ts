@@ -41,6 +41,23 @@ export interface MarketplaceBranch {
   latitude: number | null;
   longitude: number | null;
   isPrimary: boolean;
+  openingHours: BranchOpeningHours | null;
+  timezone: string;
+}
+
+export interface BranchOpeningHours {
+  monday?: BranchOpeningPeriod[];
+  tuesday?: BranchOpeningPeriod[];
+  wednesday?: BranchOpeningPeriod[];
+  thursday?: BranchOpeningPeriod[];
+  friday?: BranchOpeningPeriod[];
+  saturday?: BranchOpeningPeriod[];
+  sunday?: BranchOpeningPeriod[];
+}
+
+export interface BranchOpeningPeriod {
+  open: string;
+  close: string;
 }
 
 export interface MarketplaceOffer {

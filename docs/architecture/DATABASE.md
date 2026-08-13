@@ -12,11 +12,12 @@ supabase/migrations/202608130002_row_level_security.sql
 supabase/migrations/202608130003_loyalty_engine_rpc.sql
 supabase/migrations/202608130004_pos_card_lookup.sql
 supabase/migrations/202608130005_business_dashboard_rpc.sql
+supabase/migrations/202608130006_branch_opening_hours.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
 
-FASE 11 does not require a new migration. It uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers.
+FASE 11 uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers. FASE 12 adds optional public branch opening hours for search.
 
 ## Core Tables
 
@@ -239,3 +240,20 @@ Marketplace SEO pages read the public tables already prepared by the initial sch
 - `offers`.
 
 The application only renders establishments that have meaningful public content: active business status, description, category, active loyalty program, and at least one active branch. Offer detail pages are only generated when an active public offer slug is unique across the marketplace, because the database enforces offer slug uniqueness per business rather than globally.
+
+## Branch Opening Hours
+
+FASE 12 adds optional public opening-hour fields to `branches`:
+
+- `opening_hours jsonb not null default '{}'`;
+- `timezone text not null default 'Africa/Maputo'`.
+
+`opening_hours` is a weekly object keyed by weekday with periods such as:
+
+```json
+{
+  "monday": [{ "open": "08:00", "close": "18:00" }]
+}
+```
+
+An empty object means the open status is unknown. Public search filters by open-now only when at least one branch has valid opening-hour data.

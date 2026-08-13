@@ -69,3 +69,17 @@ The marketplace data boundary in `features/public-marketplace/data.ts` reads onl
 - active public `offers`.
 
 The model layer builds indexable snapshots for establishments, business detail pages, categories, cities, city/category combinations, active offers, canonical paths, and sitemap entries. No public marketplace route mutates loyalty state or reads private customer, wallet, transaction, membership, campaign audience, subscription, audit, or employee-only data.
+
+## Public Search Reads
+
+FASE 12 adds `/pesquisar` on top of the same public marketplace snapshot.
+
+Search supports:
+
+- text over business, branch, category, and offer content;
+- category and city filters;
+- active-offer filtering;
+- location ordering when the browser supplies coordinates;
+- open-now filtering only for branches with public `opening_hours`.
+
+Search query URLs are shareable but use `noindex, follow` and canonical `/pesquisar` so arbitrary filter combinations do not become crawlable pages. Filters with SEO value link back to canonical marketplace pages.
