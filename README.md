@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 03 — Database**.
+This repository has completed **FASE 04 — RLS**.
 
 Completed foundation work includes:
 
@@ -24,8 +24,9 @@ Completed foundation work includes:
 - reusable VUYELA design-system foundations
 - responsive public homepage with SEO metadata
 - initial Supabase schema migration with tenant fields, constraints, indexes, and append-only point ledger protection
+- Row Level Security migration for customer, business, branch, and public marketplace access
 
-Product features such as POS, dashboards, authentication, RLS policies, marketplace data, and the loyalty engine are intentionally not implemented yet.
+Product features such as POS, dashboards, authentication/onboarding, marketplace data, and the loyalty engine are intentionally not implemented yet.
 
 ## Scripts
 

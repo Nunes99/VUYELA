@@ -54,3 +54,17 @@ A feature is complete only when:
 - RLS policies are intentionally left for Phase 04;
 - database architecture documentation is updated;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 04 RLS Acceptance
+
+- dedicated RLS migration exists after the initial schema migration;
+- RLS is enabled for all private and tenant-sensitive tables;
+- customer policies restrict private card, wallet, ledger, transaction, notification, referral, and support-ticket access to the owning customer;
+- tenant policies restrict business-owned private records to active members of the same business;
+- cashier transaction access is scoped to the assigned business/branch;
+- marketplace-safe public tables expose only active public records;
+- platform support/admin roles do not receive direct client-side RLS bypasses;
+- point wallet, point ledger, and transaction writes remain unavailable to browser-authenticated roles;
+- automated tests prove the required customer, tenant, cashier, platform-admin, and sensitive-write policy invariants;
+- security and database architecture documentation is updated;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

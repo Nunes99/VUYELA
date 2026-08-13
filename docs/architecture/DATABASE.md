@@ -4,13 +4,14 @@
 
 Supabase PostgreSQL is the system of record. Schema changes must be implemented through migrations under `supabase/migrations`.
 
-The initial schema lives in:
+The initial schema and RLS migrations live in:
 
 ```text
 supabase/migrations/202608130001_initial_schema.sql
+supabase/migrations/202608130002_row_level_security.sql
 ```
 
-FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and tenant-isolation tests.
+FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests.
 
 ## Core Tables
 
@@ -147,13 +148,31 @@ The initial migration includes:
 - one active-like subscription per business;
 - lookup indexes on tenant, status, date, and FK fields.
 
-## RLS Boundary
+## RLS Model
 
-RLS is intentionally not implemented in FASE 03. The schema prepares for FASE 04 by carrying tenant fields and role enums, but access policies and automated isolation proofs belong to the next phase.
+RLS is implemented in `202608130002_row_level_security.sql`.
 
-FASE 04 must prove:
+Policy helpers use `SECURITY DEFINER`, fixed `search_path`, and `auth.uid()` to evaluate:
+
+- active business membership;
+- business admin/owner management access;
+- branch-scoped access for branch managers and cashiers;
+- customer card ownership;
+- transaction access through card ownership or assigned branch/business access.
+
+The current policy model proves:
 
 - customers cannot access another customer's private wallet;
 - business A cannot access business B;
 - cashier access is limited to assigned business/branch;
 - platform admin access uses privileged server-side paths only.
+
+There is no direct client-side RLS bypass for `support_agent`, `platform_admin`, or `super_admin`. Platform support/admin flows must use audited server-side service-role paths.
+
+Sensitive loyalty writes remain unavailable to browser-authenticated roles:
+
+- `point_wallets` writes;
+- `point_ledger` writes;
+- `transactions` writes.
+
+Future transactional RPC functions must own those mutations and maintain wallet/ledger consistency.
