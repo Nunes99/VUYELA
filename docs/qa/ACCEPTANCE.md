@@ -112,3 +112,16 @@ A feature is complete only when:
 - unit tests cover card view-model calculations and QR privacy;
 - E2E covers the protected customer-card route fallback;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 08 Customer Dashboard Acceptance
+
+- `/cliente` is a mobile-first customer dashboard, not a placeholder;
+- navigation includes Inicio, Cartoes, Explorar, Actividade, and Perfil;
+- populated dashboard state uses real Supabase/RLS reads for cards, offers, transactions, and profile summary;
+- loading, empty, error, and populated states exist;
+- no demo customer dashboard data is used outside seed environments;
+- points and MZN equivalent are shown together where relevant;
+- private customer data is rendered from server-side queries, not browser direct mutations;
+- unit tests cover dashboard summary and activity mapping;
+- E2E covers the protected dashboard route fallback;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

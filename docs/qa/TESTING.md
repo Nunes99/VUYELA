@@ -61,6 +61,15 @@ Phase 07 includes tests that verify:
 - identification QR codes omit balance and MZN values;
 - `/cliente` keeps a stable protected-route fallback when Supabase is not configured.
 
+## Current Customer Dashboard Coverage
+
+Phase 08 includes tests that verify:
+
+- dashboard totals summarize points, MZN equivalent, and active card count;
+- activity rows produce clear earn/redeem/neutral copy and signed point movement;
+- `/cliente` remains stable in protected-route fallback mode;
+- E2E runs serially to avoid `next dev` cold-compile navigation flakes.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:

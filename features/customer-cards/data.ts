@@ -168,11 +168,11 @@ function isRenderableCardRow(
   return row.status === "active" || row.status === "blocked" || row.status === "archived";
 }
 
-function rowsFrom<T>(rows: unknown): T[] {
+export function rowsFrom<T>(rows: unknown): T[] {
   return Array.isArray(rows) ? (rows as T[]) : [];
 }
 
-function rowFrom<T>(row: unknown): T | null {
+export function rowFrom<T>(row: unknown): T | null {
   return row && typeof row === "object" ? (row as T) : null;
 }
 
@@ -185,11 +185,11 @@ function getCustomerName(profile: ProfileRow | null): string {
   );
 }
 
-function uniqueValues(values: string[]): string[] {
+export function uniqueValues(values: string[]): string[] {
   return [...new Set(values)];
 }
 
-function toMap<T>(items: T[], getKey: (item: T) => string): Map<string, T> {
+export function toMap<T>(items: T[], getKey: (item: T) => string): Map<string, T> {
   return new Map(items.map((item) => [getKey(item), item]));
 }
 

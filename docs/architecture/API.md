@@ -29,3 +29,9 @@ Future application routes for POS, customer cards, and dashboards must call thes
 FASE 07 reads customer cards server-side from the authenticated Supabase session. The `/cliente` route loads customer-owned `customer_cards`, then resolves business identity, loyalty program configuration, wallet balances, and tiers through RLS-protected queries.
 
 The UI receives a normalized view model rather than raw Supabase rows, keeping card presentation separate from data access.
+
+## Customer Dashboard Reads
+
+FASE 08 extends `/cliente` into a mobile-first dashboard. It combines customer cards, profile summary, recent transactions, and public active offers through server-side Supabase queries.
+
+Dashboard data is normalized in `features/customer-dashboard` before presentation. The browser receives rendered HTML instead of direct private-table fetches.

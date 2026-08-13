@@ -49,6 +49,18 @@ Digital customer cards show:
 
 Card balances remain business-specific and read through authenticated server-side paths protected by RLS.
 
+## Customer Dashboard
+
+The authenticated customer dashboard is mobile-first and includes:
+
+- Inicio: total points, MZN equivalent, and active-card count;
+- Cartoes: digital cards from the issuing businesses;
+- Explorar: public active offers;
+- Actividade: recent customer transactions;
+- Perfil: customer account summary.
+
+All populated states use database-backed reads. Empty states explain what appears after the customer joins businesses or starts transacting.
+
 ## Content Language
 
 Portuguese is the primary product language. Copy should be simple, direct, and clear about the promotional nature of points.

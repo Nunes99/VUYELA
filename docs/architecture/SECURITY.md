@@ -52,6 +52,8 @@ Digital card reads use the authenticated Supabase session and RLS policies. Cust
 
 Identification QR display must not encode balances, MZN equivalent, tier benefits, or other confidential account state. It may identify the card and issuing business so POS flows can look up the protected record server-side.
 
+The customer dashboard follows the same boundary: private customer cards, wallets, transactions, and profile data are read server-side through the authenticated session and RLS. Public offers remain limited by their public/active policy.
+
 ## Test Areas
 
 Security tests must cover:
