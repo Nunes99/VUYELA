@@ -9,9 +9,10 @@ The initial schema and RLS migrations live in:
 ```text
 supabase/migrations/202608130001_initial_schema.sql
 supabase/migrations/202608130002_row_level_security.sql
+supabase/migrations/202608130003_loyalty_engine_rpc.sql
 ```
 
-FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests.
+FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs.
 
 ## Core Tables
 
@@ -175,4 +176,19 @@ Sensitive loyalty writes remain unavailable to browser-authenticated roles:
 - `point_ledger` writes;
 - `transactions` writes.
 
-Future transactional RPC functions must own those mutations and maintain wallet/ledger consistency.
+FASE 06 transactional RPC functions own those mutations and maintain wallet/ledger consistency.
+
+## Loyalty Engine RPC
+
+The loyalty engine migration adds deterministic calculation helpers and three transactional RPC functions:
+
+- `calculate_loyalty_points`
+- `calculate_points_value_mzn_minor`
+- `calculate_max_redeemable_points`
+- `record_purchase_points`
+- `redeem_purchase_points`
+- `refund_loyalty_transaction`
+
+`record_purchase_points` and `redeem_purchase_points` require an active loyalty program, an active customer card in the same business, and a matching wallet. They validate access with `can_access_transaction`, optionally validate the supplied `cashier_member_id`, lock the wallet row with `FOR UPDATE`, write the transaction, update the wallet, append ledger entries, and write audit logs.
+
+`refund_loyalty_transaction` locks the transaction and wallet, changes the transaction status to `refunded`, and uses `refund_reversal` ledger entries instead of mutating historical ledger rows.

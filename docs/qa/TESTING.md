@@ -5,8 +5,8 @@
 - Vitest for unit tests.
 - React Testing Library for component behavior.
 - Playwright for end-to-end flows and responsive visual checks.
-- Supabase/PostgreSQL tests for migrations, RLS, and transactional loyalty behavior in later phases.
-- Static migration tests for early schema and RLS invariants until a runnable local Supabase/PostgreSQL test harness is available.
+- Supabase/PostgreSQL tests for migrations, RLS, and transactional loyalty behavior.
+- Static migration tests for schema, RLS, and RPC invariants until a runnable local Supabase/PostgreSQL test harness is available.
 
 ## Priority Unit Tests
 
@@ -39,6 +39,17 @@ Phase 04 includes static tests that verify:
 - cashier access depends on assigned branch;
 - platform admin roles do not get direct client-side bypass policies;
 - sensitive loyalty writes remain reserved for future server-side transactional functions.
+
+## Current Loyalty Engine Coverage
+
+Phase 06 includes unit and static integration tests that verify:
+
+- default point value is `100` MZN minor units;
+- earn calculations subtract discounts and redeemed promotional value;
+- fractional points are rounded down;
+- redemption limits respect purchase amount, configured percentage, point value, and wallet balance;
+- redemption requests above the maximum are rejected;
+- loyalty RPCs use `SECURITY DEFINER`, tenant/branch guards, wallet `FOR UPDATE` locks, transactions, ledger entries, audit logs, and explicit execute grants.
 
 ## Current Auth/RBAC Coverage
 

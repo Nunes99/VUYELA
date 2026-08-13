@@ -12,6 +12,14 @@ Use server components, route handlers, and server-side libraries for data access
 - Mutations that change balances must be idempotent or protected against duplicate submission.
 - Return safe error messages to clients and log structured internal context server-side.
 
-## Future RPC
+## Loyalty RPC
 
-PostgreSQL RPC should be considered for atomic operations such as earning points, redeeming points, reversals, and expiry processing.
+FASE 06 adds PostgreSQL RPCs for atomic loyalty writes:
+
+- `record_purchase_points`
+- `redeem_purchase_points`
+- `refund_loyalty_transaction`
+
+These functions validate tenant/branch access with the RLS helper functions, lock wallet rows with `FOR UPDATE`, update wallet operational balances, append `point_ledger` entries, and write audit logs in one transaction.
+
+Future application routes for POS, customer cards, and dashboards must call these server-side boundaries instead of directly mutating `point_wallets`, `point_ledger`, or `transactions`.

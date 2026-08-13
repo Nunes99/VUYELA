@@ -74,4 +74,4 @@ The Supabase service-role key must never be exposed to browser code. Balance-cha
 - Confirm whether Portuguese copy should use Mozambique-specific spelling consistently across all product surfaces.
 - Confirm initial deployment target and Vercel project settings.
 - Confirm whether phone + OTP or email + password is the first authentication flow to ship.
-- Confirm whether all businesses use the default `1 point = 1 MZN` rule at launch or whether configurable point value is required from the first release.
+- Confirm future commercial limits around configurable point value; the database and engine already default to `1 point = 1 MZN` while allowing per-business configuration.

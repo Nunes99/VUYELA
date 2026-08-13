@@ -84,3 +84,18 @@ A feature is complete only when:
 - business admin cannot grant or remove business owner privileges;
 - auth, security, QA, and README documentation is updated;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 06 Loyalty Engine Acceptance
+
+- pure loyalty calculation helpers exist outside presentation components;
+- `1 point = 1 MZN` is represented as `100` MZN minor units;
+- earning points uses gross amount minus discounts and redeemed promotional value;
+- redemption limits respect wallet balance, point value, purchase value, and configured maximum redemption percentage;
+- balance-changing writes use PostgreSQL RPC functions instead of direct browser table writes;
+- earning, redemption, and refund RPCs validate tenant/branch access;
+- redemption locks the wallet row with `FOR UPDATE` to prevent concurrent double spending;
+- every non-zero points movement writes `point_ledger`;
+- refunds use compensating `refund_reversal` entries instead of editing ledger history;
+- sensitive operations write audit logs;
+- unit tests cover calculation rules and static integration tests cover the RPC contract;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

@@ -20,7 +20,7 @@ The Phase 04 RLS migration enables Row Level Security on private tables and adds
 
 Platform roles such as support agent, platform admin, and super admin do not receive direct client-side policy bypasses. They must use server-side service-role paths with audit logging.
 
-Browser-authenticated roles cannot directly write point wallets, point ledger, or transactions. Those writes belong in future server-side transactional RPC functions.
+Browser-authenticated roles cannot directly write point wallets, point ledger, or transactions. FASE 06 adds server-side transactional RPC functions for those writes.
 
 ## Auth and Authorization
 
@@ -35,6 +35,16 @@ The app tests and enforces:
 - platform roles require MFA-ready checks before admin route access.
 
 Service-role access is isolated to server-only helpers and must be paired with audit logs for privileged writes.
+
+## Loyalty Write Boundary
+
+The loyalty RPCs validate tenant and branch access before mutating balances. They use `SECURITY DEFINER` with a fixed `search_path`, reuse `can_access_transaction`, lock wallet rows with `FOR UPDATE`, and append ledger entries in the same transaction as wallet updates.
+
+The current sensitive write RPCs are:
+
+- `record_purchase_points`
+- `redeem_purchase_points`
+- `refund_loyalty_transaction`
 
 ## Test Areas
 
