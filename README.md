@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 09 — POS**.
+This repository has completed **FASE 10 — Business Dashboard**.
 
 Completed foundation work includes:
 
@@ -30,8 +30,9 @@ Completed foundation work includes:
 - database-backed customer digital cards with identification QR, balance, MZN equivalent, tier, and expiry information
 - mobile-first customer dashboard with Inicio, Cartoes, Explorar, Actividade, and Perfil sections backed by Supabase/RLS reads
 - low-friction POS flow for identifying customers, calculating earn/redeem results, confirming customer authorization, and writing transactions through loyalty RPCs with duplicate-submission protection
+- business dashboard with overview, customers, transactions, points, campaigns, program, branches, employees, reports, settings, liability, and retention metrics
 
-Product features such as business dashboard, campaign management, analytics, and full marketplace detail pages are intentionally not implemented yet.
+Product features such as campaign mutation workflows, advanced analytics, and full marketplace detail pages are intentionally not implemented yet.
 
 ## Scripts
 

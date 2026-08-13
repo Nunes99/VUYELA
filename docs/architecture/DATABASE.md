@@ -11,9 +11,10 @@ supabase/migrations/202608130001_initial_schema.sql
 supabase/migrations/202608130002_row_level_security.sql
 supabase/migrations/202608130003_loyalty_engine_rpc.sql
 supabase/migrations/202608130004_pos_card_lookup.sql
+supabase/migrations/202608130005_business_dashboard_rpc.sql
 ```
 
-FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes.
+FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
 
 ## Core Tables
 
@@ -207,3 +208,20 @@ The loyalty engine migration adds deterministic calculation helpers and three tr
 - earn rate.
 
 The lookup does not mutate wallets, ledger, or transactions. Balance-changing POS completion continues through `record_purchase_points` and `redeem_purchase_points`.
+
+## Business Dashboard RPC
+
+`get_business_dashboard` is a read-only reporting boundary for `/negocio`.
+
+It returns JSON sections for:
+
+- business and selected scope;
+- loyalty program settings;
+- customers and current point liability;
+- completed transactions in the reporting window;
+- campaigns and active-offer count for manager-scoped users;
+- branch performance;
+- active employees;
+- operational settings/status.
+
+The RPC validates whole-business management access with `can_manage_business` and branch reporting access with `can_access_branch`. Branch managers must provide a branch id. It does not mutate `point_wallets`, `point_ledger`, or `transactions`.

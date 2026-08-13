@@ -74,6 +74,25 @@ The authenticated POS is built for low-friction cashier use:
 
 The normal path keeps wallet writes out of browser code. Duplicate submissions are reduced by disabled pending buttons and an idempotency key sent as the transaction external reference.
 
+## Business Dashboard
+
+The authenticated business dashboard is an operational surface for branch managers, business admins, and business owners.
+
+It includes:
+
+- overview with revenue, transaction count, customer count, and average ticket;
+- customers with card number, points, MZN liability, and last transaction;
+- transactions confirmed by the POS and loyalty engine;
+- points metrics including available points, promotional liability, earned points, redeemed points, redemption rate, and retention;
+- campaigns and offers visibility for manager-scoped users;
+- program configuration summary;
+- branch performance;
+- active employees and roles;
+- report tiles for sales, liability, retention, and campaigns;
+- settings/status summary.
+
+Branch managers receive branch-scoped data. Business admins and owners can view whole-business metrics and branch-specific views.
+
 ## Content Language
 
 Portuguese is the primary product language. Copy should be simple, direct, and clear about the promotional nature of points.

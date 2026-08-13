@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
+import { BusinessDashboardView } from "@/features/business-dashboard/dashboard";
+import { getBusinessDashboard } from "@/features/business-dashboard/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
@@ -13,21 +15,28 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function BusinessAreaPage() {
+function getSearchParam(value: string | string[] | undefined): string | undefined {
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+export default async function BusinessAreaPage({
+  searchParams
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const state = await getProtectedRouteState("/negocio", "/negocio");
+  const params = (await searchParams) ?? {};
+  const dashboardState =
+    state.status === "authorized"
+      ? await getBusinessDashboard(state.principal, {
+          businessId: getSearchParam(params.businessId),
+          branchId: getSearchParam(params.branchId)
+        })
+      : null;
 
   return (
     <ProtectedRouteStateView state={state} title="Dashboard do negocio">
-      <div className="dashboard-grid">
-        <article className="dashboard-card">
-          <h2>RBAC centralizado</h2>
-          <p>A rota exige membro ativo com papel de branch manager, admin ou owner.</p>
-        </article>
-        <article className="dashboard-card">
-          <h2>Isolamento por tenant</h2>
-          <p>Dados privados continuam protegidos por `business_id` e policies RLS.</p>
-        </article>
-      </div>
+      {dashboardState ? <BusinessDashboardView state={dashboardState} /> : null}
     </ProtectedRouteStateView>
   );
 }

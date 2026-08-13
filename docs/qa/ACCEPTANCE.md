@@ -143,3 +143,20 @@ A feature is complete only when:
 - static integration tests cover the POS lookup RPC contract;
 - E2E covers the protected POS route fallback;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 10 Business Dashboard Acceptance
+
+- `/negocio` renders a mobile-first business dashboard, not a placeholder;
+- dashboard sections include overview, customers, transactions, points, campaigns, program, branches, employees, reports, and settings;
+- dashboard data is loaded through real server-side query abstractions;
+- a read-only RPC validates business/branch permissions before returning reporting data;
+- branch managers are branch-scoped, while business admins and owners can view whole-business metrics;
+- liability metrics show available points and MZN promotional value;
+- retention metrics identify customers with repeat purchases;
+- points and MZN equivalent are shown together where relevant;
+- empty, error, restricted, and populated states exist;
+- no browser code mutates wallets, ledger, transactions, campaigns, employees, or settings;
+- unit tests cover business dashboard calculations;
+- static integration tests cover the dashboard RPC permission and mutation contract;
+- E2E covers the protected business dashboard route fallback;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

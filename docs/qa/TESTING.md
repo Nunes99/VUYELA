@@ -79,6 +79,16 @@ Phase 09 includes tests that verify:
 - POS lookup RPC uses `SECURITY DEFINER`, tenant/branch guards, active-card and active-program filters, explicit execute grants, and does not mutate wallets or ledger;
 - `/pos` remains stable in protected-route fallback mode.
 
+## Current Business Dashboard Coverage
+
+Phase 10 includes tests that verify:
+
+- dashboard money, percentage, liability, redemption, overview, and retention calculations;
+- business dashboard RPC uses `SECURITY DEFINER`, tenant/branch guards, branch-scope requirements, and explicit execute grants;
+- the RPC returns liability and retention source fields without mutating wallets, ledger, or transactions;
+- manager-scoped campaign and subscription settings remain restricted;
+- `/negocio` remains stable in protected-route fallback mode.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:

@@ -45,3 +45,13 @@ The UI receives a normalized view model rather than raw Supabase rows, keeping c
 FASE 08 extends `/cliente` into a mobile-first dashboard. It combines customer cards, profile summary, recent transactions, and public active offers through server-side Supabase queries.
 
 Dashboard data is normalized in `features/customer-dashboard` before presentation. The browser receives rendered HTML instead of direct private-table fetches.
+
+## Business Dashboard Reads
+
+FASE 10 adds the `/negocio` dashboard and a read-only PostgreSQL RPC:
+
+- `get_business_dashboard`: returns scoped business, program, customer, transaction, campaign, branch, employee, settings, liability, and retention source data.
+- `features/business-dashboard/data.ts`: loads selectable business/branch context through the authenticated Supabase session and calls the RPC.
+- `features/business-dashboard/model.ts`: derives overview, liability, redemption, retention, and report metrics outside presentation components.
+
+The RPC validates `can_manage_business` and `can_access_branch`. Branch managers must pass a branch scope; business admins and owners may view whole-business or branch-scoped metrics.
