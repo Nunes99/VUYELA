@@ -1,0 +1,76 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { EmailSignInForm, PhoneOtpForm } from "@/features/auth/forms";
+
+export const metadata: Metadata = {
+  title: "Entrar",
+  description: "Entre na sua conta VUYELA por email e senha ou telefone com codigo OTP.",
+  alternates: {
+    canonical: "/entrar"
+  },
+  robots: {
+    index: false,
+    follow: false
+  }
+};
+
+interface SignInPageProps {
+  searchParams: Promise<{
+    next?: string | string[] | undefined;
+  }>;
+}
+
+function getNextPath(next: string | string[] | undefined) {
+  if (Array.isArray(next)) {
+    return "/cliente";
+  }
+
+  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+    return "/cliente";
+  }
+
+  return next;
+}
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const params = await searchParams;
+  const nextPath = getNextPath(params.next);
+
+  return (
+    <main className="auth-page">
+      <section className="auth-shell" aria-labelledby="signin-title">
+        <div className="auth-panel auth-panel--copy">
+          <Link className="auth-brand" href="/">
+            <span>VUYELA</span>
+            <small>by LEMOTE</small>
+          </Link>
+          <span className="auth-kicker">Acesso seguro</span>
+          <h1 id="signin-title">Entre para ver os seus pontos e negocios.</h1>
+          <p>
+            Use email e senha ou telefone com codigo OTP. As regras de acesso continuam protegidas
+            no servidor e no PostgreSQL.
+          </p>
+        </div>
+
+        <div className="auth-panel auth-panel--forms">
+          <div className="auth-form-group">
+            <h2>Email e senha</h2>
+            <EmailSignInForm nextPath={nextPath} />
+          </div>
+          <div className="auth-divider" role="separator">
+            ou
+          </div>
+          <div className="auth-form-group">
+            <h2>Telefone com codigo</h2>
+            <PhoneOtpForm nextPath={nextPath} />
+          </div>
+          <p className="auth-footnote">
+            Ainda nao tem conta? <Link href="/cadastrar">Criar conta</Link>. Esqueceu a senha?{" "}
+            <Link href="/recuperar-acesso">Recuperar acesso</Link>.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}

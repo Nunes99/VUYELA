@@ -150,10 +150,10 @@ export default function HomePage() {
               ))}
             </nav>
             <div className="home-header__actions">
-              <a className="home-link-button home-link-button--ghost" href="#clientes">
+              <a className="home-link-button home-link-button--ghost" href="/entrar">
                 Entrar
               </a>
-              <a className="home-link-button home-link-button--reward" href="#negocios">
+              <a className="home-link-button home-link-button--reward" href="/cadastrar">
                 Cadastrar
               </a>
             </div>
@@ -183,11 +183,14 @@ export default function HomePage() {
                 estabelecimentos preferidos.
               </p>
               <div className="home-hero__actions">
-                <a className="home-link-button home-link-button--reward" href="#clientes">
+                <a className="home-link-button home-link-button--reward" href="/cadastrar">
                   <CreditCard size={18} />
                   Quero um cartao
                 </a>
-                <a className="home-link-button home-link-button--outline" href="#negocios">
+                <a
+                  className="home-link-button home-link-button--outline"
+                  href="/onboarding/negocio"
+                >
                   <Store size={18} />
                   Sou um negocio
                 </a>

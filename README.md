@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 04 — RLS**.
+This repository has completed **FASE 05 — Auth**.
 
 Completed foundation work includes:
 
@@ -25,8 +25,9 @@ Completed foundation work includes:
 - responsive public homepage with SEO metadata
 - initial Supabase schema migration with tenant fields, constraints, indexes, and append-only point ledger protection
 - Row Level Security migration for customer, business, branch, and public marketplace access
+- Supabase auth helpers, centralized RBAC, protected route states, and customer/business onboarding routes
 
-Product features such as POS, dashboards, authentication/onboarding, marketplace data, and the loyalty engine are intentionally not implemented yet.
+Product features such as the loyalty engine, production POS flows, dashboards with real data, marketplace data, and digital cards are intentionally not implemented yet.
 
 ## Scripts
 

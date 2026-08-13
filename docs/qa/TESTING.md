@@ -40,6 +40,17 @@ Phase 04 includes static tests that verify:
 - platform admin roles do not get direct client-side bypass policies;
 - sensitive loyalty writes remain reserved for future server-side transactional functions.
 
+## Current Auth/RBAC Coverage
+
+Phase 05 includes unit tests that verify:
+
+- anonymous users cannot access protected routes;
+- customers cannot access business, POS, or admin routes without roles;
+- cashier POS access is limited to the assigned business/branch;
+- business admins cannot manage business owner privileges;
+- support/platform/super admin roles require MFA-ready checks;
+- authenticated landing routes resolve from the strongest available role.
+
 ## Priority E2E
 
 Customer:

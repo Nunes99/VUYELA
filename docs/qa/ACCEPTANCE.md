@@ -68,3 +68,19 @@ A feature is complete only when:
 - automated tests prove the required customer, tenant, cashier, platform-admin, and sensitive-write policy invariants;
 - security and database architecture documentation is updated;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 05 Auth Acceptance
+
+- Supabase server auth helpers exist for authenticated cookie sessions;
+- service-role Supabase helper is server-only and not exposed to browser code;
+- email/password, phone OTP, password reset, sign-up, logout, auth callback, and MFA-ready routes exist;
+- customer and business onboarding routes exist;
+- protected customer, business, POS, and admin surfaces use centralized route helpers;
+- RBAC is centralized and not duplicated across pages/components;
+- privileged platform roles require MFA-ready route checks;
+- unauthorized and cross-role access is covered by automated tests;
+- customer-only accounts cannot access business/POS/admin routes;
+- cashier access is scoped to assigned branch;
+- business admin cannot grant or remove business owner privileges;
+- auth, security, QA, and README documentation is updated;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

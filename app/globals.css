@@ -972,3 +972,237 @@
     min-height: auto;
   }
 }
+
+.auth-page,
+.dashboard-page {
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(0, 166, 166, 0.12), transparent 26rem),
+    linear-gradient(180deg, var(--vy-color-indigo-950), var(--vy-color-indigo));
+  color: #fff;
+}
+
+.auth-shell,
+.dashboard-shell {
+  width: min(100% - 2rem, 72rem);
+  margin-inline: auto;
+}
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 30rem);
+  gap: var(--vy-space-6);
+  align-items: start;
+  padding-block: var(--vy-space-12);
+}
+
+.auth-shell--compact {
+  grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 28rem);
+}
+
+.auth-shell--single {
+  max-width: 34rem;
+  grid-template-columns: 1fr;
+}
+
+.auth-panel {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--vy-radius-xs);
+  padding: var(--vy-space-6);
+}
+
+.auth-panel--copy {
+  position: sticky;
+  top: var(--vy-space-6);
+  background: rgba(2, 31, 41, 0.5);
+}
+
+.auth-panel--forms {
+  background: var(--vy-surface);
+  color: var(--vy-text);
+  box-shadow: var(--vy-shadow-md);
+}
+
+.auth-brand {
+  display: inline-grid;
+  gap: 0.1rem;
+  margin-bottom: var(--vy-space-8);
+  color: #fff;
+  line-height: 1;
+}
+
+.auth-brand--dark {
+  color: var(--vy-color-indigo);
+}
+
+.auth-brand span {
+  font-family: var(--vy-font-display);
+  font-size: var(--vy-text-xl);
+  font-weight: 850;
+}
+
+.auth-brand small {
+  color: currentColor;
+  font-size: var(--vy-text-xs);
+  font-weight: 750;
+  opacity: 0.68;
+  text-transform: uppercase;
+}
+
+.auth-kicker {
+  display: block;
+  color: var(--vy-color-teal-600);
+  font-size: var(--vy-text-sm);
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.auth-panel--copy .auth-kicker {
+  color: var(--vy-reward);
+}
+
+.auth-panel h1 {
+  margin: var(--vy-space-2) 0 var(--vy-space-4);
+  color: inherit;
+  font-size: var(--vy-text-4xl);
+}
+
+.auth-panel h2,
+.dashboard-card h2 {
+  margin: 0 0 var(--vy-space-4);
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-xl);
+}
+
+.auth-panel p,
+.dashboard-card p {
+  color: var(--vy-text-muted);
+}
+
+.auth-panel--copy p {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--vy-text-lg);
+}
+
+.auth-intro {
+  margin-bottom: var(--vy-space-5);
+}
+
+.auth-form,
+.auth-form-stack {
+  display: grid;
+  gap: var(--vy-space-4);
+}
+
+.auth-form-group + .auth-form-group {
+  margin-top: var(--vy-space-5);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--vy-space-3);
+  margin-block: var(--vy-space-5);
+  color: var(--vy-text-muted);
+  font-size: var(--vy-text-sm);
+  font-weight: 800;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  flex: 1;
+  height: 1px;
+  background: var(--vy-border);
+  content: "";
+}
+
+.auth-message {
+  margin: 0;
+  border-radius: var(--vy-radius-xs);
+  padding: var(--vy-space-3);
+  font-size: var(--vy-text-sm);
+  font-weight: 750;
+}
+
+.auth-message--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #991b1b;
+}
+
+.auth-message--success {
+  background: rgba(0, 166, 166, 0.12);
+  color: var(--vy-color-teal-700);
+}
+
+.auth-footnote {
+  margin: var(--vy-space-5) 0 0;
+  font-size: var(--vy-text-sm);
+}
+
+.auth-footnote a,
+.auth-intro a {
+  color: var(--vy-color-teal-700);
+  font-weight: 850;
+}
+
+.dashboard-shell {
+  display: grid;
+  gap: var(--vy-space-6);
+  padding-block: var(--vy-space-12);
+}
+
+.dashboard-shell h1 {
+  max-width: 18ch;
+  margin: 0;
+  color: #fff;
+  font-size: var(--vy-text-4xl);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vy-space-4);
+}
+
+.dashboard-card {
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: var(--vy-surface);
+  padding: var(--vy-space-6);
+  color: var(--vy-text);
+  box-shadow: var(--vy-shadow-sm);
+}
+
+.dashboard-card .auth-form {
+  margin-top: var(--vy-space-5);
+}
+
+@media (max-width: 67.5rem) {
+  .auth-shell,
+  .auth-shell--compact,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-panel--copy {
+    position: static;
+  }
+}
+
+@media (max-width: 47.5rem) {
+  .auth-shell,
+  .dashboard-shell {
+    width: min(100% - 1rem, 72rem);
+    padding-block: var(--vy-space-4);
+  }
+
+  .auth-panel,
+  .dashboard-card {
+    padding: var(--vy-space-4);
+  }
+
+  .auth-panel h1,
+  .dashboard-shell h1 {
+    font-size: var(--vy-text-3xl);
+  }
+}

@@ -22,6 +22,20 @@ Platform roles such as support agent, platform admin, and super admin do not rec
 
 Browser-authenticated roles cannot directly write point wallets, point ledger, or transactions. Those writes belong in future server-side transactional RPC functions.
 
+## Auth and Authorization
+
+Phase 05 centralizes RBAC in `lib/auth/rbac.ts` and protected route evaluation in `lib/auth/session.ts`.
+
+The app tests and enforces:
+
+- anonymous users cannot access protected routes;
+- customers cannot access business, POS, or admin areas unless they also hold an active business/platform role;
+- cashiers are scoped to assigned branch access;
+- business admins cannot grant or remove business owner privileges;
+- platform roles require MFA-ready checks before admin route access.
+
+Service-role access is isolated to server-only helpers and must be paired with audit logs for privileged writes.
+
 ## Test Areas
 
 Security tests must cover:
