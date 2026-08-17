@@ -190,3 +190,18 @@ A feature is complete only when:
 - static integration tests cover search SEO and opening-hour database contract;
 - E2E covers public search fallback without Supabase;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 13 Campaigns Acceptance
+
+- `/negocio/campanhas` exists as a protected business campaign area;
+- campaign creation is available for business admins and owners through a server action;
+- campaigns support rule-based types, reward rules, scheduled start/end dates, and draft/scheduled/active status derivation;
+- campaign eligibility is calculated server-side from tenant-scoped customer cards, wallets, completed transactions, derived tiers, recent branch city, and marketing consent;
+- eligible audiences are materialized in `campaign_audiences` for analytics and later notification delivery;
+- marketing-channel campaigns require consent-aware eligibility;
+- this phase does not send notifications and does not mutate point wallets, point ledger, or transactions;
+- campaign analytics show total, active, scheduled, draft, completed, audience, and consent coverage metrics;
+- unit tests cover eligibility, consent blocking, segmentation, status derivation, and analytics;
+- static integration tests cover the campaign RPC/security contract;
+- E2E covers the protected campaigns route fallback without Supabase;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

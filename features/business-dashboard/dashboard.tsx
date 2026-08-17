@@ -210,12 +210,19 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
         className="business-dashboard-section"
         aria-labelledby="campaigns-title"
       >
-        <SectionHeading
-          eyebrow="Campanhas"
-          title="Campanhas e ofertas"
-          id="campaigns-title"
-          body={`${dashboard.settings.activeOffers.toLocaleString("pt-MZ")} ofertas activas.`}
-        />
+        <div className="business-dashboard-section-toolbar">
+          <SectionHeading
+            eyebrow="Campanhas"
+            title="Campanhas e ofertas"
+            id="campaigns-title"
+            body={`${dashboard.settings.activeOffers.toLocaleString("pt-MZ")} ofertas activas.`}
+          />
+          {dashboard.hasManagerScope ? (
+            <Link className="business-dashboard-link-button" href="/negocio/campanhas">
+              Gerir campanhas
+            </Link>
+          ) : null}
+        </div>
         <CampaignList dashboard={dashboard} />
       </section>
 

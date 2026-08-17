@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 12 — Search**.
+This repository has completed **FASE 13 — Campaigns**.
 
 Completed foundation work includes:
 
@@ -33,8 +33,9 @@ Completed foundation work includes:
 - business dashboard with overview, customers, transactions, points, campaigns, program, branches, employees, reports, settings, liability, and retention metrics
 - public marketplace discovery pages for establishments, business profiles, categories, cities, city/category combinations, active offers, SEO metadata, structured data, and sitemap inclusion only for meaningful indexable pages
 - public establishment and offer search with text, category, city, active-offer, location, and open-now filters where branch data supports them, using shareable noindex URLs
+- business campaign creation with rule-based segmentation, scheduled start/end dates, consent-aware eligibility calculation, materialized audiences, and campaign analytics
 
-Product features such as campaign mutation workflows and advanced analytics are intentionally not implemented yet.
+Product features such as notification delivery, referrals, subscriptions, and platform administration are intentionally not implemented yet.
 
 ## Scripts
 

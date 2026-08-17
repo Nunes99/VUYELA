@@ -56,6 +56,18 @@ FASE 10 adds the `/negocio` dashboard and a read-only PostgreSQL RPC:
 
 The RPC validates `can_manage_business` and `can_access_branch`. Branch managers must pass a branch scope; business admins and owners may view whole-business or branch-scoped metrics.
 
+## Business Campaign Management
+
+FASE 13 adds `/negocio/campanhas` for business admins and owners.
+
+The feature uses server-side actions and PostgreSQL RPCs:
+
+- `get_business_campaigns`: returns private campaign rows and aggregate analytics for one manageable business;
+- `calculate_campaign_eligibility`: evaluates rule-based segments from customer cards, wallets, completed transactions, tiers, recent branch city, and marketing consent;
+- `create_campaign_with_audience`: validates rules, derives draft/scheduled/active status, inserts a campaign, and materializes eligible audience rows.
+
+Campaign actions do not send notifications. Planned marketing channels require consent-aware eligibility so FASE 14 notification delivery has a safe audience boundary.
+
 ## Public Marketplace Reads
 
 FASE 11 adds server-rendered public discovery pages backed by read-only Supabase anon queries through `lib/supabase/public.ts`.

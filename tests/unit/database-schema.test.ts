@@ -11,6 +11,10 @@ const searchMigration = readFileSync(
   join(process.cwd(), "supabase/migrations/202608130006_branch_opening_hours.sql"),
   "utf8"
 );
+const campaignsMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/202608130007_campaigns.sql"),
+  "utf8"
+);
 
 const requiredTables = [
   "profiles",
@@ -119,5 +123,17 @@ describe("initial database schema migration", () => {
     expect(searchMigration).toContain("opening_hours jsonb not null default '{}'::jsonb");
     expect(searchMigration).toContain("timezone text not null default 'Africa/Maputo'");
     expect(searchMigration).toContain("branches_opening_hours_object");
+  });
+
+  it("adds campaign rules, audience constraints, and analytics RPCs", () => {
+    expect(campaignsMigration).toContain("alter table public.campaigns");
+    expect(campaignsMigration).toContain("campaigns_rules_object");
+    expect(campaignsMigration).toContain("campaigns_audience_object");
+    expect(campaignsMigration).toContain(
+      "create or replace function public.get_business_campaigns"
+    );
+    expect(campaignsMigration).toContain(
+      "create or replace function public.calculate_campaign_eligibility"
+    );
   });
 });

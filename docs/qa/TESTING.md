@@ -116,6 +116,19 @@ Phase 12 includes tests that verify:
 - the branch opening-hours migration keeps missing hours as unknown;
 - `/pesquisar` renders a public fallback with filters when Supabase is not configured.
 
+## Current Business Campaign Coverage
+
+Phase 13 includes tests that verify:
+
+- campaign status derivation for draft, scheduled, and active campaigns;
+- eligibility presets for first purchase, second purchase, inactive, VIP, and location-compatible segments;
+- marketing consent blocks audiences when required;
+- rule-based segmentation by city, tier, spend, purchase count, and points balance;
+- campaign analytics from materialized audience counts;
+- campaign RPCs use `SECURITY DEFINER`, fixed `search_path`, and `can_manage_business`;
+- campaign creation materializes audiences without sending notifications or mutating wallets, ledger, or transactions;
+- `/negocio/campanhas` renders a protected fallback when Supabase is not configured.
+
 ## Current Auth/RBAC Coverage
 
 Phase 05 includes unit tests that verify:

@@ -21,6 +21,6 @@ Implemented in FASE 12.
 - Missing opening hours mean unknown, not closed.
 - Location is used only for ordering results during the request and is not persisted by the search feature.
 
-## Next Integration
+## Integration
 
-FASE 13 campaigns can reuse active-offer and category/city segments, but campaign targeting must remain server-side and must respect communication consent.
+FASE 13 campaign targeting now keeps its segmentation server-side and consent-aware. Public search remains a read-only marketplace feature.

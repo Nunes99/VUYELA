@@ -70,6 +70,14 @@ FASE 10 adds `get_business_dashboard`, a read-only `SECURITY DEFINER` RPC that v
 
 Dashboard metrics are rendered server-side. The browser does not query private tables directly and cannot mutate wallet, ledger, transaction, campaign, employee, or settings data through this phase.
 
+## Business Campaign Security
+
+The `/negocio/campanhas` route uses the protected `/negocio` route boundary and then restricts campaign data to active business admins and business owners.
+
+Campaign creation is performed through server actions and `SECURITY DEFINER` RPCs that require `can_manage_business(p_business_id)`. Eligibility is calculated server-side from tenant-scoped customer cards, wallets, completed transactions, derived tiers, branch city, and profile marketing consent.
+
+Campaigns can materialize `campaign_audiences`, but this phase does not send notifications and does not mutate wallets, ledger entries, or transactions.
+
 ## Public Marketplace Security
 
 FASE 11 public discovery uses Supabase anon reads plus RLS public policies. The server-side public client has no service-role key and does not attach an authenticated session.

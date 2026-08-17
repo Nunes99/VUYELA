@@ -93,6 +93,21 @@ It includes:
 
 Branch managers receive branch-scoped data. Business admins and owners can view whole-business metrics and branch-specific views.
 
+## Business Campaigns
+
+Business admins and owners can create rule-based campaigns for their own business.
+
+Campaigns include:
+
+- campaign type;
+- scheduled start and end dates;
+- reward rule such as points multiplier, bonus points, discount percentage, or message-only;
+- audience rules based on location/city, purchase count, total spend, last purchase, tier, and points balance;
+- consent-aware eligibility when marketing communication is planned;
+- materialized audience rows for analytics and later notification delivery.
+
+Campaign creation and eligibility calculation run server-side. Campaigns do not mutate wallets, ledger entries, transactions, or customer balances. Communication delivery is not performed in this phase.
+
 ## Public Marketplace
 
 The public marketplace is server-rendered and SEO-first.

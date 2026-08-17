@@ -2802,6 +2802,33 @@
   max-width: 48rem;
 }
 
+.business-dashboard-section-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--vy-space-4);
+}
+
+.business-dashboard-link-button,
+.business-campaign-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  padding-inline: var(--vy-space-4);
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-sm);
+  font-weight: 850;
+}
+
+.business-dashboard-link-button:hover,
+.business-campaign-link:hover {
+  background: var(--vy-surface-subtle);
+}
+
 .business-dashboard-list {
   display: grid;
   gap: var(--vy-space-3);
@@ -2908,6 +2935,88 @@
   color: var(--vy-color-indigo);
 }
 
+.business-campaigns {
+  display: grid;
+  gap: var(--vy-space-5);
+  padding-bottom: var(--vy-space-20);
+}
+
+.business-campaign-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  gap: var(--vy-space-5);
+  align-items: start;
+}
+
+.business-campaign-form,
+.business-campaign-form-section {
+  display: grid;
+  gap: var(--vy-space-4);
+}
+
+.business-campaign-form-section {
+  border-top: 1px solid var(--vy-border);
+  padding-top: var(--vy-space-4);
+}
+
+.business-campaign-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vy-space-4);
+}
+
+.business-campaign-check {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--vy-space-3);
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-sm);
+  font-weight: 850;
+}
+
+.business-campaign-check input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--vy-color-teal-600);
+}
+
+.business-campaign-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vy-space-3);
+}
+
+.business-campaign-message {
+  margin: 0;
+  border-radius: var(--vy-radius-xs);
+  padding: var(--vy-space-3);
+  font-weight: 800;
+}
+
+.business-campaign-message--success {
+  background: #ecfbfa;
+  color: var(--vy-color-teal-700);
+}
+
+.business-campaign-message--error {
+  background: #fff7f7;
+  color: #b42318;
+}
+
+.business-campaign-stat {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.business-campaign-stat svg {
+  color: var(--vy-color-teal-600);
+}
+
+.business-campaign-facts {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 67.5rem) {
   .auth-shell,
   .auth-shell--compact,
@@ -2923,7 +3032,8 @@
   .business-dashboard-stat-grid--wide,
   .business-dashboard-mini-grid,
   .business-dashboard-report-grid,
-  .business-dashboard-facts {
+  .business-dashboard-facts,
+  .business-campaign-layout {
     grid-template-columns: 1fr;
   }
 
@@ -3017,6 +3127,7 @@
   }
 
   .pos-form-grid,
+  .business-campaign-form-grid,
   .pos-summary-list div,
   .business-dashboard-stat-grid,
   .business-dashboard-row dl {
@@ -3063,6 +3174,10 @@
   .business-dashboard-switcher__actions a {
     flex: 1 1 9rem;
     justify-content: center;
+  }
+
+  .business-campaign-actions .vy-button {
+    width: 100%;
   }
 
   .customer-card-row__main .vy-loyalty-card {

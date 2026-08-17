@@ -46,3 +46,17 @@ Loyalty transaction RPCs validate that branch-scoped staff operate only inside t
 Campaign types can include welcome, first purchase, second purchase, birthday, inactive customer, double points, product-specific, time-specific, weekend, referral, expiring points, VIP, and location campaigns.
 
 Campaign communication must respect customer consent where required.
+
+Business admins and owners can create campaigns. Branch managers can view business dashboard context but do not create whole-business campaigns.
+
+Rule-based campaigns can segment customers by:
+
+- city or location-derived branch activity;
+- purchase count;
+- total spent;
+- last purchase age;
+- tier;
+- points balance;
+- marketing consent.
+
+Campaign eligibility must be calculated server-side from tenant-scoped customer cards, wallets, transactions, tiers, and profiles. Campaign creation may materialize eligible audience rows, but it must not send notifications, mutate point wallets, append point ledger records, or create loyalty transactions.

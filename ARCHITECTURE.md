@@ -8,6 +8,8 @@ The public surface is SEO-first and should use static generation or server rende
 
 Public marketplace pages use server rendering with anon Supabase reads. Sitemap and metadata generation share the same indexability rules so empty, duplicate, or low-value generated pages are not published. Public search URLs are shareable but noindex to prevent arbitrary query combinations from becoming crawlable pages.
 
+Business campaigns are private tenant-owned workflows. Rule evaluation, scheduling status, audience materialization, and campaign analytics run server-side behind business admin/owner checks. Notification delivery remains a separate abstraction.
+
 ## Repository Foundation Decisions
 
 - The existing `vuyela-design-system` package is preserved as a workspace package.
@@ -79,3 +81,4 @@ The Supabase service-role key must never be exposed to browser code. Balance-cha
 - Confirm future commercial limits around configurable point value; the database and engine already default to `1 point = 1 MZN` while allowing per-business configuration.
 - Confirm the future canonical URL shape for offer slugs if offers need to remain unique per business rather than globally.
 - Confirm future ranking strategy for search once live marketplace activity and paid placement rules exist.
+- Confirm how campaign reward rules should be applied at POS time once campaign execution moves beyond analytics and notification targeting.

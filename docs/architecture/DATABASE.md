@@ -13,11 +13,12 @@ supabase/migrations/202608130003_loyalty_engine_rpc.sql
 supabase/migrations/202608130004_pos_card_lookup.sql
 supabase/migrations/202608130005_business_dashboard_rpc.sql
 supabase/migrations/202608130006_branch_opening_hours.sql
+supabase/migrations/202608130007_campaigns.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
 
-FASE 11 uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers. FASE 12 adds optional public branch opening hours for search.
+FASE 11 uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers. FASE 12 adds optional public branch opening hours for search. FASE 13 adds campaign rule/audience constraints plus server-side campaign eligibility, creation, audience materialization, and analytics RPCs.
 
 ## Core Tables
 
@@ -257,3 +258,15 @@ FASE 12 adds optional public opening-hour fields to `branches`:
 ```
 
 An empty object means the open status is unknown. Public search filters by open-now only when at least one branch has valid opening-hour data.
+
+## Campaign RPCs
+
+FASE 13 adds private business campaign functions:
+
+- `calculate_campaign_eligibility`
+- `create_campaign_with_audience`
+- `get_business_campaigns`
+
+The functions are `SECURITY DEFINER`, use fixed `search_path`, and require `can_manage_business(p_business_id)`. Eligibility reads active customer cards, wallets, completed transactions, derived tiers, recent branch city, and profile marketing consent. Campaign creation inserts the campaign and materializes eligible `campaign_audiences` rows.
+
+The campaign functions do not update `point_wallets`, insert `point_ledger`, insert `transactions`, or send `notifications`.
