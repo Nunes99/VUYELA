@@ -7,7 +7,7 @@ Implemented.
 ## Scope
 
 - Pure TypeScript calculation helpers live in `lib/loyalty/engine.ts`.
-- Transactional PostgreSQL RPCs live in `supabase/migrations/202608130003_loyalty_engine_rpc.sql`.
+- Transactional PostgreSQL RPCs live in `supabase/migrations/create_loyalty_engine_rpcs.sql`.
 - Unit tests cover point value, earning, rounding, redemption caps, and invalid inputs.
 - Static integration tests cover the RPC contract until a runnable Supabase test harness is available.
 

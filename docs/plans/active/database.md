@@ -66,7 +66,7 @@ pnpm test:e2e
 
 Completed Phase 03 implementation.
 
-- Added `supabase/migrations/202608130001_initial_schema.sql`.
+- Added `supabase/migrations/create_vuyela_core_schema.sql`.
 - Created the core schema for identity, businesses, branches, memberships, loyalty programs, cards, wallets, ledger, transactions, campaigns, offers, referrals, notifications, plans, subscriptions, support tickets, audit logs, and fraud events.
 - Added constraints for tenant ownership, money minor units, transaction totals, ledger amount direction, unique active-like subscriptions, public slugs, lifecycle dates, and append-only ledger protection.
 - Added static migration tests in `tests/unit/database-schema.test.ts`.

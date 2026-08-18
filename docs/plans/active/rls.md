@@ -27,7 +27,7 @@ Phase 03 created the initial Supabase schema and prepared tenant fields. The mas
 
 # Architecture
 
-RLS policies are implemented in `supabase/migrations/202608130002_row_level_security.sql`. Helpers are `SECURITY DEFINER` SQL functions with a fixed `search_path` and are granted only to authenticated users. Sensitive loyalty writes remain unavailable to client roles; future server-side functions must own those transactional writes.
+RLS policies are implemented in `supabase/migrations/enable_tenant_row_level_security.sql`. Helpers are `SECURITY DEFINER` SQL functions with a fixed `search_path` and are granted only to authenticated users. Sensitive loyalty writes remain unavailable to client roles; future server-side functions must own those transactional writes.
 
 # Tasks
 
@@ -71,7 +71,7 @@ pnpm test:e2e
 
 Completed Phase 04 implementation.
 
-- Added `supabase/migrations/202608130002_row_level_security.sql`.
+- Added `supabase/migrations/enable_tenant_row_level_security.sql`.
 - Added helper functions for active membership, business ownership, business management, customer card ownership, branch-scoped access, transaction access, loyalty program access, and campaign management.
 - Enabled RLS across private and tenant-sensitive tables.
 - Added public read policies for marketplace-safe active records.

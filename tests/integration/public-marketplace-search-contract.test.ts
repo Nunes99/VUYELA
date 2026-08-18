@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const migration = readFileSync(
-  join(process.cwd(), "supabase/migrations/202608130006_branch_opening_hours.sql"),
+  join(process.cwd(), "supabase/migrations/add_branch_opening_hours.sql"),
   "utf8"
 );
 const searchPage = readFileSync(join(process.cwd(), "app/(public)/pesquisar/page.tsx"), "utf8");

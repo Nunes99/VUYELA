@@ -70,7 +70,7 @@ Movement types:
 
 ## Implemented Engine Boundary
 
-FASE 06 implements loyalty calculations in `lib/loyalty/engine.ts` and balance-changing PostgreSQL RPCs in `supabase/migrations/202608130003_loyalty_engine_rpc.sql`.
+FASE 06 implements loyalty calculations in `lib/loyalty/engine.ts` and balance-changing PostgreSQL RPCs in `supabase/migrations/create_loyalty_engine_rpcs.sql`.
 
 Implemented RPCs:
 

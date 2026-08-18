@@ -4,15 +4,15 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const migration = readFileSync(
-  join(process.cwd(), "supabase/migrations/202608130001_initial_schema.sql"),
+  join(process.cwd(), "supabase/migrations/create_vuyela_core_schema.sql"),
   "utf8"
 );
 const searchMigration = readFileSync(
-  join(process.cwd(), "supabase/migrations/202608130006_branch_opening_hours.sql"),
+  join(process.cwd(), "supabase/migrations/add_branch_opening_hours.sql"),
   "utf8"
 );
 const campaignsMigration = readFileSync(
-  join(process.cwd(), "supabase/migrations/202608130007_campaigns.sql"),
+  join(process.cwd(), "supabase/migrations/create_campaign_management.sql"),
   "utf8"
 );
 

@@ -434,6 +434,10 @@ revoke all on function public.calculate_campaign_eligibility(uuid, text, jsonb, 
 revoke all on function public.create_campaign_with_audience(uuid, text, text, timestamptz, timestamptz, jsonb, jsonb, boolean) from public;
 revoke all on function public.get_business_campaigns(uuid) from public;
 
+revoke all on function public.calculate_campaign_eligibility(uuid, text, jsonb, jsonb, timestamptz) from anon;
+revoke all on function public.create_campaign_with_audience(uuid, text, text, timestamptz, timestamptz, jsonb, jsonb, boolean) from anon;
+revoke all on function public.get_business_campaigns(uuid) from anon;
+
 grant execute on function public.calculate_campaign_eligibility(uuid, text, jsonb, jsonb, timestamptz) to authenticated;
 grant execute on function public.create_campaign_with_audience(uuid, text, text, timestamptz, timestamptz, jsonb, jsonb, boolean) to authenticated;
 grant execute on function public.get_business_campaigns(uuid) to authenticated;

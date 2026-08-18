@@ -762,6 +762,38 @@ revoke all on function public.redeem_purchase_points(
 ) from public;
 revoke all on function public.refund_loyalty_transaction(uuid, text) from public;
 
+revoke all on function public.calculate_loyalty_points(integer, numeric) from anon;
+revoke all on function public.calculate_points_value_mzn_minor(integer, integer) from anon;
+revoke all on function public.calculate_max_redeemable_points(
+  integer,
+  integer,
+  integer,
+  integer,
+  numeric
+) from anon;
+revoke all on function public.record_purchase_points(
+  uuid,
+  uuid,
+  uuid,
+  integer,
+  integer,
+  uuid,
+  text,
+  jsonb
+) from anon;
+revoke all on function public.redeem_purchase_points(
+  uuid,
+  uuid,
+  uuid,
+  integer,
+  integer,
+  integer,
+  uuid,
+  text,
+  jsonb
+) from anon;
+revoke all on function public.refund_loyalty_transaction(uuid, text) from anon;
+
 grant execute on function public.calculate_loyalty_points(integer, numeric) to authenticated;
 grant execute on function public.calculate_points_value_mzn_minor(integer, integer) to authenticated;
 grant execute on function public.calculate_max_redeemable_points(

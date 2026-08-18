@@ -333,4 +333,5 @@ end;
 $$;
 
 revoke all on function public.get_business_dashboard(uuid, uuid, integer) from public;
+revoke all on function public.get_business_dashboard(uuid, uuid, integer) from anon;
 grant execute on function public.get_business_dashboard(uuid, uuid, integer) to authenticated;

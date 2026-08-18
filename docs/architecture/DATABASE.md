@@ -7,13 +7,13 @@ Supabase PostgreSQL is the system of record. Schema changes must be implemented 
 The initial schema and RLS migrations live in:
 
 ```text
-supabase/migrations/202608130001_initial_schema.sql
-supabase/migrations/202608130002_row_level_security.sql
-supabase/migrations/202608130003_loyalty_engine_rpc.sql
-supabase/migrations/202608130004_pos_card_lookup.sql
-supabase/migrations/202608130005_business_dashboard_rpc.sql
-supabase/migrations/202608130006_branch_opening_hours.sql
-supabase/migrations/202608130007_campaigns.sql
+supabase/migrations/create_vuyela_core_schema.sql
+supabase/migrations/enable_tenant_row_level_security.sql
+supabase/migrations/create_loyalty_engine_rpcs.sql
+supabase/migrations/create_pos_card_lookup_rpc.sql
+supabase/migrations/create_business_dashboard_rpc.sql
+supabase/migrations/add_branch_opening_hours.sql
+supabase/migrations/create_campaign_management.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
@@ -157,7 +157,7 @@ The initial migration includes:
 
 ## RLS Model
 
-RLS is implemented in `202608130002_row_level_security.sql`.
+RLS is implemented in `enable_tenant_row_level_security.sql`.
 
 Policy helpers use `SECURITY DEFINER`, fixed `search_path`, and `auth.uid()` to evaluate:
 

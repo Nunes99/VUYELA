@@ -255,6 +255,21 @@ revoke all on function public.can_access_loyalty_program(uuid) from public;
 revoke all on function public.can_manage_loyalty_program(uuid) from public;
 revoke all on function public.can_manage_campaign(uuid) from public;
 
+revoke all on function public.is_business_member(uuid) from anon;
+revoke all on function public.has_business_role(uuid, public.business_member_role[]) from anon;
+revoke all on function public.can_manage_business(uuid) from anon;
+revoke all on function public.can_own_business(uuid) from anon;
+revoke all on function public.can_manage_customers(uuid) from anon;
+revoke all on function public.can_access_branch(uuid, uuid) from anon;
+revoke all on function public.can_manage_branch(uuid, uuid) from anon;
+revoke all on function public.can_access_transaction(uuid, uuid) from anon;
+revoke all on function public.owns_customer_card(uuid) from anon;
+revoke all on function public.can_access_customer_card(uuid, uuid) from anon;
+revoke all on function public.can_access_transaction_id(uuid) from anon;
+revoke all on function public.can_access_loyalty_program(uuid) from anon;
+revoke all on function public.can_manage_loyalty_program(uuid) from anon;
+revoke all on function public.can_manage_campaign(uuid) from anon;
+
 grant execute on function public.is_business_member(uuid) to authenticated;
 grant execute on function public.has_business_role(uuid, public.business_member_role[]) to authenticated;
 grant execute on function public.can_manage_business(uuid) to authenticated;

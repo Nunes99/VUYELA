@@ -66,4 +66,5 @@ end;
 $$;
 
 revoke all on function public.lookup_pos_customer_card(uuid, uuid, text) from public;
+revoke all on function public.lookup_pos_customer_card(uuid, uuid, text) from anon;
 grant execute on function public.lookup_pos_customer_card(uuid, uuid, text) to authenticated;
