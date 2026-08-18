@@ -2,19 +2,10 @@
 
 import { redirect } from "next/navigation";
 
+import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-export interface AuthActionState {
-  status: "idle" | "error" | "success";
-  message: string;
-}
-
-export const initialAuthActionState: AuthActionState = {
-  status: "idle",
-  message: ""
-};
 
 function getFormString(formData: FormData, key: string) {
   const value = formData.get(key);

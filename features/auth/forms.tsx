@@ -6,7 +6,6 @@ import { LogIn, Mail, Phone, Save, Store, UserPlus } from "lucide-react";
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Textarea } from "../../vuyela-design-system/src/components/Field";
 import {
-  initialAuthActionState,
   requestPasswordResetAction,
   requestPhoneOtpAction,
   signInWithEmailAction,
@@ -15,6 +14,7 @@ import {
   updateCustomerProfileAction,
   verifyPhoneOtpAction
 } from "@/features/auth/actions";
+import { initialAuthActionState } from "@/features/auth/state";
 
 interface FormProps {
   nextPath?: string | undefined;
