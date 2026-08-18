@@ -28,7 +28,7 @@ Authorization must be enforced server-side and in PostgreSQL policies. Client ch
 Authentication is wired through server-only Supabase helpers:
 
 - `lib/supabase/server.ts` creates the cookie-aware authenticated Supabase client;
-- `lib/supabase/admin.ts` creates the service-role client for privileged server actions only;
+- `lib/supabase/admin.ts` reserves a service-role client for future audited platform operations;
 - `features/auth/actions.ts` owns sign-in, sign-up, OTP, password reset, logout, and onboarding mutations.
 
 RBAC is centralized in:
@@ -66,8 +66,11 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
-Business onboarding uses server-side privileged writes and additionally requires:
+The auth profile trigger creates `public.profiles` rows for newly registered users and backfills
+existing Auth users. Business onboarding calls the authenticated
+`submit_business_onboarding` RPC, which creates the business, primary branch, owner membership, and
+audit record atomically without exposing or requiring a service-role key in the application flow.
 
-```text
-SUPABASE_SERVICE_ROLE_KEY
-```
+Password recovery returns through `/auth/callback` to `/definir-senha`, where the authenticated
+recovery session can set the new password. Invalid or expired callback codes return to the login
+screen with an explicit error state.

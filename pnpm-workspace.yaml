@@ -2,6 +2,10 @@ packages:
   - "."
   - "vuyela-design-system"
 
+overrides:
+  postcss: 8.5.26
+  sharp: 0.35.3
+
 onlyBuiltDependencies:
   - esbuild
   - sharp

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { LogOut } from "lucide-react";
 
+import { signOutAction } from "@/features/auth/actions";
 import type { ProtectedRouteState } from "@/lib/auth/session";
 
 interface ProtectedRouteStateViewProps {
@@ -49,8 +51,18 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
     return (
       <main className="dashboard-page">
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
-          <span className="auth-kicker">Area protegida</span>
-          <h1 id="dashboard-title">{title}</h1>
+          <header className="dashboard-shell__header">
+            <div>
+              <span className="auth-kicker">Area protegida</span>
+              <h1 id="dashboard-title">{title}</h1>
+            </div>
+            <form action={signOutAction}>
+              <button className="dashboard-signout" type="submit">
+                <LogOut aria-hidden="true" size={18} />
+                Terminar sessao
+              </button>
+            </form>
+          </header>
           {children}
         </section>
       </main>

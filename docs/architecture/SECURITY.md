@@ -36,6 +36,20 @@ The app tests and enforces:
 
 Service-role access is isolated to server-only helpers and must be paired with audit logs for privileged writes.
 
+Business onboarding does not use the service-role client. The authenticated
+`submit_business_onboarding` security-definer RPC derives the actor from `auth.uid()`, validates the
+required fields, and creates the business, primary branch, owner membership, and audit log in one
+database transaction.
+
+The connection audit also revokes API execution of Supabase's `rls_auto_enable` event-trigger
+helper, moves `citext` out of the exposed public schema, and caches `auth.uid()` once per statement
+in direct ownership policies. Authenticated loyalty, dashboard, POS, and campaign RPCs remain
+intentionally executable because each validates the caller and tenant scope internally.
+
+Authenticated SELECT policies with overlapping public, customer, and business scopes are
+consolidated with explicit `or` conditions. This preserves the same access rules while avoiding
+multiple permissive-policy evaluation for a single table operation.
+
 ## Loyalty Write Boundary
 
 The loyalty RPCs validate tenant and branch access before mutating balances. They use `SECURITY DEFINER` with a fixed `search_path`, reuse `can_access_transaction`, lock wallet rows with `FOR UPDATE`, and append ledger entries in the same transaction as wallet updates.

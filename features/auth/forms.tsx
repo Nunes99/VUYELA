@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { LogIn, Mail, Phone, Save, Store, UserPlus } from "lucide-react";
+import { KeyRound, LogIn, Mail, Phone, Save, Store, UserPlus } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Textarea } from "../../vuyela-design-system/src/components/Field";
@@ -11,6 +11,7 @@ import {
   signInWithEmailAction,
   signUpWithEmailAction,
   submitBusinessOnboardingAction,
+  updatePasswordAction,
   updateCustomerProfileAction,
   verifyPhoneOtpAction
 } from "@/features/auth/actions";
@@ -174,6 +175,44 @@ export function PasswordResetForm() {
         leadingIcon={<Mail size={18} />}
       >
         Enviar link
+      </Button>
+    </form>
+  );
+}
+
+export function UpdatePasswordForm() {
+  const [state, formAction, pending] = useActionState(updatePasswordAction, initialAuthActionState);
+
+  return (
+    <form action={formAction} className="auth-form">
+      <Input
+        label="Nova senha"
+        name="password"
+        type="password"
+        autoComplete="new-password"
+        minLength={8}
+        hint="Use pelo menos 8 caracteres."
+        requiredMark
+        required
+      />
+      <Input
+        label="Confirmar nova senha"
+        name="passwordConfirmation"
+        type="password"
+        autoComplete="new-password"
+        minLength={8}
+        requiredMark
+        required
+      />
+      <ActionMessage status={state.status} message={state.message} />
+      <Button
+        type="submit"
+        variant="primary"
+        fullWidth
+        loading={pending}
+        leadingIcon={<KeyRound size={18} />}
+      >
+        Guardar nova senha
       </Button>
     </form>
   );

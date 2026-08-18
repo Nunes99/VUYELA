@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 
 interface SignInPageProps {
   searchParams: Promise<{
+    erro?: string | string[] | undefined;
     next?: string | string[] | undefined;
   }>;
 }
@@ -36,6 +37,7 @@ function getNextPath(next: string | string[] | undefined) {
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const params = await searchParams;
   const nextPath = getNextPath(params.next);
+  const callbackError = params.erro === "link-invalido";
 
   return (
     <main className="auth-page">
@@ -54,6 +56,11 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         </div>
 
         <div className="auth-panel auth-panel--forms">
+          {callbackError ? (
+            <p className="auth-message auth-message--error" role="alert">
+              O link e invalido ou expirou. Solicite um novo link de recuperacao.
+            </p>
+          ) : null}
           <div className="auth-form-group">
             <h2>Email e senha</h2>
             <EmailSignInForm nextPath={nextPath} />

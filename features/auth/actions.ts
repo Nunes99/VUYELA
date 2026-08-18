@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 
 import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isSupabaseConfigured } from "@/lib/env";
-import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function getFormString(formData: FormData, key: string) {
@@ -51,13 +50,15 @@ function getSupabaseNotConfiguredState(): AuthActionState {
 }
 
 function slugifyBusinessName(name: string) {
-  return name
+  const slug = name
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48);
+
+  return slug || "negocio";
 }
 
 export async function signInWithEmailAction(
@@ -204,12 +205,6 @@ export async function signUpWithEmailAction(
   }
 
   if (data.session) {
-    await supabase.from("profiles").upsert({
-      id: data.user?.id,
-      display_name: displayName.value,
-      email: email.value
-    });
-
     redirect(next);
   }
 
@@ -234,7 +229,7 @@ export async function requestPasswordResetAction(
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
-    redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/cliente")}`
+    redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/definir-senha")}`
   });
 
   if (error) {
@@ -248,6 +243,66 @@ export async function requestPasswordResetAction(
     status: "success",
     message: "Enviamos as instrucoes de recuperacao para o email indicado."
   };
+}
+
+export async function updatePasswordAction(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState();
+  }
+
+  const password = getRequiredFormString(formData, "password", "Nova senha");
+  if (!password.ok) {
+    return password.state;
+  }
+
+  if (password.value.length < 8) {
+    return {
+      status: "error",
+      message: "A nova senha deve ter pelo menos 8 caracteres."
+    };
+  }
+
+  const passwordConfirmation = getRequiredFormString(
+    formData,
+    "passwordConfirmation",
+    "Confirmacao da senha"
+  );
+  if (!passwordConfirmation.ok) {
+    return passwordConfirmation.state;
+  }
+
+  if (password.value !== passwordConfirmation.value) {
+    return {
+      status: "error",
+      message: "As senhas introduzidas nao coincidem."
+    };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      status: "error",
+      message: "O link de recuperacao expirou. Solicite um novo link."
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: password.value });
+
+  if (error) {
+    return {
+      status: "error",
+      message: "Nao foi possivel actualizar a senha. Solicite um novo link."
+    };
+  }
+
+  redirect("/cliente");
 }
 
 export async function updateCustomerProfileAction(
@@ -331,58 +386,25 @@ export async function submitBusinessOnboardingAction(
     };
   }
 
-  const admin = createSupabaseServiceRoleClient();
   const slug = `${slugifyBusinessName(businessName.value)}-${user.id.slice(0, 8)}`;
-  const { data: business, error: businessError } = await admin
-    .from("businesses")
-    .insert({
-      owner_profile_id: user.id,
-      slug,
-      name: businessName.value,
-      legal_name: getFormString(formData, "legalName") || null,
-      nuit: getFormString(formData, "nuit") || null,
-      description: getFormString(formData, "description") || null,
-      phone: getFormString(formData, "phone") || null,
-      email: getFormString(formData, "email") || user.email || null,
-      status: "pending_review"
-    })
-    .select("id")
-    .single();
+  const { error } = await supabase.rpc("submit_business_onboarding", {
+    p_slug: slug,
+    p_name: businessName.value,
+    p_legal_name: getFormString(formData, "legalName") || null,
+    p_nuit: getFormString(formData, "nuit") || null,
+    p_description: getFormString(formData, "description") || null,
+    p_phone: getFormString(formData, "phone") || null,
+    p_email: getFormString(formData, "email") || user.email || null,
+    p_city: city.value,
+    p_province: getFormString(formData, "province") || null
+  });
 
-  if (businessError || !business) {
+  if (error) {
     return {
       status: "error",
       message: "Nao foi possivel cadastrar o negocio agora."
     };
   }
-
-  await admin.from("branches").insert({
-    business_id: business.id,
-    slug: "principal",
-    name: "Principal",
-    city: city.value,
-    province: getFormString(formData, "province") || null,
-    is_primary: true
-  });
-
-  await admin.from("business_members").insert({
-    business_id: business.id,
-    profile_id: user.id,
-    role: "business_owner",
-    status: "active",
-    joined_at: new Date().toISOString()
-  });
-
-  await admin.from("audit_logs").insert({
-    business_id: business.id,
-    actor_profile_id: user.id,
-    action: "create",
-    entity_table: "businesses",
-    entity_id: business.id,
-    context: {
-      source: "business_onboarding"
-    }
-  });
 
   return {
     status: "success",

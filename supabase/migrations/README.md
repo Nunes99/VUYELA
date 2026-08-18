@@ -12,5 +12,7 @@ Apply them in this exact order:
 6. `add_branch_opening_hours.sql`
 7. `create_campaign_management.sql`
 8. `harden_function_privileges.sql`
+9. `ensure_auth_profiles_and_atomic_business_onboarding.sql`
+10. `consolidate_select_policies.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

@@ -14,11 +14,15 @@ supabase/migrations/create_pos_card_lookup_rpc.sql
 supabase/migrations/create_business_dashboard_rpc.sql
 supabase/migrations/add_branch_opening_hours.sql
 supabase/migrations/create_campaign_management.sql
+supabase/migrations/ensure_auth_profiles_and_atomic_business_onboarding.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
 
 FASE 11 uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers. FASE 12 adds optional public branch opening hours for search. FASE 13 adds campaign rule/audience constraints plus server-side campaign eligibility, creation, audience materialization, and analytics RPCs.
+
+The post-connection auth hardening migration synchronizes `auth.users` with `public.profiles` and
+adds the atomic `submit_business_onboarding` RPC so onboarding cannot leave partial business data.
 
 ## Core Tables
 
