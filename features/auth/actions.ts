@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import type { AuthActionState } from "@/features/auth/state";
-import { getSiteUrl, isSupabaseConfigured } from "@/lib/env";
+import { getSiteUrl, isPhoneAuthEnabled, isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function getFormString(formData: FormData, key: string) {
@@ -103,6 +103,13 @@ export async function requestPhoneOtpAction(
     return getSupabaseNotConfiguredState();
   }
 
+  if (!isPhoneAuthEnabled()) {
+    return {
+      status: "error",
+      message: "A autenticacao por telefone ainda nao esta disponivel."
+    };
+  }
+
   const phone = getRequiredFormString(formData, "phone", "Telefone");
   if (!phone.ok) {
     return phone.state;
@@ -132,6 +139,13 @@ export async function verifyPhoneOtpAction(
 ): Promise<AuthActionState> {
   if (!isSupabaseConfigured()) {
     return getSupabaseNotConfiguredState();
+  }
+
+  if (!isPhoneAuthEnabled()) {
+    return {
+      status: "error",
+      message: "A autenticacao por telefone ainda nao esta disponivel."
+    };
   }
 
   const phone = getRequiredFormString(formData, "phone", "Telefone");

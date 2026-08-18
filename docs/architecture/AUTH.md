@@ -66,6 +66,9 @@ NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
+Phone OTP is exposed only when `SUPABASE_PHONE_AUTH_ENABLED=true` and an SMS provider is configured
+in Supabase Auth. It remains hidden and blocked by the server actions while the provider is absent.
+
 The auth profile trigger creates `public.profiles` rows for newly registered users and backfills
 existing Auth users. Business onboarding calls the authenticated
 `submit_business_onboarding` RPC, which creates the business, primary branch, owner membership, and

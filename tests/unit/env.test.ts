@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getSiteUrl } from "@/lib/env";
+import { getSiteUrl, isPhoneAuthEnabled } from "@/lib/env";
 
 describe("getSiteUrl", () => {
   it("falls back to localhost when no site URL is configured", () => {
@@ -26,6 +26,24 @@ describe("getSiteUrl", () => {
       delete process.env.NEXT_PUBLIC_SITE_URL;
     } else {
       process.env.NEXT_PUBLIC_SITE_URL = previousUrl;
+    }
+  });
+});
+
+describe("isPhoneAuthEnabled", () => {
+  it("keeps phone authentication disabled unless explicitly enabled", () => {
+    const previousValue = process.env.SUPABASE_PHONE_AUTH_ENABLED;
+    delete process.env.SUPABASE_PHONE_AUTH_ENABLED;
+
+    expect(isPhoneAuthEnabled()).toBe(false);
+
+    process.env.SUPABASE_PHONE_AUTH_ENABLED = "true";
+    expect(isPhoneAuthEnabled()).toBe(true);
+
+    if (previousValue === undefined) {
+      delete process.env.SUPABASE_PHONE_AUTH_ENABLED;
+    } else {
+      process.env.SUPABASE_PHONE_AUTH_ENABLED = previousValue;
     }
   });
 });

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EmailSignInForm, PhoneOtpForm } from "@/features/auth/forms";
+import { isPhoneAuthEnabled } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Entrar",
-  description: "Entre na sua conta VUYELA por email e senha ou telefone com codigo OTP.",
+  description: "Entre na sua conta VUYELA com email e senha.",
   alternates: {
     canonical: "/entrar"
   },
@@ -38,6 +39,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const params = await searchParams;
   const nextPath = getNextPath(params.next);
   const callbackError = params.erro === "link-invalido";
+  const phoneAuthEnabled = isPhoneAuthEnabled();
 
   return (
     <main className="auth-page">
@@ -50,8 +52,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           <span className="auth-kicker">Acesso seguro</span>
           <h1 id="signin-title">Entre para ver os seus pontos e negocios.</h1>
           <p>
-            Use email e senha ou telefone com codigo OTP. As regras de acesso continuam protegidas
-            no servidor e no PostgreSQL.
+            Use o seu email e senha. As regras de acesso continuam protegidas no servidor e no
+            PostgreSQL.
           </p>
         </div>
 
@@ -65,13 +67,17 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             <h2>Email e senha</h2>
             <EmailSignInForm nextPath={nextPath} />
           </div>
-          <div className="auth-divider" role="separator">
-            ou
-          </div>
-          <div className="auth-form-group">
-            <h2>Telefone com codigo</h2>
-            <PhoneOtpForm nextPath={nextPath} />
-          </div>
+          {phoneAuthEnabled ? (
+            <>
+              <div className="auth-divider" role="separator">
+                ou
+              </div>
+              <div className="auth-form-group">
+                <h2>Telefone com codigo</h2>
+                <PhoneOtpForm nextPath={nextPath} />
+              </div>
+            </>
+          ) : null}
           <p className="auth-footnote">
             Ainda nao tem conta? <Link href="/cadastrar">Criar conta</Link>. Esqueceu a senha?{" "}
             <Link href="/recuperar-acesso">Recuperar acesso</Link>.

@@ -46,3 +46,7 @@ export function isSupabaseConfigured() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
   );
 }
+
+export function isPhoneAuthEnabled() {
+  return process.env.SUPABASE_PHONE_AUTH_ENABLED?.trim().toLowerCase() === "true";
+}
