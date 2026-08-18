@@ -90,7 +90,17 @@ The `/negocio/campanhas` route uses the protected `/negocio` route boundary and 
 
 Campaign creation is performed through server actions and `SECURITY DEFINER` RPCs that require `can_manage_business(p_business_id)`. Eligibility is calculated server-side from tenant-scoped customer cards, wallets, completed transactions, derived tiers, branch city, and profile marketing consent.
 
-Campaigns can materialize `campaign_audiences`, but this phase does not send notifications and does not mutate wallets, ledger entries, or transactions.
+Campaigns materialize `campaign_audiences`; FASE 14 uses those rows to create idempotent notifications without mutating wallets, ledger entries, or transactions.
+
+## Notification Security
+
+Notification queue insertion is database-owned. Authenticated browser roles cannot insert or update arbitrary notification rows.
+
+The delivery worker uses the service-role client only in server-only modules and is reachable through a cron route protected by `CRON_SECRET`. Queue claims are leased with `FOR UPDATE SKIP LOCKED`; the claim RPC is revoked from `public`, `anon`, and `authenticated` and granted only to `service_role`.
+
+Email delivery checks marketing consent and recipient email before queueing. Provider credentials and recipient addresses are never returned to browser components. Resend receives a stable idempotency key so worker retries do not duplicate a provider send.
+
+Customers read only notifications allowed by existing RLS and can mark only their own delivered in-app rows as read through a `SECURITY INVOKER` RPC. Authenticated roles receive column-level UPDATE permission for `read_at` only; the recipient UPDATE policy still determines which rows are writable.
 
 ## Public Marketplace Security
 

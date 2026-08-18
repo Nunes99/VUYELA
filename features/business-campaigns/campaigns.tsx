@@ -2,7 +2,7 @@ import { CalendarDays, Gift, Megaphone, ShieldCheck, Users } from "lucide-react"
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { formatMznMinor, formatPercent } from "@/features/business-dashboard/model";
+import { formatPercent } from "@/features/business-dashboard/model";
 
 import { CampaignCreationForm } from "./campaign-form";
 import { getCampaignStatusLabel, getCampaignTypeLabel } from "./model";
@@ -78,6 +78,7 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
           <CampaignCreationForm
             businesses={state.businesses}
             selectedBusinessId={state.selectedBusinessId}
+            emailDeliveryConfigured={state.emailDeliveryConfigured}
           />
         </div>
 
@@ -100,6 +101,18 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
             <Fact
               label="Media audiencia"
               value={state.analytics.averageAudienceCount.toLocaleString("pt-MZ")}
+            />
+            <Fact
+              label="Notificacoes"
+              value={state.analytics.notificationCount.toLocaleString("pt-MZ")}
+            />
+            <Fact
+              label="Entregues"
+              value={state.analytics.deliveredNotificationCount.toLocaleString("pt-MZ")}
+            />
+            <Fact
+              label="Falhas"
+              value={state.analytics.failedNotificationCount.toLocaleString("pt-MZ")}
             />
           </dl>
         </aside>
@@ -172,12 +185,12 @@ function CampaignList({ campaigns }: { campaigns: BusinessCampaign[] }) {
               <dd>{campaign.audienceCount.toLocaleString("pt-MZ")}</dd>
             </div>
             <div>
-              <dt>Consentidos</dt>
-              <dd>{campaign.consentedAudienceCount.toLocaleString("pt-MZ")}</dd>
+              <dt>Na fila</dt>
+              <dd>{campaign.queuedNotificationCount.toLocaleString("pt-MZ")}</dd>
             </div>
             <div>
-              <dt>Min. gasto</dt>
-              <dd>{formatAudienceSpend(campaign)}</dd>
+              <dt>Entregues</dt>
+              <dd>{campaign.deliveredNotificationCount.toLocaleString("pt-MZ")}</dd>
             </div>
           </dl>
         </article>
@@ -244,12 +257,6 @@ function formatCampaignWindow(campaign: BusinessCampaign): string {
   const end = campaign.endsAt ? formatDate(campaign.endsAt) : "Fim aberto";
 
   return `${start} a ${end}`;
-}
-
-function formatAudienceSpend(campaign: BusinessCampaign): string {
-  return campaign.audience.minTotalSpentMznMinor
-    ? formatMznMinor(campaign.audience.minTotalSpentMznMinor)
-    : "Sem minimo";
 }
 
 function formatDate(value: string): string {

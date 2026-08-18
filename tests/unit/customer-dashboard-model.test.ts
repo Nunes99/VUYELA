@@ -42,6 +42,16 @@ describe("customer dashboard model", () => {
       ],
       activity: [],
       offers: [],
+      notifications: [
+        {
+          id: "notification-1",
+          businessName: "Restaurante Mares",
+          subject: "Pontos em dobro",
+          body: "Volte este fim de semana.",
+          createdAt: "2026-08-18T10:00:00.000Z",
+          readAt: null
+        }
+      ],
       profile: {
         displayName: "Ana Mucavele",
         email: "ana@example.com",
@@ -55,6 +65,7 @@ describe("customer dashboard model", () => {
     expect(dashboard.totalValueMzn).toBe(300);
     expect(dashboard.activeCardCount).toBe(1);
     expect(dashboard.hasCards).toBe(true);
+    expect(dashboard.unreadNotificationCount).toBe(1);
   });
 
   it("builds activity copy and signed point movement", () => {

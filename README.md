@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 13 — Campaigns**.
+This repository has completed **FASE 14 — Notifications**.
 
 Completed foundation work includes:
 
@@ -34,8 +34,9 @@ Completed foundation work includes:
 - public marketplace discovery pages for establishments, business profiles, categories, cities, city/category combinations, active offers, SEO metadata, structured data, and sitemap inclusion only for meaningful indexable pages
 - public establishment and offer search with text, category, city, active-offer, location, and open-now filters where branch data supports them, using shareable noindex URLs
 - business campaign creation with rule-based segmentation, scheduled start/end dates, consent-aware eligibility calculation, materialized audiences, and campaign analytics
+- idempotent in-app and email notification delivery with customer read state, campaign delivery metrics, server-only providers, leased retries, and a protected Vercel Cron worker
 
-Product features such as notification delivery, referrals, subscriptions, and platform administration are intentionally not implemented yet.
+Product features such as referrals, subscriptions, and platform administration are intentionally not implemented yet.
 
 ## Scripts
 

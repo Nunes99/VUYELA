@@ -4,17 +4,19 @@ import { useActionState } from "react";
 import { Megaphone, Save } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
-import { Input, Select } from "../../vuyela-design-system/src/components/Field";
+import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
 import { initialCampaignActionState, submitCampaignAction } from "./actions";
 import { campaignTypes, getCampaignTypeLabel } from "./model";
 import type { BusinessCampaignBusinessOption } from "./data";
 
 export function CampaignCreationForm({
   businesses,
-  selectedBusinessId
+  selectedBusinessId,
+  emailDeliveryConfigured
 }: {
   businesses: BusinessCampaignBusinessOption[];
   selectedBusinessId: string;
+  emailDeliveryConfigured: boolean;
 }) {
   const [state, formAction, pending] = useActionState(
     submitCampaignAction,
@@ -62,13 +64,39 @@ export function CampaignCreationForm({
           required
         >
           <option value="in_app">In-app</option>
-          <option value="email">Email</option>
-          <option value="sms">SMS</option>
-          <option value="whatsapp">WhatsApp</option>
+          <option value="email" disabled={!emailDeliveryConfigured}>
+            {emailDeliveryConfigured ? "Email" : "Email (por configurar)"}
+          </option>
+          <option value="sms" disabled>
+            SMS (brevemente)
+          </option>
+          <option value="whatsapp" disabled>
+            WhatsApp (brevemente)
+          </option>
+          <option value="push" disabled>
+            Push (brevemente)
+          </option>
         </Select>
 
         <Input label="Inicio" name="startsAt" type="datetime-local" />
         <Input label="Fim" name="endsAt" type="datetime-local" />
+      </div>
+
+      <div className="business-campaign-form-section">
+        <span className="business-dashboard-eyebrow">Notificacao</span>
+        <div className="business-campaign-form-grid">
+          <Input label="Assunto" name="notificationSubject" maxLength={120} requiredMark required />
+          <Textarea
+            className="business-campaign-message-field"
+            label="Mensagem"
+            name="notificationBody"
+            minLength={10}
+            maxLength={2000}
+            rows={4}
+            requiredMark
+            required
+          />
+        </div>
       </div>
 
       <div className="business-campaign-form-section">

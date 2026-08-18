@@ -50,3 +50,7 @@ export function isSupabaseConfigured() {
 export function isPhoneAuthEnabled() {
   return process.env.SUPABASE_PHONE_AUTH_ENABLED?.trim().toLowerCase() === "true";
 }
+
+export function isNotificationEmailConfigured() {
+  return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.NOTIFICATION_EMAIL_FROM?.trim());
+}

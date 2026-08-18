@@ -140,6 +140,19 @@ Phase 05 includes unit tests that verify:
 - support/platform/super admin roles require MFA-ready checks;
 - authenticated landing routes resolve from the strongest available role.
 
+## Current Notification Coverage
+
+Phase 14 includes tests that verify:
+
+- notification channel validation includes future SMS, WhatsApp, and push providers;
+- retry delays are bounded and provider idempotency keys remain stable;
+- campaign audience inserts are deduplicated by notification idempotency key;
+- email queueing requires marketing consent and an email recipient;
+- worker claims use leases and `FOR UPDATE SKIP LOCKED`;
+- the claim RPC is service-role only and the cron route requires `CRON_SECRET`;
+- customers can mark only their own delivered in-app notifications as read;
+- customer dashboard summaries count unread notifications.
+
 ## Priority E2E
 
 Customer:

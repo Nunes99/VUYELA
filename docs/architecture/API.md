@@ -66,7 +66,19 @@ The feature uses server-side actions and PostgreSQL RPCs:
 - `calculate_campaign_eligibility`: evaluates rule-based segments from customer cards, wallets, completed transactions, tiers, recent branch city, and marketing consent;
 - `create_campaign_with_audience`: validates rules, derives draft/scheduled/active status, inserts a campaign, and materializes eligible audience rows.
 
-Campaign actions do not send notifications. Planned marketing channels require consent-aware eligibility so FASE 14 notification delivery has a safe audience boundary.
+Planned marketing channels require consent-aware eligibility so notification delivery has a safe audience boundary.
+
+## Notification Delivery
+
+FASE 14 adds a server-only delivery abstraction under `features/notifications`.
+
+- `queue_campaign_audience_notification` creates idempotent queue rows as audiences are materialized;
+- `claim_notification_deliveries` leases due rows to the service-role worker;
+- `/api/cron/notifications` authenticates Vercel Cron with `CRON_SECRET` and processes a bounded batch;
+- the Resend email provider sends the stored idempotency key in the provider request;
+- in-app rows are rendered server-side in `/cliente` and recipients use `mark_notification_read` to update read state.
+
+Email provider failures are classified as retryable or permanent. Retryable rows receive a bounded backoff time; exhausted or permanent failures move to `failed`. SMS, WhatsApp, and push implement the same provider interface later without changing campaign or worker contracts.
 
 ## Public Marketplace Reads
 

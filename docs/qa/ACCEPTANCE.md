@@ -205,3 +205,18 @@ A feature is complete only when:
 - static integration tests cover the campaign RPC/security contract;
 - E2E covers the protected campaigns route fallback without Supabase;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 14 Notifications Acceptance
+
+- campaign audience materialization creates at most one notification per recipient and channel;
+- in-app notifications appear in the authenticated customer dashboard and support unread/read state;
+- email delivery uses a server-only provider with no credential exposure to browser code;
+- campaign email notifications require marketing consent and a valid recipient address;
+- notification provider contracts support future SMS, WhatsApp, and push implementations;
+- due work is claimed with bounded batches, row locks, leases, and `SKIP LOCKED` concurrency;
+- retries use persisted attempt counts, bounded backoff, and stable provider idempotency keys;
+- the cron route requires `CRON_SECRET` and privileged queue claims are service-role only;
+- business campaign analytics show queued, delivered, and failed notification counts;
+- notification delivery does not mutate point wallets, point ledger, or transactions;
+- unit and static integration tests cover delivery, retries, consent, idempotency, RLS, and cron security;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

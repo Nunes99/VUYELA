@@ -1,6 +1,7 @@
-import { Activity, CreditCard, Home, Search, User } from "lucide-react";
+import { Activity, Bell, CreditCard, Home, Search, User } from "lucide-react";
 
 import { CustomerCardsView } from "@/features/customer-cards/card-list";
+import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { TransactionItem } from "../../vuyela-design-system/src/components/Loyalty";
 import { OfferCard } from "../../vuyela-design-system/src/components/Loyalty";
 
@@ -16,6 +17,7 @@ const navItems = [
   { href: "#cartoes", label: "Cartoes", icon: CreditCard },
   { href: "#explorar", label: "Explorar", icon: Search },
   { href: "#actividade", label: "Actividade", icon: Activity },
+  { href: "#notificacoes", label: "Avisos", icon: Bell },
   { href: "#perfil", label: "Perfil", icon: User }
 ];
 
@@ -156,6 +158,21 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
             body="Compras, ganhos e resgates aparecem aqui."
           />
         )}
+      </section>
+
+      <section id="notificacoes" aria-labelledby="customer-notifications-title">
+        <div className="customer-dashboard-section-heading customer-notification-heading">
+          <div>
+            <span className="customer-dashboard-eyebrow">Avisos</span>
+            <h2 id="customer-notifications-title">Notificacoes</h2>
+          </div>
+          {dashboard.unreadNotificationCount > 0 ? (
+            <span className="customer-notification-count">
+              {dashboard.unreadNotificationCount.toLocaleString("pt-MZ")} por ler
+            </span>
+          ) : null}
+        </div>
+        <InAppNotificationList notifications={dashboard.notifications} />
       </section>
 
       <section id="perfil" aria-labelledby="customer-profile-title">

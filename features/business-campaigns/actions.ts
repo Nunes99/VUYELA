@@ -2,11 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 
-import { isSupabaseConfigured } from "@/lib/env";
+import { isNotificationEmailConfigured, isSupabaseConfigured } from "@/lib/env";
 import { requireRouteAccess } from "@/lib/auth/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { isCampaignPlannedChannel, isCampaignRewardType, isCampaignType } from "./model";
+import {
+  isCampaignPlannedChannel,
+  isCampaignRewardType,
+  isCampaignType,
+  isDeliverableCampaignChannel
+} from "./model";
 import type {
   CampaignAudienceCriteria,
   CampaignPlannedChannel,
@@ -144,6 +149,14 @@ function parseCampaignForm(formData: FormData): ParseResult {
     return createParseError("Canal planeado invalido.");
   }
 
+  if (!isDeliverableCampaignChannel(plannedChannelValue.value)) {
+    return createParseError("Este canal ainda nao esta disponivel para envio.");
+  }
+
+  if (plannedChannelValue.value === "email" && !isNotificationEmailConfigured()) {
+    return createParseError("O canal de email ainda nao esta configurado.");
+  }
+
   const startsAt = parseOptionalMaputoDate(formData, "startsAt");
   if (!startsAt.ok) {
     return startsAt;
@@ -190,8 +203,39 @@ function parseRules(
 ): { ok: true; value: CampaignRuleConfig } | { ok: false; state: CampaignActionState } {
   const rules: CampaignRuleConfig = {
     rewardType,
-    plannedChannel
+    plannedChannel,
+    notificationSubject: "",
+    notificationBody: ""
   };
+
+  const notificationSubject = getRequiredFormString(
+    formData,
+    "notificationSubject",
+    "Assunto da notificacao"
+  );
+  if (!notificationSubject.ok) {
+    return notificationSubject;
+  }
+
+  const notificationBody = getRequiredFormString(
+    formData,
+    "notificationBody",
+    "Mensagem da notificacao"
+  );
+  if (!notificationBody.ok) {
+    return notificationBody;
+  }
+
+  if (notificationSubject.value.length > 120) {
+    return createParseError("O assunto da notificacao deve ter ate 120 caracteres.");
+  }
+
+  if (notificationBody.value.length < 10 || notificationBody.value.length > 2000) {
+    return createParseError("A mensagem deve ter entre 10 e 2000 caracteres.");
+  }
+
+  rules.notificationSubject = notificationSubject.value;
+  rules.notificationBody = notificationBody.value;
 
   if (rewardType === "points_multiplier") {
     const pointsMultiplier = parseOptionalNumber(formData, "pointsMultiplier", "Multiplicador");

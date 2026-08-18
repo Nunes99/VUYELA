@@ -15,6 +15,10 @@ const campaignsMigration = readFileSync(
   join(process.cwd(), "supabase/migrations/create_campaign_management.sql"),
   "utf8"
 );
+const notificationsMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/create_notification_delivery.sql"),
+  "utf8"
+);
 
 const requiredTables = [
   "profiles",
@@ -135,5 +139,13 @@ describe("initial database schema migration", () => {
     expect(campaignsMigration).toContain(
       "create or replace function public.calculate_campaign_eligibility"
     );
+  });
+
+  it("adds idempotent notification delivery and customer read tracking", () => {
+    expect(notificationsMigration).toContain("alter table public.notifications");
+    expect(notificationsMigration).toContain("idempotency_key text");
+    expect(notificationsMigration).toContain("attempt_count integer not null default 0");
+    expect(notificationsMigration).toContain("read_at timestamptz");
+    expect(notificationsMigration).toContain("notifications_campaign_business_fk");
   });
 });

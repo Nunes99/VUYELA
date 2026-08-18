@@ -36,13 +36,15 @@ export const campaignRewardTypes = [
 
 export type CampaignRewardType = (typeof campaignRewardTypes)[number];
 
-export const campaignPlannedChannels = ["in_app", "email", "sms", "whatsapp"] as const;
+export const campaignPlannedChannels = ["in_app", "email", "sms", "whatsapp", "push"] as const;
 
 export type CampaignPlannedChannel = (typeof campaignPlannedChannels)[number];
 
 export interface CampaignRuleConfig {
   rewardType: CampaignRewardType;
   plannedChannel: CampaignPlannedChannel;
+  notificationSubject: string;
+  notificationBody: string;
   pointsMultiplier?: number | undefined;
   bonusPoints?: number | undefined;
   discountPercent?: number | undefined;
@@ -72,6 +74,10 @@ export interface BusinessCampaign {
   audience: CampaignAudienceCriteria;
   audienceCount: number;
   consentedAudienceCount: number;
+  notificationCount: number;
+  queuedNotificationCount: number;
+  deliveredNotificationCount: number;
+  failedNotificationCount: number;
   createdAt: string;
 }
 
@@ -107,6 +113,10 @@ export interface CampaignAnalytics {
   consentedAudienceCount: number;
   averageAudienceCount: number;
   consentCoverageRate: number;
+  notificationCount: number;
+  queuedNotificationCount: number;
+  deliveredNotificationCount: number;
+  failedNotificationCount: number;
 }
 
 export function isCampaignType(value: string): value is CampaignType {
@@ -123,6 +133,12 @@ export function isCampaignRewardType(value: string): value is CampaignRewardType
 
 export function isCampaignPlannedChannel(value: string): value is CampaignPlannedChannel {
   return campaignPlannedChannels.includes(value as CampaignPlannedChannel);
+}
+
+export function isDeliverableCampaignChannel(
+  value: CampaignPlannedChannel
+): value is "in_app" | "email" {
+  return value === "in_app" || value === "email";
 }
 
 export function getCampaignTypeLabel(type: CampaignType): string {
@@ -229,7 +245,11 @@ export function buildCampaignAnalytics(campaigns: BusinessCampaign[]): CampaignA
     consentedAudienceCount,
     averageAudienceCount:
       campaigns.length > 0 ? Math.round(totalAudienceCount / campaigns.length) : 0,
-    consentCoverageRate: totalAudienceCount > 0 ? consentedAudienceCount / totalAudienceCount : 0
+    consentCoverageRate: totalAudienceCount > 0 ? consentedAudienceCount / totalAudienceCount : 0,
+    notificationCount: sumBy(campaigns, (campaign) => campaign.notificationCount),
+    queuedNotificationCount: sumBy(campaigns, (campaign) => campaign.queuedNotificationCount),
+    deliveredNotificationCount: sumBy(campaigns, (campaign) => campaign.deliveredNotificationCount),
+    failedNotificationCount: sumBy(campaigns, (campaign) => campaign.failedNotificationCount)
   };
 }
 

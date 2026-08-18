@@ -106,7 +106,18 @@ Campaigns include:
 - consent-aware eligibility when marketing communication is planned;
 - materialized audience rows for analytics and later notification delivery.
 
-Campaign creation and eligibility calculation run server-side. Campaigns do not mutate wallets, ledger entries, transactions, or customer balances. Communication delivery is not performed in this phase.
+Campaign creation and eligibility calculation run server-side. Campaigns do not mutate wallets, ledger entries, transactions, or customer balances.
+
+## Notifications
+
+Published campaigns can create one idempotent notification per eligible customer and channel.
+
+The first delivery channels are:
+
+- in-app notifications shown in the customer dashboard;
+- email through a configurable server-side provider.
+
+SMS, WhatsApp, and push share the provider contract but remain unavailable until their providers and consent requirements are configured. Scheduled messages remain queued until their delivery time. Failed email attempts use bounded retries and never create duplicate provider sends for the same notification.
 
 ## Public Marketplace
 

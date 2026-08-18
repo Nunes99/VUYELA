@@ -1,4 +1,6 @@
 import type { DigitalCustomerCard } from "@/features/customer-cards/model";
+import type { CustomerNotification } from "@/features/notifications/model";
+import { countUnreadNotifications } from "@/features/notifications/model";
 
 export interface CustomerActivityItem {
   id: string;
@@ -28,6 +30,7 @@ export interface CustomerDashboardViewModel {
   cards: DigitalCustomerCard[];
   activity: CustomerActivityItem[];
   offers: CustomerExploreOffer[];
+  notifications: CustomerNotification[];
   profile: CustomerProfileSummary;
   totalPoints: number;
   totalValueMzn: number;
@@ -35,17 +38,21 @@ export interface CustomerDashboardViewModel {
   hasCards: boolean;
   hasActivity: boolean;
   hasOffers: boolean;
+  hasNotifications: boolean;
+  unreadNotificationCount: number;
 }
 
 export function buildCustomerDashboardViewModel({
   cards,
   activity,
   offers,
+  notifications,
   profile
 }: {
   cards: DigitalCustomerCard[];
   activity: CustomerActivityItem[];
   offers: CustomerExploreOffer[];
+  notifications: CustomerNotification[];
   profile: CustomerProfileSummary;
 }): CustomerDashboardViewModel {
   const totalPoints = cards.reduce((sum, card) => sum + card.availablePoints, 0);
@@ -56,13 +63,16 @@ export function buildCustomerDashboardViewModel({
     cards,
     activity,
     offers,
+    notifications,
     profile,
     totalPoints,
     totalValueMzn,
     activeCardCount,
     hasCards: cards.length > 0,
     hasActivity: activity.length > 0,
-    hasOffers: offers.length > 0
+    hasOffers: offers.length > 0,
+    hasNotifications: notifications.length > 0,
+    unreadNotificationCount: countUnreadNotifications(notifications)
   };
 }
 

@@ -8,6 +8,7 @@ import {
   uniqueValues
 } from "@/features/customer-cards/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { CustomerNotification } from "@/features/notifications/model";
 
 import {
   buildCustomerDashboardViewModel,
@@ -52,6 +53,15 @@ interface OfferRow {
   description: string;
 }
 
+interface NotificationRow {
+  id: string;
+  business_id: string | null;
+  subject: string | null;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+}
+
 export type CustomerDashboardState =
   | { status: "empty"; dashboard: CustomerDashboardViewModel }
   | { status: "error"; message: string }
@@ -72,7 +82,8 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
   const [
     { data: profileData, error: profileError },
     { data: transactionData, error: transactionError },
-    { data: offerData, error: offerError }
+    { data: offerData, error: offerError },
+    { data: notificationData, error: notificationError }
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -94,16 +105,31 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
       .select("id, business_id, title, description")
       .eq("is_public", true)
       .eq("is_active", true)
-      .limit(6)
+      .limit(6),
+    supabase
+      .from("notifications")
+      .select("id, business_id, subject, body, created_at, read_at")
+      .eq("channel", "in_app")
+      .in("status", ["sent", "delivered"])
+      .order("created_at", { ascending: false })
+      .limit(12)
   ]);
 
-  if (profileError || transactionError || offerError) {
+  if (profileError || transactionError || offerError || notificationError) {
     return { status: "error", message: "Nao foi possivel carregar o dashboard do cliente." };
   }
 
   const offerRows = rowsFrom<OfferRow>(offerData);
+  const notificationRows = rowsFrom<NotificationRow>(notificationData);
   const offerBusinessIds = uniqueValues(offerRows.map((offer) => offer.business_id));
-  const businessesToFetch = uniqueValues([...businessIds, ...offerBusinessIds]);
+  const notificationBusinessIds = notificationRows
+    .map((notification) => notification.business_id)
+    .filter((businessId): businessId is string => Boolean(businessId));
+  const businessesToFetch = uniqueValues([
+    ...businessIds,
+    ...offerBusinessIds,
+    ...notificationBusinessIds
+  ]);
   const { data: businessData, error: businessError } =
     businessesToFetch.length > 0
       ? await supabase.from("businesses").select("id, name").in("id", businessesToFetch)
@@ -118,14 +144,36 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
     cards,
     activity: buildActivity(rowsFrom<TransactionRow>(transactionData), businessById),
     offers: buildOffers(offerRows, businessById),
+    notifications: buildNotifications(notificationRows, businessById),
     profile: buildProfile(rowFrom<ProfileRow>(profileData))
   });
 
-  if (!dashboard.hasCards && !dashboard.hasActivity && !dashboard.hasOffers) {
+  if (
+    !dashboard.hasCards &&
+    !dashboard.hasActivity &&
+    !dashboard.hasOffers &&
+    !dashboard.hasNotifications
+  ) {
     return { status: "empty", dashboard };
   }
 
   return { status: "populated", dashboard };
+}
+
+function buildNotifications(
+  rows: NotificationRow[],
+  businessById: Map<string, BusinessNameRow>
+): CustomerNotification[] {
+  return rows.map((row) => ({
+    id: row.id,
+    businessName: row.business_id
+      ? (businessById.get(row.business_id)?.name ?? "Negocio VUYELA")
+      : "VUYELA",
+    subject: row.subject?.trim() || "Nova notificacao",
+    body: row.body,
+    createdAt: row.created_at,
+    readAt: row.read_at
+  }));
 }
 
 function buildActivity(

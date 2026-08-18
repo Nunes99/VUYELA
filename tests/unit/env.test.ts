@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getSiteUrl, isPhoneAuthEnabled } from "@/lib/env";
+import { getSiteUrl, isNotificationEmailConfigured, isPhoneAuthEnabled } from "@/lib/env";
 
 describe("getSiteUrl", () => {
   it("falls back to localhost when no site URL is configured", () => {
@@ -47,3 +47,31 @@ describe("isPhoneAuthEnabled", () => {
     }
   });
 });
+
+describe("isNotificationEmailConfigured", () => {
+  it("requires both the provider key and sender identity", () => {
+    const previousApiKey = process.env.RESEND_API_KEY;
+    const previousFrom = process.env.NOTIFICATION_EMAIL_FROM;
+    delete process.env.RESEND_API_KEY;
+    delete process.env.NOTIFICATION_EMAIL_FROM;
+
+    expect(isNotificationEmailConfigured()).toBe(false);
+
+    process.env.RESEND_API_KEY = "re_test";
+    expect(isNotificationEmailConfigured()).toBe(false);
+
+    process.env.NOTIFICATION_EMAIL_FROM = "VUYELA <notificacoes@example.com>";
+    expect(isNotificationEmailConfigured()).toBe(true);
+
+    restoreEnvironmentValue("RESEND_API_KEY", previousApiKey);
+    restoreEnvironmentValue("NOTIFICATION_EMAIL_FROM", previousFrom);
+  });
+});
+
+function restoreEnvironmentValue(key: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[key];
+  } else {
+    process.env[key] = value;
+  }
+}

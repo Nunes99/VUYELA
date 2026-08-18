@@ -133,7 +133,11 @@ describe("business campaign model", () => {
       totalAudienceCount: 14,
       consentedAudienceCount: 10,
       averageAudienceCount: 5,
-      consentCoverageRate: 10 / 14
+      consentCoverageRate: 10 / 14,
+      notificationCount: 18,
+      queuedNotificationCount: 3,
+      deliveredNotificationCount: 12,
+      failedNotificationCount: 3
     });
   });
 });
@@ -149,12 +153,18 @@ function campaign(
     endsAt: null,
     rules: {
       rewardType: "message_only",
-      plannedChannel: "in_app"
+      plannedChannel: "in_app",
+      notificationSubject: "Novidade",
+      notificationBody: "Temos uma novidade para si."
     },
     audience: {
       requiresMarketingConsent: false
     },
     createdAt: "2026-08-17T10:00:00.000Z",
+    notificationCount: 6,
+    queuedNotificationCount: 1,
+    deliveredNotificationCount: 4,
+    failedNotificationCount: 1,
     ...overrides
   };
 }

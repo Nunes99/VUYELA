@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { AuthPrincipal, BusinessMemberRole, BusinessMembership } from "@/lib/auth/rbac";
+import { isNotificationEmailConfigured } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { buildCampaignAnalytics } from "./model";
@@ -34,6 +35,7 @@ export type BusinessCampaignsState =
       selectedBusinessId: string;
       campaigns: BusinessCampaign[];
       analytics: CampaignAnalytics;
+      emailDeliveryConfigured: boolean;
     };
 
 const campaignManagerRoles = new Set<BusinessMemberRole>(["business_admin", "business_owner"]);
@@ -94,7 +96,8 @@ export async function getBusinessCampaigns(
     businesses,
     selectedBusinessId: selectedBusiness.id,
     campaigns,
-    analytics
+    analytics,
+    emailDeliveryConfigured: isNotificationEmailConfigured()
   };
 }
 

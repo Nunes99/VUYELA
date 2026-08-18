@@ -15,11 +15,16 @@ supabase/migrations/create_business_dashboard_rpc.sql
 supabase/migrations/add_branch_opening_hours.sql
 supabase/migrations/create_campaign_management.sql
 supabase/migrations/ensure_auth_profiles_and_atomic_business_onboarding.sql
+supabase/migrations/create_notification_delivery.sql
+supabase/migrations/secure_notification_read_updates.sql
+supabase/migrations/restrict_notification_read_column.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
 
 FASE 11 uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers. FASE 12 adds optional public branch opening hours for search. FASE 13 adds campaign rule/audience constraints plus server-side campaign eligibility, creation, audience materialization, and analytics RPCs.
+
+FASE 14 extends `notifications` with campaign ownership, idempotency keys, delivery attempts, retry scheduling, worker leases, provider result fields, and read state.
 
 The post-connection auth hardening migration synchronizes `auth.users` with `public.profiles` and
 adds the atomic `submit_business_onboarding` RPC so onboarding cannot leave partial business data.
@@ -274,3 +279,13 @@ FASE 13 adds private business campaign functions:
 The functions are `SECURITY DEFINER`, use fixed `search_path`, and require `can_manage_business(p_business_id)`. Eligibility reads active customer cards, wallets, completed transactions, derived tiers, recent branch city, and profile marketing consent. Campaign creation inserts the campaign and materializes eligible `campaign_audiences` rows.
 
 The campaign functions do not update `point_wallets`, insert `point_ledger`, insert `transactions`, or send `notifications`.
+
+## Notification Delivery
+
+FASE 14 uses `notifications` as a durable delivery queue and recipient inbox.
+
+The campaign-audience insert trigger creates at most one row for each campaign, customer card, and channel. A partial unique index over `idempotency_key` prevents duplicate rows. Email recipients are checked again for both an address and marketing consent before queueing.
+
+`claim_notification_deliveries` is executable only by `service_role`. It claims due rows with `FOR UPDATE SKIP LOCKED`, increments the attempt count, and stores a short lease token. Stale leases can be reclaimed after five minutes.
+
+`mark_notification_read` is a `SECURITY INVOKER` function available to authenticated recipients. A column-level grant permits updates only to `read_at`, while a dedicated UPDATE policy limits rows to delivered in-app notifications owned by the current profile or customer card. Existing notification SELECT RLS continues to isolate recipients and business managers.
