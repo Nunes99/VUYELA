@@ -178,6 +178,18 @@ Phase 16 includes tests that verify:
 - append-only audit history;
 - protected admin views across desktop and mobile Playwright projects.
 
+## Current Subscription Coverage
+
+Phase 17 includes tests that verify:
+
+- subscription overview parsing, unlimited limits, labels, and bounded usage ratios;
+- plan limits and feature access are persisted in `plan_entitlements`;
+- branch, staff, and campaign checks use one per-business advisory transaction lock;
+- new-business trials and privileged plan changes create audit records;
+- administrative plan RPCs are service-role only and reject capacity below current usage;
+- campaign creation reads the authoritative subscription overview;
+- `/negocio/subscricao` remains stable in protected fallback mode.
+
 ## Priority E2E
 
 Customer:

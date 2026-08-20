@@ -17,6 +17,7 @@ import type {
   AdminDashboardState,
   AdminFraudEvent,
   AdminOperator,
+  AdminPlan,
   AdminSubscription,
   AdminSupportTicket,
   AdminUser,
@@ -46,8 +47,23 @@ interface BusinessRow {
 
 interface PlanRow {
   id: string;
+  slug: string;
   name: string;
+  description: string | null;
   monthly_price_mzn_minor: number | null;
+  trial_days: number;
+  is_public: boolean;
+  is_active: boolean;
+  sort_order: number;
+}
+
+interface PlanEntitlementRow {
+  plan_id: string;
+  branch_limit: number | null;
+  staff_limit: number | null;
+  campaign_limit: number | null;
+  analytics_level: string;
+  feature_flags: unknown;
 }
 
 interface SubscriptionRow {
@@ -138,6 +154,7 @@ export async function getAdminDashboardState(
       businesses: [],
       users: [],
       subscriptions: [],
+      plans: [],
       tickets: [],
       operators: [],
       fraudEvents: [],
@@ -151,7 +168,12 @@ export async function getAdminDashboardState(
     } else if (view === "users") {
       baseState.users = await loadUsers(supabase, query);
     } else if (view === "subscriptions") {
-      baseState.subscriptions = await loadSubscriptions(supabase, query);
+      const [subscriptions, plans] = await Promise.all([
+        loadSubscriptions(supabase, query),
+        loadAdminPlans(supabase)
+      ]);
+      baseState.subscriptions = subscriptions;
+      baseState.plans = plans;
     } else if (view === "support") {
       const [tickets, operators] = await Promise.all([
         loadSupportTickets(supabase, query),
@@ -317,6 +339,8 @@ async function loadSubscriptions(
       const plan = plans.get(row.plan_id);
       return {
         id: row.id,
+        businessId: row.business_id,
+        planId: row.plan_id,
         businessName,
         planName: plan?.name ?? "Plano removido",
         monthlyPriceMznMinor: plan?.monthly_price_mzn_minor ?? null,
@@ -326,6 +350,62 @@ async function loadSubscriptions(
       };
     })
     .filter((row) => matchesQuery(query, row.businessName, row.planName, row.status));
+}
+
+async function loadAdminPlans(supabase: SupabaseClient): Promise<AdminPlan[]> {
+  const [{ data: planData, error: planError }, { data: entitlementData, error: entitlementError }] =
+    await Promise.all([
+      supabase
+        .from("plans")
+        .select(
+          "id, slug, name, description, monthly_price_mzn_minor, trial_days, is_public, is_active, sort_order"
+        )
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true }),
+      supabase
+        .from("plan_entitlements")
+        .select(
+          "plan_id, branch_limit, staff_limit, campaign_limit, analytics_level, feature_flags"
+        )
+    ]);
+
+  if (planError || entitlementError) {
+    throw planError ?? entitlementError;
+  }
+
+  const entitlements = new Map(
+    ((entitlementData ?? []) as PlanEntitlementRow[]).map((row) => [row.plan_id, row])
+  );
+
+  return ((planData ?? []) as PlanRow[]).flatMap((plan) => {
+    const entitlement = entitlements.get(plan.id);
+
+    if (!entitlement) {
+      return [];
+    }
+
+    return [
+      {
+        id: plan.id,
+        slug: plan.slug,
+        name: plan.name,
+        description: plan.description ?? "",
+        monthlyPriceMznMinor: plan.monthly_price_mzn_minor,
+        trialDays: plan.trial_days,
+        branchLimit: entitlement.branch_limit,
+        staffLimit: entitlement.staff_limit,
+        campaignLimit: entitlement.campaign_limit,
+        analyticsLevel: entitlement.analytics_level,
+        featureFlags: Array.isArray(entitlement.feature_flags)
+          ? entitlement.feature_flags.filter(
+              (feature): feature is string => typeof feature === "string"
+            )
+          : [],
+        isPublic: plan.is_public,
+        isActive: plan.is_active
+      }
+    ];
+  });
 }
 
 async function loadSupportTickets(
@@ -581,7 +661,9 @@ async function loadPlanMap(supabase: SupabaseClient, ids: string[]): Promise<Map
 
   const { data, error } = await supabase
     .from("plans")
-    .select("id, name, monthly_price_mzn_minor")
+    .select(
+      "id, slug, name, description, monthly_price_mzn_minor, trial_days, is_public, is_active, sort_order"
+    )
     .in("id", uniqueIds);
 
   if (error) {

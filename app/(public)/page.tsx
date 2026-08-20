@@ -22,6 +22,8 @@ import {
   TransactionItem
 } from "../../vuyela-design-system/src/components/Loyalty";
 import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
+import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
+import { formatEntitlementLimit, getAnalyticsLabel } from "@/features/subscriptions/model";
 import { getSiteUrl } from "@/lib/env";
 
 const siteUrl = getSiteUrl();
@@ -130,7 +132,9 @@ const organizationJsonLd = {
     "Plataforma de fidelizacao digital para negocios em Mocambique criarem razoes reais para clientes voltarem."
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const subscriptionPlans = await getPublicSubscriptionPlans();
+
   return (
     <>
       <script
@@ -330,18 +334,52 @@ export default function HomePage() {
                 escalar para POS, campanhas e relatorios.
               </p>
             </div>
-            <div className="home-pricing__panel">
-              {pricingNotes.map((note) => (
-                <p key={note}>
-                  <CheckCircle2 size={18} />
-                  {note}
-                </p>
-              ))}
-              <a className="home-link-button home-link-button--primary" href="#faq">
-                Ver perguntas frequentes
-                <ArrowRight size={18} />
-              </a>
-            </div>
+            {subscriptionPlans.length > 0 ? (
+              <div className="home-pricing__plans">
+                {subscriptionPlans.map((plan) => (
+                  <article key={plan.id}>
+                    <span>{plan.name}</span>
+                    <strong>
+                      {plan.monthlyPriceMznMinor === null
+                        ? "Sob consulta"
+                        : `${(plan.monthlyPriceMznMinor / 100).toLocaleString("pt-MZ")} MZN`}
+                    </strong>
+                    <p>{plan.description}</p>
+                    <dl>
+                      <div>
+                        <dt>Filiais</dt>
+                        <dd>{formatEntitlementLimit(plan.branchLimit)}</dd>
+                      </div>
+                      <div>
+                        <dt>Equipa</dt>
+                        <dd>{formatEntitlementLimit(plan.staffLimit)}</dd>
+                      </div>
+                      <div>
+                        <dt>Campanhas</dt>
+                        <dd>{formatEntitlementLimit(plan.campaignLimit)}</dd>
+                      </div>
+                      <div>
+                        <dt>Analitica</dt>
+                        <dd>{getAnalyticsLabel(plan.analyticsLevel)}</dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="home-pricing__panel">
+                {pricingNotes.map((note) => (
+                  <p key={note}>
+                    <CheckCircle2 size={18} />
+                    {note}
+                  </p>
+                ))}
+                <a className="home-link-button home-link-button--primary" href="#faq">
+                  Ver perguntas frequentes
+                  <ArrowRight size={18} />
+                </a>
+              </div>
+            )}
           </div>
         </section>
 

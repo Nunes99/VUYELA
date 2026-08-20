@@ -7,6 +7,7 @@ export const adminCapabilities = [
   "users_read",
   "users_manage",
   "subscriptions_read",
+  "subscriptions_manage",
   "support_manage",
   "fraud_review",
   "audit_read"

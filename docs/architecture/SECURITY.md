@@ -24,6 +24,13 @@ FASE 16 implements that boundary in `/admin`. The route requires a platform role
 
 Administrative mutation RPCs are granted only to `service_role`. They validate the recorded actor, lock the target row, perform the mutation, and append actor, before/after state, IP, user agent, operation, and reason to `audit_logs` in one database transaction. Audit rows are append-only.
 
+FASE 17 applies subscription capacity in PostgreSQL instead of trusting UI checks. Branch,
+business-member, and campaign triggers resolve the tenant's active plan and serialize counted
+resource writes with a per-business advisory transaction lock. The authenticated subscription
+overview validates `can_manage_business`; plan assignment and configuration functions are
+`service_role` only, validate the platform actor, reject limits below current usage, and append an
+audit record in the same transaction.
+
 Browser-authenticated roles cannot directly write point wallets, point ledger, or transactions. FASE 06 adds server-side transactional RPC functions for those writes.
 
 ## Auth and Authorization

@@ -182,6 +182,109 @@ export async function reviewFraudEventAction(
   return adminSuccess("Alerta de fraude actualizado e auditado.");
 }
 
+export async function assignSubscriptionPlanAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const businessId = getFormString(formData, "businessId");
+  const planId = getFormString(formData, "planId");
+  const status = getFormString(formData, "status");
+  const note = getFormString(formData, "note");
+
+  if (
+    !isUuid(businessId) ||
+    !isUuid(planId) ||
+    !["trialing", "active", "paused"].includes(status) ||
+    note.length < 4
+  ) {
+    return adminError("Seleccione um plano, estado e motivo validos.");
+  }
+
+  const principal = await getActionPrincipal("subscriptions_manage");
+
+  if (!principal) {
+    return adminError("A sua funcao nao permite alterar subscricoes.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc("admin_assign_subscription_plan", {
+    p_actor_profile_id: principal.profileId,
+    p_business_id: businessId,
+    p_plan_id: planId,
+    p_status: status,
+    p_note: note,
+    p_ip_address: auditContext.ipAddress,
+    p_user_agent: auditContext.userAgent
+  });
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateSubscriptions();
+  return adminSuccess("Subscricao actualizada e auditada.");
+}
+
+export async function updatePlanEntitlementsAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const planId = getFormString(formData, "planId");
+  const monthlyPrice = parseMznMinor(formData.get("monthlyPriceMzn"));
+  const branchLimit = parseNullableInteger(formData.get("branchLimit"), 1);
+  const staffLimit = parseNullableInteger(formData.get("staffLimit"), 1);
+  const campaignLimit = parseNullableInteger(formData.get("campaignLimit"), 0);
+  const trialDays = parseRequiredInteger(formData.get("trialDays"), 0, 365);
+  const analyticsLevel = getFormString(formData, "analyticsLevel");
+  const featureFlags = parseFeatureFlags(getFormString(formData, "featureFlags"));
+  const note = getFormString(formData, "note");
+
+  if (
+    !isUuid(planId) ||
+    monthlyPrice === undefined ||
+    branchLimit === undefined ||
+    staffLimit === undefined ||
+    campaignLimit === undefined ||
+    trialDays === undefined ||
+    !["none", "basic", "standard", "advanced"].includes(analyticsLevel) ||
+    !featureFlags ||
+    note.length < 4
+  ) {
+    return adminError("Revise o preco, limites, funcionalidades e motivo do plano.");
+  }
+
+  const principal = await getActionPrincipal("subscriptions_manage");
+
+  if (!principal) {
+    return adminError("A sua funcao nao permite configurar planos.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc("admin_update_plan_entitlements", {
+    p_actor_profile_id: principal.profileId,
+    p_plan_id: planId,
+    p_monthly_price_mzn_minor: monthlyPrice,
+    p_branch_limit: branchLimit,
+    p_staff_limit: staffLimit,
+    p_campaign_limit: campaignLimit,
+    p_analytics_level: analyticsLevel,
+    p_feature_flags: featureFlags,
+    p_is_public: formData.get("isPublic") === "on",
+    p_is_active: formData.get("isActive") === "on",
+    p_trial_days: trialDays,
+    p_note: note,
+    p_ip_address: auditContext.ipAddress,
+    p_user_agent: auditContext.userAgent
+  });
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateSubscriptions();
+  return adminSuccess("Plano e entitlements actualizados e auditados.");
+}
+
 async function getActionPrincipal(capability: Parameters<typeof requireAdminCapability>[0]) {
   try {
     return await requireAdminCapability(capability);
@@ -212,6 +315,49 @@ function getFormString(formData: FormData, key: string): string {
   return typeof value === "string" ? value.trim().slice(0, 2000) : "";
 }
 
+function parseMznMinor(value: FormDataEntryValue | null): number | null | undefined {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) : undefined;
+}
+
+function parseNullableInteger(
+  value: FormDataEntryValue | null,
+  minimum: number
+): number | null | undefined {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= minimum ? parsed : undefined;
+}
+
+function parseRequiredInteger(
+  value: FormDataEntryValue | null,
+  minimum: number,
+  maximum: number
+): number | undefined {
+  const parsed = typeof value === "string" ? Number(value) : Number.NaN;
+  return Number.isInteger(parsed) && parsed >= minimum && parsed <= maximum ? parsed : undefined;
+}
+
+function parseFeatureFlags(value: string): string[] | null {
+  const flags = [
+    ...new Set(
+      value
+        .split(",")
+        .map((flag) => flag.trim().toLowerCase())
+        .filter(Boolean)
+    )
+  ];
+
+  return flags.every((flag) => /^[a-z][a-z0-9_]{1,63}$/.test(flag)) ? flags : null;
+}
+
 function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
@@ -233,11 +379,27 @@ function getDatabaseActionMessage(message: string): string {
     return "O estado do registo mudou. Actualize a pagina e tente novamente.";
   }
 
+  if (message.includes("limit is below current usage")) {
+    return "O novo plano fica abaixo do consumo actual do negocio.";
+  }
+
+  if (message.includes("limit reached for subscription plan")) {
+    return "O limite configurado no plano foi atingido.";
+  }
+
   return "Nao foi possivel concluir a operacao administrativa.";
 }
 
 function revalidateAdmin() {
   revalidatePath("/admin");
+}
+
+function revalidateSubscriptions() {
+  revalidateAdmin();
+  revalidatePath("/negocio");
+  revalidatePath("/negocio/campanhas");
+  revalidatePath("/negocio/subscricao");
+  revalidatePath("/");
 }
 
 function adminError(message: string): AdminActionState {

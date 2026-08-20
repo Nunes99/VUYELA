@@ -8,13 +8,15 @@ import { profileRoles } from "@/lib/auth/rbac";
 import type { ProfileRole } from "@/lib/auth/rbac";
 
 import {
+  assignSubscriptionPlanAction,
   initialAdminActionState,
   reviewBusinessAction,
   reviewFraudEventAction,
+  updatePlanEntitlementsAction,
   updateProfileRoleAction,
   updateSupportTicketAction
 } from "./actions";
-import type { AdminOperator } from "./model";
+import type { AdminOperator, AdminPlan } from "./model";
 
 interface BusinessReviewFormProps {
   businessId: string;
@@ -95,6 +97,136 @@ export function UserRoleForm({
             </option>
           ))}
         </select>
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Motivo</span>
+        <input maxLength={1000} name="note" placeholder="Obrigatorio" required />
+      </label>
+      <SubmitButton label="Guardar" pending={pending} />
+      <ActionMessage state={state} />
+    </form>
+  );
+}
+
+export function SubscriptionPlanForm({
+  businessId,
+  currentPlanId,
+  currentStatus,
+  plans
+}: {
+  businessId: string;
+  currentPlanId: string;
+  currentStatus: string;
+  plans: AdminPlan[];
+}) {
+  const [state, action, pending] = useActionState(
+    assignSubscriptionPlanAction,
+    initialAdminActionState
+  );
+  const activePlans = plans.filter((plan) => plan.isActive);
+
+  if (activePlans.length === 0) {
+    return null;
+  }
+
+  return (
+    <form action={action} className="admin-inline-form">
+      <input name="businessId" type="hidden" value={businessId} />
+      <label>
+        <span>Plano</span>
+        <select defaultValue={currentPlanId} name="planId">
+          {activePlans.map((plan) => (
+            <option key={plan.id} value={plan.id}>
+              {plan.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <span>Estado</span>
+        <select
+          defaultValue={
+            ["trialing", "active", "paused"].includes(currentStatus) ? currentStatus : "active"
+          }
+          name="status"
+        >
+          <option value="trialing">Em teste</option>
+          <option value="active">Activa</option>
+          <option value="paused">Pausada</option>
+        </select>
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Motivo</span>
+        <input maxLength={1000} name="note" placeholder="Obrigatorio" required />
+      </label>
+      <SubmitButton label="Guardar" pending={pending} />
+      <ActionMessage state={state} />
+    </form>
+  );
+}
+
+export function PlanEntitlementsForm({ plan }: { plan: AdminPlan }) {
+  const [state, action, pending] = useActionState(
+    updatePlanEntitlementsAction,
+    initialAdminActionState
+  );
+
+  return (
+    <form action={action} className="admin-inline-form admin-plan-form">
+      <input name="planId" type="hidden" value={plan.id} />
+      <label>
+        <span>Mensalidade (MZN)</span>
+        <input
+          defaultValue={plan.monthlyPriceMznMinor === null ? "" : plan.monthlyPriceMznMinor / 100}
+          min="0"
+          name="monthlyPriceMzn"
+          step="0.01"
+          type="number"
+        />
+      </label>
+      <label>
+        <span>Filiais</span>
+        <input defaultValue={plan.branchLimit ?? ""} min="1" name="branchLimit" type="number" />
+      </label>
+      <label>
+        <span>Equipa</span>
+        <input defaultValue={plan.staffLimit ?? ""} min="1" name="staffLimit" type="number" />
+      </label>
+      <label>
+        <span>Campanhas</span>
+        <input defaultValue={plan.campaignLimit ?? ""} min="0" name="campaignLimit" type="number" />
+      </label>
+      <label>
+        <span>Analitica</span>
+        <select defaultValue={plan.analyticsLevel} name="analyticsLevel">
+          <option value="none">Sem analitica</option>
+          <option value="basic">Basica</option>
+          <option value="standard">Standard</option>
+          <option value="advanced">Avancada</option>
+        </select>
+      </label>
+      <label>
+        <span>Dias de teste</span>
+        <input
+          defaultValue={plan.trialDays}
+          max="365"
+          min="0"
+          name="trialDays"
+          required
+          type="number"
+        />
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Funcionalidades</span>
+        <input defaultValue={plan.featureFlags.join(", ")} name="featureFlags" />
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input defaultChecked={plan.isPublic} name="isPublic" type="checkbox" />
+        <span>Publico</span>
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input defaultChecked={plan.isActive} name="isActive" type="checkbox" />
+        <span>Activo</span>
       </label>
       <label className="admin-inline-form__wide">
         <span>Motivo</span>

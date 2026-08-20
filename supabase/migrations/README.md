@@ -21,5 +21,6 @@ Apply them in this exact order:
 15. `harden_referral_programs.sql`
 16. `implement_platform_administration.sql`
 17. `harden_platform_administration.sql`
+18. `implement_subscription_entitlements.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

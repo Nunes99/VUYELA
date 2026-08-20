@@ -86,6 +86,10 @@ export async function submitCampaignAction(
   });
 
   if (error) {
+    if (error.message.includes("Campaign limit reached for subscription plan")) {
+      return createErrorState("O limite de campanhas abertas do plano foi atingido.");
+    }
+
     return createErrorState("Nao foi possivel criar a campanha. Confirme permissoes e regras.");
   }
 

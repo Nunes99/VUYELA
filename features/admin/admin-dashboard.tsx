@@ -19,6 +19,8 @@ import type { AuthPrincipal } from "@/lib/auth/rbac";
 import {
   BusinessReviewForm,
   FraudReviewForm,
+  PlanEntitlementsForm,
+  SubscriptionPlanForm,
   SupportTicketForm,
   UserRoleForm
 } from "./action-forms";
@@ -29,6 +31,7 @@ import type {
   AdminDashboardReadyState,
   AdminDashboardState,
   AdminFraudEvent,
+  AdminPlan,
   AdminSubscription,
   AdminSupportTicket,
   AdminUser,
@@ -140,7 +143,11 @@ function AdminViewContent({
         />
       ) : null}
       {state.view === "subscriptions" ? (
-        <SubscriptionList subscriptions={state.subscriptions} />
+        <SubscriptionManagement
+          canManage={state.capabilities.includes("subscriptions_manage")}
+          plans={state.plans}
+          subscriptions={state.subscriptions}
+        />
       ) : null}
       {state.view === "support" ? (
         <SupportList operators={state.operators} tickets={state.tickets} />
@@ -309,7 +316,75 @@ function UserList({
   );
 }
 
-function SubscriptionList({ subscriptions }: { subscriptions: AdminSubscription[] }) {
+function SubscriptionManagement({
+  subscriptions,
+  plans,
+  canManage
+}: {
+  subscriptions: AdminSubscription[];
+  plans: AdminPlan[];
+  canManage: boolean;
+}) {
+  return (
+    <div className="admin-subscription-management">
+      <div>
+        <h3>Planos</h3>
+        <PlanCatalog canManage={canManage} plans={plans} />
+      </div>
+      <div>
+        <h3>Subscricoes por negocio</h3>
+        <SubscriptionList canManage={canManage} plans={plans} subscriptions={subscriptions} />
+      </div>
+    </div>
+  );
+}
+
+function PlanCatalog({ plans, canManage }: { plans: AdminPlan[]; canManage: boolean }) {
+  if (plans.length === 0) {
+    return <EmptyState label="Nenhum plano configurado." />;
+  }
+
+  return (
+    <div className="admin-record-list">
+      {plans.map((plan) => (
+        <article className="admin-record" key={plan.id}>
+          <div className="admin-record__header">
+            <div>
+              <h3>{plan.name}</h3>
+              <p>{plan.description}</p>
+            </div>
+            <StatusBadge value={plan.isActive ? "active" : "paused"} />
+          </div>
+          <dl className="admin-record__facts">
+            <Fact
+              label="Mensalidade"
+              value={
+                plan.monthlyPriceMznMinor === null
+                  ? "Sob consulta"
+                  : formatMznMinor(plan.monthlyPriceMznMinor)
+              }
+            />
+            <Fact label="Filiais" value={formatAdminLimit(plan.branchLimit)} />
+            <Fact label="Equipa" value={formatAdminLimit(plan.staffLimit)} />
+            <Fact label="Campanhas" value={formatAdminLimit(plan.campaignLimit)} />
+            <Fact label="Analitica" value={plan.analyticsLevel} />
+          </dl>
+          {canManage ? <PlanEntitlementsForm plan={plan} /> : null}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function SubscriptionList({
+  subscriptions,
+  plans,
+  canManage
+}: {
+  subscriptions: AdminSubscription[];
+  plans: AdminPlan[];
+  canManage: boolean;
+}) {
   if (subscriptions.length === 0) {
     return <EmptyState label="Nenhuma subscricao encontrada." />;
   }
@@ -339,10 +414,22 @@ function SubscriptionList({ subscriptions }: { subscriptions: AdminSubscription[
               value={formatAdminDate(subscription.currentPeriodEnd ?? subscription.trialEndsAt)}
             />
           </dl>
+          {canManage ? (
+            <SubscriptionPlanForm
+              businessId={subscription.businessId}
+              currentPlanId={subscription.planId}
+              currentStatus={subscription.status}
+              plans={plans}
+            />
+          ) : null}
         </article>
       ))}
     </div>
   );
+}
+
+function formatAdminLimit(limit: number | null): string {
+  return limit === null ? "Ilimitado" : limit.toLocaleString("pt-MZ");
 }
 
 function SupportList({

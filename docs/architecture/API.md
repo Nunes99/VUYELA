@@ -68,6 +68,19 @@ The feature uses server-side actions and PostgreSQL RPCs:
 
 Planned marketing channels require consent-aware eligibility so notification delivery has a safe audience boundary.
 
+## Subscription Management
+
+FASE 17 adds the following PostgreSQL boundaries:
+
+- `get_business_subscription_overview`: authenticated, tenant-checked read of the current plan,
+  usage, entitlements, and public plan catalogue;
+- `admin_assign_subscription_plan`: service-role-only audited plan assignment;
+- `admin_update_plan_entitlements`: service-role-only audited price, trial, visibility, and
+  entitlement configuration.
+
+`/negocio/subscricao` renders the overview server-side. Campaign creation uses the same overview
+for an early UI check, while PostgreSQL triggers remain the authoritative capacity enforcement.
+
 ## Notification Delivery
 
 FASE 14 adds a server-only delivery abstraction under `features/notifications`.

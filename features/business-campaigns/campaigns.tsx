@@ -75,11 +75,25 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
             title="Nova campanha"
             body="Crie uma campanha baseada em regras e audiencia calculada no servidor."
           />
-          <CampaignCreationForm
-            businesses={state.businesses}
-            selectedBusinessId={state.selectedBusinessId}
-            emailDeliveryConfigured={state.emailDeliveryConfigured}
-          />
+          {state.canCreateCampaign ? (
+            <CampaignCreationForm
+              businesses={state.businesses}
+              selectedBusinessId={state.selectedBusinessId}
+              emailDeliveryConfigured={state.emailDeliveryConfigured}
+            />
+          ) : (
+            <div className="business-dashboard-empty" role="status">
+              <Megaphone aria-hidden="true" size={22} />
+              <h3>Limite de campanhas atingido</h3>
+              <p>
+                {state.campaignUsage.toLocaleString("pt-MZ")} de{" "}
+                {state.campaignLimit?.toLocaleString("pt-MZ")} campanhas abertas.
+              </p>
+              <Link className="business-campaign-link" href="/negocio/subscricao">
+                Ver subscricao
+              </Link>
+            </div>
+          )}
         </div>
 
         <aside className="business-dashboard-section">

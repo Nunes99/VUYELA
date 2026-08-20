@@ -22,6 +22,7 @@ supabase/migrations/implement_referral_programs.sql
 supabase/migrations/harden_referral_programs.sql
 supabase/migrations/implement_platform_administration.sql
 supabase/migrations/harden_platform_administration.sql
+supabase/migrations/implement_subscription_entitlements.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
@@ -33,6 +34,11 @@ FASE 14 extends `notifications` with campaign ownership, idempotency keys, deliv
 FASE 15 completes referrals with tenant configuration, one-use invitation codes, purchase qualification, fraud controls, atomic rewards, ledger entries, and refund reversals.
 
 FASE 16 extends business review, support, and fraud records with operational ownership and resolution fields. Platform administration uses service-role-only transactional RPCs for business review, user role changes, support updates, and fraud review. Each privileged mutation locks its target and appends an immutable audit entry in the same transaction. A read-only platform metrics RPC supplies aggregate operational indicators.
+
+FASE 17 adds `plan_entitlements`, configurable trial duration, default trial provisioning, and
+database-enforced limits for active branches, active business members, and open campaigns. Limit
+checks and plan changes share a per-business advisory transaction lock, preventing concurrent
+writes from exceeding configured capacity. `null` limits mean unlimited capacity.
 
 The post-connection auth hardening migration synchronizes `auth.users` with `public.profiles` and
 adds the atomic `submit_business_onboarding` RPC so onboarding cannot leave partial business data.
@@ -78,6 +84,7 @@ Growth and communication:
 Monetization and operations:
 
 - `plans`
+- `plan_entitlements`
 - `subscriptions`
 - `support_tickets`
 - `audit_logs`

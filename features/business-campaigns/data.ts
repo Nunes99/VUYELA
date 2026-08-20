@@ -3,6 +3,7 @@ import "server-only";
 import type { AuthPrincipal, BusinessMemberRole, BusinessMembership } from "@/lib/auth/rbac";
 import { isNotificationEmailConfigured } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { parseBusinessSubscriptionOverview } from "@/features/subscriptions/model";
 
 import { buildCampaignAnalytics } from "./model";
 import type { BusinessCampaign, CampaignAnalytics } from "./model";
@@ -36,6 +37,9 @@ export type BusinessCampaignsState =
       campaigns: BusinessCampaign[];
       analytics: CampaignAnalytics;
       emailDeliveryConfigured: boolean;
+      campaignLimit: number | null;
+      campaignUsage: number;
+      canCreateCampaign: boolean;
     };
 
 const campaignManagerRoles = new Set<BusinessMemberRole>(["business_admin", "business_owner"]);
@@ -78,18 +82,33 @@ export async function getBusinessCampaigns(
 
   const selectedBusiness =
     businesses.find((business) => business.id === params.businessId) ?? businesses[0];
-  const { data, error } = await supabase.rpc("get_business_campaigns", {
-    p_business_id: selectedBusiness.id
-  });
+  const [campaignResult, subscriptionResult] = await Promise.all([
+    supabase.rpc("get_business_campaigns", {
+      p_business_id: selectedBusiness.id
+    }),
+    supabase.rpc("get_business_subscription_overview", {
+      p_business_id: selectedBusiness.id
+    })
+  ]);
 
-  if (error) {
+  if (campaignResult.error || subscriptionResult.error) {
     return { status: "error", message: "Nao foi possivel carregar as campanhas." };
   }
 
-  const row = Array.isArray(data) ? (data[0] as BusinessCampaignsRpcRow | undefined) : undefined;
+  const row = Array.isArray(campaignResult.data)
+    ? (campaignResult.data[0] as BusinessCampaignsRpcRow | undefined)
+    : undefined;
   const campaigns = arrayFrom<BusinessCampaign>(row?.campaigns).filter(isBusinessCampaign);
   const analytics =
     objectFrom<CampaignAnalytics>(row?.analytics) ?? buildCampaignAnalytics(campaigns);
+  const subscription = parseBusinessSubscriptionOverview(subscriptionResult.data);
+
+  if (!subscription?.entitlements) {
+    return { status: "error", message: "O plano do negocio nao esta configurado." };
+  }
+
+  const campaignLimit = subscription.entitlements.campaignLimit;
+  const campaignUsage = subscription.usage.campaigns;
 
   return {
     status: "ready",
@@ -97,7 +116,10 @@ export async function getBusinessCampaigns(
     selectedBusinessId: selectedBusiness.id,
     campaigns,
     analytics,
-    emailDeliveryConfigured: isNotificationEmailConfigured()
+    emailDeliveryConfigured: isNotificationEmailConfigured(),
+    campaignLimit,
+    campaignUsage,
+    canCreateCampaign: campaignLimit === null || campaignUsage < campaignLimit
   };
 }
 

@@ -50,12 +50,30 @@ export interface AdminUser {
 
 export interface AdminSubscription {
   id: string;
+  businessId: string;
+  planId: string;
   businessName: string;
   planName: string;
   monthlyPriceMznMinor: number | null;
   status: string;
   currentPeriodEnd: string | null;
   trialEndsAt: string | null;
+}
+
+export interface AdminPlan {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  monthlyPriceMznMinor: number | null;
+  trialDays: number;
+  branchLimit: number | null;
+  staffLimit: number | null;
+  campaignLimit: number | null;
+  analyticsLevel: string;
+  featureFlags: string[];
+  isPublic: boolean;
+  isActive: boolean;
 }
 
 export interface AdminOperator {
@@ -114,6 +132,7 @@ export interface AdminDashboardReadyState {
   businesses: AdminBusiness[];
   users: AdminUser[];
   subscriptions: AdminSubscription[];
+  plans: AdminPlan[];
   tickets: AdminSupportTicket[];
   operators: AdminOperator[];
   fraudEvents: AdminFraudEvent[];

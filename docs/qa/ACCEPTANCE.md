@@ -249,3 +249,17 @@ A feature is complete only when:
 - audit records are append-only;
 - desktop and mobile Playwright projects verify every protected admin view;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 17 Subscription System Acceptance
+
+- plans, prices, trials, capacity limits, analytics levels, and feature flags are configurable in
+  PostgreSQL rather than hard-coded in application code;
+- every new business receives an audited default trial subscription;
+- active branches, staff, and open campaigns cannot exceed the active plan under concurrent writes;
+- business admins and owners can inspect their current plan, usage, features, and public catalogue;
+- campaign creation displays the configured capacity and is blocked by PostgreSQL at the limit;
+- platform admins can assign plans and update entitlements through service-role-only audited RPCs;
+- a plan cannot be assigned or reduced below current tenant usage;
+- the public pricing section is rendered from active public database plans;
+- payment collection remains explicitly outside scope until a provider is configured;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
