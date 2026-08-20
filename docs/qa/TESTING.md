@@ -137,7 +137,7 @@ Phase 05 includes unit tests that verify:
 - customers cannot access business, POS, or admin routes without roles;
 - cashier POS access is limited to the assigned business/branch;
 - business admins cannot manage business owner privileges;
-- support/platform/super admin roles require MFA-ready checks;
+- support/platform/super admin roles require a verified Supabase Auth `aal2` session;
 - authenticated landing routes resolve from the strongest available role.
 
 ## Current Notification Coverage

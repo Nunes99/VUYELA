@@ -32,7 +32,7 @@ The app tests and enforces:
 - customers cannot access business, POS, or admin areas unless they also hold an active business/platform role;
 - cashiers are scoped to assigned branch access;
 - business admins cannot grant or remove business owner privileges;
-- platform roles require MFA-ready checks before admin route access.
+- platform roles require a Supabase Auth `aal2` session before admin route access.
 
 Service-role access is isolated to server-only helpers and must be paired with audit logs for privileged writes.
 

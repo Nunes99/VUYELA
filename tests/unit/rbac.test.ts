@@ -4,6 +4,7 @@ import {
   canAccessRoute,
   canManageBusinessRole,
   getDefaultAuthenticatedPath,
+  isMfaVerifiedAssuranceLevel,
   requiresMfa
 } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
@@ -85,7 +86,7 @@ describe("RBAC", () => {
     expect(canManageBusinessRole("cashier", "cashier")).toBe(false);
   });
 
-  it("requires MFA-ready checks for privileged platform roles", () => {
+  it("requires MFA checks for privileged platform roles", () => {
     expect(requiresMfa("support_agent")).toBe(true);
     expect(requiresMfa("platform_admin")).toBe(true);
     expect(requiresMfa("super_admin")).toBe(true);
@@ -102,6 +103,12 @@ describe("RBAC", () => {
         "/admin"
       )
     ).toBe(false);
+  });
+
+  it("accepts only a real aal2 session as completed MFA", () => {
+    expect(isMfaVerifiedAssuranceLevel("aal2")).toBe(true);
+    expect(isMfaVerifiedAssuranceLevel("aal1")).toBe(false);
+    expect(isMfaVerifiedAssuranceLevel(null)).toBe(false);
   });
 
   it("resolves the default authenticated landing route by strongest role", () => {

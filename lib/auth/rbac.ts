@@ -69,6 +69,10 @@ export function requiresMfa(profileRole: ProfileRole) {
   return mfaRequiredProfileRoles.has(profileRole);
 }
 
+export function isMfaVerifiedAssuranceLevel(level: string | null | undefined) {
+  return level === "aal2";
+}
+
 export function hasCompletedMfa(principal: AuthPrincipal) {
   return !requiresMfa(principal.profileRole) || principal.mfaVerified;
 }

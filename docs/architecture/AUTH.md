@@ -15,7 +15,7 @@ Prepare architecture for future Google and Apple sign-in without implementing th
 - verification;
 - session management;
 - device logout;
-- MFA-ready privileged roles.
+- TOTP MFA for privileged roles.
 
 ## RBAC
 
@@ -47,15 +47,17 @@ Protected routes use server-side route state instead of duplicating permission c
 - `/onboarding/cliente`
 - `/onboarding/negocio`
 
-## MFA-Ready Direction
+## Administrative MFA
 
-Privileged platform roles require MFA-ready checks before `/admin` access:
+Privileged platform roles require a Supabase Auth `aal2` session before `/admin` access:
 
 - `support_agent`
 - `platform_admin`
 - `super_admin`
 
-The provider-specific MFA challenge UI is deferred, but the route guard already treats missing MFA as a blocking state.
+`/mfa` supports TOTP enrollment and challenge with an authenticator application. The server derives
+the completed state from Supabase Auth's authenticator assurance level instead of mutable profile or
+user metadata.
 
 ## Environment
 

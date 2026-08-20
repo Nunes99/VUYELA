@@ -19,7 +19,7 @@ export default async function AdminPage() {
   return (
     <ProtectedRouteStateView state={state} title="Administracao VUYELA">
       <div className="dashboard-card">
-        <h2>MFA-ready e service-role</h2>
+        <h2>MFA activo e operacoes privilegiadas</h2>
         <p>
           Rotas privilegiadas exigem papel de plataforma e MFA. Acoes administrativas sensiveis
           devem usar service-role server-side com auditoria.
