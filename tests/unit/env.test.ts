@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { getSiteUrl, isNotificationEmailConfigured, isPhoneAuthEnabled } from "@/lib/env";
+import {
+  getSiteUrl,
+  getSupabaseServiceRoleKey,
+  isNotificationEmailConfigured,
+  isPhoneAuthEnabled
+} from "@/lib/env";
 
 describe("getSiteUrl", () => {
   it("falls back to localhost when no site URL is configured", () => {
@@ -65,6 +70,46 @@ describe("isNotificationEmailConfigured", () => {
 
     restoreEnvironmentValue("RESEND_API_KEY", previousApiKey);
     restoreEnvironmentValue("NOTIFICATION_EMAIL_FROM", previousFrom);
+  });
+});
+
+describe("getSupabaseServiceRoleKey", () => {
+  it("prefers the modern Supabase secret key", () => {
+    const previousSecretKey = process.env.SUPABASE_SECRET_KEY;
+    const previousServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    process.env.SUPABASE_SECRET_KEY = "modern-secret";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "legacy-service-role";
+
+    expect(getSupabaseServiceRoleKey()).toBe("modern-secret");
+
+    restoreEnvironmentValue("SUPABASE_SECRET_KEY", previousSecretKey);
+    restoreEnvironmentValue("SUPABASE_SERVICE_ROLE_KEY", previousServiceRoleKey);
+  });
+
+  it("supports the legacy service role key", () => {
+    const previousSecretKey = process.env.SUPABASE_SECRET_KEY;
+    const previousServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.SUPABASE_SECRET_KEY;
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "legacy-service-role";
+
+    expect(getSupabaseServiceRoleKey()).toBe("legacy-service-role");
+
+    restoreEnvironmentValue("SUPABASE_SECRET_KEY", previousSecretKey);
+    restoreEnvironmentValue("SUPABASE_SERVICE_ROLE_KEY", previousServiceRoleKey);
+  });
+
+  it("rejects an unconfigured privileged client", () => {
+    const previousSecretKey = process.env.SUPABASE_SECRET_KEY;
+    const previousServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.SUPABASE_SECRET_KEY;
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    expect(() => getSupabaseServiceRoleKey()).toThrow(
+      "SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY"
+    );
+
+    restoreEnvironmentValue("SUPABASE_SECRET_KEY", previousSecretKey);
+    restoreEnvironmentValue("SUPABASE_SERVICE_ROLE_KEY", previousServiceRoleKey);
   });
 });
 

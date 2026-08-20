@@ -166,7 +166,12 @@ export async function getAdminDashboardState(
     }
 
     return baseState;
-  } catch {
+  } catch (error) {
+    console.error("Admin dashboard data load failed", {
+      view,
+      errorCode: getAdminDataErrorCode(error)
+    });
+
     return {
       status: "error",
       view,
@@ -174,6 +179,18 @@ export async function getAdminDashboardState(
       message: "Nao foi possivel carregar os dados administrativos. Tente novamente."
     };
   }
+}
+
+function getAdminDataErrorCode(error: unknown) {
+  if (isRecord(error) && typeof error.code === "string") {
+    return error.code.slice(0, 64);
+  }
+
+  if (error instanceof Error) {
+    return error.name;
+  }
+
+  return "unknown";
 }
 
 async function loadMetrics(

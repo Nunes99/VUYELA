@@ -31,10 +31,18 @@ export function getSupabaseAnonKey() {
 }
 
 export function getSupabaseServiceRoleKey() {
+  const secretKey = process.env.SUPABASE_SECRET_KEY?.trim();
+
+  if (secretKey) {
+    return secretKey;
+  }
+
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
   if (!serviceRoleKey) {
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required for privileged server operations.");
+    throw new Error(
+      "SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY is required for privileged server operations."
+    );
   }
 
   return serviceRoleKey;
