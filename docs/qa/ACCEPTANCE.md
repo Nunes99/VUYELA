@@ -235,3 +235,17 @@ A feature is complete only when:
 - static integration tests cover configuration, no-signup reward, qualification, fraud controls, RPC wrapping, reversals, privileges, and protected routes;
 - E2E covers customer and business protected fallbacks;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 16 Platform Administration Acceptance
+
+- `/admin` requires a platform role and a verified AAL2 session;
+- the admin console provides platform metrics, business approval, user management, subscription visibility, support, fraud review, and audit views;
+- support agents cannot approve businesses, change profile roles, or read the global audit trail;
+- platform admins cannot change their own role or manage platform-admin and super-admin roles;
+- the final super admin cannot be demoted;
+- privileged database functions are executable only by `service_role`;
+- business, profile, support, and fraud mutations lock the target and append an audit entry in the same transaction;
+- audit entries include actor, before/after state, IP, user agent, operation, reason, and timestamp;
+- audit records are append-only;
+- desktop and mobile Playwright projects verify every protected admin view;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

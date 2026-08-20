@@ -20,6 +20,10 @@ The Phase 04 RLS migration enables Row Level Security on private tables and adds
 
 Platform roles such as support agent, platform admin, and super admin do not receive direct client-side policy bypasses. They must use server-side service-role paths with audit logging.
 
+FASE 16 implements that boundary in `/admin`. The route requires a platform role and AAL2, while server-only capability gates separately authorize metrics, business review, user management, subscription visibility, support, fraud review, and global audit access. Support agents cannot approve businesses, alter profile roles, or read the global audit trail. Platform admins cannot alter platform-admin or super-admin roles; only a super admin can do so, and the final super admin cannot be demoted.
+
+Administrative mutation RPCs are granted only to `service_role`. They validate the recorded actor, lock the target row, perform the mutation, and append actor, before/after state, IP, user agent, operation, and reason to `audit_logs` in one database transaction. Audit rows are append-only.
+
 Browser-authenticated roles cannot directly write point wallets, point ledger, or transactions. FASE 06 adds server-side transactional RPC functions for those writes.
 
 ## Auth and Authorization

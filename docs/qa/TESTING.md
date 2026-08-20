@@ -167,6 +167,17 @@ Phase 15 includes tests that verify:
 - internal reward functions are not executable by anonymous or authenticated API roles;
 - `/cliente/indicacoes` and `/negocio/indicacoes` remain stable in protected fallback mode.
 
+## Current Platform Administration Coverage
+
+Phase 16 includes tests that verify:
+
+- platform capability separation between support, platform admin, and super admin;
+- privileged role-assignment limits and final-super-admin protection;
+- server-only service-role access for administrative reads and mutations;
+- row locking and same-transaction audit insertion for every privileged mutation;
+- append-only audit history;
+- protected admin views across desktop and mobile Playwright projects.
+
 ## Priority E2E
 
 Customer:

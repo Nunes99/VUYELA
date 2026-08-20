@@ -20,6 +20,8 @@ supabase/migrations/secure_notification_read_updates.sql
 supabase/migrations/restrict_notification_read_column.sql
 supabase/migrations/implement_referral_programs.sql
 supabase/migrations/harden_referral_programs.sql
+supabase/migrations/implement_platform_administration.sql
+supabase/migrations/harden_platform_administration.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
@@ -29,6 +31,8 @@ FASE 11 uses the existing marketplace-safe public policies over active businesse
 FASE 14 extends `notifications` with campaign ownership, idempotency keys, delivery attempts, retry scheduling, worker leases, provider result fields, and read state.
 
 FASE 15 completes referrals with tenant configuration, one-use invitation codes, purchase qualification, fraud controls, atomic rewards, ledger entries, and refund reversals.
+
+FASE 16 extends business review, support, and fraud records with operational ownership and resolution fields. Platform administration uses service-role-only transactional RPCs for business review, user role changes, support updates, and fraud review. Each privileged mutation locks its target and appends an immutable audit entry in the same transaction. A read-only platform metrics RPC supplies aggregate operational indicators.
 
 The post-connection auth hardening migration synchronizes `auth.users` with `public.profiles` and
 adds the atomic `submit_business_onboarding` RPC so onboarding cannot leave partial business data.

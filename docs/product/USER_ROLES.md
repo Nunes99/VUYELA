@@ -21,6 +21,8 @@
 - Platform Admin: platform management through privileged server-side paths.
 - Super Admin: maximum platform privileges, reserved for exceptional administrative work.
 
+Support agents can manage support queues and review fraud alerts, with read-only business, user, subscription, and platform metrics context. Platform admins can additionally approve or suspend businesses, manage non-privileged platform roles, and inspect the global audit trail. Super admins alone can assign or remove platform-admin and super-admin roles.
+
 ## Authorization Direction
 
 RBAC must be centralized. Do not duplicate permission logic across UI components. Tenant isolation is enforced in database policies and server-side operations, not only in client navigation.
