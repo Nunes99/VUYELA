@@ -8,6 +8,7 @@ import {
   canAccessRoute,
   getDefaultAuthenticatedPath,
   isBusinessMemberRole,
+  isMfaVerifiedAssuranceLevel,
   isProfileRole,
   requiresMfa
 } from "@/lib/auth/rbac";
@@ -61,10 +62,6 @@ function toBusinessMembership(row: BusinessMembershipRow): BusinessMembership | 
   };
 }
 
-function getMfaVerified(user: User) {
-  return user.app_metadata.mfa_verified === true;
-}
-
 function buildSignInPath(nextPath: string) {
   return `/entrar?next=${encodeURIComponent(nextPath)}`;
 }
@@ -92,13 +89,14 @@ export async function getAuthContext(): Promise<AuthContext> {
     };
   }
 
-  const [{ data: profileData }, { data: membershipData }] = await Promise.all([
+  const [{ data: profileData }, { data: membershipData }, assurance] = await Promise.all([
     supabase.from("profiles").select("id, role").eq("id", user.id).maybeSingle(),
     supabase
       .from("business_members")
       .select("business_id, branch_id, role, status")
       .eq("profile_id", user.id)
-      .eq("status", "active")
+      .eq("status", "active"),
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel()
   ]);
 
   const profile = profileData as ProfileRow | null;
@@ -115,7 +113,7 @@ export async function getAuthContext(): Promise<AuthContext> {
     principal: {
       profileId: user.id,
       profileRole,
-      mfaVerified: getMfaVerified(user),
+      mfaVerified: isMfaVerifiedAssuranceLevel(assurance.data?.currentLevel),
       businessMemberships
     }
   };

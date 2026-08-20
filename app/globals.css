@@ -1990,6 +1990,48 @@
   font-weight: 850;
 }
 
+.mfa-enrollment {
+  display: grid;
+  gap: var(--vy-space-3);
+}
+
+.mfa-enrollment p,
+.mfa-secret-label {
+  margin: 0;
+  font-size: var(--vy-text-sm);
+}
+
+.mfa-qr {
+  width: min(100%, 15rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border: 1px solid var(--vy-border);
+  background: #fff;
+  padding: var(--vy-space-2);
+}
+
+.mfa-qr img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mfa-secret-label {
+  color: var(--vy-text-muted);
+  font-weight: 750;
+}
+
+.mfa-secret {
+  overflow-wrap: anywhere;
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: var(--vy-surface-soft);
+  padding: var(--vy-space-3);
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-sm);
+  text-align: center;
+}
+
 .dashboard-shell {
   display: grid;
   gap: var(--vy-space-6);

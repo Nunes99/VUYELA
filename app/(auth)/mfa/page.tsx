@@ -1,16 +1,45 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
+import { MfaForm } from "@/features/auth/mfa-form";
+import { getSafeMfaNextPath } from "@/features/auth/mfa";
+import { getDefaultAuthenticatedPath, requiresMfa } from "@/lib/auth/rbac";
+import { getAuthContext } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Verificacao adicional",
-  description: "Arquitetura MFA-ready para funcoes privilegiadas VUYELA.",
+  description: "Verificacao multifactor para funcoes privilegiadas VUYELA.",
   robots: {
     index: false,
     follow: false
   }
 };
 
-export default function MfaPage() {
+interface MfaPageProps {
+  searchParams: Promise<{
+    next?: string | string[] | undefined;
+  }>;
+}
+
+export const dynamic = "force-dynamic";
+
+export default async function MfaPage({ searchParams }: MfaPageProps) {
+  const [params, authContext] = await Promise.all([searchParams, getAuthContext()]);
+  const nextPath = getSafeMfaNextPath(params.next);
+
+  if (!authContext.principal) {
+    redirect(`/entrar?next=${encodeURIComponent(nextPath)}`);
+  }
+
+  if (!requiresMfa(authContext.principal.profileRole)) {
+    redirect(getDefaultAuthenticatedPath(authContext.principal));
+  }
+
+  if (authContext.principal.mfaVerified) {
+    redirect(nextPath);
+  }
+
   return (
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="mfa-title">
@@ -19,15 +48,15 @@ export default function MfaPage() {
             <span>VUYELA</span>
             <small>by LEMOTE</small>
           </Link>
-          <span className="auth-kicker">MFA-ready</span>
+          <span className="auth-kicker">Verificacao em dois passos</span>
           <h1 id="mfa-title">Verificacao adicional necessaria.</h1>
           <p className="auth-intro">
-            Funcoes de suporte e administracao exigem MFA. A tela final de MFA sera ligada quando o
-            provedor estiver configurado para producao.
+            Funcoes de suporte e administracao exigem um codigo temporario alem da sua senha.
           </p>
-          <Link className="home-link-button home-link-button--primary" href="/entrar">
-            Voltar ao login
-          </Link>
+          <MfaForm nextPath={nextPath} />
+          <p className="auth-footnote">
+            Nao consegue concluir? <Link href="/entrar">Voltar ao login</Link>.
+          </p>
         </div>
       </section>
     </main>
