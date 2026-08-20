@@ -17,5 +17,7 @@ Apply them in this exact order:
 11. `create_notification_delivery.sql`
 12. `secure_notification_read_updates.sql`
 13. `restrict_notification_read_column.sql`
+14. `implement_referral_programs.sql`
+15. `harden_referral_programs.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

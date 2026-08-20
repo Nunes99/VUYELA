@@ -80,6 +80,21 @@ Implemented RPCs:
 
 All wallet-changing writes must continue to go through server-side transactional paths. Application code must not update `point_wallets` or `point_ledger` directly.
 
+## Referrals
+
+Creating an account, generating an invitation, or accepting a referral code never awards points.
+
+A referral becomes rewardable only when:
+
+- the business and referral program are active;
+- the invitation was accepted before it expired;
+- the referred customer had no previous completed or refunded purchase in that business when accepting;
+- a later completed purchase reaches the configured minimum eligible amount;
+- the referrer remains within the configured reward-period limit;
+- fraud controls do not detect self-referral or reciprocal referral.
+
+The qualifying purchase awards the configured referrer and referred-customer amounts as separate positive `referral` ledger entries. A refund of that purchase removes both rewards with negative `refund_reversal` entries. The original ledger history remains unchanged.
+
 ## QR
 
 There are two QR concepts:

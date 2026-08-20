@@ -18,6 +18,8 @@ supabase/migrations/ensure_auth_profiles_and_atomic_business_onboarding.sql
 supabase/migrations/create_notification_delivery.sql
 supabase/migrations/secure_notification_read_updates.sql
 supabase/migrations/restrict_notification_read_column.sql
+supabase/migrations/implement_referral_programs.sql
+supabase/migrations/harden_referral_programs.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
@@ -25,6 +27,8 @@ FASE 03 defines tables, constraints, indexes, and append-only ledger protection.
 FASE 11 uses the existing marketplace-safe public policies over active businesses, branches, categories, loyalty programs, and public offers. FASE 12 adds optional public branch opening hours for search. FASE 13 adds campaign rule/audience constraints plus server-side campaign eligibility, creation, audience materialization, and analytics RPCs.
 
 FASE 14 extends `notifications` with campaign ownership, idempotency keys, delivery attempts, retry scheduling, worker leases, provider result fields, and read state.
+
+FASE 15 completes referrals with tenant configuration, one-use invitation codes, purchase qualification, fraud controls, atomic rewards, ledger entries, and refund reversals.
 
 The post-connection auth hardening migration synchronizes `auth.users` with `public.profiles` and
 adds the atomic `submit_business_onboarding` RPC so onboarding cannot leave partial business data.
@@ -64,6 +68,7 @@ Growth and communication:
 - `campaigns`
 - `campaign_audiences`
 - `referrals`
+- `referral_programs`
 - `notifications`
 
 Monetization and operations:
@@ -207,6 +212,16 @@ The loyalty engine migration adds deterministic calculation helpers and three tr
 `record_purchase_points` and `redeem_purchase_points` require an active loyalty program, an active customer card in the same business, and a matching wallet. They validate access with `can_access_transaction`, optionally validate the supplied `cashier_member_id`, lock the wallet row with `FOR UPDATE`, write the transaction, update the wallet, append ledger entries, and write audit logs.
 
 `refund_loyalty_transaction` locks the transaction and wallet, changes the transaction status to `refunded`, and uses `refund_reversal` ledger entries instead of mutating historical ledger rows.
+
+## Referral RPCs
+
+Referral rules live in `referral_programs`, one configuration per business. The rules control the minimum qualifying purchase, both point rewards, invite validity, open-invite limit, and reward count per configurable period.
+
+`create_customer_referral` and `accept_customer_referral` validate card ownership and eligibility but never change a wallet or insert ledger entries. `apply_qualifying_referral_reward` is internal to the purchase RPC wrappers and rewards only an accepted, unexpired referral after the first qualifying completed purchase. Both wallets are locked, updated, and represented by separate positive `referral` ledger entries.
+
+Self-referrals, existing customers, reciprocal referrals, expired invitations, duplicate referred cards, and exceeded limits are blocked. Relevant attempts are recorded in `fraud_events`.
+
+`refund_loyalty_transaction` now wraps the original loyalty refund and calls `reverse_qualifying_referral_reward`. Both referral rewards are removed through negative `refund_reversal` entries; historical referral ledger rows remain immutable.
 
 ## POS Lookup RPC
 

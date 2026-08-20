@@ -2112,7 +2112,7 @@
   top: var(--vy-space-3);
   z-index: 2;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--vy-space-2);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--vy-radius-xs);
@@ -2875,7 +2875,7 @@
   top: var(--vy-space-3);
   z-index: 2;
   display: grid;
-  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-columns: repeat(11, minmax(0, 1fr));
   gap: var(--vy-space-2);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--vy-radius-xs);
@@ -3179,6 +3179,281 @@
   grid-template-columns: 1fr;
 }
 
+.customer-referrals,
+.business-referrals {
+  color: var(--vy-text);
+}
+
+.referral-page-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.referral-back-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: var(--vy-surface);
+  padding-inline: var(--vy-space-4);
+  color: var(--vy-color-indigo);
+  font-weight: 850;
+}
+
+.referral-back-link:focus-visible {
+  outline: 3px solid rgba(242, 181, 68, 0.72);
+  outline-offset: 2px;
+}
+
+.referral-section {
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: var(--vy-surface);
+  padding: var(--vy-space-6);
+  box-shadow: var(--vy-shadow-sm);
+}
+
+.referral-action-grid,
+.business-referral-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vy-space-5);
+}
+
+.referral-form,
+.referral-program-form {
+  display: grid;
+  align-content: start;
+  gap: var(--vy-space-4);
+}
+
+.referral-form {
+  border: 1px solid var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  background: #f8fbfb;
+  padding: var(--vy-space-5);
+}
+
+.referral-form-heading h3 {
+  margin: var(--vy-space-1) 0 0;
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-xl);
+}
+
+.referral-form-empty {
+  min-height: 3rem;
+  margin: 0;
+  color: var(--vy-text-muted);
+}
+
+.referral-code {
+  display: block;
+  min-height: 3.25rem;
+  border: 1px dashed var(--vy-color-teal-600);
+  border-radius: var(--vy-radius-xs);
+  background: #ecfbfa;
+  padding: var(--vy-space-3);
+  color: var(--vy-color-indigo);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: var(--vy-text-xl);
+  font-weight: 900;
+  text-align: center;
+}
+
+.referral-message {
+  margin: 0;
+  border-radius: var(--vy-radius-xs);
+  padding: var(--vy-space-3);
+  font-size: var(--vy-text-sm);
+  font-weight: 750;
+}
+
+.referral-message--success {
+  background: #edf9f0;
+  color: #176b37;
+}
+
+.referral-message--error {
+  background: #fff2f0;
+  color: #b42318;
+}
+
+.referral-program-list,
+.referral-history-list {
+  display: grid;
+  gap: var(--vy-space-3);
+}
+
+.referral-program-row,
+.referral-history-row {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(24rem, 2fr);
+  gap: var(--vy-space-4);
+  align-items: center;
+  border-top: 1px solid var(--vy-border);
+  padding-block: var(--vy-space-4);
+}
+
+.referral-program-row:first-child,
+.referral-history-row:first-child {
+  border-top: 0;
+}
+
+.referral-program-row h3,
+.referral-history-row h3 {
+  margin: var(--vy-space-1) 0 0;
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-lg);
+}
+
+.referral-program-row p,
+.referral-history-row p {
+  margin: var(--vy-space-1) 0 0;
+  color: var(--vy-text-muted);
+}
+
+.referral-program-row dl,
+.referral-history-row dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--vy-space-2);
+  margin: 0;
+}
+
+.referral-history-row dl {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.referral-program-row dl div,
+.referral-history-row dl div,
+.referral-economics div {
+  min-width: 0;
+}
+
+.referral-program-row dt,
+.referral-history-row dt,
+.referral-economics dt {
+  color: var(--vy-text-muted);
+  font-size: var(--vy-text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.referral-program-row dd,
+.referral-history-row dd,
+.referral-economics dd {
+  overflow-wrap: anywhere;
+  margin: 0.2rem 0 0;
+  color: var(--vy-color-indigo);
+  font-weight: 850;
+}
+
+.referral-program-row small,
+.referral-history-row small,
+.referral-economics small {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--vy-text-muted);
+}
+
+.referral-status {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: var(--vy-radius-pill);
+  background: #edf3fb;
+  padding: 0.3rem 0.55rem;
+  color: #284b7a;
+  font-size: var(--vy-text-xs);
+  font-weight: 850;
+}
+
+.referral-status--rewarded {
+  background: #edf9f0;
+  color: #176b37;
+}
+
+.referral-status--accepted,
+.referral-status--pending {
+  background: #fff8e6;
+  color: #825d12;
+}
+
+.referral-status--blocked,
+.referral-status--reversed,
+.referral-status--expired,
+.referral-status--cancelled {
+  background: #fff2f0;
+  color: #9b2c23;
+}
+
+.referral-empty {
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  gap: var(--vy-space-2);
+  border: 1px dashed var(--vy-border);
+  border-radius: var(--vy-radius-xs);
+  padding: var(--vy-space-5);
+  text-align: center;
+}
+
+.referral-empty h3,
+.referral-empty p {
+  margin: 0;
+}
+
+.referral-empty h3 {
+  color: var(--vy-color-indigo);
+}
+
+.referral-empty p {
+  color: var(--vy-text-muted);
+}
+
+.referral-empty-icons {
+  display: flex;
+  gap: var(--vy-space-2);
+  color: var(--vy-color-teal-600);
+}
+
+.referral-program-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vy-space-4);
+}
+
+.referral-toggle {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--vy-space-3);
+  font-weight: 850;
+}
+
+.referral-toggle input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--vy-color-teal-600);
+}
+
+.referral-economics {
+  grid-template-columns: 1fr;
+}
+
+.business-referral-stat {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.business-referral-stat svg {
+  color: var(--vy-color-teal-600);
+}
+
+.business-referral-row dl {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 @media (max-width: 67.5rem) {
   .auth-shell,
   .auth-shell--compact,
@@ -3195,7 +3470,10 @@
   .business-dashboard-mini-grid,
   .business-dashboard-report-grid,
   .business-dashboard-facts,
-  .business-campaign-layout {
+  .business-campaign-layout,
+  .business-referral-layout,
+  .referral-program-row,
+  .referral-history-row {
     grid-template-columns: 1fr;
   }
 
@@ -3271,7 +3549,7 @@
   }
 
   .customer-dashboard-nav a span {
-    font-size: 0.68rem;
+    display: none;
   }
 
   .customer-notification-heading {
@@ -3314,6 +3592,10 @@
 
   .pos-form-grid,
   .business-campaign-form-grid,
+  .referral-action-grid,
+  .referral-program-form-grid,
+  .referral-program-row dl,
+  .referral-history-row dl,
   .pos-summary-list div,
   .business-dashboard-stat-grid,
   .business-dashboard-row dl {

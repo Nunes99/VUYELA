@@ -7,7 +7,8 @@ import {
   LineChart,
   Settings,
   Store,
-  Users
+  Users,
+  UserPlus
 } from "lucide-react";
 import Link from "next/link";
 
@@ -25,6 +26,7 @@ const navItems = [
   { href: "#transactions", label: "Transaccoes", icon: ClipboardList },
   { href: "#points", label: "Pontos", icon: Coins },
   { href: "#campaigns", label: "Campanhas", icon: Gift },
+  { href: "/negocio/indicacoes", label: "Indicacoes", icon: UserPlus },
   { href: "#program", label: "Programa", icon: LineChart },
   { href: "#branches", label: "Filiais", icon: Store },
   { href: "#employees", label: "Equipa", icon: Building2 },
@@ -113,7 +115,7 @@ function BusinessDashboardNav() {
         const Icon = item.icon;
 
         return (
-          <a href={item.href} key={item.href}>
+          <a href={item.href} key={item.href} title={item.label}>
             <Icon size={18} aria-hidden="true" />
             <span>{item.label}</span>
           </a>

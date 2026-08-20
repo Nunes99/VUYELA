@@ -1,4 +1,4 @@
-import { Activity, Bell, CreditCard, Home, Search, User } from "lucide-react";
+import { Activity, Bell, CreditCard, Home, Search, User, UserPlus } from "lucide-react";
 
 import { CustomerCardsView } from "@/features/customer-cards/card-list";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
@@ -17,6 +17,7 @@ const navItems = [
   { href: "#cartoes", label: "Cartoes", icon: CreditCard },
   { href: "#explorar", label: "Explorar", icon: Search },
   { href: "#actividade", label: "Actividade", icon: Activity },
+  { href: "/cliente/indicacoes", label: "Indicacoes", icon: UserPlus },
   { href: "#notificacoes", label: "Avisos", icon: Bell },
   { href: "#perfil", label: "Perfil", icon: User }
 ];
@@ -47,7 +48,7 @@ function CustomerDashboardNav() {
         const Icon = item.icon;
 
         return (
-          <a href={item.href} key={item.href}>
+          <a href={item.href} key={item.href} title={item.label}>
             <Icon size={18} aria-hidden="true" />
             <span>{item.label}</span>
           </a>

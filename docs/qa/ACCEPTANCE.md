@@ -220,3 +220,18 @@ A feature is complete only when:
 - notification delivery does not mutate point wallets, point ledger, or transactions;
 - unit and static integration tests cover delivery, retries, consent, idempotency, RLS, and cron security;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 15 Referrals Acceptance
+
+- `/cliente/indicacoes` lets authenticated customers create one-use invitations, accept valid codes, inspect active rules, and review referral history;
+- `/negocio/indicacoes` lets business admins and owners configure thresholds, rewards, validity, open-invite limits, and reward-period limits;
+- invitation creation and acceptance never mutate wallets or create ledger entries;
+- rewards are issued only after an accepted, unexpired referral completes its first valid purchase at or above the configured minimum;
+- the indicator and invited customer receive separate `referral` ledger entries and see points with their MZN equivalent;
+- self-referrals, existing customers, reciprocal referrals, duplicate referred cards, expired invitations, inactive programs, and exceeded limits are rejected or blocked;
+- qualifying-purchase refunds reverse both rewards with compensating `refund_reversal` entries and never mutate ledger history;
+- RLS protects referral configuration/history and internal reward functions are not executable by browser-authenticated roles;
+- unit tests cover statuses, MZN values, and summaries;
+- static integration tests cover configuration, no-signup reward, qualification, fraud controls, RPC wrapping, reversals, privileges, and protected routes;
+- E2E covers customer and business protected fallbacks;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

@@ -153,6 +153,20 @@ Phase 14 includes tests that verify:
 - customers can mark only their own delivered in-app notifications as read;
 - customer dashboard summaries count unread notifications.
 
+## Current Referral Coverage
+
+Phase 15 includes tests that verify:
+
+- pending invitations become effectively expired after their deadline;
+- customer and business summaries calculate points and MZN equivalents correctly;
+- configurable minimum purchase, validity, open-invite limits, and reward-period limits are persisted per tenant;
+- invitation creation and acceptance do not update wallets or insert ledger entries;
+- only accepted, unexpired, completed qualifying purchases reward both wallets;
+- self-referral, existing-customer, reciprocal-referral, duplicate-card, and limit controls exist;
+- purchase RPCs invoke internal reward qualification and refund RPCs reverse both rewards with compensating ledger entries;
+- internal reward functions are not executable by anonymous or authenticated API roles;
+- `/cliente/indicacoes` and `/negocio/indicacoes` remain stable in protected fallback mode.
+
 ## Priority E2E
 
 Customer:
