@@ -101,7 +101,7 @@ export async function acceptReferralAction(
 
   return {
     status: "success",
-    message: "Convite aceite. O premio fica elegivel depois da compra minima.",
+    message: "Convite aceite. O prémio fica elegível depois da compra mínima.",
     referralCode: null
   };
 }
@@ -229,7 +229,7 @@ function getReferralOutcomeMessage(outcome: string): string {
     card_required: "Adira primeiro ao programa de fidelização deste negócio.",
     already_referred: "Este cartão já está associado a outra indicação.",
     rewarded: "Este convite já foi premiado.",
-    reversed: "O premio deste convite foi revertido.",
+    reversed: "O prémio deste convite foi revertido.",
     cancelled: "Este convite foi cancelado."
   };
 

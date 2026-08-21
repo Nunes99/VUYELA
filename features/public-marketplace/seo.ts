@@ -30,7 +30,7 @@ export function buildBusinessMetadata(business: MarketplaceBusiness): Metadata {
 
   return buildMetadata({
     title: `${business.name} - pontos e benefícios em ${cityLabel}`,
-    description: `${business.description} Veja pontos, filiais, regras e ofertas publicas de ${business.name}.`,
+    description: `${business.description} Veja pontos, filiais, regras e ofertas públicas de ${business.name}.`,
     canonicalPath: `/estabelecimentos/${business.slug}`,
     indexable: true,
     imageUrl: business.coverUrl ?? business.logoUrl
@@ -40,7 +40,7 @@ export function buildBusinessMetadata(business: MarketplaceBusiness): Metadata {
 export function buildOfferMetadata(viewModel: MarketplaceOfferViewModel): Metadata {
   return buildMetadata({
     title: `${viewModel.offer.title} - ${viewModel.business.name}`,
-    description: `${viewModel.offer.description} Oferta publica VUYELA de ${viewModel.business.name}.`,
+    description: `${viewModel.offer.description} Oferta pública VUYELA de ${viewModel.business.name}.`,
     canonicalPath: `/ofertas/${viewModel.offer.slug}`,
     indexable: isIndexableOffer(viewModel.offer),
     imageUrl: viewModel.business.coverUrl ?? viewModel.business.logoUrl
@@ -163,7 +163,7 @@ export function buildBusinessFaqJsonLd(business: MarketplaceBusiness): Record<st
         name: `Onde posso usar pontos de ${business.name}?`,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Os pontos podem ser usados no proprio negocio emissor. ${getPointValueLabel(business.program)}.`
+          text: `Os pontos podem ser usados no próprio negócio emissor. ${getPointValueLabel(business.program)}.`
         }
       },
       {

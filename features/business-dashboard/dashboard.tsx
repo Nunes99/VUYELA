@@ -133,7 +133,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
           <span className="business-dashboard-eyebrow">{dashboard.scopeLabel}</span>
           <h2 id="overview-title">{dashboard.business.name}</h2>
           <p>
-            Resumo dos últimos 90 dias com vendas, clientes, pontos, liability promocional e
+            Resumo dos últimos 90 dias com vendas, clientes, pontos, responsabilidade promocional e
             retenção.
           </p>
         </div>
@@ -264,7 +264,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
           eyebrow="Equipa"
           title="Membros ativos"
           id="employees-title"
-          body="Papeis que participam na gestao e operação."
+          body="Papéis que participam na gestão e operação."
         />
         <EmployeeList dashboard={dashboard} />
       </section>
@@ -293,7 +293,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
         aria-labelledby="settings-title"
       >
         <SectionHeading
-          eyebrow="Definicoes"
+          eyebrow="Definições"
           title="Estado operacional"
           id="settings-title"
           body="Resumo de estados que afetam o painel e o POS."

@@ -610,7 +610,7 @@ function OffersBand({ offers }: { offers: MarketplaceOffer[] }) {
         <SectionHeader
           eyebrow="Ofertas"
           title="Ofertas públicas ativas"
-          description="Promocoes publicadas pelos negócios participantes."
+          description="Promoções publicadas pelos negócios participantes."
           id="offers-title"
         />
         <div className="marketplace-offer-grid">
@@ -754,7 +754,7 @@ function MarketplaceEmptyState() {
   return (
     <div className="marketplace-empty">
       <Store size={24} />
-      <h2>Conteúdo público em preparacao</h2>
+      <h2>Conteúdo público em preparação</h2>
       <p>
         Assim que houver estabelecimentos ativos com categoria, programa de pontos e filial
         publicada, esta página passa a ser indexavel.

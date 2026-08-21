@@ -225,7 +225,7 @@ export function calculateCampaignEligibility(input: {
       consentBlocked,
       reason: consentBlocked
         ? "Consentimento de marketing em falta"
-        : (audienceReason ?? "Elegivel"),
+        : (audienceReason ?? "Elegível"),
       segmentKey
     };
   });

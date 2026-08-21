@@ -56,7 +56,7 @@ import {
 import { useState } from "react";
 
 const navLinks = [
-  { label: "Fundacao", href: "#fundacao", active: true },
+  { label: "Fundação", href: "#fundacao", active: true },
   { label: "Componentes", href: "#componentes" },
   { label: "Fidelização", href: "#fidelizacao" },
   { label: "Dados", href: "#dados" }
@@ -99,7 +99,7 @@ export function DesignSystemShowcase() {
             <Badge tone="reward">FASE 01</Badge>
             <h1>VUYELA Design System</h1>
             <p>
-              Fundacao visual e componentes reutilizaveis para construir fluxos moveis, acessiveis e
+              Fundação visual e componentes reutilizáveis para construir fluxos móveis, acessíveis e
               consistentes da plataforma VUYELA by LEMOTE.
             </p>
             <div className="ds-actions">
@@ -161,7 +161,7 @@ export function DesignSystemShowcase() {
       >
         <div className="ds-section__header">
           <span>Componentes</span>
-          <h2 id="controls-heading">Acoes, formularios e feedback</h2>
+          <h2 id="controls-heading">Ações, formulários e feedback</h2>
         </div>
         <div className="ds-component-grid">
           <article className="ds-example">
@@ -195,7 +195,7 @@ export function DesignSystemShowcase() {
             </div>
           </article>
           <article className="ds-example">
-            <h3>Selecao</h3>
+            <h3>Seleção</h3>
             <div className="ds-stack">
               <Checkbox
                 label="Enviar comprovativo por e-mail"
@@ -280,7 +280,7 @@ export function DesignSystemShowcase() {
 
       <section className="vy-container ds-section" aria-labelledby="overlays-heading">
         <div className="ds-section__header">
-          <span>Interacao</span>
+          <span>Interação</span>
           <h2 id="overlays-heading">Sobreposições e organização de conteúdo</h2>
         </div>
         <div className="ds-component-grid">
@@ -373,7 +373,7 @@ export function DesignSystemShowcase() {
           <OfferCard
             title="Pontos em dobro ao almoco"
             businessName="Restaurante Mares"
-            description="Ganhe benefícios extra em compras validas de segunda a sexta."
+            description="Ganhe benefícios extra em compras válidas de segunda a sexta."
             badge={<Badge tone="reward">Campanha</Badge>}
             action={
               <Button size="sm" variant="outline">

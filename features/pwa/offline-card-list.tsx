@@ -99,7 +99,7 @@ export function OfflineCardList() {
         <section aria-labelledby="offline-card-list-title">
           <div className="offline-section-heading">
             <div>
-              <span>Identificacao local</span>
+              <span>Identificação local</span>
               <h2 id="offline-card-list-title">Os seus cartões</h2>
               <p>
                 Atualizado{" "}
@@ -119,7 +119,7 @@ export function OfflineCardList() {
                   <h3>{card.businessName}</h3>
                   <p>{card.cardNumber}</p>
                 </div>
-                <QRDisplay code={card.qrCode} label="QR de identificacao" />
+                <QRDisplay code={card.qrCode} label="QR de identificação" />
               </article>
             ))}
           </div>

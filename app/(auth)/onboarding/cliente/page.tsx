@@ -23,7 +23,7 @@ export default async function CustomerOnboardingPage() {
       <div className="dashboard-card">
         <p>
           Estes dados criam a base para cartões digitais, notificações e recuperação de acesso nas
-          proximas fases.
+          próximas fases.
         </p>
         <CustomerOnboardingForm />
       </div>

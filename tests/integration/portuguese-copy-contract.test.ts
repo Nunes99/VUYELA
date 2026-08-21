@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 const sourceRoots = ["app", "components", "features", "vuyela-design-system/src"];
 const forbiddenCopy =
-  /\b(?:Nao|nao|Administracao|Aprovacao|Navegacao|Cartoes|Negocios|Notificacoes|Subscricao|Beneficios|Mocambique|Paginacao|Inicio|Ola|actualiz\w*|activ[oa]s?|inactiv\w*|senha|senhas|owner|owners|dashboard|Standard)\b/i;
+  /\b(?:Nao|nao|Administracao|Aprovacao|Navegacao|Cartoes|Negocios|Notificacoes|Subscricao|Beneficios|Mocambique|Paginacao|Inicio|Ola|Visao|Verificacao|Identificacao|Gestao|Criacao|Eliminacao|Fundacao|Acoes|Formularios|Interacao|Aplicacao|Introducao|Combinacao|Definicoes|Promocoes|Preparacao|actualiz\w*|activ[oa]s?|inactiv\w*|public[oa]s?|propri[oa]s?|necessari[oa]s?|proxim[oa]s?|pratic[oa]s?|minim[oa]s?|maxim[oa]s?|automatic[oa]s?|senha|senhas|premios?|elegiveis?|audiencias?|calendarios?|owner|owners|dashboard|Standard)\b/i;
 
 function collectSourceFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {

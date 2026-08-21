@@ -81,7 +81,7 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
   if (state.status === "unauthenticated") {
     return (
       <AuthNotice
-        eyebrow="Login necessario"
+        eyebrow="Login necessário"
         title="Entre para continuar."
         body="Esta área usa helpers server-side e RBAC centralizado antes de renderizar dados privados."
         actionHref={state.signInPath}
@@ -93,8 +93,8 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
   if (state.status === "mfa_required") {
     return (
       <AuthNotice
-        eyebrow="MFA necessario"
-        title="Verificacao adicional obrigatoria."
+        eyebrow="MFA necessário"
+        title="Verificação adicional obrigatória."
         body="Funções privilegiadas precisam de MFA antes de acessar rotas sensiveis."
         actionHref={state.mfaPath}
         actionLabel="Verificar"

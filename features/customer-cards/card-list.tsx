@@ -23,7 +23,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
         <h2>Ainda não tem cartões</h2>
         <p>
           Quando aderir a um negócio VUYELA, o cartão digital aparece aqui com pontos, equivalente
-          em MZN e código de identificacao.
+          em MZN e código de identificação.
         </p>
       </div>
     );
@@ -91,7 +91,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
 
             <QRDisplay
               code={card.qrCode}
-              label="QR de identificacao"
+              label="QR de identificação"
               className="customer-card-row__qr"
             />
           </section>

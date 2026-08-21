@@ -407,7 +407,7 @@ function buildSearchSeoLinks(
       links.push({
         href: `/locais/${city.slug}/${category.slug}`,
         label: `${category.name} em ${city.name}`,
-        description: "Página SEO da combinacao com conteúdo suficiente."
+        description: "Página SEO da combinação com conteúdo suficiente."
       });
     }
   }

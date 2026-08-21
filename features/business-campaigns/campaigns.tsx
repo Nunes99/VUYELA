@@ -57,7 +57,7 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
           />
           <CampaignStat
             icon={<Users size={18} />}
-            label="Audiencia"
+            label="Audiência"
             value={state.analytics.totalAudienceCount.toLocaleString("pt-MZ")}
           />
           <CampaignStat
@@ -68,12 +68,12 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
         </div>
       </section>
 
-      <section className="business-campaign-layout" aria-label="Gestao de campanhas">
+      <section className="business-campaign-layout" aria-label="Gestão de campanhas">
         <div className="business-dashboard-section">
           <SectionHeading
-            eyebrow="Criacao"
+            eyebrow="Criação"
             title="Nova campanha"
-            body="Crie uma campanha baseada em regras e audiencia calculada no servidor."
+            body="Crie uma campanha baseada em regras e audiência calculada no servidor."
           />
           {state.canCreateCampaign ? (
             <CampaignCreationForm
@@ -113,7 +113,7 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
               value={state.analytics.completedCampaigns.toLocaleString("pt-MZ")}
             />
             <Fact
-              label="Media audiencia"
+              label="Média da audiência"
               value={state.analytics.averageAudienceCount.toLocaleString("pt-MZ")}
             />
             <Fact
@@ -137,7 +137,7 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
           eyebrow="Histórico"
           title="Campanhas do negócio"
           id="campaign-list-title"
-          body="Lista operacional com calendario, tipo e audiencia elegivel."
+          body="Lista operacional com calendário, tipo e audiência elegível."
         />
         <CampaignList campaigns={state.campaigns} />
       </section>
@@ -195,7 +195,7 @@ function CampaignList({ campaigns }: { campaigns: BusinessCampaign[] }) {
           </div>
           <dl>
             <div>
-              <dt>Audiencia</dt>
+              <dt>Audiência</dt>
               <dd>{campaign.audienceCount.toLocaleString("pt-MZ")}</dd>
             </div>
             <div>
@@ -264,7 +264,7 @@ function SectionEmpty({ title, body }: { title: string; body: string }) {
 
 function formatCampaignWindow(campaign: BusinessCampaign): string {
   if (!campaign.startsAt && !campaign.endsAt) {
-    return "Sem calendario";
+    return "Sem calendário";
   }
 
   const start = campaign.startsAt ? formatDate(campaign.startsAt) : "Início aberto";

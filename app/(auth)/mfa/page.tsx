@@ -10,8 +10,8 @@ import { getDefaultAuthenticatedPath, requiresMfa } from "@/lib/auth/rbac";
 import { getAuthContext } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Verificacao adicional",
-  description: "Verificacao multifactor para funções privilegiadas VUYELA.",
+  title: "Verificação adicional",
+  description: "Verificação multifator para funções privilegiadas VUYELA.",
   robots: {
     index: false,
     follow: false
@@ -47,8 +47,8 @@ export default async function MfaPage({ searchParams }: MfaPageProps) {
       <section className="auth-shell auth-shell--single" aria-labelledby="mfa-title">
         <div className="auth-panel auth-panel--forms">
           <VuyelaLogo className="auth-brand auth-brand--dark" />
-          <span className="auth-kicker">Verificacao em dois passos</span>
-          <h1 id="mfa-title">Verificacao adicional necessaria.</h1>
+          <span className="auth-kicker">Verificação em dois passos</span>
+          <h1 id="mfa-title">Verificação adicional necessária.</h1>
           <p className="auth-intro">
             Funções de suporte e administração exigem um código temporário além da sua
             palavra-passe.

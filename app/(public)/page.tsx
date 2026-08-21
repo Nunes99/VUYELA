@@ -123,7 +123,7 @@ const businessBenefits = [
   "Programa próprio de fidelização.",
   "Regras simples para atribuir e usar pontos.",
   "Histórico preparado para ledger e auditoria.",
-  "Base pronta para POS, campanhas e relatórios nas proximas fases."
+  "Base pronta para POS, campanhas e relatórios nas próximas fases."
 ];
 
 const pricingNotes = [
@@ -173,7 +173,7 @@ export default async function HomePage() {
         <header className="home-header" aria-label="Navegação principal">
           <div className="vy-container home-header__inner">
             <VuyelaLogo className="home-logo" href="#top" inverse />
-            <nav className="home-nav" aria-label="Secoes da homepage">
+            <nav className="home-nav" aria-label="Secções da página inicial">
               {navLinks.map((link) => (
                 <a href={link.href} key={link.href}>
                   {link.label}
@@ -239,7 +239,7 @@ export default async function HomePage() {
               </ul>
             </div>
 
-            <div className="home-product-visual" aria-label="Pre-visualizacao do produto VUYELA">
+            <div className="home-product-visual" aria-label="Pré-visualização do produto VUYELA">
               <div className="home-phone" aria-hidden="true">
                 <div className="home-phone__top">
                   <span>VUYELA</span>
@@ -449,7 +449,7 @@ export default async function HomePage() {
               <span>Recursos VUYELA</span>
               <h2 id="home-journal-title">Fidelização explicada com clareza.</h2>
               <p>
-                Consulte estabelecimentos, ofertas e respostas praticas para clientes e negócios.
+                Consulte estabelecimentos, ofertas e respostas práticas para clientes e negócios.
               </p>
             </div>
             <nav aria-label="Recursos VUYELA">

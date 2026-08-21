@@ -32,7 +32,7 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
         <div>
           <span className="business-dashboard-eyebrow">Indicações</span>
           <h2 id="business-referrals-title">{state.selectedBusinessName}</h2>
-          <p>Regras ativas, convites, premios emitidos e controlos de elegibilidade.</p>
+          <p>Regras ativas, convites, prémios emitidos e controlos de elegibilidade.</p>
         </div>
         <div className="business-dashboard-stat-grid">
           <ReferralStat
@@ -64,10 +64,10 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
           <ReferralProgramForm businessId={state.selectedBusinessId} rules={state.rules} />
         </div>
         <aside className="business-dashboard-section">
-          <SectionHeading eyebrow="Economia" title="Premios actuais" />
+          <SectionHeading eyebrow="Economia" title="Prémios atuais" />
           <dl className="business-painel-facts referral-economics">
             <Fact
-              label="Compra minima"
+              label="Compra mínima"
               value={formatMznMinor(state.rules.qualifyingPurchaseMinimumMznMinor)}
             />
             <Fact

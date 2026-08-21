@@ -131,8 +131,8 @@ export function CampaignCreationForm({
         <div className="business-campaign-form-grid">
           <Input label="Cidade" name="city" placeholder="Maputo" />
           <Input label="Tier" name="tierName" placeholder="VIP" />
-          <Input label="Compras minimas" name="minPurchaseCount" inputMode="numeric" />
-          <Input label="Compras maximas" name="maxPurchaseCount" inputMode="numeric" />
+          <Input label="Compras mínimas" name="minPurchaseCount" inputMode="numeric" />
+          <Input label="Compras máximas" name="maxPurchaseCount" inputMode="numeric" />
           <Input label="Gasto mínimo (MZN)" name="minTotalSpentMzn" inputMode="decimal" />
           <Input label="Dias inativo" name="lastPurchaseBeforeDays" inputMode="numeric" />
           <Input label="Pontos mínimos" name="minPointsBalance" inputMode="numeric" />

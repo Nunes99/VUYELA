@@ -244,7 +244,7 @@ function buildReports(input: {
       id: "sales",
       label: "Vendas",
       value: formatMznMinor(input.revenueMznMinor),
-      detail: `${input.transactionCount.toLocaleString("pt-MZ")} transaccoes registadas`
+      detail: `${input.transactionCount.toLocaleString("pt-MZ")} transações registadas`
     },
     {
       id: "liability",

@@ -32,7 +32,7 @@ export function ReferralProgramForm({
 
       <div className="referral-program-form-grid">
         <Input
-          label="Compra minima (MZN)"
+          label="Compra mínima (MZN)"
           name="minimumPurchaseMzn"
           inputMode="decimal"
           defaultValue={(rules.qualifyingPurchaseMinimumMznMinor / 100).toFixed(2)}
@@ -40,7 +40,7 @@ export function ReferralProgramForm({
           required
         />
         <Input
-          label="Premio do indicador"
+          label="Prémio do indicador"
           name="referrerRewardPoints"
           inputMode="numeric"
           min={1}
@@ -50,7 +50,7 @@ export function ReferralProgramForm({
           required
         />
         <Input
-          label="Premio do convidado"
+          label="Prémio do convidado"
           name="referredRewardPoints"
           inputMode="numeric"
           min={0}
@@ -80,7 +80,7 @@ export function ReferralProgramForm({
           required
         />
         <Input
-          label="Premios por período"
+          label="Prémios por período"
           name="rewardLimitCount"
           inputMode="numeric"
           min={1}

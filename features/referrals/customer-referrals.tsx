@@ -40,7 +40,7 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
       <section className="customer-dashboard-home" aria-labelledby="customer-referrals-title">
         <div>
           <span className="customer-dashboard-eyebrow">Indicações</span>
-          <h2 id="customer-referrals-title">Convites e premios</h2>
+          <h2 id="customer-referrals-title">Convites e prémios</h2>
           <p>Partilhe códigos dos seus cartões e acompanhe compras qualificadas.</p>
         </div>
         <div className="customer-dashboard-stats" aria-label="Resumo de indicações">
@@ -98,7 +98,7 @@ function CustomerProgramList({ programs }: { programs: CustomerReferralProgram[]
           <div>
             <span className="customer-dashboard-eyebrow">{program.cardNumber}</span>
             <h3>{program.businessName}</h3>
-            <p>Compra minima {formatMznMinor(program.qualifyingPurchaseMinimumMznMinor)}</p>
+            <p>Compra mínima {formatMznMinor(program.qualifyingPurchaseMinimumMznMinor)}</p>
           </div>
           <dl>
             <ReferralFact
@@ -161,7 +161,7 @@ function ReferralHistory({ items }: { items: ReferralHistoryItem[] }) {
               <ReferralFact label="Criado" value={formatDate(item.createdAt)} />
               <ReferralFact label="Expira" value={formatDate(item.expiresAt)} />
               <ReferralFact
-                label="Premio"
+                label="Prémio"
                 value={
                   rewardPoints > 0 ? `${rewardPoints.toLocaleString("pt-MZ")} pts` : "Pendente"
                 }

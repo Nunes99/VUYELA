@@ -21,7 +21,7 @@ interface MfaFormProps {
   nextPath: string;
 }
 
-const genericMfaError = "Não foi possível concluir a verificacao. Tente novamente.";
+const genericMfaError = "Não foi possível concluir a verificação. Tente novamente.";
 
 export function MfaForm({ nextPath }: MfaFormProps) {
   const router = useRouter();
@@ -167,7 +167,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
   if (step === "loading") {
     return (
       <p className="auth-message auth-message--success" role="status">
-        A preparar a verificacao segura...
+        A preparar a verificação segura...
       </p>
     );
   }
@@ -176,7 +176,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
     return (
       <div className="auth-form">
         <p className="auth-intro">
-          Ligue a conta a uma aplicacao autenticadora para proteger as funções administrativas.
+          Ligue a conta a uma aplicação autenticadora para proteger as funções administrativas.
         </p>
         {error ? (
           <p className="auth-message auth-message--error" role="alert">
@@ -232,17 +232,17 @@ export function MfaForm({ nextPath }: MfaFormProps) {
               unoptimized
             />
           </div>
-          <p className="mfa-secret-label">Chave para introducao manual</p>
+          <p className="mfa-secret-label">Chave para introdução manual</p>
           <code className="mfa-secret">{enrollment.secret}</code>
         </div>
       ) : (
         <p className="auth-intro">
-          Introduza o código atual da aplicacao autenticadora ligada a esta conta.
+          Introduza o código atual da aplicação autenticadora ligada a esta conta.
         </p>
       )}
 
       <Input
-        label="Código de verificacao"
+        label="Código de verificação"
         name="code"
         inputMode="numeric"
         autoComplete="one-time-code"

@@ -490,7 +490,7 @@ export function getPointValueLabel(program: MarketplaceProgram | null): string {
 
 export function getExpiryLabel(program: MarketplaceProgram | null): string {
   if (!program?.pointsExpireAfterDays) {
-    return "Sem expiração automatica publicada";
+    return "Sem expiração automática publicada";
   }
 
   return `Expira em ${program.pointsExpireAfterDays.toLocaleString("pt-MZ")} dias`;

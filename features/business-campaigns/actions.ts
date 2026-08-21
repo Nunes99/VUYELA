@@ -95,7 +95,7 @@ export async function submitCampaignAction(
     status: "success",
     message: `Campanha ${row.campaign_status} criada com ${row.eligible_count.toLocaleString(
       "pt-MZ"
-    )} clientes elegiveis.`,
+    )} clientes elegíveis.`,
     campaignId: row.campaign_id
   };
 }
@@ -277,12 +277,12 @@ function parseAudience(
   campaignType: CampaignType,
   plannedChannel: CampaignPlannedChannel
 ): { ok: true; value: CampaignAudienceCriteria } | { ok: false; state: CampaignActionState } {
-  const minPurchaseCount = parseOptionalInteger(formData, "minPurchaseCount", "Compras minimas");
+  const minPurchaseCount = parseOptionalInteger(formData, "minPurchaseCount", "Compras mínimas");
   if (!minPurchaseCount.ok) {
     return minPurchaseCount;
   }
 
-  const maxPurchaseCount = parseOptionalInteger(formData, "maxPurchaseCount", "Compras maximas");
+  const maxPurchaseCount = parseOptionalInteger(formData, "maxPurchaseCount", "Compras máximas");
   if (!maxPurchaseCount.ok) {
     return maxPurchaseCount;
   }

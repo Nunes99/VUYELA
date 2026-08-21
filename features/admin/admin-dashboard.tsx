@@ -45,7 +45,7 @@ const adminNavigation: Array<{
   icon: typeof BarChart3;
   capability: AdminCapability;
 }> = [
-  { view: "overview", label: "Visao geral", icon: BarChart3, capability: "platform_metrics_read" },
+  { view: "overview", label: "Visão geral", icon: BarChart3, capability: "platform_metrics_read" },
   { view: "businesses", label: "Negócios", icon: Building2, capability: "businesses_read" },
   { view: "users", label: "Utilizadores", icon: Users, capability: "users_read" },
   {
@@ -173,7 +173,7 @@ function Overview({ metrics }: { metrics: PlatformMetrics }) {
       <div className="admin-console__section-heading">
         <div>
           <span>Plataforma</span>
-          <h2>Visao geral</h2>
+          <h2>Visão geral</h2>
         </div>
         <span className="admin-status-badge admin-status-badge--active">Operacional</span>
       </div>
@@ -616,9 +616,9 @@ function humanizeStatus(value: string): string {
     high: "Alta",
     urgent: "Urgente",
     critical: "Critica",
-    create: "Criacao",
+    create: "Criação",
     update: "Atualização",
-    delete: "Eliminacao",
+    delete: "Eliminação",
     permission_change: "Permissão",
     suspension: "Suspensao"
   };
