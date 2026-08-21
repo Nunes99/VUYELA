@@ -39,5 +39,10 @@ describe("approved VUYELA design contract", () => {
     for (const label of ["Inicio", "Cartoes", "Explorar", "Actividade", "Perfil"]) {
       expect(customerDashboard).toContain(`label: "${label}"`);
     }
+
+    expect(pageStyles).toContain("bottom: max(var(--vy-space-2), env(safe-area-inset-bottom))");
+    expect(pageStyles).toContain("top: auto");
+    expect(pageStyles).toContain(".customer-dashboard-nav a span");
+    expect(pageStyles).toContain("color: var(--vy-text-muted)");
   });
 });

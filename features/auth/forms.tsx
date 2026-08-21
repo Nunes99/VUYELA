@@ -259,7 +259,17 @@ export function BusinessOnboardingForm() {
         required
       />
       <Input label="Nome legal" name="legalName" autoComplete="organization" />
-      <Input label="NUIT" name="nuit" inputMode="numeric" />
+      <Input
+        label="NUIT"
+        name="nuit"
+        inputMode="numeric"
+        autoComplete="off"
+        minLength={9}
+        maxLength={12}
+        pattern="[0-9]{9,12}"
+        hint="Opcional. Introduza entre 9 e 12 algarismos, sem espacos."
+        title="Introduza entre 9 e 12 algarismos."
+      />
       <Input label="Cidade" name="city" autoComplete="address-level2" requiredMark required />
       <Input label="Provincia" name="province" autoComplete="address-level1" />
       <Input label="Telefone" name="phone" type="tel" autoComplete="tel" />

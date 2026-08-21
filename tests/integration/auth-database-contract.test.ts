@@ -11,6 +11,7 @@ const migration = readFileSync(
   "utf8"
 );
 const actions = readFileSync(join(process.cwd(), "features/auth/actions.ts"), "utf8");
+const forms = readFileSync(join(process.cwd(), "features/auth/forms.tsx"), "utf8");
 const callback = readFileSync(join(process.cwd(), "app/(auth)/auth/callback/route.ts"), "utf8");
 const consolidatedPolicies = readFileSync(
   join(process.cwd(), "supabase/migrations/consolidate_select_policies.sql"),
@@ -35,6 +36,14 @@ describe("authentication database contract", () => {
     expect(migration).toContain("grant execute on function public.submit_business_onboarding");
     expect(actions).toContain('supabase.rpc("submit_business_onboarding"');
     expect(actions).not.toContain("createSupabaseServiceRoleClient");
+  });
+
+  it("validates the NUIT before business onboarding reaches PostgreSQL", () => {
+    expect(forms).toContain('pattern="[0-9]{9,12}"');
+    expect(forms).toContain("Introduza entre 9 e 12 algarismos");
+    expect(actions).toContain("/^\\d{9,12}$/");
+    expect(actions).toContain("businesses_nuit_format");
+    expect(actions).toContain("Ja existe um pedido para este negocio nesta conta");
   });
 
   it("hardens automatic RLS and prepares relational access paths", () => {

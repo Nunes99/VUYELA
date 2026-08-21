@@ -61,6 +61,26 @@ function slugifyBusinessName(name: string) {
   return slug || "negocio";
 }
 
+function getOptionalNuit(formData: FormData) {
+  const value = getFormString(formData, "nuit").replace(/\s+/g, "");
+
+  if (!value) {
+    return { ok: true as const, value: null };
+  }
+
+  if (!/^\d{9,12}$/.test(value)) {
+    return {
+      ok: false as const,
+      state: {
+        status: "error" as const,
+        message: "O NUIT deve ter entre 9 e 12 algarismos, sem letras ou simbolos."
+      }
+    };
+  }
+
+  return { ok: true as const, value };
+}
+
 export async function signInWithEmailAction(
   _previousState: AuthActionState,
   formData: FormData
@@ -388,6 +408,11 @@ export async function submitBusinessOnboardingAction(
     return city.state;
   }
 
+  const nuit = getOptionalNuit(formData);
+  if (!nuit.ok) {
+    return nuit.state;
+  }
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -405,7 +430,7 @@ export async function submitBusinessOnboardingAction(
     p_slug: slug,
     p_name: businessName.value,
     p_legal_name: getFormString(formData, "legalName") || null,
-    p_nuit: getFormString(formData, "nuit") || null,
+    p_nuit: nuit.value,
     p_description: getFormString(formData, "description") || null,
     p_phone: getFormString(formData, "phone") || null,
     p_email: getFormString(formData, "email") || user.email || null,
@@ -414,9 +439,24 @@ export async function submitBusinessOnboardingAction(
   });
 
   if (error) {
+    if (error.code === "23514" && error.message.includes("businesses_nuit_format")) {
+      return {
+        status: "error",
+        message: "O NUIT deve ter entre 9 e 12 algarismos. Confirme o numero e tente novamente."
+      };
+    }
+
+    if (error.code === "23505") {
+      return {
+        status: "error",
+        message:
+          "Ja existe um pedido para este negocio nesta conta. Aguarde a validacao da equipa VUYELA."
+      };
+    }
+
     return {
       status: "error",
-      message: "Nao foi possivel cadastrar o negocio agora."
+      message: "Nao foi possivel cadastrar o negocio agora. Reveja os dados e tente novamente."
     };
   }
 
