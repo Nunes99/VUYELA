@@ -13,7 +13,7 @@ export function InAppNotificationList({
     return (
       <div className="customer-dashboard-section-empty" role="status">
         <Bell size={22} aria-hidden="true" />
-        <h3>Sem notificacoes</h3>
+        <h3>Sem notificações</h3>
         <p>Novidades dos seus estabelecimentos aparecem aqui.</p>
       </div>
     );

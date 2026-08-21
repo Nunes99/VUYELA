@@ -9,18 +9,8 @@ import {
   isValidIdempotencyKey,
   parseMznToMinorUnits
 } from "./model";
-import type { PosCustomerCard, PosQuote } from "./model";
-
-export interface PosActionState {
-  status: "idle" | "error" | "success";
-  message: string;
-  businessId: string;
-  branchId: string;
-  card: PosCustomerCard | null;
-  quote: PosQuote | null;
-  transactionId: string | null;
-  idempotencyKey: string;
-}
+import { initialPosActionState } from "./state";
+import type { PosActionState } from "./state";
 
 interface PosLookupRow {
   customer_card_id: string;
@@ -36,17 +26,6 @@ interface PosTransactionRow {
   transaction_id: string;
   available_balance: number;
 }
-
-export const initialPosActionState: PosActionState = {
-  status: "idle",
-  message: "",
-  businessId: "",
-  branchId: "",
-  card: null,
-  quote: null,
-  transactionId: null,
-  idempotencyKey: ""
-};
 
 export async function submitPosAction(
   previousState: PosActionState,
@@ -70,7 +49,7 @@ export async function submitPosAction(
     return initialPosActionState;
   }
 
-  return createErrorState("Acao de POS invalida.", previousState);
+  return createErrorState("Ação de POS inválida.", previousState);
 }
 
 function getFormString(formData: FormData, key: string) {
@@ -85,7 +64,7 @@ function getRequiredFormString(formData: FormData, key: string, label: string) {
   if (!value) {
     return {
       ok: false as const,
-      state: createErrorState(`${label} e obrigatorio.`)
+      state: createErrorState(`${label} é obrigatório.`)
     };
   }
 
@@ -107,7 +86,7 @@ function createErrorState(message: string, previousState?: PosActionState): PosA
 
 function getSupabaseNotConfiguredState(): PosActionState {
   return createErrorState(
-    "Supabase ainda nao esta configurado neste ambiente. Configure as variaveis antes de usar o POS."
+    "Supabase ainda não está configurado neste ambiente. Configure as variáveis antes de usar o POS."
   );
 }
 
@@ -119,13 +98,13 @@ export async function identifyPosCustomerAction(
     return getSupabaseNotConfiguredState();
   }
 
-  const businessId = getRequiredFormString(formData, "businessId", "Negocio");
+  const businessId = getRequiredFormString(formData, "businessId", "Negócio");
   if (!businessId.ok) {
     return businessId.state;
   }
   const branchId = getFormString(formData, "branchId");
 
-  const cardCode = getRequiredFormString(formData, "cardCode", "Cartao ou QR");
+  const cardCode = getRequiredFormString(formData, "cardCode", "Cartão ou QR");
   if (!cardCode.ok) {
     return cardCode.state;
   }
@@ -138,13 +117,13 @@ export async function identifyPosCustomerAction(
   });
 
   if (error) {
-    return createErrorState("Nao foi possivel identificar o cartao.", previousState);
+    return createErrorState("Não foi possível identificar o cartão.", previousState);
   }
 
   const row = Array.isArray(data) ? (data[0] as PosLookupRow | undefined) : undefined;
 
   if (!row) {
-    return createErrorState("Cartao activo nao encontrado para este negocio.", previousState);
+    return createErrorState("Cartão ativo não encontrado para este negócio.", previousState);
   }
 
   return {
@@ -198,7 +177,7 @@ export async function quotePosTransactionAction(
   }
 
   if (discountAmount.value > grossAmount.value) {
-    return createErrorState("O desconto nao pode ser maior que a compra.", previousState);
+    return createErrorState("O desconto não pode ser maior que a compra.", previousState);
   }
 
   const quote = buildPosQuote({
@@ -223,17 +202,17 @@ export async function confirmPosTransactionAction(
   formData: FormData
 ): Promise<PosActionState> {
   if (!previousState.card || !previousState.quote) {
-    return createErrorState("Calcule a transaccao antes de confirmar.", previousState);
+    return createErrorState("Calcule a transação antes de confirmar.", previousState);
   }
 
   const businessId = getFormString(formData, "businessId") || previousState.businessId;
 
   if (!businessId) {
-    return createErrorState("Negocio e obrigatorio.", previousState);
+    return createErrorState("O negócio é obrigatório.", previousState);
   }
 
   if (getFormString(formData, "customerAuthorized") !== "on") {
-    return createErrorState("Confirme a autorizacao do cliente antes de concluir.", previousState);
+    return createErrorState("Confirme a autorização do cliente antes de concluir.", previousState);
   }
 
   const branchId = getFormString(formData, "branchId") || previousState.branchId || null;
@@ -241,7 +220,7 @@ export async function confirmPosTransactionAction(
   const idempotencyKey = getIdempotencyKey(formData, previousState);
 
   if (!isValidIdempotencyKey(idempotencyKey)) {
-    return createErrorState("A chave anti-duplicacao e invalida.", previousState);
+    return createErrorState("A chave anti-duplicação é inválida.", previousState);
   }
 
   if (!isSupabaseConfigured()) {
@@ -270,10 +249,10 @@ export async function confirmPosTransactionAction(
 
   if (error) {
     if (error.code === "23505") {
-      return createErrorState("Esta confirmacao ja foi recebida. Evite reenviar.", previousState);
+      return createErrorState("Esta confirmação já foi recebida. Evite reenviar.", previousState);
     }
 
-    return createErrorState("Nao foi possivel confirmar a transaccao.", previousState);
+    return createErrorState("Não foi possível confirmar a transação.", previousState);
   }
 
   const row = Array.isArray(data) ? (data[0] as PosTransactionRow | undefined) : undefined;
@@ -287,7 +266,7 @@ export async function confirmPosTransactionAction(
         }
       : previousState.card,
     status: "success",
-    message: "Transaccao confirmada com sucesso.",
+    message: "Transação confirmada com sucesso.",
     transactionId: row?.transaction_id ?? null,
     idempotencyKey
   };
@@ -344,7 +323,7 @@ function parseOptionalInteger(formData: FormData, key: string, previousState: Po
   if (!Number.isSafeInteger(parsed) || parsed < 0) {
     return {
       ok: false as const,
-      state: createErrorState("Os pontos a usar devem ser validos.", previousState)
+      state: createErrorState("Os pontos a usar devem ser válidos.", previousState)
     };
   }
 

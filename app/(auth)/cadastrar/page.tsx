@@ -6,7 +6,7 @@ import { SignUpForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
   title: "Criar conta",
-  description: "Crie uma conta VUYELA para usar cartoes digitais ou cadastrar um negocio.",
+  description: "Crie uma conta VUYELA para usar cartões digitais ou registar um negócio.",
   alternates: {
     canonical: "/cadastrar"
   },
@@ -25,15 +25,15 @@ export default function SignUpPage() {
           <span className="auth-kicker">Nova conta</span>
           <h1 id="signup-title">Crie a base da sua conta VUYELA.</h1>
           <p>
-            Depois da confirmacao, pode completar o perfil de cliente ou cadastrar um negocio para
-            validacao.
+            Depois da confirmação, pode completar o perfil de cliente ou registar um negócio para
+            validação.
           </p>
         </div>
 
         <div className="auth-panel auth-panel--forms">
           <SignUpForm />
           <p className="auth-footnote">
-            Ja tem conta? <Link href="/entrar">Entrar</Link>.
+            Já tem conta? <Link href="/entrar">Entrar</Link>.
           </p>
         </div>
       </section>

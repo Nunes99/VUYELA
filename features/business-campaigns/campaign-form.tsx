@@ -5,8 +5,9 @@ import { Megaphone, Save } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
-import { initialCampaignActionState, submitCampaignAction } from "./actions";
+import { submitCampaignAction } from "./actions";
 import { campaignTypes, getCampaignTypeLabel } from "./model";
+import { initialCampaignActionState } from "./state";
 import type { BusinessCampaignBusinessOption } from "./data";
 
 export function CampaignCreationForm({
@@ -27,7 +28,7 @@ export function CampaignCreationForm({
     <form action={formAction} className="business-campaign-form">
       <div className="business-campaign-form-grid">
         <Select
-          label="Negocio"
+          label="Negócio"
           name="businessId"
           defaultValue={selectedBusinessId}
           requiredMark
@@ -65,7 +66,7 @@ export function CampaignCreationForm({
         >
           <option value="in_app">In-app</option>
           <option value="email" disabled={!emailDeliveryConfigured}>
-            {emailDeliveryConfigured ? "Email" : "Email (por configurar)"}
+            {emailDeliveryConfigured ? "E-mail" : "E-mail (por configurar)"}
           </option>
           <option value="sms" disabled>
             SMS (brevemente)
@@ -78,12 +79,12 @@ export function CampaignCreationForm({
           </option>
         </Select>
 
-        <Input label="Inicio" name="startsAt" type="datetime-local" />
+        <Input label="Início" name="startsAt" type="datetime-local" />
         <Input label="Fim" name="endsAt" type="datetime-local" />
       </div>
 
       <div className="business-campaign-form-section">
-        <span className="business-dashboard-eyebrow">Notificacao</span>
+        <span className="business-dashboard-eyebrow">Notificação</span>
         <div className="business-campaign-form-grid">
           <Input label="Assunto" name="notificationSubject" maxLength={120} requiredMark required />
           <Textarea
@@ -100,7 +101,7 @@ export function CampaignCreationForm({
       </div>
 
       <div className="business-campaign-form-section">
-        <span className="business-dashboard-eyebrow">Beneficio</span>
+        <span className="business-dashboard-eyebrow">Benefício</span>
         <div className="business-campaign-form-grid">
           <Select
             label="Regra"
@@ -132,9 +133,9 @@ export function CampaignCreationForm({
           <Input label="Tier" name="tierName" placeholder="VIP" />
           <Input label="Compras minimas" name="minPurchaseCount" inputMode="numeric" />
           <Input label="Compras maximas" name="maxPurchaseCount" inputMode="numeric" />
-          <Input label="Gasto minimo (MZN)" name="minTotalSpentMzn" inputMode="decimal" />
-          <Input label="Dias inactivo" name="lastPurchaseBeforeDays" inputMode="numeric" />
-          <Input label="Pontos minimos" name="minPointsBalance" inputMode="numeric" />
+          <Input label="Gasto mínimo (MZN)" name="minTotalSpentMzn" inputMode="decimal" />
+          <Input label="Dias inativo" name="lastPurchaseBeforeDays" inputMode="numeric" />
+          <Input label="Pontos mínimos" name="minPointsBalance" inputMode="numeric" />
         </div>
         <label className="business-campaign-check">
           <input name="requiresMarketingConsent" type="checkbox" defaultChecked />

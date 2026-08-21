@@ -5,8 +5,8 @@ import { ProtectedRouteStateView } from "@/components/auth/protected-route-state
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Cadastrar negocio",
-  description: "Cadastre um negocio para validacao na VUYELA.",
+  title: "Registar negócio",
+  description: "Registe um negócio para validação na VUYELA.",
   robots: {
     index: false,
     follow: false
@@ -19,11 +19,11 @@ export default async function BusinessOnboardingPage() {
   const state = await getProtectedRouteState("/cliente", "/onboarding/negocio");
 
   return (
-    <ProtectedRouteStateView state={state} title="Cadastre um negocio para validacao.">
+    <ProtectedRouteStateView state={state} title="Registe um negócio para validação.">
       <div className="dashboard-card">
         <p>
-          O negocio entra como pendente de validacao. O acesso completo ao dashboard vem depois da
-          aprovacao e configuracao de fidelizacao.
+          O negócio entra como pendente de validação. O acesso completo ao painel vem depois da
+          aprovação e configuração de fidelização.
         </p>
         <BusinessOnboardingForm />
       </div>

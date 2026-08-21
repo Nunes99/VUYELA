@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/cliente",
     name: "VUYELA by LEMOTE",
     short_name: "VUYELA",
-    description: "Cartoes digitais e beneficios VUYELA em Mocambique.",
+    description: "Cartões digitais e benefícios VUYELA em Moçambique.",
     start_url: "/cliente",
     scope: "/",
     display: "standalone",

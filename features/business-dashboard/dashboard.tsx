@@ -21,17 +21,17 @@ interface BusinessDashboardViewProps {
 }
 
 const navItems = [
-  { href: "#overview", label: "Dashboard", icon: BarChart3 },
+  { href: "#overview", label: "Painel", icon: BarChart3 },
   { href: "#customers", label: "Clientes", icon: Users },
-  { href: "#transactions", label: "Transaccoes", icon: ClipboardList },
+  { href: "#transactions", label: "Transações", icon: ClipboardList },
   { href: "#campaigns", label: "Campanhas", icon: Gift },
   { href: "#program", label: "Programa", icon: LineChart },
   { href: "#branches", label: "Filiais", icon: Store },
-  { href: "#employees", label: "Funcionarios", icon: Building2 },
-  { href: "#reports", label: "Relatorios", icon: BarChart3 },
-  { href: "/negocio/subscricao", label: "Facturacao", icon: CreditCard },
-  { href: "#settings", label: "Configuracoes", icon: Settings },
-  { href: "/negocio/indicacoes", label: "Indicacoes", icon: UserPlus }
+  { href: "#employees", label: "Funcionários", icon: Building2 },
+  { href: "#reports", label: "Relatórios", icon: BarChart3 },
+  { href: "/negocio/subscricao", label: "Faturação", icon: CreditCard },
+  { href: "#settings", label: "Configurações", icon: Settings },
+  { href: "/negocio/indicacoes", label: "Indicações", icon: UserPlus }
 ];
 
 export function BusinessDashboardView({ state }: BusinessDashboardViewProps) {
@@ -39,11 +39,11 @@ export function BusinessDashboardView({ state }: BusinessDashboardViewProps) {
     return (
       <section
         className={`business-dashboard-notice${
-          state.status === "error" ? " business-dashboard-notice--error" : ""
+          state.status === "error" ? " business-painel-notice--error" : ""
         }`}
         aria-labelledby="business-dashboard-notice"
       >
-        <h2 id="business-dashboard-notice">Dashboard indisponivel</h2>
+        <h2 id="business-dashboard-notice">Painel indisponível</h2>
         <p>{state.message}</p>
       </section>
     );
@@ -74,10 +74,10 @@ function BusinessDashboardSwitcher({
   const selectedBusiness = businesses.find((business) => business.id === selectedBusinessId);
 
   return (
-    <section className="business-dashboard-switcher" aria-label="Contexto do dashboard">
+    <section className="business-dashboard-switcher" aria-label="Contexto do painel">
       <div>
         <span className="business-dashboard-eyebrow">Contexto</span>
-        <h2>{selectedBusiness?.name ?? "Negocio VUYELA"}</h2>
+        <h2>{selectedBusiness?.name ?? "Negócio VUYELA"}</h2>
         <p>{getScopeCopy(selectedBusiness, selectedBranchId)}</p>
       </div>
       <div className="business-dashboard-switcher__actions">
@@ -110,7 +110,7 @@ function BusinessDashboardSwitcher({
 
 function BusinessDashboardNav() {
   return (
-    <nav className="business-dashboard-nav" aria-label="Navegacao do negocio">
+    <nav className="business-dashboard-nav" aria-label="Navegação do negócio">
       {navItems.map((item) => {
         const Icon = item.icon;
 
@@ -133,19 +133,19 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
           <span className="business-dashboard-eyebrow">{dashboard.scopeLabel}</span>
           <h2 id="overview-title">{dashboard.business.name}</h2>
           <p>
-            Resumo dos ultimos 90 dias com vendas, clientes, pontos, liability promocional e
-            retencao.
+            Resumo dos últimos 90 dias com vendas, clientes, pontos, liability promocional e
+            retenção.
           </p>
         </div>
         <div className="business-dashboard-stat-grid">
           <Stat label="Vendas" value={formatMznMinor(dashboard.overview.revenueMznMinor)} />
           <Stat
-            label="Transaccoes"
+            label="Transações"
             value={dashboard.overview.transactionCount.toLocaleString("pt-MZ")}
           />
           <Stat label="Clientes" value={dashboard.overview.customerCount.toLocaleString("pt-MZ")} />
           <Stat
-            label="Ticket medio"
+            label="Ticket médio"
             value={formatMznMinor(dashboard.overview.averageTicketMznMinor)}
           />
         </div>
@@ -154,18 +154,21 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
       <section id="points" className="business-dashboard-section" aria-labelledby="points-title">
         <SectionHeading
           eyebrow="Pontos"
-          title="Liability e actividade"
+          title="Responsabilidade e atividade"
           id="points-title"
-          body="Valor promocional em aberto e ritmo de utilizacao de pontos."
+          body="Valor promocional em aberto e ritmo de utilização de pontos."
         />
-        <div className="business-dashboard-stat-grid business-dashboard-stat-grid--wide">
+        <div className="business-painel-stat-grid business-painel-stat-grid--wide">
           <Stat
-            label="Pontos disponiveis"
+            label="Pontos disponíveis"
             value={dashboard.points.availablePoints.toLocaleString("pt-MZ")}
           />
-          <Stat label="Liability" value={formatMznMinor(dashboard.points.liabilityMznMinor)} />
           <Stat
-            label="Ganhos historicos"
+            label="Responsabilidade"
+            value={formatMznMinor(dashboard.points.liabilityMznMinor)}
+          />
+          <Stat
+            label="Ganhos históricos"
             value={dashboard.points.lifetimeEarned.toLocaleString("pt-MZ")}
           />
           <Stat
@@ -173,7 +176,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
             value={dashboard.points.lifetimeRedeemed.toLocaleString("pt-MZ")}
           />
           <Stat label="Taxa de resgate" value={formatPercent(dashboard.points.redemptionRate)} />
-          <Stat label="Retencao" value={formatPercent(dashboard.retention.retentionRate)} />
+          <Stat label="Retenção" value={formatPercent(dashboard.retention.retentionRate)} />
         </div>
       </section>
 
@@ -199,7 +202,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
         aria-labelledby="transactions-title"
       >
         <SectionHeading
-          eyebrow="Transaccoes"
+          eyebrow="Transações"
           title="Movimentos recentes"
           id="transactions-title"
           body="Compras confirmadas pelo POS e loyalty engine."
@@ -217,7 +220,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
             eyebrow="Campanhas"
             title="Campanhas e ofertas"
             id="campaigns-title"
-            body={`${dashboard.settings.activeOffers.toLocaleString("pt-MZ")} ofertas activas.`}
+            body={`${dashboard.settings.activeOffers.toLocaleString("pt-MZ")} ofertas ativas.`}
           />
           {dashboard.hasManagerScope ? (
             <Link className="business-dashboard-link-button" href="/negocio/campanhas">
@@ -231,9 +234,9 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
       <section id="program" className="business-dashboard-section" aria-labelledby="program-title">
         <SectionHeading
           eyebrow="Programa"
-          title="Regras de fidelizacao"
+          title="Regras de fidelização"
           id="program-title"
-          body="Configuracao actual usada pelo POS e pelos cartoes digitais."
+          body="Configuração atual usada pelo POS e pelos cartões digitais."
         />
         <ProgramPanel dashboard={dashboard} />
       </section>
@@ -247,7 +250,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
           eyebrow="Filiais"
           title="Performance por filial"
           id="branches-title"
-          body="Receita e transaccoes no escopo seleccionado."
+          body="Receita e transações no escopo selecionado."
         />
         <BranchList dashboard={dashboard} />
       </section>
@@ -259,16 +262,16 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
       >
         <SectionHeading
           eyebrow="Equipa"
-          title="Membros activos"
+          title="Membros ativos"
           id="employees-title"
-          body="Papeis que participam na gestao e operacao."
+          body="Papeis que participam na gestao e operação."
         />
         <EmployeeList dashboard={dashboard} />
       </section>
 
       <section id="reports" className="business-dashboard-section" aria-labelledby="reports-title">
         <SectionHeading
-          eyebrow="Relatorios"
+          eyebrow="Relatórios"
           title="Indicadores principais"
           id="reports-title"
           body="Blocos prontos para relatórios operacionais."
@@ -293,7 +296,7 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
           eyebrow="Definicoes"
           title="Estado operacional"
           id="settings-title"
-          body="Resumo de estados que afectam o dashboard e o POS."
+          body="Resumo de estados que afetam o painel e o POS."
         />
         <SettingsPanel dashboard={dashboard} />
       </section>
@@ -332,7 +335,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function CustomerList({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   if (dashboard.customers.length === 0) {
-    return <SectionEmpty title="Sem clientes" body="Clientes aparecem depois da adesao." />;
+    return <SectionEmpty title="Sem clientes" body="Clientes aparecem depois da adesão." />;
   }
 
   return (
@@ -349,11 +352,11 @@ function CustomerList({ dashboard }: { dashboard: BusinessDashboardViewModel }) 
               <dd>{customer.availablePoints.toLocaleString("pt-MZ")}</dd>
             </div>
             <div>
-              <dt>Liability</dt>
+              <dt>Responsabilidade</dt>
               <dd>{formatMznMinor(customer.liabilityMznMinor)}</dd>
             </div>
             <div>
-              <dt>Ultima compra</dt>
+              <dt>Última compra</dt>
               <dd>
                 {customer.lastTransactionAt ? formatDate(customer.lastTransactionAt) : "Sem compra"}
               </dd>
@@ -367,7 +370,7 @@ function CustomerList({ dashboard }: { dashboard: BusinessDashboardViewModel }) 
 
 function TransactionList({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   if (dashboard.transactions.length === 0) {
-    return <SectionEmpty title="Sem transaccoes" body="Compras confirmadas aparecem aqui." />;
+    return <SectionEmpty title="Sem transações" body="Compras confirmadas aparecem aqui." />;
   }
 
   return (
@@ -405,7 +408,7 @@ function CampaignList({ dashboard }: { dashboard: BusinessDashboardViewModel }) 
     return (
       <SectionEmpty
         title="Campanhas restritas"
-        body="Campanhas e ofertas sao geridas por admin ou owner do negocio."
+        body="Campanhas e ofertas são geridas por admin ou proprietário do negócio."
       />
     );
   }
@@ -429,7 +432,7 @@ function CampaignList({ dashboard }: { dashboard: BusinessDashboardViewModel }) 
 
 function ProgramPanel({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   if (!dashboard.program) {
-    return <SectionEmpty title="Sem programa" body="Configure um programa para activar pontos." />;
+    return <SectionEmpty title="Sem programa" body="Configure um programa para ativar pontos." />;
   }
 
   return (
@@ -453,7 +456,7 @@ function ProgramPanel({ dashboard }: { dashboard: BusinessDashboardViewModel }) 
 
 function BranchList({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   if (dashboard.branches.length === 0) {
-    return <SectionEmpty title="Sem filiais" body="Filiais activas aparecem aqui." />;
+    return <SectionEmpty title="Sem filiais" body="Filiais ativas aparecem aqui." />;
   }
 
   return (
@@ -463,7 +466,7 @@ function BranchList({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
           <span>{branch.isPrimary ? "Principal" : branch.city}</span>
           <h3>{branch.name}</h3>
           <p>
-            {branch.transactionCount.toLocaleString("pt-MZ")} transaccoes ·{" "}
+            {branch.transactionCount.toLocaleString("pt-MZ")} transações ·{" "}
             {formatMznMinor(branch.revenueMznMinor)}
           </p>
         </article>
@@ -474,7 +477,7 @@ function BranchList({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
 
 function EmployeeList({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   if (dashboard.employees.length === 0) {
-    return <SectionEmpty title="Sem equipa" body="Membros activos aparecem aqui." />;
+    return <SectionEmpty title="Sem equipa" body="Membros ativos aparecem aqui." />;
   }
 
   return (
@@ -493,11 +496,11 @@ function EmployeeList({ dashboard }: { dashboard: BusinessDashboardViewModel }) 
 function SettingsPanel({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   return (
     <dl className="business-dashboard-facts">
-      <Fact label="Negocio" value={dashboard.settings.businessStatus} />
+      <Fact label="Negócio" value={dashboard.settings.businessStatus} />
       <Fact label="Programa" value={dashboard.settings.programStatus} />
-      <Fact label="Subscricao" value={dashboard.settings.subscriptionStatus} />
+      <Fact label="Subscrição" value={dashboard.settings.subscriptionStatus} />
       <Fact
-        label="Ofertas activas"
+        label="Ofertas ativas"
         value={dashboard.settings.activeOffers.toLocaleString("pt-MZ")}
       />
     </dl>
@@ -535,7 +538,7 @@ function roleLabel(role: string): string {
     cashier: "Caixa",
     branch_manager: "Gestor de filial",
     business_admin: "Admin",
-    business_owner: "Owner"
+    business_owner: "Proprietário"
   };
 
   return labels[role] ?? role;
@@ -546,14 +549,14 @@ function getScopeCopy(
   selectedBranchId: string
 ): string {
   if (!business) {
-    return "Sem contexto seleccionado";
+    return "Sem contexto selecionado";
   }
 
   if (!selectedBranchId) {
-    return "Todo o negocio";
+    return "Todo o negócio";
   }
 
   const branch = business.branches.find((item) => item.id === selectedBranchId);
 
-  return branch ? `${branch.name} - ${branch.city}` : "Filial seleccionada";
+  return branch ? `${branch.name} - ${branch.city}` : "Filial selecionada";
 }

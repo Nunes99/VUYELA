@@ -11,28 +11,28 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
     return (
       <section
         className={`business-dashboard-notice${
-          state.status === "error" ? " business-dashboard-notice--error" : ""
+          state.status === "error" ? " business-painel-notice--error" : ""
         }`}
         aria-labelledby="business-referral-notice"
       >
-        <h2 id="business-referral-notice">Indicacoes indisponiveis</h2>
+        <h2 id="business-referral-notice">Indicações indisponíveis</h2>
         <p>{state.message}</p>
         <Link className="business-campaign-link" href="/negocio">
-          Voltar ao dashboard
+          Voltar ao painel
         </Link>
       </section>
     );
   }
 
   return (
-    <div className="business-dashboard business-referrals">
+    <div className="business-painel business-referrals">
       <BusinessReferralSwitcher state={state} />
 
       <section className="business-dashboard-hero" aria-labelledby="business-referrals-title">
         <div>
-          <span className="business-dashboard-eyebrow">Indicacoes</span>
+          <span className="business-dashboard-eyebrow">Indicações</span>
           <h2 id="business-referrals-title">{state.selectedBusinessName}</h2>
-          <p>Regras activas, convites, premios emitidos e controlos de elegibilidade.</p>
+          <p>Regras ativas, convites, premios emitidos e controlos de elegibilidade.</p>
         </div>
         <div className="business-dashboard-stat-grid">
           <ReferralStat
@@ -58,14 +58,14 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
         </div>
       </section>
 
-      <section className="business-referral-layout" aria-label="Programa de indicacoes">
+      <section className="business-referral-layout" aria-label="Programa de indicações">
         <div className="business-dashboard-section">
-          <SectionHeading eyebrow="Configuracao" title="Regras do programa" />
+          <SectionHeading eyebrow="Configuração" title="Regras do programa" />
           <ReferralProgramForm businessId={state.selectedBusinessId} rules={state.rules} />
         </div>
         <aside className="business-dashboard-section">
           <SectionHeading eyebrow="Economia" title="Premios actuais" />
-          <dl className="business-dashboard-facts referral-economics">
+          <dl className="business-painel-facts referral-economics">
             <Fact
               label="Compra minima"
               value={formatMznMinor(state.rules.qualifyingPurchaseMinimumMznMinor)}
@@ -94,7 +94,7 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
               label="Limite"
               value={`${state.rules.rewardLimitCount}/${state.rules.rewardLimitPeriodDays} dias`}
             />
-            <Fact label="Estado" value={state.rules.isActive ? "Activo" : "Inactivo"} />
+            <Fact label="Estado" value={state.rules.isActive ? "Ativo" : "Inativo"} />
           </dl>
         </aside>
       </section>
@@ -104,7 +104,7 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
         aria-labelledby="business-referral-list-title"
       >
         <SectionHeading
-          eyebrow="Operacao"
+          eyebrow="Operação"
           title="Convites recentes"
           id="business-referral-list-title"
         />
@@ -116,14 +116,14 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
 
 function BusinessReferralSwitcher({ state }: { state: BusinessReferralsReadyState }) {
   return (
-    <section className="business-dashboard-switcher" aria-label="Contexto de indicacoes">
+    <section className="business-dashboard-switcher" aria-label="Contexto de indicações">
       <div>
         <span className="business-dashboard-eyebrow">Contexto</span>
-        <h2>Indicacoes</h2>
-        <p>Programa por negocio.</p>
+        <h2>Indicações</h2>
+        <p>Programa por negócio.</p>
       </div>
       <div className="business-dashboard-switcher__actions">
-        <Link href="/negocio">Dashboard</Link>
+        <Link href="/negocio">Painel</Link>
         {state.businesses.map((business) => (
           <Link
             className={business.id === state.selectedBusinessId ? "is-active" : ""}
@@ -152,16 +152,16 @@ function BusinessReferralList({ state }: { state: BusinessReferralsReadyState })
   return (
     <div className="business-dashboard-list">
       {state.referrals.map((referral) => (
-        <article className="business-dashboard-row business-referral-row" key={referral.id}>
+        <article className="business-painel-row business-referral-row" key={referral.id}>
           <div>
             <span className={`referral-status referral-status--${referral.status}`}>
               {getReferralStatusLabel(referral.status)}
             </span>
             <h3>{referral.referralCode}</h3>
             <p>
-              {state.cardNumberById[referral.referrerCardId] ?? "Cartao indicador"}
+              {state.cardNumberById[referral.referrerCardId] ?? "Cartão indicador"}
               {referral.referredCardId
-                ? ` · ${state.cardNumberById[referral.referredCardId] ?? "Cartao indicado"}`
+                ? ` · ${state.cardNumberById[referral.referredCardId] ?? "Cartão indicado"}`
                 : ""}
             </p>
           </div>
@@ -187,7 +187,7 @@ function BusinessReferralList({ state }: { state: BusinessReferralsReadyState })
 
 function ReferralStat({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div className="business-dashboard-stat business-referral-stat">
+    <div className="business-painel-stat business-referral-stat">
       {icon}
       {label}
       <strong>{value}</strong>

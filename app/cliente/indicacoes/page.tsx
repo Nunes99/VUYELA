@@ -6,7 +6,7 @@ import { getCustomerReferrals } from "@/features/referrals/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Indicacoes",
+  title: "Indicações",
   robots: {
     index: false,
     follow: false
@@ -21,7 +21,7 @@ export default async function CustomerReferralsPage() {
     state.status === "authorized" ? await getCustomerReferrals(state.principal.profileId) : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Indicacoes">
+    <ProtectedRouteStateView state={state} title="Indicações">
       {referralState ? <CustomerReferralsView state={referralState} /> : null}
     </ProtectedRouteStateView>
   );

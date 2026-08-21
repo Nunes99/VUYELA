@@ -116,7 +116,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
   ]);
 
   if (profileError || transactionError || offerError || notificationError) {
-    return { status: "error", message: "Nao foi possivel carregar o dashboard do cliente." };
+    return { status: "error", message: "Não foi possível carregar o painel do cliente." };
   }
 
   const offerRows = rowsFrom<OfferRow>(offerData);
@@ -136,7 +136,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
       : { data: [], error: null };
 
   if (businessError) {
-    return { status: "error", message: "Nao foi possivel carregar negocios do dashboard." };
+    return { status: "error", message: "Não foi possível carregar negócios do painel." };
   }
 
   const businessById = toMap(rowsFrom<BusinessNameRow>(businessData), (business) => business.id);
@@ -167,9 +167,9 @@ function buildNotifications(
   return rows.map((row) => ({
     id: row.id,
     businessName: row.business_id
-      ? (businessById.get(row.business_id)?.name ?? "Negocio VUYELA")
+      ? (businessById.get(row.business_id)?.name ?? "Negócio VUYELA")
       : "VUYELA",
-    subject: row.subject?.trim() || "Nova notificacao",
+    subject: row.subject?.trim() || "Nova notificação",
     body: row.body,
     createdAt: row.created_at,
     readAt: row.read_at
@@ -188,7 +188,7 @@ function buildActivity(
 
     return {
       id: row.id,
-      businessName: businessById.get(row.business_id)?.name ?? "Negocio VUYELA",
+      businessName: businessById.get(row.business_id)?.name ?? "Negócio VUYELA",
       description: getActivityDescription({
         pointsEarned: row.points_earned,
         pointsRedeemed: row.points_redeemed,
@@ -207,7 +207,7 @@ function buildOffers(
 ): CustomerExploreOffer[] {
   return rows.map((row) => ({
     id: row.id,
-    businessName: businessById.get(row.business_id)?.name ?? "Negocio VUYELA",
+    businessName: businessById.get(row.business_id)?.name ?? "Negócio VUYELA",
     title: row.title,
     description: row.description
   }));

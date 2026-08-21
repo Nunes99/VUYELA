@@ -48,7 +48,7 @@ export async function getBusinessSubscription(
   if (businessIds.length === 0) {
     return {
       status: "empty",
-      message: "A subscricao pode ser consultada por admins ou owners do negocio."
+      message: "A subscrição pode ser consultada por administradores ou proprietários do negócio."
     };
   }
 
@@ -60,7 +60,7 @@ export async function getBusinessSubscription(
     .order("name", { ascending: true });
 
   if (businessError) {
-    return { status: "error", message: "Nao foi possivel carregar os negocios." };
+    return { status: "error", message: "Não foi possível carregar os negócios." };
   }
 
   const businesses = (Array.isArray(businessData) ? (businessData as BusinessRow[]) : []).map(
@@ -72,7 +72,7 @@ export async function getBusinessSubscription(
   );
 
   if (businesses.length === 0) {
-    return { status: "empty", message: "Nao ha negocios disponiveis para esta conta." };
+    return { status: "empty", message: "Não há negócios disponíveis para esta conta." };
   }
 
   const selectedBusiness =
@@ -82,13 +82,13 @@ export async function getBusinessSubscription(
   });
 
   if (error) {
-    return { status: "error", message: "Nao foi possivel carregar a subscricao." };
+    return { status: "error", message: "Não foi possível carregar a subscrição." };
   }
 
   const overview = parseBusinessSubscriptionOverview(data);
 
   if (!overview) {
-    return { status: "error", message: "Os dados da subscricao estao incompletos." };
+    return { status: "error", message: "Os dados da subscrição estão incompletos." };
   }
 
   return {

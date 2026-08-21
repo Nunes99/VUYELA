@@ -22,7 +22,7 @@ export default async function CustomerOnboardingPage() {
     <ProtectedRouteStateView state={state} title="Complete o seu perfil de cliente.">
       <div className="dashboard-card">
         <p>
-          Estes dados criam a base para cartoes digitais, notificacoes e recuperacao de acesso nas
+          Estes dados criam a base para cartões digitais, notificações e recuperação de acesso nas
           proximas fases.
         </p>
         <CustomerOnboardingForm />

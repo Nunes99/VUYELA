@@ -18,7 +18,7 @@ const categories = [
     id: "cat-restaurant",
     slug: "restaurantes",
     name: "Restaurantes",
-    description: "Restaurantes com beneficios claros."
+    description: "Restaurantes com benefícios claros."
   },
   {
     id: "cat-gym",
@@ -34,14 +34,14 @@ const program = {
   pointValueMznMinor: 100,
   maximumRedemptionPercent: 50,
   pointsExpireAfterDays: 365,
-  terms: "Pontos validos apenas no negocio emissor."
+  terms: "Pontos válidos apenas no negócio emissor."
 };
 
 function business(
   input: Partial<MarketplaceBusiness> & Pick<MarketplaceBusiness, "id" | "slug" | "name">
 ): MarketplaceBusiness {
   return {
-    description: "Programa de pontos com beneficios publicados para clientes voltarem.",
+    description: "Programa de pontos com benefícios publicados para clientes voltarem.",
     phone: null,
     email: null,
     websiteUrl: null,
@@ -78,7 +78,7 @@ function offer(
 ): MarketplaceOffer {
   return {
     title: "Desconto de almoco",
-    description: "Oferta publica activa para clientes VUYELA.",
+    description: "Oferta pública ativa para clientes VUYELA.",
     startsAt: "2026-08-01T00:00:00.000Z",
     endsAt: null,
     businessSlug: "restaurante-mares",

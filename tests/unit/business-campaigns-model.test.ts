@@ -76,7 +76,7 @@ describe("business campaign model", () => {
       "card-1"
     ]);
     expect(results.find((result) => result.customerId === "card-2")?.reason).toBe(
-      "Cliente ja comprou"
+      "Cliente já comprou"
     );
   });
 

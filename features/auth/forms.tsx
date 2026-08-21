@@ -45,9 +45,9 @@ export function EmailSignInForm({ nextPath = "/cliente" }: FormProps) {
   return (
     <form action={formAction} className="auth-form">
       <input type="hidden" name="next" value={nextPath} />
-      <Input label="Email" name="email" type="email" autoComplete="email" requiredMark required />
+      <Input label="E-mail" name="email" type="email" autoComplete="email" requiredMark required />
       <Input
-        label="Senha"
+        label="Palavra-passe"
         name="password"
         type="password"
         autoComplete="current-password"
@@ -98,7 +98,7 @@ export function PhoneOtpForm({ nextPath = "/cliente" }: FormProps) {
           loading={requesting}
           leadingIcon={<Phone size={18} />}
         >
-          Enviar codigo
+          Enviar código
         </Button>
       </form>
 
@@ -106,7 +106,7 @@ export function PhoneOtpForm({ nextPath = "/cliente" }: FormProps) {
         <input type="hidden" name="next" value={nextPath} />
         <Input label="Telefone" name="phone" type="tel" autoComplete="tel" requiredMark required />
         <Input
-          label="Codigo SMS"
+          label="Código SMS"
           name="token"
           inputMode="numeric"
           autoComplete="one-time-code"
@@ -115,7 +115,7 @@ export function PhoneOtpForm({ nextPath = "/cliente" }: FormProps) {
         />
         <ActionMessage status={verifyState.status} message={verifyState.message} />
         <Button type="submit" variant="primary" fullWidth loading={verifying}>
-          Confirmar codigo
+          Confirmar código
         </Button>
       </form>
     </div>
@@ -132,9 +132,9 @@ export function SignUpForm({ nextPath = "/onboarding/cliente" }: FormProps) {
     <form action={formAction} className="auth-form">
       <input type="hidden" name="next" value={nextPath} />
       <Input label="Nome" name="displayName" autoComplete="name" requiredMark required />
-      <Input label="Email" name="email" type="email" autoComplete="email" requiredMark required />
+      <Input label="E-mail" name="email" type="email" autoComplete="email" requiredMark required />
       <Input
-        label="Senha"
+        label="Palavra-passe"
         name="password"
         type="password"
         autoComplete="new-password"
@@ -165,7 +165,7 @@ export function PasswordResetForm() {
 
   return (
     <form action={formAction} className="auth-form">
-      <Input label="Email" name="email" type="email" autoComplete="email" requiredMark required />
+      <Input label="E-mail" name="email" type="email" autoComplete="email" requiredMark required />
       <ActionMessage status={state.status} message={state.message} />
       <Button
         type="submit"
@@ -186,7 +186,7 @@ export function UpdatePasswordForm() {
   return (
     <form action={formAction} className="auth-form">
       <Input
-        label="Nova senha"
+        label="Nova palavra-passe"
         name="password"
         type="password"
         autoComplete="new-password"
@@ -196,7 +196,7 @@ export function UpdatePasswordForm() {
         required
       />
       <Input
-        label="Confirmar nova senha"
+        label="Confirmar nova palavra-passe"
         name="passwordConfirmation"
         type="password"
         autoComplete="new-password"
@@ -212,7 +212,7 @@ export function UpdatePasswordForm() {
         loading={pending}
         leadingIcon={<KeyRound size={18} />}
       >
-        Guardar nova senha
+        Guardar nova palavra-passe
       </Button>
     </form>
   );
@@ -228,7 +228,7 @@ export function CustomerOnboardingForm() {
     <form action={formAction} className="auth-form">
       <Input label="Nome completo" name="displayName" autoComplete="name" requiredMark required />
       <Input label="Telefone" name="phone" type="tel" autoComplete="tel" />
-      <Input label="Email" name="email" type="email" autoComplete="email" />
+      <Input label="E-mail" name="email" type="email" autoComplete="email" />
       <ActionMessage status={state.status} message={state.message} />
       <Button
         type="submit"
@@ -252,7 +252,7 @@ export function BusinessOnboardingForm() {
   return (
     <form action={formAction} className="auth-form">
       <Input
-        label="Nome do negocio"
+        label="Nome do negócio"
         name="businessName"
         autoComplete="organization"
         requiredMark
@@ -271,10 +271,10 @@ export function BusinessOnboardingForm() {
         title="Introduza entre 9 e 12 algarismos."
       />
       <Input label="Cidade" name="city" autoComplete="address-level2" requiredMark required />
-      <Input label="Provincia" name="province" autoComplete="address-level1" />
+      <Input label="Província" name="province" autoComplete="address-level1" />
       <Input label="Telefone" name="phone" type="tel" autoComplete="tel" />
-      <Input label="Email do negocio" name="email" type="email" autoComplete="email" />
-      <Textarea label="Descricao" name="description" rows={4} />
+      <Input label="E-mail do negócio" name="email" type="email" autoComplete="email" />
+      <Textarea label="Descrição" name="description" rows={4} />
       <ActionMessage status={state.status} message={state.message} />
       <Button
         type="submit"
@@ -283,7 +283,7 @@ export function BusinessOnboardingForm() {
         loading={pending}
         leadingIcon={<Store size={18} />}
       >
-        Enviar para validacao
+        Enviar para validação
       </Button>
     </form>
   );

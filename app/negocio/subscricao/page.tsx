@@ -6,7 +6,7 @@ import { BusinessSubscriptionView } from "@/features/subscriptions/subscription-
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Subscricao do negocio",
+  title: "Subscrição do negócio",
   robots: {
     index: false,
     follow: false
@@ -29,7 +29,7 @@ export default async function BusinessSubscriptionPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Subscricao do negocio">
+    <ProtectedRouteStateView state={state} title="Subscrição do negócio">
       {subscriptionState ? <BusinessSubscriptionView state={subscriptionState} /> : null}
     </ProtectedRouteStateView>
   );

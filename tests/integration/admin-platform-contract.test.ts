@@ -12,6 +12,7 @@ const hardeningMigration = readFileSync(
   "utf8"
 );
 const actions = readFileSync(join(process.cwd(), "features/admin/actions.ts"), "utf8");
+const actionState = readFileSync(join(process.cwd(), "features/admin/state.ts"), "utf8");
 const data = readFileSync(join(process.cwd(), "features/admin/data.ts"), "utf8");
 const page = readFileSync(join(process.cwd(), "app/admin/page.tsx"), "utf8");
 
@@ -90,5 +91,7 @@ describe("platform administration contract", () => {
     expect(actions).toContain("p_ip_address");
     expect(page).toContain('getProtectedRouteState("/admin", "/admin")');
     expect(page).toContain("getAdminDashboardState");
+    expect(actions).not.toContain("export const initialAdminActionState");
+    expect(actionState).toContain("export const initialAdminActionState");
   });
 });

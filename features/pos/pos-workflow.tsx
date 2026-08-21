@@ -14,9 +14,10 @@ import {
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select } from "../../vuyela-design-system/src/components/Field";
-import { initialPosActionState, submitPosAction } from "./actions";
+import { submitPosAction } from "./actions";
 import { formatMznMinor, posSteps } from "./model";
-import type { PosActionState } from "./actions";
+import { initialPosActionState } from "./state";
+import type { PosActionState } from "./state";
 import type { PosBusinessContext, PosContextState } from "./data";
 
 interface PosWorkflowProps {
@@ -58,7 +59,7 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
         className={`pos-notice${context.status === "error" ? " pos-notice--error" : ""}`}
         aria-labelledby="pos-notice-title"
       >
-        <h2 id="pos-notice-title">POS indisponivel</h2>
+        <h2 id="pos-notice-title">POS indisponível</h2>
         <p>{context.message}</p>
       </section>
     );
@@ -72,7 +73,7 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
         <section className="pos-panel" aria-labelledby="pos-flow-title">
           <div className="pos-panel__header">
             <span className="pos-eyebrow">Caixa</span>
-            <h2 id="pos-flow-title">Nova transaccao</h2>
+            <h2 id="pos-flow-title">Nova transação</h2>
           </div>
 
           {!state.card ? (
@@ -121,9 +122,9 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
           <ActionMessage status={state.status} message={state.message} />
         </section>
 
-        <aside className="pos-summary" aria-label="Resumo da transaccao">
+        <aside className="pos-summary" aria-label="Resumo da transação">
           <div className="pos-summary__business">
-            <span>Negocio</span>
+            <span>Negócio</span>
             <strong>{selectedBusiness?.name ?? "VUYELA"}</strong>
             <small>{getBranchLabel(selectedBusiness, state.branchId)}</small>
           </div>
@@ -171,7 +172,7 @@ function IdentifyForm({
 }) {
   const firstBusiness = businesses[0] ?? {
     id: "",
-    name: "Negocio VUYELA",
+    name: "Negócio VUYELA",
     branches: [],
     defaultBranchId: "",
     requiresBranch: true,
@@ -188,7 +189,7 @@ function IdentifyForm({
 
       <div className="pos-form-grid">
         <Select
-          label="Negocio"
+          label="Negócio"
           name="businessId"
           value={selectedBusinessId}
           onChange={(event) => {
@@ -229,7 +230,7 @@ function IdentifyForm({
       </div>
 
       <Input
-        label="Cartao ou QR"
+        label="Cartão ou QR"
         name="cardCode"
         autoComplete="off"
         inputMode="text"
@@ -358,7 +359,7 @@ function ConfirmForm({
         loading={pending}
         leadingIcon={<ShieldCheck size={20} />}
       >
-        Confirmar transaccao
+        Confirmar transação
       </Button>
     </form>
   );
@@ -379,9 +380,9 @@ function SuccessState({
     <div className="pos-success" role="status">
       <BadgeCheck size={44} aria-hidden="true" />
       <div>
-        <h3>Transaccao concluida</h3>
+        <h3>Transação concluída</h3>
         <p>Referencia: {transactionId}</p>
-        <small>Anti-duplicacao: {idempotencyKey}</small>
+        <small>Anti-duplicação: {idempotencyKey}</small>
       </div>
       <form action={formAction}>
         <input type="hidden" name="intent" value="reset" />
@@ -391,7 +392,7 @@ function SuccessState({
           leadingIcon={<RotateCcw size={18} />}
           onClick={onReset}
         >
-          Nova transaccao
+          Nova transação
         </Button>
       </form>
     </div>
@@ -416,7 +417,7 @@ function CustomerSummary({ state }: { state: PosActionState }) {
       <h3>{state.card.customerName}</h3>
       <dl className="pos-summary-list">
         <div>
-          <dt>Cartao</dt>
+          <dt>Cartão</dt>
           <dd>{state.card.cardNumber}</dd>
         </div>
         <div>
@@ -497,7 +498,7 @@ function getBranchLabel(
     return "Sede / sem filial";
   }
 
-  return business?.branches.find((branch) => branch.id === id)?.name ?? "Filial seleccionada";
+  return business?.branches.find((branch) => branch.id === id)?.name ?? "Filial selecionada";
 }
 
 function createBrowserIdempotencyKey() {

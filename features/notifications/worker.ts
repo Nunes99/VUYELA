@@ -50,7 +50,7 @@ export async function processPendingNotifications(
   });
 
   if (error) {
-    throw new Error("Nao foi possivel reservar notificacoes pendentes.");
+    throw new Error("Não foi possível reservar notificações pendentes.");
   }
 
   const rows = Array.isArray(data) ? (data as ClaimedNotificationRow[]) : [];
@@ -75,7 +75,7 @@ async function deliverClaimedNotification(
   row: ClaimedNotificationRow
 ): Promise<NotificationDeliveryResult> {
   if (!isNotificationChannel(row.channel)) {
-    return { ok: false, message: "Canal de notificacao invalido.", retryable: false };
+    return { ok: false, message: "Canal de notificação inválido.", retryable: false };
   }
 
   const provider = getNotificationProvider(row.channel);
@@ -85,7 +85,7 @@ async function deliverClaimedNotification(
     channel: row.channel,
     recipientEmail: row.recipient_email,
     businessName: row.business_name,
-    subject: row.subject?.trim() || "Nova notificacao VUYELA",
+    subject: row.subject?.trim() || "Nova notificação VUYELA",
     body: row.body,
     idempotencyKey: buildProviderIdempotencyKey(row.id, row.idempotency_key)
   });
@@ -127,7 +127,7 @@ async function persistDeliveryResult(
       .eq("lock_token", row.lock_token);
 
     if (error) {
-      throw new Error("Nao foi possivel confirmar a entrega da notificacao.");
+      throw new Error("Não foi possível confirmar a entrega da notificação.");
     }
 
     return status;
@@ -152,7 +152,7 @@ async function persistDeliveryResult(
     .eq("lock_token", row.lock_token);
 
   if (error) {
-    throw new Error("Nao foi possivel registar a tentativa de notificacao.");
+    throw new Error("Não foi possível registar a tentativa de notificação.");
   }
 
   return failed ? "failed" : "retried";

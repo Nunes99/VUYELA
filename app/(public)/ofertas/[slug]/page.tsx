@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: OfferPageProps): Promise<Meta
 
   if (!viewModel) {
     return {
-      title: "Oferta nao encontrada",
+      title: "Oferta não encontrada",
       robots: {
         index: false,
         follow: false

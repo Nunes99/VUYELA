@@ -55,7 +55,7 @@ export async function getBusinessCampaigns(
   if (memberships.length === 0) {
     return {
       status: "empty",
-      message: "Campanhas podem ser criadas por admins ou owners do negocio."
+      message: "Campanhas podem ser criadas por administradores ou proprietários do negócio."
     };
   }
 
@@ -68,7 +68,7 @@ export async function getBusinessCampaigns(
     .order("name", { ascending: true });
 
   if (businessError) {
-    return { status: "error", message: "Nao foi possivel carregar os negocios." };
+    return { status: "error", message: "Não foi possível carregar os negócios." };
   }
 
   const businesses = buildBusinessOptions(rowsFrom<BusinessRow>(businessData), memberships);
@@ -76,7 +76,7 @@ export async function getBusinessCampaigns(
   if (businesses.length === 0) {
     return {
       status: "empty",
-      message: "Nao ha negocios activos disponiveis para campanhas."
+      message: "Não há negócios ativos disponíveis para campanhas."
     };
   }
 
@@ -92,7 +92,7 @@ export async function getBusinessCampaigns(
   ]);
 
   if (campaignResult.error || subscriptionResult.error) {
-    return { status: "error", message: "Nao foi possivel carregar as campanhas." };
+    return { status: "error", message: "Não foi possível carregar as campanhas." };
   }
 
   const row = Array.isArray(campaignResult.data)
@@ -104,7 +104,7 @@ export async function getBusinessCampaigns(
   const subscription = parseBusinessSubscriptionOverview(subscriptionResult.data);
 
   if (!subscription?.entitlements) {
-    return { status: "error", message: "O plano do negocio nao esta configurado." };
+    return { status: "error", message: "O plano do negócio não está configurado." };
   }
 
   const campaignLimit = subscription.entitlements.campaignLimit;

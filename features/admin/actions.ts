@@ -8,16 +8,7 @@ import { headers } from "next/headers";
 import { AdminAccessDeniedError, requireAdminCapability } from "@/lib/auth/admin-access";
 import { isProfileRole } from "@/lib/auth/rbac";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
-
-export interface AdminActionState {
-  status: "idle" | "error" | "success";
-  message: string;
-}
-
-export const initialAdminActionState: AdminActionState = {
-  status: "idle",
-  message: ""
-};
+import type { AdminActionState } from "@/features/admin/state";
 
 export async function reviewBusinessAction(
   _previousState: AdminActionState,
@@ -28,7 +19,7 @@ export async function reviewBusinessAction(
   const note = getFormString(formData, "note");
 
   if (!isUuid(businessId) || !["approve", "reject", "suspend", "reactivate"].includes(decision)) {
-    return adminError("Pedido de revisao invalido.");
+    return adminError("Pedido de revisão inválido.");
   }
 
   if (["reject", "suspend"].includes(decision) && note.length < 4) {
@@ -38,7 +29,7 @@ export async function reviewBusinessAction(
   const principal = await getActionPrincipal("businesses_review");
 
   if (!principal) {
-    return adminError("A sua funcao nao permite rever negocios.");
+    return adminError("A sua função não permite rever negócios.");
   }
 
   const auditContext = await getRequestAuditContext();
@@ -56,7 +47,7 @@ export async function reviewBusinessAction(
   }
 
   revalidateAdmin();
-  return adminSuccess("Estado do negocio actualizado e auditado.");
+  return adminSuccess("Estado do negócio atualizado e auditado.");
 }
 
 export async function updateProfileRoleAction(
@@ -68,13 +59,13 @@ export async function updateProfileRoleAction(
   const note = getFormString(formData, "note");
 
   if (!isUuid(targetProfileId) || !isProfileRole(newRole) || note.length < 4) {
-    return adminError("Seleccione uma funcao e registe o motivo da alteracao.");
+    return adminError("Selecione uma função e registe o motivo da alteração.");
   }
 
   const principal = await getActionPrincipal("users_manage");
 
   if (!principal) {
-    return adminError("A sua funcao nao permite alterar permissoes.");
+    return adminError("A sua função não permite alterar permissões.");
   }
 
   const auditContext = await getRequestAuditContext();
@@ -92,7 +83,7 @@ export async function updateProfileRoleAction(
   }
 
   revalidateAdmin();
-  return adminSuccess("Funcao do utilizador actualizada e auditada.");
+  return adminSuccess("Função do utilizador atualizada e auditada.");
 }
 
 export async function updateSupportTicketAction(
@@ -112,17 +103,17 @@ export async function updateSupportTicketAction(
     !["low", "normal", "high", "urgent"].includes(priority) ||
     (assignedToProfileId && !isUuid(assignedToProfileId))
   ) {
-    return adminError("Actualizacao de suporte invalida.");
+    return adminError("Atualização de suporte inválida.");
   }
 
   if (["resolved", "closed"].includes(status) && resolutionNote.length < 4) {
-    return adminError("Registe a resolucao antes de concluir o pedido.");
+    return adminError("Registe a resolução antes de concluir o pedido.");
   }
 
   const principal = await getActionPrincipal("support_manage");
 
   if (!principal) {
-    return adminError("A sua funcao nao permite gerir suporte.");
+    return adminError("A sua função não permite gerir suporte.");
   }
 
   const auditContext = await getRequestAuditContext();
@@ -143,7 +134,7 @@ export async function updateSupportTicketAction(
   }
 
   revalidateAdmin();
-  return adminSuccess("Pedido de suporte actualizado e auditado.");
+  return adminSuccess("Pedido de suporte atualizado e auditado.");
 }
 
 export async function reviewFraudEventAction(
@@ -155,13 +146,13 @@ export async function reviewFraudEventAction(
   const note = getFormString(formData, "note");
 
   if (!isUuid(fraudEventId) || !["resolve", "reopen"].includes(resolution) || note.length < 4) {
-    return adminError("Registe uma decisao e o respectivo motivo.");
+    return adminError("Registe uma decisão e o respetivo motivo.");
   }
 
   const principal = await getActionPrincipal("fraud_review");
 
   if (!principal) {
-    return adminError("A sua funcao nao permite rever alertas de fraude.");
+    return adminError("A sua função não permite rever alertas de fraude.");
   }
 
   const auditContext = await getRequestAuditContext();
@@ -179,7 +170,7 @@ export async function reviewFraudEventAction(
   }
 
   revalidateAdmin();
-  return adminSuccess("Alerta de fraude actualizado e auditado.");
+  return adminSuccess("Alerta de fraude atualizado e auditado.");
 }
 
 export async function assignSubscriptionPlanAction(
@@ -197,13 +188,13 @@ export async function assignSubscriptionPlanAction(
     !["trialing", "active", "paused"].includes(status) ||
     note.length < 4
   ) {
-    return adminError("Seleccione um plano, estado e motivo validos.");
+    return adminError("Selecione um plano, estado e motivo válidos.");
   }
 
   const principal = await getActionPrincipal("subscriptions_manage");
 
   if (!principal) {
-    return adminError("A sua funcao nao permite alterar subscricoes.");
+    return adminError("A sua função não permite alterar subscrições.");
   }
 
   const auditContext = await getRequestAuditContext();
@@ -222,7 +213,7 @@ export async function assignSubscriptionPlanAction(
   }
 
   revalidateSubscriptions();
-  return adminSuccess("Subscricao actualizada e auditada.");
+  return adminSuccess("Subscrição atualizada e auditada.");
 }
 
 export async function updatePlanEntitlementsAction(
@@ -256,7 +247,7 @@ export async function updatePlanEntitlementsAction(
   const principal = await getActionPrincipal("subscriptions_manage");
 
   if (!principal) {
-    return adminError("A sua funcao nao permite configurar planos.");
+    return adminError("A sua função não permite configurar planos.");
   }
 
   const auditContext = await getRequestAuditContext();
@@ -282,7 +273,7 @@ export async function updatePlanEntitlementsAction(
   }
 
   revalidateSubscriptions();
-  return adminSuccess("Plano e entitlements actualizados e auditados.");
+  return adminSuccess("Plano e permissões atualizados e auditados.");
 }
 
 async function getActionPrincipal(capability: Parameters<typeof requireAdminCapability>[0]) {
@@ -364,30 +355,30 @@ function isUuid(value: string): boolean {
 
 function getDatabaseActionMessage(message: string): string {
   if (message.includes("own role")) {
-    return "Nao pode alterar a sua propria funcao administrativa.";
+    return "Não pode alterar a sua própria função administrativa.";
   }
 
   if (message.includes("final super admin")) {
-    return "O ultimo super admin nao pode ser despromovido.";
+    return "O último super admin não pode ser despromovido.";
   }
 
   if (message.includes("privileged platform roles")) {
-    return "Apenas um super admin pode gerir funcoes administrativas superiores.";
+    return "Apenas um super admin pode gerir funções administrativas superiores.";
   }
 
   if (message.includes("transition")) {
-    return "O estado do registo mudou. Actualize a pagina e tente novamente.";
+    return "O estado do registo mudou. Atualize a página e tente novamente.";
   }
 
   if (message.includes("limit is below current usage")) {
-    return "O novo plano fica abaixo do consumo actual do negocio.";
+    return "O novo plano fica abaixo do consumo atual do negócio.";
   }
 
   if (message.includes("limit reached for subscription plan")) {
     return "O limite configurado no plano foi atingido.";
   }
 
-  return "Nao foi possivel concluir a operacao administrativa.";
+  return "Não foi possível concluir a operação administrativa.";
 }
 
 function revalidateAdmin() {

@@ -49,8 +49,8 @@ const businessWideRoles = new Set<BusinessMemberRole>(["business_admin", "busine
 const roleLabels: Record<BusinessMemberRole, string> = {
   cashier: "Caixa",
   branch_manager: "Gestor de filial",
-  business_admin: "Admin do negocio",
-  business_owner: "Owner"
+  business_admin: "Admin do negócio",
+  business_owner: "Proprietário"
 };
 
 export async function getPosContext(principal: AuthPrincipal): Promise<PosContextState> {
@@ -61,7 +61,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   if (memberships.length === 0) {
     return {
       status: "empty",
-      message: "Esta conta ainda nao tem um papel activo para operar o POS."
+      message: "Esta conta ainda não tem um papel ativo para operar o POS."
     };
   }
 
@@ -80,7 +80,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
     ]);
 
   if (businessError || branchError) {
-    return { status: "error", message: "Nao foi possivel carregar negocios e filiais do POS." };
+    return { status: "error", message: "Não foi possível carregar negócios e filiais do POS." };
   }
 
   const branchesByBusinessId = groupBranches(rowsFrom<BranchRow>(branchData));
@@ -126,7 +126,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   if (businesses.length === 0) {
     return {
       status: "empty",
-      message: "Nao ha filiais activas disponiveis para esta conta de POS."
+      message: "Não há filiais ativas disponíveis para esta conta de POS."
     };
   }
 

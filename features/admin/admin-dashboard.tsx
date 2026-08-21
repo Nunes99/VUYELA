@@ -46,11 +46,11 @@ const adminNavigation: Array<{
   capability: AdminCapability;
 }> = [
   { view: "overview", label: "Visao geral", icon: BarChart3, capability: "platform_metrics_read" },
-  { view: "businesses", label: "Negocios", icon: Building2, capability: "businesses_read" },
+  { view: "businesses", label: "Negócios", icon: Building2, capability: "businesses_read" },
   { view: "users", label: "Utilizadores", icon: Users, capability: "users_read" },
   {
     view: "subscriptions",
-    label: "Subscricoes",
+    label: "Subscrições",
     icon: CreditCard,
     capability: "subscriptions_read"
   },
@@ -76,7 +76,7 @@ export function AdminDashboard({
         <Shield aria-hidden="true" size={22} />
       </header>
 
-      <nav className="admin-console__nav" aria-label="Administracao da plataforma">
+      <nav className="admin-console__nav" aria-label="Administração da plataforma">
         {adminNavigation
           .filter((item) => hasAdminCapability(principal.profileRole, item.capability))
           .map((item) => {
@@ -98,7 +98,7 @@ export function AdminDashboard({
 
       {state.status === "denied" || state.status === "error" ? (
         <section className="admin-console__notice" role="alert">
-          <h2>{state.status === "denied" ? "Acesso limitado" : "Dados indisponiveis"}</h2>
+          <h2>{state.status === "denied" ? "Acesso limitado" : "Dados indisponíveis"}</h2>
           <p>{state.message}</p>
         </section>
       ) : (
@@ -160,10 +160,10 @@ function AdminViewContent({
 
 function Overview({ metrics }: { metrics: PlatformMetrics }) {
   const primaryMetrics = [
-    { label: "Negocios activos", value: metrics.activeBusinesses.toLocaleString("pt-MZ") },
-    { label: "Em aprovacao", value: metrics.pendingBusinesses.toLocaleString("pt-MZ") },
+    { label: "Negócios ativos", value: metrics.activeBusinesses.toLocaleString("pt-MZ") },
+    { label: "Em aprovação", value: metrics.pendingBusinesses.toLocaleString("pt-MZ") },
     { label: "Utilizadores", value: metrics.totalProfiles.toLocaleString("pt-MZ") },
-    { label: "Subscricoes activas", value: metrics.activeSubscriptions.toLocaleString("pt-MZ") },
+    { label: "Subscrições ativas", value: metrics.activeSubscriptions.toLocaleString("pt-MZ") },
     { label: "Suporte em aberto", value: metrics.openSupportTickets.toLocaleString("pt-MZ") },
     { label: "Alertas por rever", value: metrics.unresolvedFraudEvents.toLocaleString("pt-MZ") }
   ];
@@ -187,14 +187,14 @@ function Overview({ metrics }: { metrics: PlatformMetrics }) {
       </div>
       <div className="admin-console__split">
         <div className="admin-summary-block">
-          <span>Operacao acumulada</span>
+          <span>Operação acumulada</span>
           <dl>
             <Fact
-              label="Negocios registados"
+              label="Negócios registados"
               value={metrics.totalBusinesses.toLocaleString("pt-MZ")}
             />
             <Fact
-              label="Transaccoes concluidas"
+              label="Transações concluídas"
               value={metrics.completedTransactions.toLocaleString("pt-MZ")}
             />
             <Fact label="Volume bruto" value={formatMznMinor(metrics.grossVolumeMznMinor)} />
@@ -202,14 +202,14 @@ function Overview({ metrics }: { metrics: PlatformMetrics }) {
           </dl>
         </div>
         <div className="admin-summary-block">
-          <span>Ultimos 30 dias</span>
+          <span>Últimos 30 dias</span>
           <dl>
             <Fact
-              label="Novos negocios"
+              label="Novos negócios"
               value={metrics.businessesCreatedLast30Days.toLocaleString("pt-MZ")}
             />
             <Fact
-              label="Transaccoes"
+              label="Transações"
               value={metrics.transactionsLast30Days.toLocaleString("pt-MZ")}
             />
           </dl>
@@ -225,7 +225,7 @@ function AdminSearch({ view, query }: { view: AdminView; query: string }) {
       <input name="view" type="hidden" value={view} />
       <Search aria-hidden="true" size={17} />
       <input
-        aria-label="Pesquisar nesta area"
+        aria-label="Pesquisar nesta área"
         defaultValue={query}
         maxLength={80}
         name="q"
@@ -245,7 +245,7 @@ function BusinessList({
   canReview: boolean;
 }) {
   if (businesses.length === 0) {
-    return <EmptyState label="Nenhum negocio encontrado." />;
+    return <EmptyState label="Nenhum negócio encontrado." />;
   }
 
   return (
@@ -262,7 +262,7 @@ function BusinessList({
           <dl className="admin-record__facts">
             <Fact label="Slug" value={business.slug} />
             <Fact label="Registo" value={formatAdminDate(business.createdAt)} />
-            <Fact label="Ultima revisao" value={formatAdminDate(business.reviewedAt)} />
+            <Fact label="Última revisão" value={formatAdminDate(business.reviewedAt)} />
           </dl>
           {business.reviewNote ? <p className="admin-record__note">{business.reviewNote}</p> : null}
           {canReview ? (
@@ -332,7 +332,7 @@ function SubscriptionManagement({
         <PlanCatalog canManage={canManage} plans={plans} />
       </div>
       <div>
-        <h3>Subscricoes por negocio</h3>
+        <h3>Subscrições por negócio</h3>
         <SubscriptionList canManage={canManage} plans={plans} subscriptions={subscriptions} />
       </div>
     </div>
@@ -367,7 +367,7 @@ function PlanCatalog({ plans, canManage }: { plans: AdminPlan[]; canManage: bool
             <Fact label="Filiais" value={formatAdminLimit(plan.branchLimit)} />
             <Fact label="Equipa" value={formatAdminLimit(plan.staffLimit)} />
             <Fact label="Campanhas" value={formatAdminLimit(plan.campaignLimit)} />
-            <Fact label="Analitica" value={plan.analyticsLevel} />
+            <Fact label="Analítica" value={plan.analyticsLevel} />
           </dl>
           {canManage ? <PlanEntitlementsForm plan={plan} /> : null}
         </article>
@@ -386,7 +386,7 @@ function SubscriptionList({
   canManage: boolean;
 }) {
   if (subscriptions.length === 0) {
-    return <EmptyState label="Nenhuma subscricao encontrada." />;
+    return <EmptyState label="Nenhuma subscrição encontrada." />;
   }
 
   return (
@@ -410,7 +410,7 @@ function SubscriptionList({
               }
             />
             <Fact
-              label="Fim do periodo"
+              label="Fim do período"
               value={formatAdminDate(subscription.currentPeriodEnd ?? subscription.trialEndsAt)}
             />
           </dl>
@@ -459,8 +459,8 @@ function SupportList({
           </div>
           <dl className="admin-record__facts">
             <Fact label="Solicitante" value={ticket.requesterName} />
-            <Fact label="Negocio" value={ticket.businessName} />
-            <Fact label="Responsavel" value={ticket.assignedToName} />
+            <Fact label="Negócio" value={ticket.businessName} />
+            <Fact label="Responsável" value={ticket.assignedToName} />
             <Fact label="Criado" value={formatAdminDate(ticket.createdAt)} />
           </dl>
           <SupportTicketForm
@@ -494,7 +494,7 @@ function FraudList({ events }: { events: AdminFraudEvent[] }) {
             <StatusBadge value={event.resolvedAt ? "resolved" : event.severity} />
           </div>
           <dl className="admin-record__facts">
-            <Fact label="Negocio" value={event.businessName} />
+            <Fact label="Negócio" value={event.businessName} />
             <Fact label="Utilizador" value={event.profileName} />
             <Fact label="Revisto por" value={event.resolvedByName} />
             <Fact label="Criado" value={formatAdminDate(event.createdAt)} />
@@ -563,18 +563,18 @@ function EmptyState({ label }: { label: string }) {
 }
 
 function viewTitle(view: AdminView): string {
-  return adminNavigation.find((item) => item.view === view)?.label ?? "Administracao";
+  return adminNavigation.find((item) => item.view === view)?.label ?? "Administração";
 }
 
 function viewEyebrow(view: AdminView): string {
   const labels: Record<AdminView, string> = {
     overview: "Plataforma",
-    businesses: "Aprovacao e estado",
+    businesses: "Aprovação e estado",
     users: "Identidade e acesso",
-    subscriptions: "Planos por negocio",
+    subscriptions: "Planos por negócio",
     support: "Fila operacional",
-    fraud: "Revisao de risco",
-    audit: "Historico imutavel"
+    fraud: "Revisão de risco",
+    audit: "Histórico imutavel"
   };
 
   return labels[view];
@@ -594,8 +594,8 @@ function profileRoleLabel(role: AuthPrincipal["profileRole"]): string {
 function humanizeStatus(value: string): string {
   const labels: Record<string, string> = {
     draft: "Rascunho",
-    pending_review: "Em aprovacao",
-    active: "Activo",
+    pending_review: "Em aprovação",
+    active: "Ativo",
     suspended: "Suspenso",
     archived: "Arquivado",
     customer: "Cliente",
@@ -617,9 +617,9 @@ function humanizeStatus(value: string): string {
     urgent: "Urgente",
     critical: "Critica",
     create: "Criacao",
-    update: "Actualizacao",
+    update: "Atualização",
     delete: "Eliminacao",
-    permission_change: "Permissao",
+    permission_change: "Permissão",
     suspension: "Suspensao"
   };
 

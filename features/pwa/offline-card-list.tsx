@@ -51,17 +51,17 @@ export function OfflineCardList() {
       <section className={`offline-status${online ? " offline-status--online" : ""}`}>
         {online ? <Wifi aria-hidden="true" size={20} /> : <WifiOff aria-hidden="true" size={20} />}
         <div>
-          <strong>{online ? "Ligacao disponivel" : "Sem ligacao a internet"}</strong>
+          <strong>{online ? "Ligação disponível" : "Sem ligação a internet"}</strong>
           <p>
             {online
-              ? "Pode voltar ao dashboard para actualizar dados e usar funcionalidades online."
-              : "As identificacoes guardadas neste dispositivo continuam disponiveis."}
+              ? "Pode voltar ao painel para atualizar os dados e utilizar as funcionalidades online."
+              : "As identificações guardadas neste dispositivo continuam disponíveis."}
           </p>
         </div>
         {online ? (
           <Link className="offline-action" href="/cliente">
             <RefreshCw aria-hidden="true" size={17} />
-            Actualizar
+            Atualizar
           </Link>
         ) : null}
       </section>
@@ -69,29 +69,29 @@ export function OfflineCardList() {
       <section className="offline-security" aria-label="Limite de segurança offline">
         <ShieldCheck aria-hidden="true" size={20} />
         <p>
-          Estes QR servem apenas para identificar o cartao. Consultar saldo ou usar pontos requer
-          ligacao e validacao no servidor.
+          Estes QR servem apenas para identificar o cartão. Consultar saldo ou usar pontos requer
+          ligação e validação no servidor.
         </p>
       </section>
 
       {state.status === "loading" ? (
         <div className="offline-empty" role="status">
           <RefreshCw aria-hidden="true" className="offline-loading-icon" size={24} />
-          <p>A carregar identificacoes guardadas...</p>
+          <p>A carregar identificações guardadas...</p>
         </div>
       ) : null}
 
       {state.status === "error" ? (
         <div className="offline-empty offline-empty--error" role="alert">
-          <p>Nao foi possivel ler os cartoes guardados neste dispositivo.</p>
+          <p>Não foi possível ler os cartões guardados neste dispositivo.</p>
         </div>
       ) : null}
 
       {state.status === "ready" && cards.length === 0 ? (
         <div className="offline-empty" role="status">
           <CreditCard aria-hidden="true" size={28} />
-          <h2>Nenhum cartao guardado</h2>
-          <p>Abra o dashboard do cliente com internet para guardar as identificacoes activas.</p>
+          <h2>Nenhum cartão guardado</h2>
+          <p>Abra o painel do cliente com internet para guardar as identificações ativas.</p>
         </div>
       ) : null}
 
@@ -100,9 +100,9 @@ export function OfflineCardList() {
           <div className="offline-section-heading">
             <div>
               <span>Identificacao local</span>
-              <h2 id="offline-card-list-title">Os seus cartoes</h2>
+              <h2 id="offline-card-list-title">Os seus cartões</h2>
               <p>
-                Actualizado{" "}
+                Atualizado{" "}
                 {formatOfflineDate(state.status === "ready" ? state.payload?.updatedAt : null)}
               </p>
             </div>
@@ -115,7 +115,7 @@ export function OfflineCardList() {
             {cards.map((card) => (
               <article className="offline-card" key={card.id}>
                 <div>
-                  <span>Cartao VUYELA</span>
+                  <span>Cartão VUYELA</span>
                   <h3>{card.businessName}</h3>
                   <p>{card.cardNumber}</p>
                 </div>

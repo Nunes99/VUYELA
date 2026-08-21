@@ -21,7 +21,7 @@ export default async function CustomerAreaPage() {
     state.status === "authorized" ? await getCustomerDashboard(state.principal.profileId) : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Dashboard do cliente">
+    <ProtectedRouteStateView state={state} title="Painel do cliente">
       {dashboardState ? <CustomerDashboardView state={dashboardState} /> : null}
     </ProtectedRouteStateView>
   );

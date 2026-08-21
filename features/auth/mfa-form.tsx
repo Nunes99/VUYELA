@@ -21,7 +21,7 @@ interface MfaFormProps {
   nextPath: string;
 }
 
-const genericMfaError = "Nao foi possivel concluir a verificacao. Tente novamente.";
+const genericMfaError = "Não foi possível concluir a verificacao. Tente novamente.";
 
 export function MfaForm({ nextPath }: MfaFormProps) {
   const router = useRouter();
@@ -120,7 +120,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
       });
       setStep("enrolling");
     } catch {
-      setError("Nao foi possivel iniciar a configuracao do autenticador. Tente novamente.");
+      setError("Não foi possível iniciar a configuração do autenticador. Tente novamente.");
     } finally {
       setPending(false);
     }
@@ -133,7 +133,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
     const normalizedCode = code.trim();
 
     if (!isValidTotpCode(normalizedCode) || !factorId) {
-      setError("Introduza o codigo de 6 digitos do seu autenticador.");
+      setError("Introduza o código de 6 digitos do seu autenticador.");
       return;
     }
 
@@ -159,7 +159,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
       router.replace(nextPath);
       router.refresh();
     } catch {
-      setError("Codigo invalido ou expirado. Confirme o autenticador e tente novamente.");
+      setError("Código inválido ou expirado. Confirme o autenticador e tente novamente.");
       setPending(false);
     }
   }
@@ -176,7 +176,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
     return (
       <div className="auth-form">
         <p className="auth-intro">
-          Ligue a conta a uma aplicacao autenticadora para proteger as funcoes administrativas.
+          Ligue a conta a uma aplicacao autenticadora para proteger as funções administrativas.
         </p>
         {error ? (
           <p className="auth-message auth-message--error" role="alert">
@@ -221,12 +221,12 @@ export function MfaForm({ nextPath }: MfaFormProps) {
       {step === "enrolling" && enrollment ? (
         <div className="mfa-enrollment">
           <p>
-            Leia este codigo QR com Google Authenticator, Microsoft Authenticator ou equivalente.
+            Leia este código QR com Google Authenticator, Microsoft Authenticator ou equivalente.
           </p>
           <div className="mfa-qr">
             <Image
               src={enrollment.qrCode}
-              alt="Codigo QR para configurar o autenticador VUYELA"
+              alt="Código QR para configurar o autenticador VUYELA"
               width={220}
               height={220}
               unoptimized
@@ -237,12 +237,12 @@ export function MfaForm({ nextPath }: MfaFormProps) {
         </div>
       ) : (
         <p className="auth-intro">
-          Introduza o codigo actual da aplicacao autenticadora ligada a esta conta.
+          Introduza o código atual da aplicacao autenticadora ligada a esta conta.
         </p>
       )}
 
       <Input
-        label="Codigo de verificacao"
+        label="Código de verificacao"
         name="code"
         inputMode="numeric"
         autoComplete="one-time-code"
@@ -265,7 +265,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
         loading={pending}
         leadingIcon={step === "enrolling" ? <ShieldCheck size={18} /> : <KeyRound size={18} />}
       >
-        {step === "enrolling" ? "Activar e continuar" : "Verificar e continuar"}
+        {step === "enrolling" ? "Ativar e continuar" : "Verificar e continuar"}
       </Button>
     </form>
   );

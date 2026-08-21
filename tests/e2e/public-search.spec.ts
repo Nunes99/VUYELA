@@ -7,7 +7,7 @@ test("shows public search with shareable filters when Supabase is not configured
 
   await expect(page.getByRole("heading", { name: 'Resultados para "mares"' })).toBeVisible();
   await expect(page.getByLabel("Texto")).toHaveValue("mares");
-  await expect(page.getByLabel("Com ofertas activas")).toBeChecked();
+  await expect(page.getByLabel("Com ofertas ativas")).toBeChecked();
   await expect(page.getByRole("button", { name: "Filtrar resultados" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Sem resultados para estes filtros" })

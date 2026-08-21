@@ -4,7 +4,7 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { OfflineCardList } from "@/features/pwa/offline-card-list";
 
 export const metadata: Metadata = {
-  title: "Cartoes offline",
+  title: "Cartões offline",
   robots: {
     index: false,
     follow: false
@@ -19,7 +19,7 @@ export default function OfflinePage() {
           <VuyelaLogo compact />
           <div>
             <span>VUYELA by LEMOTE</span>
-            <h1>Cartoes disponiveis offline</h1>
+            <h1>Cartões disponíveis offline</h1>
           </div>
         </header>
         <OfflineCardList />

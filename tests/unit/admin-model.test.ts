@@ -25,6 +25,6 @@ describe("admin view model", () => {
     expect(describeAuditChange({ status: "draft" }, { status: "active" })).toContain(
       "status: draft -> active"
     );
-    expect(describeAuditChange(null, null)).toBe("Registo criado ou actualizado");
+    expect(describeAuditChange(null, null)).toBe("Registo criado ou atualizado");
   });
 });

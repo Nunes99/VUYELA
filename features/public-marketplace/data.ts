@@ -158,7 +158,7 @@ export async function getPublicMarketplaceSnapshot(): Promise<PublicMarketplaceS
   if (categoryError || businessError || branchError || programError || offerError) {
     return {
       status: "error",
-      message: "Nao foi possivel carregar o marketplace publico.",
+      message: "Não foi possível carregar o marketplace público.",
       snapshot: emptySnapshot
     };
   }

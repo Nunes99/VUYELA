@@ -34,7 +34,7 @@ export default async function BusinessCampaignsPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Campanhas do negocio">
+    <ProtectedRouteStateView state={state} title="Campanhas do negócio">
       {campaignsState ? <BusinessCampaignsView state={campaignsState} /> : null}
     </ProtectedRouteStateView>
   );

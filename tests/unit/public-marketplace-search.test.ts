@@ -14,7 +14,7 @@ const restaurant = {
   id: "cat-restaurant",
   slug: "restaurantes",
   name: "Restaurantes",
-  description: "Restaurantes com beneficios."
+  description: "Restaurantes com benefícios."
 };
 
 const gym = {
@@ -37,7 +37,7 @@ function business(
   input: Partial<MarketplaceBusiness> & Pick<MarketplaceBusiness, "id" | "slug" | "name">
 ): MarketplaceBusiness {
   return {
-    description: "Negocio com beneficios publicos e pontos VUYELA.",
+    description: "Negócio com benefícios públicos e pontos VUYELA.",
     phone: null,
     email: null,
     websiteUrl: null,
@@ -105,7 +105,7 @@ const snapshot = buildMarketplaceSnapshot({
       id: "offer-1",
       slug: "almoco",
       title: "Desconto de almoco",
-      description: "Oferta publica no restaurante.",
+      description: "Oferta pública no restaurante.",
       startsAt: null,
       endsAt: null,
       businessId: "business-1",

@@ -27,8 +27,8 @@ describe("VUYELA design system components", () => {
   });
 
   it("uses an accessible switch control", () => {
-    render(<Switch label="Campanha activa" defaultChecked />);
+    render(<Switch label="Campanha ativa" defaultChecked />);
 
-    expect(screen.getByRole("switch", { name: "Campanha activa" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Campanha ativa" })).toBeChecked();
   });
 });

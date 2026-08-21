@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   if (!viewModel) {
     return {
-      title: "Categoria nao encontrada",
+      title: "Categoria não encontrada",
       robots: {
         index: false,
         follow: false

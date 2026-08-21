@@ -51,7 +51,7 @@ export function Navbar({ brand, links, actions, className = "", ...props }: Navb
   return (
     <header className={["vy-navbar", className].filter(Boolean).join(" ")} {...props}>
       <div className="vy-navbar__brand">{brand}</div>
-      <nav className="vy-navbar__links" aria-label="Navegacao principal">
+      <nav className="vy-navbar__links" aria-label="Navegação principal">
         {links.map((link) => (
           <a key={link.href} href={link.href} aria-current={link.active ? "page" : undefined}>
             {link.label}
@@ -94,7 +94,7 @@ export function BottomNavigation({ items, className = "", ...props }: BottomNavi
   return (
     <nav
       className={["vy-bottom-nav", className].filter(Boolean).join(" ")}
-      aria-label="Navegacao inferior"
+      aria-label="Navegação inferior"
       {...props}
     >
       {items.map((item) => (

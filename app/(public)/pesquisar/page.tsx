@@ -9,7 +9,7 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Pesquisar estabelecimentos e ofertas",
   description:
-    "Pesquise negocios, categorias, cidades e ofertas publicas VUYELA. URLs de busca sao partilháveis e ficam fora do indice.",
+    "Pesquise negócios, categorias, cidades e ofertas públicas VUYELA. URLs de busca são partilháveis e ficam fora do índice.",
   alternates: {
     canonical: "/pesquisar"
   },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Pesquisar estabelecimentos e ofertas VUYELA",
     description:
-      "Encontre negocios e ofertas publicas VUYELA por texto, categoria, cidade, ofertas e localizacao permitida.",
+      "Encontre negócios e ofertas públicas VUYELA por texto, categoria, cidade, ofertas e localização permitida.",
     url: "/pesquisar",
     siteName: "VUYELA",
     locale: "pt_MZ",

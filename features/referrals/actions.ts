@@ -5,17 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireRouteAccess } from "@/lib/auth/session";
 import { isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-export interface ReferralActionState {
-  status: "idle" | "error" | "success";
-  message: string;
-  referralCode: string | null;
-}
-
-export interface ReferralProgramActionState {
-  status: "idle" | "error" | "success";
-  message: string;
-}
+import type { ReferralActionState, ReferralProgramActionState } from "./state";
 
 interface CreatedReferralRow {
   referral_id: string;
@@ -28,17 +18,6 @@ interface AcceptedReferralRow {
   outcome: string;
 }
 
-export const initialReferralActionState: ReferralActionState = {
-  status: "idle",
-  message: "",
-  referralCode: null
-};
-
-export const initialReferralProgramActionState: ReferralProgramActionState = {
-  status: "idle",
-  message: ""
-};
-
 export async function createReferralAction(
   _previousState: ReferralActionState,
   formData: FormData
@@ -46,11 +25,11 @@ export async function createReferralAction(
   const cardId = getFormString(formData, "cardId");
 
   if (!isUuid(cardId)) {
-    return referralError("Seleccione um cartao valido.");
+    return referralError("Selecione um cartão válido.");
   }
 
   if (!isSupabaseConfigured()) {
-    return referralError("Supabase ainda nao esta configurado neste ambiente.");
+    return referralError("Supabase ainda não está configurado neste ambiente.");
   }
 
   await requireRouteAccess("/cliente", "/cliente/indicacoes");
@@ -63,8 +42,8 @@ export async function createReferralAction(
   if (error) {
     return referralError(
       error.message.includes("limit")
-        ? "Atingiu o limite de convites abertos para este negocio."
-        : "Nao foi possivel criar o convite. Confirme se o programa esta activo."
+        ? "Atingiu o limite de convites abertos para este negócio."
+        : "Não foi possível criar o convite. Confirme se o programa está ativo."
     );
   }
 
@@ -78,7 +57,7 @@ export async function createReferralAction(
 
   return {
     status: "success",
-    message: `Convite valido ate ${formatDate(row.expires_at)}.`,
+    message: `Convite válido até ${formatDate(row.expires_at)}.`,
     referralCode: row.referral_code
   };
 }
@@ -90,11 +69,11 @@ export async function acceptReferralAction(
   const referralCode = getFormString(formData, "referralCode").toUpperCase();
 
   if (!/^VY-[A-Z0-9]{8}$/.test(referralCode)) {
-    return referralError("Introduza um codigo VUYELA valido.");
+    return referralError("Introduza um código VUYELA válido.");
   }
 
   if (!isSupabaseConfigured()) {
-    return referralError("Supabase ainda nao esta configurado neste ambiente.");
+    return referralError("Supabase ainda não está configurado neste ambiente.");
   }
 
   await requireRouteAccess("/cliente", "/cliente/indicacoes");
@@ -105,13 +84,13 @@ export async function acceptReferralAction(
   });
 
   if (error) {
-    return referralError("Nao foi possivel validar este convite.");
+    return referralError("Não foi possível validar este convite.");
   }
 
   const row = Array.isArray(data) ? (data[0] as AcceptedReferralRow | undefined) : undefined;
 
   if (!row) {
-    return referralError("A validacao do convite veio incompleta.");
+    return referralError("A validação do convite veio incompleta.");
   }
 
   if (row.outcome !== "accepted") {
@@ -150,7 +129,7 @@ export async function configureReferralProgramAction(
     rewardLimitCount === null ||
     rewardLimitPeriodDays === null
   ) {
-    return programError("Preencha todas as regras com valores validos.");
+    return programError("Preencha todas as regras com valores válidos.");
   }
 
   if (
@@ -168,11 +147,11 @@ export async function configureReferralProgramAction(
     rewardLimitPeriodDays < 1 ||
     rewardLimitPeriodDays > 365
   ) {
-    return programError("Uma ou mais regras estao fora dos limites permitidos.");
+    return programError("Uma ou mais regras estão fora dos limites permitidos.");
   }
 
   if (!isSupabaseConfigured()) {
-    return programError("Supabase ainda nao esta configurado neste ambiente.");
+    return programError("Supabase ainda não está configurado neste ambiente.");
   }
 
   await requireRouteAccess("/negocio", "/negocio/indicacoes");
@@ -191,12 +170,12 @@ export async function configureReferralProgramAction(
   });
 
   if (error) {
-    return programError("Nao foi possivel guardar o programa. Confirme o negocio e as regras.");
+    return programError("Não foi possível guardar o programa. Confirme o negócio e as regras.");
   }
 
   revalidateReferralPaths();
 
-  return { status: "success", message: "Programa de indicacoes actualizado." };
+  return { status: "success", message: "Programa de indicações atualizado." };
 }
 
 function getFormString(formData: FormData, key: string): string {
@@ -245,16 +224,16 @@ function programError(message: string): ReferralProgramActionState {
 function getReferralOutcomeMessage(outcome: string): string {
   const messages: Record<string, string> = {
     expired: "Este convite expirou.",
-    blocked: "Este convite nao cumpre as regras de elegibilidade.",
-    program_inactive: "O programa de indicacoes deste negocio esta inactivo.",
-    card_required: "Adira primeiro ao programa de fidelizacao deste negocio.",
-    already_referred: "Este cartao ja esta associado a outra indicacao.",
-    rewarded: "Este convite ja foi premiado.",
+    blocked: "Este convite não cumpre as regras de elegibilidade.",
+    program_inactive: "O programa de indicações deste negócio esta inativo.",
+    card_required: "Adira primeiro ao programa de fidelização deste negócio.",
+    already_referred: "Este cartão já está associado a outra indicação.",
+    rewarded: "Este convite já foi premiado.",
     reversed: "O premio deste convite foi revertido.",
     cancelled: "Este convite foi cancelado."
   };
 
-  return messages[outcome] ?? "Este convite ja nao esta disponivel.";
+  return messages[outcome] ?? "Este convite já não está disponível.";
 }
 
 function revalidateReferralPaths() {

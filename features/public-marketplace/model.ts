@@ -205,9 +205,9 @@ export function buildEstablishmentsList(
 ): MarketplaceListViewModel {
   return {
     kind: "all",
-    title: "Estabelecimentos com beneficios VUYELA",
+    title: "Estabelecimentos com benefícios VUYELA",
     description:
-      "Descubra negocios activos em Mocambique com programas de pontos, beneficios e ofertas publicas.",
+      "Descubra negócios ativos em Moçambique com programas de pontos, benefícios e ofertas públicas.",
     canonicalPath: "/estabelecimentos",
     indexable: snapshot.businesses.length > 0,
     businesses: snapshot.businesses,
@@ -215,7 +215,7 @@ export function buildEstablishmentsList(
     cities: snapshot.cities,
     offers: snapshot.offers.slice(0, 6),
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Estabelecimentos", path: "/estabelecimentos" }
     ]
   };
@@ -240,8 +240,8 @@ export function buildCategoryList(
     kind: "category",
     title: `${category.name} com pontos VUYELA`,
     description: category.description
-      ? `${category.description} Veja estabelecimentos com beneficios e ofertas activas.`
-      : `Veja estabelecimentos de ${category.name} com pontos, beneficios e ofertas activas.`,
+      ? `${category.description} Veja estabelecimentos com benefícios e ofertas ativas.`
+      : `Veja estabelecimentos de ${category.name} com pontos, benefícios e ofertas ativas.`,
     canonicalPath: `/categorias/${category.slug}`,
     indexable: businesses.length >= MIN_CATEGORY_ESTABLISHMENTS_FOR_INDEX,
     businesses,
@@ -249,7 +249,7 @@ export function buildCategoryList(
     cities: snapshot.cities.filter((city) => category.cities.includes(city.name)),
     offers,
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Categorias", path: "/categorias" },
       { name: category.name, path: `/categorias/${category.slug}` }
     ]
@@ -261,9 +261,9 @@ export function buildCategoriesIndex(
 ): MarketplaceListViewModel {
   return {
     kind: "all",
-    title: "Categorias com beneficios VUYELA",
+    title: "Categorias com benefícios VUYELA",
     description:
-      "Explore categorias de negocios com programas de pontos, ofertas publicas e beneficios claros.",
+      "Explore categorias de negócios com programas de pontos, ofertas públicas e benefícios claros.",
     canonicalPath: "/categorias",
     indexable: snapshot.categories.length > 0,
     businesses: snapshot.businesses.slice(0, 9),
@@ -271,7 +271,7 @@ export function buildCategoriesIndex(
     cities: snapshot.cities,
     offers: snapshot.offers.slice(0, 6),
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Categorias", path: "/categorias" }
     ]
   };
@@ -293,7 +293,7 @@ export function buildCityList(
   return {
     kind: "city",
     title: `Estabelecimentos VUYELA em ${city.name}`,
-    description: `Descubra negocios em ${city.name} com pontos, beneficios promocionais e ofertas activas.`,
+    description: `Descubra negócios em ${city.name} com pontos, benefícios promocionais e ofertas ativas.`,
     canonicalPath: `/locais/${city.slug}`,
     indexable: businesses.length >= MIN_CITY_ESTABLISHMENTS_FOR_INDEX,
     businesses,
@@ -301,7 +301,7 @@ export function buildCityList(
     cities: snapshot.cities.filter((item) => item.slug !== city.slug).slice(0, 8),
     offers,
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Locais", path: "/locais" },
       { name: city.name, path: `/locais/${city.slug}` }
     ]
@@ -331,8 +331,8 @@ export function buildCityCategoryList(
 
   return {
     kind: "city-category",
-    title: `${item.category.name} com beneficios em ${item.city.name}`,
-    description: `Veja ${item.category.name.toLocaleLowerCase("pt-MZ")} em ${item.city.name} com pontos VUYELA, beneficios e ofertas activas.`,
+    title: `${item.category.name} com benefícios em ${item.city.name}`,
+    description: `Veja ${item.category.name.toLocaleLowerCase("pt-MZ")} em ${item.city.name} com pontos VUYELA, benefícios e ofertas ativas.`,
     canonicalPath: `/locais/${item.city.slug}/${item.category.slug}`,
     indexable: businesses.length >= MIN_CITY_CATEGORY_ESTABLISHMENTS_FOR_INDEX,
     businesses,
@@ -340,7 +340,7 @@ export function buildCityCategoryList(
     cities: snapshot.cities.filter((city) => city.slug !== item.city.slug).slice(0, 8),
     offers,
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Locais", path: "/locais" },
       { name: item.city.name, path: `/locais/${item.city.slug}` },
       { name: item.category.name, path: `/locais/${item.city.slug}/${item.category.slug}` }
@@ -374,7 +374,7 @@ export function buildBusinessDetail(
     relatedOffers: business.offers.slice(0, 4),
     canonicalPath: `/estabelecimentos/${business.slug}`,
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Estabelecimentos", path: "/estabelecimentos" },
       { name: business.name, path: `/estabelecimentos/${business.slug}` }
     ]
@@ -384,9 +384,9 @@ export function buildBusinessDetail(
 export function buildOffersIndex(snapshot: PublicMarketplaceSnapshot): MarketplaceListViewModel {
   return {
     kind: "all",
-    title: "Ofertas activas VUYELA",
+    title: "Ofertas ativas VUYELA",
     description:
-      "Encontre ofertas publicas activas em negocios VUYELA e veja onde pode acumular ou usar pontos.",
+      "Encontre ofertas públicas ativas em negócios VUYELA e veja onde pode acumular ou usar pontos.",
     canonicalPath: "/ofertas",
     indexable: snapshot.offers.length > 0,
     businesses: snapshot.businesses.slice(0, 9),
@@ -394,7 +394,7 @@ export function buildOffersIndex(snapshot: PublicMarketplaceSnapshot): Marketpla
     cities: snapshot.cities,
     offers: snapshot.offers,
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Ofertas", path: "/ofertas" }
     ]
   };
@@ -405,7 +405,7 @@ export function buildCitiesIndex(snapshot: PublicMarketplaceSnapshot): Marketpla
     kind: "all",
     title: "Locais com estabelecimentos VUYELA",
     description:
-      "Veja cidades com negocios activos na VUYELA e descubra categorias, beneficios e ofertas por local.",
+      "Veja cidades com negócios ativos na VUYELA e descubra categorias, benefícios e ofertas por local.",
     canonicalPath: "/locais",
     indexable: snapshot.cities.length > 0,
     businesses: snapshot.businesses.slice(0, 9),
@@ -413,7 +413,7 @@ export function buildCitiesIndex(snapshot: PublicMarketplaceSnapshot): Marketpla
     cities: snapshot.cities,
     offers: snapshot.offers.slice(0, 6),
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Locais", path: "/locais" }
     ]
   };
@@ -446,7 +446,7 @@ export function buildOfferDetail(
     canonicalPath: `/ofertas/${offer.slug}`,
     indexable: offer.uniquePublicSlug,
     breadcrumbs: [
-      { name: "Inicio", path: "/" },
+      { name: "Início", path: "/" },
       { name: "Ofertas", path: "/ofertas" },
       { name: offer.title, path: `/ofertas/${offer.slug}` }
     ]
@@ -463,18 +463,18 @@ export function getBusinessPrimaryCity(business: MarketplaceBusiness): string | 
 export function getBusinessCityLabel(business: MarketplaceBusiness): string {
   const cities = uniqueValues(business.branches.map((branch) => branch.city).filter(Boolean));
 
-  return cities.length > 0 ? cities.join(", ") : "Mocambique";
+  return cities.length > 0 ? cities.join(", ") : "Moçambique";
 }
 
 export function getProgramEarnRateLabel(program: MarketplaceProgram | null): string {
   if (!program) {
-    return "Programa de pontos activo";
+    return "Programa de pontos ativo";
   }
 
   const percent = Math.round(program.earnRate * 100);
 
   if (percent <= 0) {
-    return "Beneficios configurados";
+    return "Benefícios configurados";
   }
 
   return `${percent}% em pontos`;
@@ -490,7 +490,7 @@ export function getPointValueLabel(program: MarketplaceProgram | null): string {
 
 export function getExpiryLabel(program: MarketplaceProgram | null): string {
   if (!program?.pointsExpireAfterDays) {
-    return "Sem expiracao automatica publicada";
+    return "Sem expiração automatica publicada";
   }
 
   return `Expira em ${program.pointsExpireAfterDays.toLocaleString("pt-MZ")} dias`;

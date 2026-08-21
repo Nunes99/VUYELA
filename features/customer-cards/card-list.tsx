@@ -11,7 +11,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
   if (state.status === "error") {
     return (
       <div className="customer-cards-notice customer-cards-notice--error" role="status">
-        <h2>Cartoes indisponiveis</h2>
+        <h2>Cartões indisponíveis</h2>
         <p>{state.message}</p>
       </div>
     );
@@ -20,10 +20,10 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
   if (state.status === "empty") {
     return (
       <div className="customer-cards-notice" role="status">
-        <h2>Ainda nao tem cartoes</h2>
+        <h2>Ainda não tem cartões</h2>
         <p>
-          Quando aderir a um negocio VUYELA, o cartao digital aparece aqui com pontos, equivalente
-          em MZN e codigo de identificacao.
+          Quando aderir a um negócio VUYELA, o cartão digital aparece aqui com pontos, equivalente
+          em MZN e código de identificacao.
         </p>
       </div>
     );
@@ -33,7 +33,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
     <div className="customer-cards">
       <div className="customer-cards__header">
         <p>
-          Cada cartao pertence ao negocio que o emitiu. Os pontos nao sao dinheiro e so podem ser
+          Cada cartão pertence ao negócio que o emitiu. Os pontos não são dinheiro e só podem ser
           usados nesse estabelecimento.
         </p>
       </div>
@@ -58,20 +58,20 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
 
             <div className="customer-card-row__details">
               <div>
-                <span className="customer-card-row__eyebrow">Negocio</span>
+                <span className="customer-card-row__eyebrow">Negócio</span>
                 <h2 id={`customer-card-${card.id}`}>{card.businessName}</h2>
                 <p>{card.expiryLabel}</p>
               </div>
 
-              <div className="customer-card-row__facts" aria-label="Detalhes do cartao">
+              <div className="customer-card-row__facts" aria-label="Detalhes do cartão">
                 <span>
                   Cliente<strong>{card.customerName}</strong>
                 </span>
                 <span>
-                  Numero<strong>{card.cardNumber}</strong>
+                  Número<strong>{card.cardNumber}</strong>
                 </span>
                 <span>
-                  Nivel<strong>{card.currentTierName}</strong>
+                  Nível<strong>{card.currentTierName}</strong>
                 </span>
                 <span>
                   Valor<strong>{card.valueMzn.toLocaleString("pt-MZ")} MZN</strong>
@@ -85,7 +85,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
                   )} pontos para ${card.nextTierName}`}
                 />
               ) : (
-                <RewardBadge label="Nivel maximo actual" />
+                <RewardBadge label="Nível máximo atual" />
               )}
             </div>
 

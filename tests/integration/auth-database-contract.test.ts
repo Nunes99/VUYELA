@@ -43,7 +43,7 @@ describe("authentication database contract", () => {
     expect(forms).toContain("Introduza entre 9 e 12 algarismos");
     expect(actions).toContain("/^\\d{9,12}$/");
     expect(actions).toContain("businesses_nuit_format");
-    expect(actions).toContain("Ja existe um pedido para este negocio nesta conta");
+    expect(actions).toContain("Já existe um pedido para este negócio nesta conta");
   });
 
   it("hardens automatic RLS and prepares relational access paths", () => {

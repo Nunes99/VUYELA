@@ -14,14 +14,14 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
     return (
       <section
         className={`business-dashboard-notice${
-          state.status === "error" ? " business-dashboard-notice--error" : ""
+          state.status === "error" ? " business-painel-notice--error" : ""
         }`}
         aria-labelledby="business-campaigns-notice"
       >
-        <h2 id="business-campaigns-notice">Campanhas indisponiveis</h2>
+        <h2 id="business-campaigns-notice">Campanhas indisponíveis</h2>
         <p>{state.message}</p>
         <Link className="business-campaign-link" href="/negocio">
-          Voltar ao dashboard
+          Voltar ao painel
         </Link>
       </section>
     );
@@ -41,13 +41,13 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
       <section className="business-dashboard-hero" aria-labelledby="business-campaigns-title">
         <div>
           <span className="business-dashboard-eyebrow">Campanhas</span>
-          <h2 id="business-campaigns-title">{selectedBusiness?.name ?? "Negocio VUYELA"}</h2>
-          <p>Campanhas privadas do negocio com regras, agenda, segmentos e analitica.</p>
+          <h2 id="business-campaigns-title">{selectedBusiness?.name ?? "Negócio VUYELA"}</h2>
+          <p>Campanhas privadas do negócio com regras, agenda, segmentos e analítica.</p>
         </div>
         <div className="business-dashboard-stat-grid">
           <CampaignStat
             icon={<Megaphone size={18} />}
-            label="Activas"
+            label="Ativas"
             value={state.analytics.activeCampaigns.toLocaleString("pt-MZ")}
           />
           <CampaignStat
@@ -90,7 +90,7 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
                 {state.campaignLimit?.toLocaleString("pt-MZ")} campanhas abertas.
               </p>
               <Link className="business-campaign-link" href="/negocio/subscricao">
-                Ver subscricao
+                Ver subscrição
               </Link>
             </div>
           )}
@@ -98,18 +98,18 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
 
         <aside className="business-dashboard-section">
           <SectionHeading
-            eyebrow="Analitica"
+            eyebrow="Analítica"
             title="Resumo"
-            body="Indicadores agregados das campanhas deste negocio."
+            body="Indicadores agregados das campanhas deste negócio."
           />
-          <dl className="business-dashboard-facts business-campaign-facts">
+          <dl className="business-painel-facts business-campaign-facts">
             <Fact label="Total" value={state.analytics.totalCampaigns.toLocaleString("pt-MZ")} />
             <Fact
               label="Rascunhos"
               value={state.analytics.draftCampaigns.toLocaleString("pt-MZ")}
             />
             <Fact
-              label="Concluidas"
+              label="Concluídas"
               value={state.analytics.completedCampaigns.toLocaleString("pt-MZ")}
             />
             <Fact
@@ -117,7 +117,7 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
               value={state.analytics.averageAudienceCount.toLocaleString("pt-MZ")}
             />
             <Fact
-              label="Notificacoes"
+              label="Notificações"
               value={state.analytics.notificationCount.toLocaleString("pt-MZ")}
             />
             <Fact
@@ -134,8 +134,8 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
 
       <section className="business-dashboard-section" aria-labelledby="campaign-list-title">
         <SectionHeading
-          eyebrow="Historico"
-          title="Campanhas do negocio"
+          eyebrow="Histórico"
+          title="Campanhas do negócio"
           id="campaign-list-title"
           body="Lista operacional com calendario, tipo e audiencia elegivel."
         />
@@ -157,10 +157,10 @@ function CampaignContextSwitcher({
       <div>
         <span className="business-dashboard-eyebrow">Contexto</span>
         <h2>Campanhas</h2>
-        <p>Admins e owners gerem campanhas por negocio.</p>
+        <p>Administradores e proprietários gerem campanhas por negócio.</p>
       </div>
       <div className="business-dashboard-switcher__actions">
-        <Link href="/negocio">Dashboard</Link>
+        <Link href="/negocio">Painel</Link>
         {businesses.map((business) => (
           <Link
             className={business.id === selectedBusinessId ? "is-active" : ""}
@@ -215,7 +215,7 @@ function CampaignList({ campaigns }: { campaigns: BusinessCampaign[] }) {
 
 function CampaignStat({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div className="business-dashboard-stat business-campaign-stat">
+    <div className="business-painel-stat business-campaign-stat">
       {icon}
       {label}
       <strong>{value}</strong>
@@ -267,7 +267,7 @@ function formatCampaignWindow(campaign: BusinessCampaign): string {
     return "Sem calendario";
   }
 
-  const start = campaign.startsAt ? formatDate(campaign.startsAt) : "Inicio aberto";
+  const start = campaign.startsAt ? formatDate(campaign.startsAt) : "Início aberto";
   const end = campaign.endsAt ? formatDate(campaign.endsAt) : "Fim aberto";
 
   return `${start} a ${end}`;

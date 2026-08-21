@@ -45,7 +45,7 @@ export function LocationSearchButton() {
         <LocateFixed size={17} />
         {status === "loading" ? "A localizar" : "Perto de mim"}
       </button>
-      {status === "blocked" ? <small>Localizacao indisponivel.</small> : null}
+      {status === "blocked" ? <small>Localização indisponível.</small> : null}
     </div>
   );
 }

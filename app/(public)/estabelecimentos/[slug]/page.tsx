@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: BusinessPageProps): Promise<M
 
   if (!viewModel) {
     return {
-      title: "Estabelecimento nao encontrado",
+      title: "Estabelecimento não encontrado",
       robots: {
         index: false,
         follow: false

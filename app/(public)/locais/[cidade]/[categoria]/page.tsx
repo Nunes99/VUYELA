@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: CityCategoryPageProps): Promi
 
   if (!viewModel) {
     return {
-      title: "Pagina nao encontrada",
+      title: "Página não encontrada",
       robots: {
         index: false,
         follow: false

@@ -33,16 +33,16 @@ import { getSiteUrl } from "@/lib/env";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Fidelizacao digital em Mocambique",
+  title: "Fidelização digital em Moçambique",
   description:
-    "VUYELA by LEMOTE ajuda negocios em Mocambique a criarem programas de fidelizacao claros, digitais e simples para clientes voltarem.",
+    "VUYELA by LEMOTE ajuda negócios em Moçambique a criarem programas de fidelização claros, digitais e simples para clientes voltarem.",
   alternates: {
     canonical: "/"
   },
   openGraph: {
-    title: "VUYELA by LEMOTE - Fidelizacao digital em Mocambique",
+    title: "VUYELA by LEMOTE - Fidelização digital em Moçambique",
     description:
-      "Cada compra cria uma razao para voltar. Clientes acumulam pontos e usam beneficios no mesmo estabelecimento emissor.",
+      "Cada compra cria uma razão para voltar. Clientes acumulam pontos e usam benefícios no mesmo estabelecimento emissor.",
     url: siteUrl,
     siteName: "VUYELA",
     locale: "pt_MZ",
@@ -51,25 +51,25 @@ export const metadata: Metadata = {
 };
 
 const navLinks = [
-  { href: "#top", label: "Inicio" },
+  { href: "#top", label: "Início" },
   { href: "#como-funciona", label: "Como funciona" },
   { href: "#clientes", label: "Para clientes" },
-  { href: "#negocios", label: "Para negocios" },
-  { href: "#precos", label: "Precos" },
+  { href: "#negocios", label: "Para negócios" },
+  { href: "#precos", label: "Preços" },
   { href: "#recursos", label: "Recursos" },
   { href: "#blog", label: "Blog" }
 ];
 
 const trustIndicators = [
   { label: "100% Digital", icon: <Smartphone size={16} /> },
-  { label: "Seguro & Confiavel", icon: <ShieldCheck size={16} /> },
-  { label: "Feito em Mocambique", icon: <MapPin size={16} /> }
+  { label: "Seguro & Confiável", icon: <ShieldCheck size={16} /> },
+  { label: "Feito em Moçambique", icon: <MapPin size={16} /> }
 ];
 
 const productBenefits = [
   {
     title: "Descontos exclusivos",
-    body: "Beneficios criados pelos estabelecimentos onde ja compra.",
+    body: "Benefícios criados pelos estabelecimentos onde já compra.",
     icon: <Percent size={22} />
   },
   {
@@ -78,13 +78,13 @@ const productBenefits = [
     icon: <Coins size={22} />
   },
   {
-    title: "Estabelecimentos proximos",
-    body: "Descubra negocios e vantagens disponiveis na sua cidade.",
+    title: "Estabelecimentos próximos",
+    body: "Descubra negócios e vantagens disponíveis na sua cidade.",
     icon: <MapPin size={22} />
   },
   {
     title: "Ofertas personalizadas",
-    body: "Acompanhe campanhas relevantes dos seus negocios preferidos.",
+    body: "Acompanhe campanhas relevantes dos seus negócios preferidos.",
     icon: <Sparkles size={22} />
   }
 ];
@@ -97,7 +97,7 @@ const steps = [
   },
   {
     title: "Acumule pontos",
-    body: "A regra do negocio transforma a compra em pontos promocionais.",
+    body: "A regra do negócio transforma a compra em pontos promocionais.",
     icon: <Gift size={22} />
   },
   {
@@ -106,47 +106,47 @@ const steps = [
     icon: <Store size={22} />
   },
   {
-    title: "Use e economize",
-    body: "Os pontos podem reduzir o valor de uma compra futura nesse negocio.",
+    title: "Use e poupe",
+    body: "Os pontos podem reduzir o valor de uma compra futura nesse negócio.",
     icon: <WalletCards size={22} />
   }
 ];
 
 const customerBenefits = [
-  "Cartoes digitais sempre a mao.",
+  "Cartões digitais sempre a mão.",
   "Pontos com valor claro em MZN promocional.",
-  "Ofertas e beneficios do negocio que emitiu os pontos.",
-  "Codigo QR para consultar ou usar saldo sem complicacao."
+  "Ofertas e benefícios do negócio que emitiu os pontos.",
+  "Código QR para consultar ou usar saldo sem complicação."
 ];
 
 const businessBenefits = [
-  "Programa proprio de fidelizacao.",
+  "Programa próprio de fidelização.",
   "Regras simples para atribuir e usar pontos.",
-  "Historico preparado para ledger e auditoria.",
-  "Base pronta para POS, campanhas e relatorios nas proximas fases."
+  "Histórico preparado para ledger e auditoria.",
+  "Base pronta para POS, campanhas e relatórios nas proximas fases."
 ];
 
 const pricingNotes = [
-  "Teste a experiencia antes de escalar.",
-  "Escolha um plano de acordo com o tamanho do negocio.",
-  "Cresca para POS, campanhas e analitica quando estiver pronto."
+  "Teste a experiência antes de escalar.",
+  "Escolha um plano de acordo com o tamanho do negócio.",
+  "Cresca para POS, campanhas e analítica quando estiver pronto."
 ];
 
 const faqItems = [
   {
     question: "Os pontos podem ser levantados?",
     answer:
-      "Nao. Os pontos sao valor promocional do estabelecimento que os emitiu e nao representam saldo bancario."
+      "Não. Os pontos são valor promocional do estabelecimento que os emitiu e não representam saldo bancário."
   },
   {
-    question: "Posso usar pontos noutro negocio?",
+    question: "Posso usar pontos noutro negócio?",
     answer:
-      "Nao. Cada saldo pertence ao estabelecimento emissor e so pode ser usado nesse mesmo negocio."
+      "Não. Cada saldo pertence ao estabelecimento emissor e só pode ser usado nesse mesmo negócio."
   },
   {
     question: "A VUYELA assume o valor dos pontos?",
     answer:
-      "Nao. A VUYELA calcula, guarda e valida os pontos, mas a responsabilidade promocional pertence ao estabelecimento emissor."
+      "Não. A VUYELA calcula, guarda e valida os pontos, mas a responsabilidade promocional pertence ao estabelecimento emissor."
   }
 ];
 
@@ -157,7 +157,7 @@ const organizationJsonLd = {
   url: siteUrl,
   slogan: "Volte. Ganhe. Cresca.",
   description:
-    "Plataforma de fidelizacao digital para negocios em Mocambique criarem razoes reais para clientes voltarem."
+    "Plataforma de fidelização digital para negócios em Moçambique criarem razões reais para clientes voltarem."
 };
 
 export default async function HomePage() {
@@ -170,7 +170,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       <main className="home-page" id="top">
-        <header className="home-header" aria-label="Navegacao principal">
+        <header className="home-header" aria-label="Navegação principal">
           <div className="vy-container home-header__inner">
             <VuyelaLogo className="home-logo" href="#top" inverse />
             <nav className="home-nav" aria-label="Secoes da homepage">
@@ -185,7 +185,7 @@ export default async function HomePage() {
                 Entrar
               </a>
               <a className="home-link-button home-link-button--reward" href="/cadastrar">
-                Cadastrar
+                Registar
               </a>
             </div>
             <details className="home-mobile-menu">
@@ -209,27 +209,27 @@ export default async function HomePage() {
               <Badge tone="reward">VUYELA by LEMOTE</Badge>
               <h1 id="home-title">
                 <span>Cada compra</span>
-                <span>cria uma razao</span>
+                <span>cria uma razão</span>
                 <span>para voltar.</span>
               </h1>
               <p>
-                Acumule pontos, desbloqueie beneficios e aproveite vantagens exclusivas nos seus
+                Acumule pontos, desbloqueie benefícios e aproveite vantagens exclusivas nos seus
                 estabelecimentos preferidos.
               </p>
               <div className="home-hero__actions">
                 <a className="home-link-button home-link-button--reward" href="/cadastrar">
                   <CreditCard size={18} />
-                  Quero um cartao
+                  Quero um cartão
                 </a>
                 <a
                   className="home-link-button home-link-button--outline"
                   href="/onboarding/negocio"
                 >
                   <Store size={18} />
-                  Sou um negocio
+                  Sou um negócio
                 </a>
               </div>
-              <ul className="home-trust-list" aria-label="Indicadores de confianca">
+              <ul className="home-trust-list" aria-label="Indicadores de confiança">
                 {trustIndicators.map((item) => (
                   <li key={item.label}>
                     {item.icon}
@@ -274,7 +274,7 @@ export default async function HomePage() {
           <div className="vy-container">
             <div className="home-section__header">
               <span>Como funciona</span>
-              <h2>Voltar fica simples quando o beneficio e claro.</h2>
+              <h2>Voltar fica simples quando o benefício é claro.</h2>
             </div>
             <ol className="home-step-grid">
               {steps.map((step, index) => (
@@ -292,9 +292,9 @@ export default async function HomePage() {
         <section className="home-section home-section--benefits" id="recursos">
           <div className="vy-container">
             <div className="home-section__header home-section__header--centered">
-              <span>Beneficios</span>
+              <span>Benefícios</span>
               <h2>Mais valor em cada regresso.</h2>
-              <p>Uma experiencia simples para descobrir, acumular e utilizar beneficios locais.</p>
+              <p>Uma experiência simples para descobrir, acumular e utilizar benefícios locais.</p>
             </div>
             <div className="home-benefit-grid">
               {productBenefits.map((benefit) => (
@@ -312,7 +312,7 @@ export default async function HomePage() {
           <div className="vy-container home-audience">
             <div className="home-audience__copy">
               <span>Para clientes</span>
-              <h2>Um cartao digital para beneficios que fazem sentido.</h2>
+              <h2>Um cartão digital para benefícios que fazem sentido.</h2>
               <p>
                 O cliente sabe onde ganhou pontos, quanto valem em MZN promocional e onde pode
                 voltar para usar esse saldo.
@@ -327,7 +327,7 @@ export default async function HomePage() {
               </ul>
             </div>
             <div className="home-audience__panel">
-              <RewardBadge label="Beneficio activo" points={50} />
+              <RewardBadge label="Benefício ativo" points={50} />
               <LoyaltyCard
                 businessName="Cafe Central"
                 points={180}
@@ -342,10 +342,10 @@ export default async function HomePage() {
         <section className="home-section home-section--dark" id="negocios">
           <div className="vy-container home-business">
             <div className="home-section__header">
-              <span>Para negocios</span>
-              <h2>Clientes que voltam. Negocios que crescem.</h2>
+              <span>Para negócios</span>
+              <h2>Clientes que voltam. Negócios que crescem.</h2>
               <p>
-                Configure beneficios claros, acompanhe movimentos e prepare a sua equipa para operar
+                Configure benefícios claros, acompanhe movimentos e prepare a sua equipa para operar
                 com pontos de forma organizada.
               </p>
             </div>
@@ -357,12 +357,12 @@ export default async function HomePage() {
                 </article>
               ))}
             </div>
-            <div className="home-marketplace-links" aria-label="Links de descoberta publica">
+            <div className="home-marketplace-links" aria-label="Links de descoberta pública">
               <Link href="/estabelecimentos">Ver estabelecimentos</Link>
               <Link href="/categorias">Explorar categorias</Link>
               <Link href="/locais">Explorar locais</Link>
-              <Link href="/ofertas">Ver ofertas activas</Link>
-              <Link href="/pesquisar">Pesquisar beneficios</Link>
+              <Link href="/ofertas">Ver ofertas ativas</Link>
+              <Link href="/pesquisar">Pesquisar benefícios</Link>
             </div>
           </div>
         </section>
@@ -370,11 +370,11 @@ export default async function HomePage() {
         <section className="home-section" id="precos">
           <div className="vy-container home-pricing">
             <div className="home-section__header">
-              <span>Precos</span>
+              <span>Preços</span>
               <h2>Planos para comecar pequeno e crescer com controlo.</h2>
               <p>
-                A VUYELA foi pensada para negocios que querem validar fidelizacao digital antes de
-                escalar para POS, campanhas e relatorios.
+                A VUYELA foi pensada para negócios que querem validar fidelização digital antes de
+                escalar para POS, campanhas e relatórios.
               </p>
             </div>
             {subscriptionPlans.length > 0 ? (
@@ -402,7 +402,7 @@ export default async function HomePage() {
                         <dd>{formatEntitlementLimit(plan.campaignLimit)}</dd>
                       </div>
                       <div>
-                        <dt>Analitica</dt>
+                        <dt>Analítica</dt>
                         <dd>{getAnalyticsLabel(plan.analyticsLevel)}</dd>
                       </div>
                     </dl>
@@ -430,7 +430,7 @@ export default async function HomePage() {
           <div className="vy-container home-faq">
             <div className="home-section__header">
               <span>FAQ</span>
-              <h2>Pontos VUYELA sao promocionais, claros e locais ao negocio.</h2>
+              <h2>Pontos VUYELA são promocionais, claros e locais ao negócio.</h2>
             </div>
             <div className="home-faq__items">
               {faqItems.map((item) => (
@@ -447,14 +447,14 @@ export default async function HomePage() {
           <div className="vy-container home-journal__inner">
             <div>
               <span>Recursos VUYELA</span>
-              <h2 id="home-journal-title">Fidelizacao explicada com clareza.</h2>
+              <h2 id="home-journal-title">Fidelização explicada com clareza.</h2>
               <p>
-                Consulte estabelecimentos, ofertas e respostas praticas para clientes e negocios.
+                Consulte estabelecimentos, ofertas e respostas praticas para clientes e negócios.
               </p>
             </div>
             <nav aria-label="Recursos VUYELA">
               <Link href="/estabelecimentos">Estabelecimentos</Link>
-              <Link href="/ofertas">Ofertas activas</Link>
+              <Link href="/ofertas">Ofertas ativas</Link>
               <a href="#faq">Perguntas frequentes</a>
             </nav>
           </div>
@@ -464,7 +464,7 @@ export default async function HomePage() {
           <div className="vy-container home-footer__inner">
             <VuyelaLogo inverse />
             <p>Volte. Ganhe. Cresca.</p>
-            <small>VUYELA by LEMOTE. Tecnologia de fidelizacao para Mocambique.</small>
+            <small>VUYELA by LEMOTE. Tecnologia de fidelização para Moçambique.</small>
           </div>
         </footer>
       </main>

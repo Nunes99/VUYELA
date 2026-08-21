@@ -39,7 +39,7 @@ describe("business dashboard model", () => {
     const dashboard = buildBusinessDashboardViewModel({
       business,
       program,
-      scopeLabel: "Todo o negocio",
+      scopeLabel: "Todo o negócio",
       hasManagerScope: true,
       settings: {
         businessStatus: "active",

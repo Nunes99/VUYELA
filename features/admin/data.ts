@@ -138,7 +138,7 @@ export async function getAdminDashboardState(
       status: "denied",
       view,
       capabilities,
-      message: "A sua funcao nao permite consultar esta area administrativa."
+      message: "A sua função não permite consultar esta área administrativa."
     };
   }
 
@@ -189,7 +189,7 @@ export async function getAdminDashboardState(
 
     return baseState;
   } catch (error) {
-    console.error("Admin dashboard data load failed", {
+    console.error("Admin painel data load failed", {
       view,
       errorCode: getAdminDataErrorCode(error)
     });
@@ -198,7 +198,7 @@ export async function getAdminDashboardState(
       status: "error",
       view,
       capabilities,
-      message: "Nao foi possivel carregar os dados administrativos. Tente novamente."
+      message: "Não foi possível carregar os dados administrativos. Tente novamente."
     };
   }
 }
@@ -269,7 +269,7 @@ async function loadBusinesses(supabase: SupabaseClient, query: string): Promise<
       status: row.status,
       ownerName: row.owner_profile_id
         ? getProfileLabel(profiles.get(row.owner_profile_id))
-        : "Sem owner",
+        : "Sem proprietário",
       createdAt: row.created_at,
       reviewedAt: row.reviewed_at,
       reviewNote: row.review_note
@@ -298,7 +298,7 @@ async function loadUsers(supabase: SupabaseClient, query: string): Promise<Admin
         {
           id: row.id,
           displayName: row.display_name ?? "Utilizador sem nome",
-          email: row.email ?? "Sem email",
+          email: row.email ?? "Sem e-mail",
           phone: row.phone ?? "Sem telefone",
           role: row.role,
           createdAt: row.created_at
@@ -335,7 +335,7 @@ async function loadSubscriptions(
 
   return rows
     .map((row) => {
-      const businessName = businesses.get(row.business_id) ?? "Negocio removido";
+      const businessName = businesses.get(row.business_id) ?? "Negócio removido";
       const plan = plans.get(row.plan_id);
       return {
         id: row.id,
@@ -442,17 +442,17 @@ async function loadSupportTickets(
     .map((row) => ({
       id: row.id,
       subject: row.subject,
-      description: row.description ?? "Sem descricao",
+      description: row.description ?? "Sem descrição",
       status: row.status,
       priority: row.priority,
       requesterName: getProfileLabel(row.profile_id ? profiles.get(row.profile_id) : undefined),
       businessName: row.business_id
-        ? (businesses.get(row.business_id) ?? "Negocio removido")
+        ? (businesses.get(row.business_id) ?? "Negócio removido")
         : "Plataforma",
       assignedToProfileId: row.assigned_to_profile_id,
       assignedToName: row.assigned_to_profile_id
         ? getProfileLabel(profiles.get(row.assigned_to_profile_id))
-        : "Nao atribuido",
+        : "Não atribuído",
       resolutionNote: row.resolution_note ?? "",
       resolvedAt: row.resolved_at,
       createdAt: row.created_at
@@ -526,7 +526,7 @@ async function loadFraudEvents(
       eventType: row.event_type,
       severity: row.severity,
       businessName: row.business_id
-        ? (businesses.get(row.business_id) ?? "Negocio removido")
+        ? (businesses.get(row.business_id) ?? "Negócio removido")
         : "Plataforma",
       profileName: getProfileLabel(row.profile_id ? profiles.get(row.profile_id) : undefined),
       detailsSummary: summarizeJson(row.details),
@@ -589,11 +589,11 @@ async function loadAuditEntries(
           row.actor_profile_id ? profiles.get(row.actor_profile_id) : undefined
         ),
         businessName: row.business_id
-          ? (businesses.get(row.business_id) ?? "Negocio removido")
+          ? (businesses.get(row.business_id) ?? "Negócio removido")
           : "Plataforma",
         operation: typeof context.operation === "string" ? context.operation : "operacao_sensivel",
         changeSummary: describeAuditChange(row.before_data, row.after_data),
-        ipAddress: row.ip_address ?? "Nao registado",
+        ipAddress: row.ip_address ?? "Não registado",
         createdAt: row.created_at
       };
     })

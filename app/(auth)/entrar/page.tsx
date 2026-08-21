@@ -7,7 +7,7 @@ import { isPhoneAuthEnabled } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Entrar",
-  description: "Entre na sua conta VUYELA com email e senha.",
+  description: "Entre na sua conta VUYELA com e-mail e palavra-passe.",
   alternates: {
     canonical: "/entrar"
   },
@@ -48,21 +48,21 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         <div className="auth-panel auth-panel--copy">
           <VuyelaLogo className="auth-brand" inverse />
           <span className="auth-kicker">Acesso seguro</span>
-          <h1 id="signin-title">Entre para ver os seus pontos e negocios.</h1>
+          <h1 id="signin-title">Entre para ver os seus pontos e negócios.</h1>
           <p>
-            Use o seu email e senha. As regras de acesso continuam protegidas no servidor e no
-            PostgreSQL.
+            Use o seu e-mail e palavra-passe. As regras de acesso continuam protegidas no servidor e
+            no PostgreSQL.
           </p>
         </div>
 
         <div className="auth-panel auth-panel--forms">
           {callbackError ? (
             <p className="auth-message auth-message--error" role="alert">
-              O link e invalido ou expirou. Solicite um novo link de recuperacao.
+              O link é inválido ou expirou. Solicite um novo link de recuperação.
             </p>
           ) : null}
           <div className="auth-form-group">
-            <h2>Email e senha</h2>
+            <h2>E-mail e palavra-passe</h2>
             <EmailSignInForm nextPath={nextPath} />
           </div>
           {phoneAuthEnabled ? (
@@ -71,14 +71,14 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
                 ou
               </div>
               <div className="auth-form-group">
-                <h2>Telefone com codigo</h2>
+                <h2>Telefone com código</h2>
                 <PhoneOtpForm nextPath={nextPath} />
               </div>
             </>
           ) : null}
           <p className="auth-footnote">
-            Ainda nao tem conta? <Link href="/cadastrar">Criar conta</Link>. Esqueceu a senha?{" "}
-            <Link href="/recuperar-acesso">Recuperar acesso</Link>.
+            Ainda não tem conta? <Link href="/cadastrar">Criar conta</Link>. Esqueceu a
+            palavra-passe? <Link href="/recuperar-acesso">Recuperar acesso</Link>.
           </p>
         </div>
       </section>

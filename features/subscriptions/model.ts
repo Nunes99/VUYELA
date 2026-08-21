@@ -93,10 +93,10 @@ export function getUsageRatio(used: number, limit: number | null): number {
 
 export function getAnalyticsLabel(level: AnalyticsLevel): string {
   const labels: Record<AnalyticsLevel, string> = {
-    none: "Sem analitica",
-    basic: "Basica",
-    standard: "Standard",
-    advanced: "Avancada"
+    none: "Sem analítica",
+    basic: "Básica",
+    standard: "Padrão",
+    advanced: "Avançada"
   };
 
   return labels[level];
@@ -104,9 +104,9 @@ export function getAnalyticsLabel(level: AnalyticsLevel): string {
 
 export function getFeatureLabel(feature: string): string {
   const labels: Record<string, string> = {
-    loyalty: "Fidelizacao",
+    loyalty: "Fidelização",
     pos: "POS",
-    referrals: "Indicacoes",
+    referrals: "Indicações",
     campaign_delivery: "Envio de campanhas",
     priority_support: "Suporte prioritario"
   };

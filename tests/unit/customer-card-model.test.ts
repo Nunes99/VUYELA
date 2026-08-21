@@ -81,7 +81,7 @@ describe("customer card model", () => {
       currentTierName: "Base",
       nextTierName: null,
       pointsUntilNextTier: null,
-      expiryLabel: "Pontos sem expiracao configurada"
+      expiryLabel: "Pontos sem expiração configurada"
     });
   });
 

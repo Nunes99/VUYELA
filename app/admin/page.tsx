@@ -7,7 +7,7 @@ import { normalizeAdminQuery, parseAdminView } from "@/features/admin/model";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Administracao",
+  title: "Administração",
   robots: {
     index: false,
     follow: false
@@ -33,7 +33,7 @@ export default async function AdminPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Administracao VUYELA">
+    <ProtectedRouteStateView state={state} title="Administração VUYELA">
       {adminState && state.status === "authorized" ? (
         <AdminDashboard principal={state.principal} state={adminState} />
       ) : null}

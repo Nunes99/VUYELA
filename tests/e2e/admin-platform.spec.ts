@@ -13,7 +13,7 @@ for (const view of [
     await page.goto(`/admin?view=${view}`);
 
     await expect(
-      page.getByRole("heading", { name: "Autenticacao ainda nao esta ligada." })
+      page.getByRole("heading", { name: "Autenticação ainda não está ligada." })
     ).toBeVisible();
     await expect(page.getByText("Configurar Supabase")).toBeVisible();
   });

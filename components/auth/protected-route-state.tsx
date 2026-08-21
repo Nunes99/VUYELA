@@ -52,13 +52,13 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
           <header className="dashboard-shell__header">
             <VuyelaLogo />
             <div className="dashboard-shell__title">
-              <span className="auth-kicker">Area protegida</span>
+              <span className="auth-kicker">Área protegida</span>
               <h1 id="dashboard-title">{title}</h1>
             </div>
             <form action={signOutAction}>
               <button className="dashboard-signout" type="submit">
                 <LogOut aria-hidden="true" size={18} />
-                <span>Terminar sessao</span>
+                <span>Terminar sessão</span>
               </button>
             </form>
           </header>
@@ -72,8 +72,8 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
     return (
       <AuthNotice
         eyebrow="Configurar Supabase"
-        title="Autenticacao ainda nao esta ligada."
-        body="Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY para testar esta area protegida com sessoes reais."
+        title="Autenticação ainda não está ligada."
+        body="Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY para testar esta área protegida com sessões reais."
       />
     );
   }
@@ -83,7 +83,7 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
       <AuthNotice
         eyebrow="Login necessario"
         title="Entre para continuar."
-        body="Esta area usa helpers server-side e RBAC centralizado antes de renderizar dados privados."
+        body="Esta área usa helpers server-side e RBAC centralizado antes de renderizar dados privados."
         actionHref={state.signInPath}
         actionLabel="Entrar"
       />
@@ -95,7 +95,7 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
       <AuthNotice
         eyebrow="MFA necessario"
         title="Verificacao adicional obrigatoria."
-        body="Funcoes privilegiadas precisam de MFA antes de acessar rotas sensiveis."
+        body="Funções privilegiadas precisam de MFA antes de acessar rotas sensiveis."
         actionHref={state.mfaPath}
         actionLabel="Verificar"
       />
@@ -104,9 +104,9 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
 
   return (
     <AuthNotice
-      eyebrow="Sem permissao"
-      title="Esta conta nao tem acesso a esta area."
-      body="As permissoes sao avaliadas no servidor por perfil, membro ativo, negocio e filial."
+      eyebrow="Sem permissão"
+      title="Esta conta não tem acesso a esta área."
+      body="As permissões são avaliadas no servidor por perfil, membro ativo, negócio e filial."
       actionHref="/cliente"
       actionLabel="Ir para cliente"
     />

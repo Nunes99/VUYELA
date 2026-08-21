@@ -4,18 +4,18 @@ test("shows the public homepage", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Cada compra cria uma razao para voltar." })
+    page.getByRole("heading", { name: "Cada compra cria uma razão para voltar." })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Quero um cartao" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Quero um cartão" })).toBeVisible();
   await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toBeVisible();
-  await expect(page.getByText("Seguro & Confiavel")).toBeVisible();
+  await expect(page.getByText("Seguro & Confiável")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mais valor em cada regresso." })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Voltar fica simples quando o beneficio e claro." })
+    page.getByRole("heading", { name: "Voltar fica simples quando o benefício é claro." })
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
-      name: "Pontos VUYELA sao promocionais, claros e locais ao negocio."
+      name: "Pontos VUYELA são promocionais, claros e locais ao negócio."
     })
   ).toBeVisible();
 });

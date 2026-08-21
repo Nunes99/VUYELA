@@ -39,7 +39,7 @@ export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListV
     <main className="marketplace-page">
       <MarketplaceHeader />
       <MarketplaceHero
-        eyebrow="Descoberta publica"
+        eyebrow="Descoberta pública"
         title={viewModel.title}
         description={viewModel.description}
         breadcrumbs={viewModel.breadcrumbs}
@@ -51,13 +51,13 @@ export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListV
               eyebrow="Estabelecimentos"
               title={
                 viewModel.businesses.length > 0
-                  ? `${viewModel.businesses.length.toLocaleString("pt-MZ")} negocios encontrados`
+                  ? `${viewModel.businesses.length.toLocaleString("pt-MZ")} negócios encontrados`
                   : "Ainda sem estabelecimentos para publicar"
               }
               description={
                 viewModel.businesses.length > 0
-                  ? "Cada perfil mostra pontos, beneficios, localizacao e ofertas publicas activas."
-                  : "Esta pagina fica fora do indice enquanto nao houver conteudo publico suficiente."
+                  ? "Cada perfil mostra pontos, benefícios, localização e ofertas públicas ativas."
+                  : "Esta página fica fora do índice enquanto não houver conteúdo público suficiente."
               }
               id="marketplace-results-title"
             />
@@ -77,7 +77,7 @@ export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListV
               items={viewModel.categories.map((category) => ({
                 href: `/categorias/${category.slug}`,
                 label: category.name,
-                meta: `${category.businessCount.toLocaleString("pt-MZ")} negocios`
+                meta: `${category.businessCount.toLocaleString("pt-MZ")} negócios`
               }))}
             />
             <MarketplaceFacetSection
@@ -85,7 +85,7 @@ export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListV
               items={viewModel.cities.map((city) => ({
                 href: `/locais/${city.slug}`,
                 label: city.name,
-                meta: `${city.businessCount.toLocaleString("pt-MZ")} negocios`
+                meta: `${city.businessCount.toLocaleString("pt-MZ")} negócios`
               }))}
             />
           </aside>
@@ -117,7 +117,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
             <div className="marketplace-detail__identity">
               <BusinessLogo business={business} />
               <div>
-                <span>{business.category?.name ?? "Negocio VUYELA"}</span>
+                <span>{business.category?.name ?? "Negócio VUYELA"}</span>
                 <h2>{business.name}</h2>
                 <p>
                   {getBusinessCityLabel(business)} · {getProgramEarnRateLabel(business.program)}
@@ -125,11 +125,11 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
               </div>
             </div>
 
-            <div className="marketplace-benefit-grid" aria-label="Beneficios publicados">
+            <div className="marketplace-benefit-grid" aria-label="Benefícios publicados">
               <BenefitTile
                 icon={<Gift size={20} />}
                 title={getProgramEarnRateLabel(business.program)}
-                body="Pontos promocionais acumulados no proprio negocio."
+                body="Pontos promocionais acumulados no próprio negócio."
               />
               <BenefitTile
                 icon={<ShieldCheck size={20} />}
@@ -185,14 +185,14 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
             <DetailSection title="Perguntas frequentes">
               <div className="marketplace-faq">
                 <details>
-                  <summary>Posso usar estes pontos noutro negocio?</summary>
-                  <p>Nao. Os pontos sao promocionais e pertencem ao negocio que os emitiu.</p>
+                  <summary>Posso usar estes pontos noutro negócio?</summary>
+                  <p>Não. Os pontos são promocionais e pertencem ao negócio que os emitiu.</p>
                 </details>
                 <details>
                   <summary>Os pontos podem ser levantados em dinheiro?</summary>
                   <p>
-                    Nao. Pontos VUYELA nao sao saldo bancario, dinheiro electronico ou valor
-                    transferivel.
+                    Não. Pontos VUYELA não são saldo bancário, dinheiro electronico ou valor
+                    transferível.
                   </p>
                 </details>
               </div>
@@ -201,14 +201,14 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
 
           <aside className="marketplace-detail-aside" aria-label="Resumo do estabelecimento">
             <div className="marketplace-action-panel">
-              <h2>Adesao ao programa</h2>
-              <p>Entre ou crie uma conta para ver o seu cartao digital deste negocio.</p>
+              <h2>Adesão ao programa</h2>
+              <p>Entre ou crie uma conta para ver o seu cartão digital deste negócio.</p>
               <Link className="marketplace-button marketplace-button--reward" href="/cadastrar">
                 Quero aderir
                 <ArrowRight size={18} />
               </Link>
               <Link className="marketplace-button marketplace-button--ghost" href="/entrar">
-                Ja tenho conta
+                Já tenho conta
               </Link>
             </div>
 
@@ -223,7 +223,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
                 {business.websiteUrl ? (
                   <a href={business.websiteUrl} rel="noreferrer" target="_blank">
                     <Globe size={16} />
-                    Site do negocio
+                    Site do negócio
                   </a>
                 ) : null}
               </div>
@@ -242,7 +242,7 @@ export function OfferDetailPage({ viewModel }: { viewModel: MarketplaceOfferView
     <main className="marketplace-page">
       <MarketplaceHeader />
       <MarketplaceHero
-        eyebrow="Oferta activa"
+        eyebrow="Oferta ativa"
         title={viewModel.offer.title}
         description={viewModel.offer.description}
         breadcrumbs={viewModel.breadcrumbs}
@@ -259,14 +259,14 @@ export function OfferDetailPage({ viewModel }: { viewModel: MarketplaceOfferView
                 <p>{getOfferMeta(viewModel.offer)}</p>
               </div>
             </div>
-            <DetailSection title="Descricao da oferta">
+            <DetailSection title="Descrição da oferta">
               <p>{viewModel.offer.description}</p>
             </DetailSection>
             <DetailSection title="Onde aproveitar">
               <BusinessCard business={viewModel.business} />
             </DetailSection>
           </article>
-          <aside className="marketplace-detail-aside" aria-label="Acao da oferta">
+          <aside className="marketplace-detail-aside" aria-label="Ação da oferta">
             <div className="marketplace-action-panel">
               <h2>Ver estabelecimento</h2>
               <p>Consulte as regras de pontos e as filiais onde esta oferta pode ser relevante.</p>
@@ -293,11 +293,11 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
     <main className="marketplace-page">
       <MarketplaceHeader />
       <MarketplaceHero
-        eyebrow="Busca publica"
+        eyebrow="Busca pública"
         title={viewModel.title}
         description={viewModel.description}
         breadcrumbs={[
-          { name: "Inicio", path: "/" },
+          { name: "Início", path: "/" },
           { name: "Pesquisar", path: "/pesquisar" }
         ]}
       />
@@ -349,7 +349,7 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
                   type="checkbox"
                   value="1"
                 />
-                <span>Com ofertas activas</span>
+                <span>Com ofertas ativas</span>
               </label>
               <label
                 className={
@@ -379,7 +379,7 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
             </form>
             <LocationSearchButton />
             {viewModel.activeFilters.length > 0 ? (
-              <div className="marketplace-active-filters" aria-label="Filtros activos">
+              <div className="marketplace-active-filters" aria-label="Filtros ativos">
                 {viewModel.activeFilters.map((filter) => (
                   <Link href={filter.href} key={`${filter.key}-${filter.label}`}>
                     {filter.label}
@@ -389,7 +389,7 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
             ) : null}
             {viewModel.seoLinks.length > 0 ? (
               <div className="marketplace-seo-links">
-                <h2>Paginas relacionadas</h2>
+                <h2>Páginas relacionadas</h2>
                 {viewModel.seoLinks.map((link) => (
                   <Link href={link.href} key={link.href}>
                     <span>{link.label}</span>
@@ -410,7 +410,7 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
               description={
                 viewModel.supportsLocation
                   ? "Resultados com coordenadas publicadas aparecem ordenados por proximidade."
-                  : "Use filtros ou permita localizacao para refinar os resultados publicos."
+                  : "Use filtros ou permita localização para refinar os resultados públicos."
               }
               id="marketplace-search-title"
             />
@@ -428,7 +428,7 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
                 <SectionHeader
                   eyebrow="Ofertas"
                   title="Ofertas encontradas"
-                  description="Ofertas publicas que combinam com a sua busca."
+                  description="Ofertas públicas que combinam com a sua busca."
                   id="marketplace-search-offers-title"
                 />
                 <div className="marketplace-offer-grid">
@@ -456,7 +456,7 @@ export function MarketplaceHeader() {
     <header className="marketplace-header">
       <div className="vy-container marketplace-header__inner">
         <VuyelaLogo className="marketplace-logo" />
-        <nav className="marketplace-desktop-nav" aria-label="Navegacao publica">
+        <nav className="marketplace-desktop-nav" aria-label="Navegação pública">
           <Link href="/estabelecimentos">Estabelecimentos</Link>
           <Link href="/categorias">Categorias</Link>
           <Link href="/locais">Locais</Link>
@@ -467,10 +467,10 @@ export function MarketplaceHeader() {
           Entrar
         </Link>
         <details className="marketplace-mobile-menu">
-          <summary aria-label="Abrir navegacao publica">
+          <summary aria-label="Abrir navegação pública">
             <Menu aria-hidden="true" size={20} />
           </summary>
-          <nav aria-label="Navegacao publica mobile">
+          <nav aria-label="Navegação pública mobile">
             <Link href="/estabelecimentos">Estabelecimentos</Link>
             <Link href="/categorias">Categorias</Link>
             <Link href="/locais">Locais</Link>
@@ -529,7 +529,7 @@ export function MarketplaceHero({
 }
 
 export function BusinessCard({ business }: { business: MarketplaceBusiness }) {
-  const primaryCity = getBusinessPrimaryCity(business) ?? "Mocambique";
+  const primaryCity = getBusinessPrimaryCity(business) ?? "Moçambique";
   const searchBusiness = business as MarketplaceBusiness & {
     distanceKm?: number | null;
     isOpenNow?: boolean | null;
@@ -609,8 +609,8 @@ function OffersBand({ offers }: { offers: MarketplaceOffer[] }) {
       <div className="vy-container">
         <SectionHeader
           eyebrow="Ofertas"
-          title="Ofertas publicas activas"
-          description="Promocoes publicadas pelos negocios participantes."
+          title="Ofertas públicas ativas"
+          description="Promocoes publicadas pelos negócios participantes."
           id="offers-title"
         />
         <div className="marketplace-offer-grid">
@@ -680,7 +680,7 @@ function RelatedBusinesses({ businesses }: { businesses: MarketplaceBusiness[] }
         <SectionHeader
           eyebrow="Tambem pode gostar"
           title="Estabelecimentos relacionados"
-          description="Outras opcoes com beneficios VUYELA."
+          description="Outras opções com benefícios VUYELA."
           id="related-businesses-title"
         />
         <div className="marketplace-business-grid marketplace-business-grid--compact">
@@ -754,13 +754,13 @@ function MarketplaceEmptyState() {
   return (
     <div className="marketplace-empty">
       <Store size={24} />
-      <h2>Conteudo publico em preparacao</h2>
+      <h2>Conteúdo público em preparacao</h2>
       <p>
-        Assim que houver estabelecimentos activos com categoria, programa de pontos e filial
-        publicada, esta pagina passa a ser indexavel.
+        Assim que houver estabelecimentos ativos com categoria, programa de pontos e filial
+        publicada, esta página passa a ser indexavel.
       </p>
       <Link className="marketplace-button marketplace-button--reward" href="/onboarding/negocio">
-        Cadastrar negocio
+        Registar negócio
       </Link>
     </div>
   );
@@ -771,7 +771,7 @@ function MarketplaceNoSearchResults() {
     <div className="marketplace-empty">
       <Store size={24} />
       <h2>Nenhum resultado encontrado</h2>
-      <p>Remova algum filtro ou procure por outra cidade, categoria, negocio ou oferta.</p>
+      <p>Remova algum filtro ou procure por outra cidade, categoria, negócio ou oferta.</p>
       <Link className="marketplace-button marketplace-button--ghost" href="/pesquisar">
         Limpar busca
       </Link>
@@ -787,7 +787,7 @@ function getOfferMeta(offer: MarketplaceOffer): string {
   }
 
   if (offer.endsAt) {
-    pieces.push(`activa ate ${new Date(offer.endsAt).toLocaleDateString("pt-MZ")}`);
+    pieces.push(`ativa até ${new Date(offer.endsAt).toLocaleDateString("pt-MZ")}`);
   }
 
   return pieces.join(" · ");

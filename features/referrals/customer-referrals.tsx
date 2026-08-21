@@ -16,34 +16,34 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
     return (
       <section
         className={`customer-dashboard-notice${
-          state.status === "error" ? " customer-dashboard-notice--error" : ""
+          state.status === "error" ? " customer-painel-notice--error" : ""
         }`}
         aria-labelledby="customer-referral-notice"
       >
-        <h2 id="customer-referral-notice">Indicacoes indisponiveis</h2>
+        <h2 id="customer-referral-notice">Indicações indisponíveis</h2>
         <p>{state.message}</p>
         <Link className="referral-back-link" href="/cliente">
-          Voltar ao inicio
+          Voltar ao início
         </Link>
       </section>
     );
   }
 
   return (
-    <div className="customer-dashboard customer-referrals">
+    <div className="customer-painel customer-referrals">
       <div className="referral-page-actions">
         <Link className="referral-back-link" href="/cliente">
-          Dashboard
+          Painel
         </Link>
       </div>
 
       <section className="customer-dashboard-home" aria-labelledby="customer-referrals-title">
         <div>
-          <span className="customer-dashboard-eyebrow">Indicacoes</span>
+          <span className="customer-dashboard-eyebrow">Indicações</span>
           <h2 id="customer-referrals-title">Convites e premios</h2>
-          <p>Partilhe codigos dos seus cartoes e acompanhe compras qualificadas.</p>
+          <p>Partilhe códigos dos seus cartões e acompanhe compras qualificadas.</p>
         </div>
-        <div className="customer-dashboard-stats" aria-label="Resumo de indicacoes">
+        <div className="customer-dashboard-stats" aria-label="Resumo de indicações">
           <span>
             Premiados<strong>{state.summary.rewardedCount.toLocaleString("pt-MZ")}</strong>
           </span>
@@ -58,7 +58,7 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
 
       <section className="referral-section" aria-labelledby="customer-referral-actions-title">
         <SectionHeading
-          eyebrow="Codigos"
+          eyebrow="Códigos"
           title="Gerir convites"
           id="customer-referral-actions-title"
         />
@@ -68,7 +68,7 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
       <section className="referral-section" aria-labelledby="customer-referral-programs-title">
         <SectionHeading
           eyebrow="Regras"
-          title="Programas activos"
+          title="Programas ativos"
           id="customer-referral-programs-title"
         />
         <CustomerProgramList programs={state.programs} />
@@ -76,8 +76,8 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
 
       <section className="referral-section" aria-labelledby="customer-referral-history-title">
         <SectionHeading
-          eyebrow="Historico"
-          title="As suas indicacoes"
+          eyebrow="Histórico"
+          title="As suas indicações"
           id="customer-referral-history-title"
         />
         <ReferralHistory items={state.referrals} />
@@ -88,7 +88,7 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
 
 function CustomerProgramList({ programs }: { programs: CustomerReferralProgram[] }) {
   if (programs.length === 0) {
-    return <EmptyState title="Sem programas activos" body="Os programas activos aparecem aqui." />;
+    return <EmptyState title="Sem programas ativos" body="Os programas ativos aparecem aqui." />;
   }
 
   return (
@@ -136,7 +136,7 @@ function CustomerProgramList({ programs }: { programs: CustomerReferralProgram[]
 function ReferralHistory({ items }: { items: ReferralHistoryItem[] }) {
   if (items.length === 0) {
     return (
-      <EmptyState title="Sem indicacoes" body="Os convites criados ou aceites aparecem aqui." />
+      <EmptyState title="Sem indicações" body="Os convites criados ou aceites aparecem aqui." />
     );
   }
 

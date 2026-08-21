@@ -29,7 +29,7 @@ export function buildBusinessMetadata(business: MarketplaceBusiness): Metadata {
   const cityLabel = getBusinessCityLabel(business);
 
   return buildMetadata({
-    title: `${business.name} - pontos e beneficios em ${cityLabel}`,
+    title: `${business.name} - pontos e benefícios em ${cityLabel}`,
     description: `${business.description} Veja pontos, filiais, regras e ofertas publicas de ${business.name}.`,
     canonicalPath: `/estabelecimentos/${business.slug}`,
     indexable: true,
@@ -171,7 +171,7 @@ export function buildBusinessFaqJsonLd(business: MarketplaceBusiness): Record<st
         name: "Os pontos VUYELA podem ser levantados em dinheiro?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Nao. Os pontos sao beneficios promocionais do negocio emissor e nao representam dinheiro, saldo bancario ou valor transferivel."
+          text: "Não. Os pontos são benefícios promocionais do negócio emissor e não representam dinheiro, saldo bancário ou valor transferível."
         }
       }
     ]

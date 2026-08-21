@@ -6,7 +6,7 @@ import { PasswordResetForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
   title: "Recuperar acesso",
-  description: "Receba instrucoes para recuperar o acesso a sua conta VUYELA.",
+  description: "Receba instruções para recuperar o acesso a sua conta VUYELA.",
   alternates: {
     canonical: "/recuperar-acesso"
   },
@@ -22,14 +22,14 @@ export default function PasswordResetPage() {
       <section className="auth-shell auth-shell--single" aria-labelledby="reset-title">
         <div className="auth-panel auth-panel--forms">
           <VuyelaLogo className="auth-brand auth-brand--dark" />
-          <span className="auth-kicker">Recuperacao</span>
+          <span className="auth-kicker">Recuperação</span>
           <h1 id="reset-title">Recupere o acesso com seguranca.</h1>
           <p className="auth-intro">
-            Indique o email da conta para receber as instrucoes de recuperacao.
+            Indique o e-mail da conta para receber as instruções de recuperação.
           </p>
           <PasswordResetForm />
           <p className="auth-footnote">
-            Lembrou a senha? <Link href="/entrar">Voltar ao login</Link>.
+            Lembrou a palavra-passe? <Link href="/entrar">Voltar ao login</Link>.
           </p>
         </div>
       </section>

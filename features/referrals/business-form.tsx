@@ -6,7 +6,8 @@ import { useActionState } from "react";
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input } from "../../vuyela-design-system/src/components/Field";
 
-import { configureReferralProgramAction, initialReferralProgramActionState } from "./actions";
+import { configureReferralProgramAction } from "./actions";
+import { initialReferralProgramActionState } from "./state";
 import type { ReferralProgramRules } from "./model";
 
 export function ReferralProgramForm({
@@ -26,7 +27,7 @@ export function ReferralProgramForm({
       <input type="hidden" name="businessId" value={businessId} />
       <label className="referral-toggle">
         <input name="isActive" type="checkbox" defaultChecked={rules.isActive} />
-        <span>Programa activo</span>
+        <span>Programa ativo</span>
       </label>
 
       <div className="referral-program-form-grid">
@@ -79,7 +80,7 @@ export function ReferralProgramForm({
           required
         />
         <Input
-          label="Premios por periodo"
+          label="Premios por período"
           name="rewardLimitCount"
           inputMode="numeric"
           min={1}
@@ -89,7 +90,7 @@ export function ReferralProgramForm({
           required
         />
         <Input
-          label="Periodo do limite (dias)"
+          label="Período do limite (dias)"
           name="rewardLimitPeriodDays"
           inputMode="numeric"
           min={1}

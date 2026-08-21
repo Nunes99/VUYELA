@@ -9,7 +9,6 @@ import type { ProfileRole } from "@/lib/auth/rbac";
 
 import {
   assignSubscriptionPlanAction,
-  initialAdminActionState,
   reviewBusinessAction,
   reviewFraudEventAction,
   updatePlanEntitlementsAction,
@@ -17,6 +16,7 @@ import {
   updateSupportTicketAction
 } from "./actions";
 import type { AdminOperator, AdminPlan } from "./model";
+import { initialAdminActionState } from "./state";
 
 interface BusinessReviewFormProps {
   businessId: string;
@@ -42,7 +42,7 @@ export function BusinessReviewForm({ businessId, status }: BusinessReviewFormPro
     <form action={action} className="admin-inline-form">
       <input name="businessId" type="hidden" value={businessId} />
       <label>
-        <span>Decisao</span>
+        <span>Decisão</span>
         <select defaultValue={decisions[0]?.value} name="decision">
           {decisions.map((decision) => (
             <option key={decision.value} value={decision.value}>
@@ -89,7 +89,7 @@ export function UserRoleForm({
     <form action={action} className="admin-inline-form">
       <input name="targetProfileId" type="hidden" value={userId} />
       <label>
-        <span>Nova funcao</span>
+        <span>Nova função</span>
         <select defaultValue={assignableRoles[0]} name="newRole">
           {assignableRoles.map((role) => (
             <option key={role} value={role}>
@@ -100,7 +100,7 @@ export function UserRoleForm({
       </label>
       <label className="admin-inline-form__wide">
         <span>Motivo</span>
-        <input maxLength={1000} name="note" placeholder="Obrigatorio" required />
+        <input maxLength={1000} name="note" placeholder="Obrigatório" required />
       </label>
       <SubmitButton label="Guardar" pending={pending} />
       <ActionMessage state={state} />
@@ -151,13 +151,13 @@ export function SubscriptionPlanForm({
           name="status"
         >
           <option value="trialing">Em teste</option>
-          <option value="active">Activa</option>
+          <option value="active">Ativa</option>
           <option value="paused">Pausada</option>
         </select>
       </label>
       <label className="admin-inline-form__wide">
         <span>Motivo</span>
-        <input maxLength={1000} name="note" placeholder="Obrigatorio" required />
+        <input maxLength={1000} name="note" placeholder="Obrigatório" required />
       </label>
       <SubmitButton label="Guardar" pending={pending} />
       <ActionMessage state={state} />
@@ -197,12 +197,12 @@ export function PlanEntitlementsForm({ plan }: { plan: AdminPlan }) {
         <input defaultValue={plan.campaignLimit ?? ""} min="0" name="campaignLimit" type="number" />
       </label>
       <label>
-        <span>Analitica</span>
+        <span>Analítica</span>
         <select defaultValue={plan.analyticsLevel} name="analyticsLevel">
-          <option value="none">Sem analitica</option>
-          <option value="basic">Basica</option>
-          <option value="standard">Standard</option>
-          <option value="advanced">Avancada</option>
+          <option value="none">Sem analítica</option>
+          <option value="basic">Básica</option>
+          <option value="standard">Padrão</option>
+          <option value="advanced">Avançada</option>
         </select>
       </label>
       <label>
@@ -222,15 +222,15 @@ export function PlanEntitlementsForm({ plan }: { plan: AdminPlan }) {
       </label>
       <label className="admin-plan-form__toggle">
         <input defaultChecked={plan.isPublic} name="isPublic" type="checkbox" />
-        <span>Publico</span>
+        <span>Público</span>
       </label>
       <label className="admin-plan-form__toggle">
         <input defaultChecked={plan.isActive} name="isActive" type="checkbox" />
-        <span>Activo</span>
+        <span>Ativo</span>
       </label>
       <label className="admin-inline-form__wide">
         <span>Motivo</span>
-        <input maxLength={1000} name="note" placeholder="Obrigatorio" required />
+        <input maxLength={1000} name="note" placeholder="Obrigatório" required />
       </label>
       <SubmitButton label="Guardar" pending={pending} />
       <ActionMessage state={state} />
@@ -280,9 +280,9 @@ export function SupportTicketForm({
         </select>
       </label>
       <label>
-        <span>Responsavel</span>
+        <span>Responsável</span>
         <select defaultValue={assignedToProfileId ?? ""} name="assignedToProfileId">
-          <option value="">Nao atribuido</option>
+          <option value="">Não atribuído</option>
           {operators.map((operator) => (
             <option key={operator.id} value={operator.id}>
               {operator.label}
@@ -291,7 +291,7 @@ export function SupportTicketForm({
         </select>
       </label>
       <label className="admin-inline-form__wide">
-        <span>Resolucao</span>
+        <span>Resolução</span>
         <input defaultValue={resolutionNote} maxLength={2000} name="resolutionNote" />
       </label>
       <label className="admin-inline-form__wide">
@@ -318,8 +318,8 @@ export function FraudReviewForm({
       <input name="fraudEventId" type="hidden" value={fraudEventId} />
       <input name="resolution" type="hidden" value={resolved ? "reopen" : "resolve"} />
       <label className="admin-inline-form__wide">
-        <span>Nota da revisao</span>
-        <input maxLength={2000} name="note" placeholder="Obrigatorio" required />
+        <span>Nota da revisão</span>
+        <input maxLength={2000} name="note" placeholder="Obrigatório" required />
       </label>
       <SubmitButton label={resolved ? "Reabrir" : "Resolver"} pending={pending} />
       <ActionMessage state={state} />
@@ -358,7 +358,7 @@ function getBusinessDecisions(status: string): Array<{ value: string; label: str
   if (status === "pending_review") {
     return [
       { value: "approve", label: "Aprovar" },
-      { value: "reject", label: "Devolver para revisao" }
+      { value: "reject", label: "Devolver para revisão" }
     ];
   }
 
@@ -367,7 +367,7 @@ function getBusinessDecisions(status: string): Array<{ value: string; label: str
   }
 
   if (status === "suspended") {
-    return [{ value: "reactivate", label: "Reactivar" }];
+    return [{ value: "reactivate", label: "Reativar" }];
   }
 
   return [];

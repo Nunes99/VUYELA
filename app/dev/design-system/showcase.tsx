@@ -58,7 +58,7 @@ import { useState } from "react";
 const navLinks = [
   { label: "Fundacao", href: "#fundacao", active: true },
   { label: "Componentes", href: "#componentes" },
-  { label: "Fidelizacao", href: "#fidelizacao" },
+  { label: "Fidelização", href: "#fidelizacao" },
   { label: "Dados", href: "#dados" }
 ];
 
@@ -104,10 +104,10 @@ export function DesignSystemShowcase() {
             </p>
             <div className="ds-actions">
               <Button variant="reward" leadingIcon={<CreditCard size={18} />}>
-                Quero um cartao
+                Quero um cartão
               </Button>
               <Button variant="outline" leadingIcon={<Store size={18} />}>
-                Sou um negocio
+                Sou um negócio
               </Button>
             </div>
           </div>
@@ -144,11 +144,11 @@ export function DesignSystemShowcase() {
         </div>
         <div className="ds-theme-grid">
           <Alert title="Tema claro" tone="success" icon={<Check size={18} />}>
-            Superficies limpas para operacao diaria, POS e dashboards.
+            Superfícies limpas para operação diária, POS e dashboards.
           </Alert>
           <div data-theme="dark" className="ds-dark-sample">
             <Alert title="Tema escuro" tone="info" icon={<Sparkles size={18} />}>
-              Base pronta para superficies premium e alto contraste.
+              Base pronta para superfícies premium e alto contraste.
             </Alert>
           </div>
         </div>
@@ -181,7 +181,7 @@ export function DesignSystemShowcase() {
           <article className="ds-example">
             <h3>Campos</h3>
             <div className="ds-form-grid">
-              <Input label="Nome do negocio" placeholder="Ex.: Restaurante Mares" requiredMark />
+              <Input label="Nome do negócio" placeholder="Ex.: Restaurante Mares" requiredMark />
               <Select label="Categoria" defaultValue="restaurante">
                 <option value="restaurante">Restaurante</option>
                 <option value="ginasio">Ginasio</option>
@@ -191,21 +191,21 @@ export function DesignSystemShowcase() {
                 label="Mensagem da campanha"
                 placeholder="Volte esta semana e ganhe pontos extra."
               />
-              <Input label="NUIT" error="Informe um NUIT valido." defaultValue="123" />
+              <Input label="NUIT" error="Informe um NUIT válido." defaultValue="123" />
             </div>
           </article>
           <article className="ds-example">
             <h3>Selecao</h3>
             <div className="ds-stack">
               <Checkbox
-                label="Enviar comprovativo por email"
+                label="Enviar comprovativo por e-mail"
                 hint="Cliente recebe os pontos e o resumo."
                 defaultChecked
               />
               <Radio label="Plano mensal" name="billing" defaultChecked />
               <Radio label="Plano anual" name="billing" />
               <Switch
-                label="Campanha activa"
+                label="Campanha ativa"
                 hint="Pode ser pausada a qualquer momento."
                 defaultChecked
               />
@@ -224,10 +224,10 @@ export function DesignSystemShowcase() {
               <Alert title="Pontos creditados" tone="success" icon={<Check size={18} />}>
                 O cliente recebeu 50 pontos neste estabelecimento.
               </Alert>
-              <Toast title="QR gerado" description="O codigo expira em 2 minutos." tone="info" />
+              <Toast title="QR gerado" description="O código expira em 2 minutos." tone="info" />
               <EmptyState
-                title="Ainda nao existem campanhas"
-                description="Crie a primeira campanha depois de configurar o programa de fidelizacao."
+                title="Ainda não existem campanhas"
+                description="Crie a primeira campanha depois de configurar o programa de fidelização."
                 icon={<Sparkles size={20} />}
                 action={<Button size="sm">Criar campanha</Button>}
               />
@@ -238,12 +238,12 @@ export function DesignSystemShowcase() {
 
       <section className="vy-container ds-section" aria-labelledby="navigation-heading">
         <div className="ds-section__header">
-          <span>Navegacao</span>
-          <h2 id="navigation-heading">Estruturas para publico e dashboards</h2>
+          <span>Navegação</span>
+          <h2 id="navigation-heading">Estruturas para público e dashboards</h2>
         </div>
         <div className="ds-component-grid">
           <article className="ds-example ds-wide">
-            <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Design System" }]} />
+            <Breadcrumb items={[{ label: "Início", href: "/" }, { label: "Design System" }]} />
             <Navbar
               brand="VUYELA"
               links={navLinks}
@@ -256,9 +256,9 @@ export function DesignSystemShowcase() {
           </article>
           <article className="ds-example">
             <Sidebar
-              title="Negocio"
+              title="Negócio"
               items={[
-                { label: "Dashboard", href: "#", active: true, icon: <Home size={16} /> },
+                { label: "Painel", href: "#", active: true, icon: <Home size={16} /> },
                 { label: "Clientes", href: "#", icon: <Users size={16} /> },
                 { label: "Programa", href: "#", icon: <Settings size={16} /> }
               ]}
@@ -268,8 +268,8 @@ export function DesignSystemShowcase() {
           <article className="ds-example">
             <BottomNavigation
               items={[
-                { label: "Inicio", href: "#", active: true, icon: <Home size={16} /> },
-                { label: "Cartoes", href: "#", icon: <CreditCard size={16} /> },
+                { label: "Início", href: "#", active: true, icon: <Home size={16} /> },
+                { label: "Cartões", href: "#", icon: <CreditCard size={16} /> },
                 { label: "Ofertas", href: "#", icon: <Ticket size={16} /> },
                 { label: "Perfil", href: "#", icon: <Users size={16} /> }
               ]}
@@ -281,7 +281,7 @@ export function DesignSystemShowcase() {
       <section className="vy-container ds-section" aria-labelledby="overlays-heading">
         <div className="ds-section__header">
           <span>Interacao</span>
-          <h2 id="overlays-heading">Overlays e organizacao de conteudo</h2>
+          <h2 id="overlays-heading">Sobreposições e organização de conteúdo</h2>
         </div>
         <div className="ds-component-grid">
           <article className="ds-example">
@@ -312,11 +312,11 @@ export function DesignSystemShowcase() {
                 {
                   value: "cliente",
                   label: "Cliente",
-                  content: <p>Saldo, cartoes e actividade recente.</p>
+                  content: <p>Saldo, cartões e atividade recente.</p>
                 },
                 {
                   value: "negocio",
-                  label: "Negocio",
+                  label: "Negócio",
                   content: <p>Clientes, campanhas e programa.</p>
                 }
               ]}
@@ -325,7 +325,7 @@ export function DesignSystemShowcase() {
               items={[
                 {
                   title: "Os pontos podem ser levantados?",
-                  content: "Nao. Sao valor promocional do negocio emissor."
+                  content: "Não. São valor promocional do negócio emissor."
                 },
                 {
                   title: "Os pontos expiram?",
@@ -343,7 +343,7 @@ export function DesignSystemShowcase() {
         aria-labelledby="loyalty-heading"
       >
         <div className="ds-section__header">
-          <span>Fidelizacao</span>
+          <span>Fidelização</span>
           <h2 id="loyalty-heading">Pontos, QR e ofertas</h2>
         </div>
         <div className="ds-component-grid">
@@ -373,7 +373,7 @@ export function DesignSystemShowcase() {
           <OfferCard
             title="Pontos em dobro ao almoco"
             businessName="Restaurante Mares"
-            description="Ganhe beneficios extra em compras validas de segunda a sexta."
+            description="Ganhe benefícios extra em compras validas de segunda a sexta."
             badge={<Badge tone="reward">Campanha</Badge>}
             action={
               <Button size="sm" variant="outline">
@@ -382,7 +382,7 @@ export function DesignSystemShowcase() {
             }
           />
           <QRDisplay code="VY-8F2K-91M" expiresAt="02:00" />
-          <QRScanner action={<Button size="sm">Activar camara</Button>} />
+          <QRScanner action={<Button size="sm">Ativar câmara</Button>} />
         </div>
       </section>
 
@@ -404,8 +404,8 @@ export function DesignSystemShowcase() {
             <Chip>Campanhas</Chip>
           </FilterBar>
           <DataTable
-            title="Transaccoes recentes"
-            description="Exemplo visual sem ligacao a base de dados."
+            title="Transações recentes"
+            description="Exemplo visual sem ligação a base de dados."
             columns={transactionColumns}
             rows={transactions}
             getRowKey={(row) => row.id}
@@ -413,7 +413,7 @@ export function DesignSystemShowcase() {
           />
           <div className="ds-skeleton-grid">
             <StatCard
-              label="Clientes activos"
+              label="Clientes ativos"
               value="1.284"
               delta="+12% vs. 30 dias"
               direction="up"
@@ -452,8 +452,8 @@ export function DesignSystemShowcase() {
         }
       >
         <p>
-          Use drawers para tarefas curtas, revisoes e configuracoes leves sem perder o contexto da
-          pagina.
+          Use drawers para tarefas curtas, revisoes e configurações leves sem perder o contexto da
+          página.
         </p>
       </Drawer>
     </main>

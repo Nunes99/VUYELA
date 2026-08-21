@@ -350,7 +350,7 @@ function buildActiveFilters(
     { key: "q", active: Boolean(params.q), label: `Texto: ${params.q}` },
     { key: "category", active: Boolean(category), label: `Categoria: ${category?.name ?? ""}` },
     { key: "city", active: Boolean(city), label: `Cidade: ${city?.name ?? ""}` },
-    { key: "offersOnly", active: params.offersOnly, label: "Com ofertas activas" },
+    { key: "offersOnly", active: params.offersOnly, label: "Com ofertas ativas" },
     { key: "openNow", active: params.openNow, label: "Aberto agora" },
     {
       key: "latitude",
@@ -386,7 +386,7 @@ function buildSearchSeoLinks(
     links.push({
       href: `/categorias/${category.slug}`,
       label: `Ver ${category.name}`,
-      description: "Pagina canonica da categoria."
+      description: "Página canonica da categoria."
     });
   }
 
@@ -394,7 +394,7 @@ function buildSearchSeoLinks(
     links.push({
       href: `/locais/${city.slug}`,
       label: `Ver ${city.name}`,
-      description: "Pagina canonica da cidade."
+      description: "Página canonica da cidade."
     });
   }
 
@@ -407,7 +407,7 @@ function buildSearchSeoLinks(
       links.push({
         href: `/locais/${city.slug}/${category.slug}`,
         label: `${category.name} em ${city.name}`,
-        description: "Pagina SEO da combinacao com conteudo suficiente."
+        description: "Página SEO da combinacao com conteúdo suficiente."
       });
     }
   }
@@ -416,7 +416,7 @@ function buildSearchSeoLinks(
     links.push({
       href: "/ofertas",
       label: "Todas as ofertas",
-      description: "Pagina canonica de ofertas activas."
+      description: "Página canonica de ofertas ativas."
     });
   }
 
@@ -455,16 +455,16 @@ function getSearchDescription(
   const filters = [
     category?.name,
     city?.name,
-    params.offersOnly ? "com ofertas activas" : null,
+    params.offersOnly ? "com ofertas ativas" : null,
     params.openNow ? "aberto agora quando houver horario publicado" : null,
     params.latitude !== null && params.longitude !== null ? "ordenado por proximidade" : null
   ].filter(Boolean);
 
   if (filters.length === 0) {
-    return "Use texto, categoria, cidade, ofertas e localizacao permitida para encontrar negocios VUYELA.";
+    return "Use texto, categoria, cidade, ofertas e localização permitida para encontrar negócios VUYELA.";
   }
 
-  return `Busca filtrada por ${filters.join(", ")}. URLs de busca sao partilháveis, mas ficam fora do indice para evitar combinacoes infinitas.`;
+  return `Pesquisa filtrada por ${filters.join(", ")}. Os URL de pesquisa são partilháveis, mas ficam fora do índice para evitar combinações infinitas.`;
 }
 
 function removeFilter(

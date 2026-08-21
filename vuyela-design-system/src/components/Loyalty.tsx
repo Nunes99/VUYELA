@@ -11,7 +11,7 @@ export function PointsBalance({
   businessName,
   points,
   valueMzn = points,
-  label = "Saldo disponivel",
+  label = "Saldo disponível",
   className = "",
   ...props
 }: PointsBalanceProps) {
@@ -148,7 +148,7 @@ export interface QRDisplayProps extends HTMLAttributes<HTMLDivElement> {
 
 export function QRDisplay({
   code,
-  label = "Codigo QR",
+  label = "Código QR",
   expiresAt,
   className = "",
   ...props
@@ -175,7 +175,7 @@ export interface QRScannerProps extends HTMLAttributes<HTMLDivElement> {
 
 export function QRScanner({
   title = "Ler QR Code",
-  description = "Aponte a camara para identificar o cartao ou validar a autorizacao.",
+  description = "Aponte a câmara para identificar o cartão ou validar a autorização.",
   action,
   className = "",
   ...props

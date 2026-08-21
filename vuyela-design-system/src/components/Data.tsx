@@ -107,14 +107,14 @@ export function Pagination({
   return (
     <nav
       className={["vy-pagination", className].filter(Boolean).join(" ")}
-      aria-label="Paginacao"
+      aria-label="Páginação"
       {...props}
     >
       <button type="button" onClick={onPrevious} disabled={page <= 1}>
         Anterior
       </button>
       <span>
-        Pagina {page} de {pageCount}
+        Página {page} de {pageCount}
       </span>
       <button type="button" onClick={onNext} disabled={page >= pageCount}>
         Seguinte

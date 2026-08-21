@@ -88,7 +88,7 @@ export async function getBusinessDashboard(
   if (memberships.length === 0) {
     return {
       status: "empty",
-      message: "Esta conta ainda nao tem permissao activa para o dashboard do negocio."
+      message: "Esta conta ainda não tem permissão ativa para o painel do negócio."
     };
   }
 
@@ -107,7 +107,7 @@ export async function getBusinessDashboard(
     ]);
 
   if (businessError || branchError) {
-    return { status: "error", message: "Nao foi possivel carregar o contexto do negocio." };
+    return { status: "error", message: "Não foi possível carregar o contexto do negócio." };
   }
 
   const businesses = buildBusinessOptions(
@@ -119,7 +119,7 @@ export async function getBusinessDashboard(
   if (businesses.length === 0) {
     return {
       status: "empty",
-      message: "Nao ha negocios ou filiais activos disponiveis para este dashboard."
+      message: "Não há negócios ou filiais ativos disponíveis para este painel."
     };
   }
 
@@ -133,20 +133,20 @@ export async function getBusinessDashboard(
   });
 
   if (error) {
-    return { status: "error", message: "Nao foi possivel carregar o dashboard do negocio." };
+    return { status: "error", message: "Não foi possível carregar o painel do negócio." };
   }
 
   const row = Array.isArray(data) ? (data[0] as BusinessDashboardRpcRow | undefined) : undefined;
 
   if (!row) {
-    return { status: "error", message: "Dashboard do negocio indisponivel." };
+    return { status: "error", message: "Painel do negócio indisponível." };
   }
 
   const business = objectFrom<BusinessDashboardBusiness>(row.business);
   const settings = objectFrom<BusinessDashboardSettings>(row.settings);
 
   if (!business || !settings) {
-    return { status: "error", message: "Dashboard do negocio incompleto." };
+    return { status: "error", message: "Painel do negócio incompleto." };
   }
 
   return {

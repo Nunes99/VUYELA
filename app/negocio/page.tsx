@@ -6,7 +6,7 @@ import { getBusinessDashboard } from "@/features/business-dashboard/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Negocio",
+  title: "Negócio",
   robots: {
     index: false,
     follow: false
@@ -35,7 +35,7 @@ export default async function BusinessAreaPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Dashboard do negocio">
+    <ProtectedRouteStateView state={state} title="Painel do negócio">
       {dashboardState ? <BusinessDashboardView state={dashboardState} /> : null}
     </ProtectedRouteStateView>
   );

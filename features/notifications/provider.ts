@@ -35,7 +35,7 @@ class UnsupportedNotificationProvider implements NotificationProvider {
   async deliver(): Promise<NotificationDeliveryResult> {
     return {
       ok: false,
-      message: `O canal ${this.channel} ainda nao esta configurado.`,
+      message: `O canal ${this.channel} ainda não está configurado.`,
       retryable: false
     };
   }

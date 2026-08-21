@@ -112,7 +112,7 @@ export async function getCustomerReferrals(profileId: string): Promise<CustomerR
     .order("joined_at", { ascending: false });
 
   if (cardError) {
-    return { status: "error", message: "Nao foi possivel carregar os cartoes de indicacao." };
+    return { status: "error", message: "Não foi possível carregar os cartões de indicação." };
   }
 
   const cards = rowsFrom<CustomerCardRow>(cardData);
@@ -120,7 +120,7 @@ export async function getCustomerReferrals(profileId: string): Promise<CustomerR
   if (cards.length === 0) {
     return {
       status: "empty",
-      message: "Adira a um negocio VUYELA para criar ou aceitar indicacoes."
+      message: "Adira a um negócio VUYELA para criar ou aceitar indicações."
     };
   }
 
@@ -166,7 +166,7 @@ export async function getCustomerReferrals(profileId: string): Promise<CustomerR
     sentResult.error ||
     receivedResult.error
   ) {
-    return { status: "error", message: "Nao foi possivel carregar as indicacoes." };
+    return { status: "error", message: "Não foi possível carregar as indicações." };
   }
 
   const businessById = toMap(rowsFrom<BusinessRow>(businessResult.data), (row) => row.id);
@@ -208,7 +208,7 @@ export async function getCustomerReferrals(profileId: string): Promise<CustomerR
   const referrals = referralRows.map((row) =>
     historyFromRow(row, {
       role: cardIdSet.has(row.referrer_card_id) ? "referrer" : "referred",
-      businessName: businessById.get(row.business_id)?.name ?? "Negocio VUYELA",
+      businessName: businessById.get(row.business_id)?.name ?? "Negócio VUYELA",
       pointValueMznMinor: loyaltyByBusinessId.get(row.business_id)?.point_value_mzn_minor ?? 0
     })
   );
@@ -232,7 +232,7 @@ export async function getBusinessReferrals(
   if (memberships.length === 0) {
     return {
       status: "empty",
-      message: "Indicacoes podem ser configuradas por admins ou owners do negocio."
+      message: "Indicações podem ser configuradas por administradores ou proprietários do negócio."
     };
   }
 
@@ -245,13 +245,13 @@ export async function getBusinessReferrals(
     .order("name", { ascending: true });
 
   if (businessError) {
-    return { status: "error", message: "Nao foi possivel carregar os negocios." };
+    return { status: "error", message: "Não foi possível carregar os negócios." };
   }
 
   const businesses = buildBusinessOptions(rowsFrom<BusinessRow>(businessData), memberships);
 
   if (businesses.length === 0) {
-    return { status: "empty", message: "Nao ha negocios activos disponiveis." };
+    return { status: "empty", message: "Não há negócios ativos disponíveis." };
   }
 
   const selectedBusiness =
@@ -285,7 +285,7 @@ export async function getBusinessReferrals(
   ]);
 
   if (programResult.error || loyaltyResult.error || referralResult.error || fraudResult.error) {
-    return { status: "error", message: "Nao foi possivel carregar o programa de indicacoes." };
+    return { status: "error", message: "Não foi possível carregar o programa de indicações." };
   }
 
   const program = rowFrom<ReferralProgramRow>(programResult.data);
@@ -303,7 +303,7 @@ export async function getBusinessReferrals(
       : { data: [], error: null };
 
   if (cardError) {
-    return { status: "error", message: "Nao foi possivel carregar os cartoes indicados." };
+    return { status: "error", message: "Não foi possível carregar os cartões indicados." };
   }
 
   const referrals = referralRows.map((row) =>

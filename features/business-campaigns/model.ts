@@ -146,16 +146,16 @@ export function getCampaignTypeLabel(type: CampaignType): string {
     welcome: "Boas-vindas",
     first_purchase: "Primeira compra",
     second_purchase: "Segunda compra",
-    birthday: "Aniversario",
-    inactive_customer: "Cliente inactivo",
+    birthday: "Aniversário",
+    inactive_customer: "Cliente inativo",
     double_points: "Pontos em dobro",
     specific_product: "Produto especifico",
     specific_time: "Horario especifico",
     weekend: "Fim de semana",
-    referral: "Indicacao",
+    referral: "Indicação",
     expiring_points: "Pontos a expirar",
     vip: "VIP",
-    location: "Localizacao"
+    location: "Localização"
   };
 
   return labels[type];
@@ -165,9 +165,9 @@ export function getCampaignStatusLabel(status: CampaignStatus): string {
   const labels: Record<CampaignStatus, string> = {
     draft: "Rascunho",
     scheduled: "Agendada",
-    active: "Activa",
+    active: "Ativa",
     paused: "Pausada",
-    completed: "Concluida",
+    completed: "Concluída",
     cancelled: "Cancelada"
   };
 
@@ -292,11 +292,11 @@ function getTypeEligibilityReason(
   input: { referenceAt: Date; inactiveDays?: number | undefined }
 ): string | null {
   if (campaignType === "welcome" || campaignType === "first_purchase") {
-    return customer.purchaseCount === 0 ? null : "Cliente ja comprou";
+    return customer.purchaseCount === 0 ? null : "Cliente já comprou";
   }
 
   if (campaignType === "second_purchase") {
-    return customer.purchaseCount === 1 ? null : "Cliente nao esta na segunda compra";
+    return customer.purchaseCount === 1 ? null : "O cliente não está na segunda compra";
   }
 
   if (campaignType === "inactive_customer") {
@@ -311,7 +311,7 @@ function getTypeEligibilityReason(
 
     return Number.isFinite(lastPurchase.getTime()) && lastPurchase.getTime() <= inactiveSince
       ? null
-      : "Cliente ainda activo";
+      : "Cliente ainda ativo";
   }
 
   return null;
@@ -337,40 +337,40 @@ function getAudienceEligibilityReason(
     audience.minPurchaseCount !== undefined &&
     customer.purchaseCount < audience.minPurchaseCount
   ) {
-    return "Compras abaixo do minimo";
+    return "Compras abaixo do mínimo";
   }
 
   if (
     audience.maxPurchaseCount !== undefined &&
     customer.purchaseCount > audience.maxPurchaseCount
   ) {
-    return "Compras acima do maximo";
+    return "Compras acima do máximo";
   }
 
   if (
     audience.minTotalSpentMznMinor !== undefined &&
     customer.totalSpentMznMinor < audience.minTotalSpentMznMinor
   ) {
-    return "Valor gasto abaixo do minimo";
+    return "Valor gasto abaixo do mínimo";
   }
 
   if (
     audience.minPointsBalance !== undefined &&
     customer.pointsBalance < audience.minPointsBalance
   ) {
-    return "Saldo de pontos abaixo do minimo";
+    return "Saldo de pontos abaixo do mínimo";
   }
 
   if (
     audience.maxPointsBalance !== undefined &&
     customer.pointsBalance > audience.maxPointsBalance
   ) {
-    return "Saldo de pontos acima do maximo";
+    return "Saldo de pontos acima do máximo";
   }
 
   if (audience.lastPurchaseBeforeDays !== undefined) {
     if (!customer.lastPurchaseAt) {
-      return "Cliente sem ultima compra";
+      return "Cliente sem última compra";
     }
 
     const lastPurchase = new Date(customer.lastPurchaseAt);
@@ -378,7 +378,7 @@ function getAudienceEligibilityReason(
       referenceAt.getTime() - audience.lastPurchaseBeforeDays * 24 * 60 * 60 * 1000;
 
     if (!Number.isFinite(lastPurchase.getTime()) || lastPurchase.getTime() > inactiveSince) {
-      return "Ultima compra ainda recente";
+      return "Última compra ainda recente";
     }
   }
 

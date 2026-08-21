@@ -197,7 +197,7 @@ export function describeAuditChange(beforeData: unknown, afterData: unknown): st
     .slice(0, 3)
     .map((key) => `${key}: ${formatValue(before[key])} -> ${formatValue(after[key])}`);
 
-  return changes.length > 0 ? changes.join("; ") : "Registo criado ou actualizado";
+  return changes.length > 0 ? changes.join("; ") : "Registo criado ou atualizado";
 }
 
 function formatValue(value: unknown): string {

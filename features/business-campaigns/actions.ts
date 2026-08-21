@@ -19,12 +19,7 @@ import type {
   CampaignRuleConfig,
   CampaignType
 } from "./model";
-
-export interface CampaignActionState {
-  status: "idle" | "error" | "success";
-  message: string;
-  campaignId: string | null;
-}
+import type { CampaignActionState } from "./state";
 
 interface CampaignCreateRow {
   campaign_id: string;
@@ -49,12 +44,6 @@ type ParseResult =
 
 type StringParseResult = { ok: true; value: string } | { ok: false; state: CampaignActionState };
 
-export const initialCampaignActionState: CampaignActionState = {
-  status: "idle",
-  message: "",
-  campaignId: null
-};
-
 export async function submitCampaignAction(
   _previousState: CampaignActionState,
   formData: FormData
@@ -67,7 +56,7 @@ export async function submitCampaignAction(
 
   if (!isSupabaseConfigured()) {
     return createErrorState(
-      "Supabase ainda nao esta configurado neste ambiente. Configure as variaveis antes de criar campanhas."
+      "Supabase ainda não está configurado neste ambiente. Configure as variáveis antes de criar campanhas."
     );
   }
 
@@ -90,13 +79,13 @@ export async function submitCampaignAction(
       return createErrorState("O limite de campanhas abertas do plano foi atingido.");
     }
 
-    return createErrorState("Nao foi possivel criar a campanha. Confirme permissoes e regras.");
+    return createErrorState("Não foi possível criar a campanha. Confirme permissões e regras.");
   }
 
   const row = Array.isArray(data) ? (data[0] as CampaignCreateRow | undefined) : undefined;
 
   if (!row) {
-    return createErrorState("Campanha criada, mas a resposta de analitica veio incompleta.");
+    return createErrorState("Campanha criada, mas a resposta de analítica veio incompleta.");
   }
 
   revalidatePath("/negocio");
@@ -112,7 +101,7 @@ export async function submitCampaignAction(
 }
 
 function parseCampaignForm(formData: FormData): ParseResult {
-  const businessId = getRequiredFormString(formData, "businessId", "Negocio");
+  const businessId = getRequiredFormString(formData, "businessId", "Negócio");
   if (!businessId.ok) {
     return businessId;
   }
@@ -132,16 +121,16 @@ function parseCampaignForm(formData: FormData): ParseResult {
   }
 
   if (!isCampaignType(campaignTypeValue.value)) {
-    return createParseError("Tipo de campanha invalido.");
+    return createParseError("Tipo de campanha inválido.");
   }
 
-  const rewardTypeValue = getRequiredFormString(formData, "rewardType", "Beneficio");
+  const rewardTypeValue = getRequiredFormString(formData, "rewardType", "Benefício");
   if (!rewardTypeValue.ok) {
     return rewardTypeValue;
   }
 
   if (!isCampaignRewardType(rewardTypeValue.value)) {
-    return createParseError("Beneficio da campanha invalido.");
+    return createParseError("Benefício da campanha inválido.");
   }
 
   const plannedChannelValue = getRequiredFormString(formData, "plannedChannel", "Canal");
@@ -150,15 +139,15 @@ function parseCampaignForm(formData: FormData): ParseResult {
   }
 
   if (!isCampaignPlannedChannel(plannedChannelValue.value)) {
-    return createParseError("Canal planeado invalido.");
+    return createParseError("Canal planeado inválido.");
   }
 
   if (!isDeliverableCampaignChannel(plannedChannelValue.value)) {
-    return createParseError("Este canal ainda nao esta disponivel para envio.");
+    return createParseError("Este canal ainda não está disponível para envio.");
   }
 
   if (plannedChannelValue.value === "email" && !isNotificationEmailConfigured()) {
-    return createParseError("O canal de email ainda nao esta configurado.");
+    return createParseError("O canal de e-mail ainda não está configurado.");
   }
 
   const startsAt = parseOptionalMaputoDate(formData, "startsAt");
@@ -172,7 +161,7 @@ function parseCampaignForm(formData: FormData): ParseResult {
   }
 
   if (startsAt.value && endsAt.value && new Date(endsAt.value) <= new Date(startsAt.value)) {
-    return createParseError("A data de fim deve ser posterior ao inicio.");
+    return createParseError("A data de fim deve ser posterior ao início.");
   }
 
   const rules = parseRules(formData, rewardTypeValue.value, plannedChannelValue.value);
@@ -215,7 +204,7 @@ function parseRules(
   const notificationSubject = getRequiredFormString(
     formData,
     "notificationSubject",
-    "Assunto da notificacao"
+    "Assunto da notificação"
   );
   if (!notificationSubject.ok) {
     return notificationSubject;
@@ -224,14 +213,14 @@ function parseRules(
   const notificationBody = getRequiredFormString(
     formData,
     "notificationBody",
-    "Mensagem da notificacao"
+    "Mensagem da notificação"
   );
   if (!notificationBody.ok) {
     return notificationBody;
   }
 
   if (notificationSubject.value.length > 120) {
-    return createParseError("O assunto da notificacao deve ter ate 120 caracteres.");
+    return createParseError("O assunto da notificação deve ter até 120 caracteres.");
   }
 
   if (notificationBody.value.length < 10 || notificationBody.value.length > 2000) {
@@ -298,17 +287,17 @@ function parseAudience(
     return maxPurchaseCount;
   }
 
-  const minTotalSpent = parseOptionalMoney(formData, "minTotalSpentMzn", "Gasto minimo");
+  const minTotalSpent = parseOptionalMoney(formData, "minTotalSpentMzn", "Gasto mínimo");
   if (!minTotalSpent.ok) {
     return minTotalSpent;
   }
 
-  const inactiveDays = parseOptionalInteger(formData, "lastPurchaseBeforeDays", "Dias inactivo");
+  const inactiveDays = parseOptionalInteger(formData, "lastPurchaseBeforeDays", "Dias inativo");
   if (!inactiveDays.ok) {
     return inactiveDays;
   }
 
-  const minPointsBalance = parseOptionalInteger(formData, "minPointsBalance", "Pontos minimos");
+  const minPointsBalance = parseOptionalInteger(formData, "minPointsBalance", "Pontos mínimos");
   if (!minPointsBalance.ok) {
     return minPointsBalance;
   }
@@ -316,7 +305,7 @@ function parseAudience(
   const city = getFormString(formData, "city");
 
   if (campaignType === "location" && !city) {
-    return createParseError("Campanhas por localizacao precisam de uma cidade.");
+    return createParseError("Campanhas por localização precisam de uma cidade.");
   }
 
   return {
@@ -346,7 +335,7 @@ function getRequiredFormString(formData: FormData, key: string, label: string): 
   const value = getFormString(formData, key);
 
   if (!value) {
-    return createParseError(`${label} e obrigatorio.`);
+    return createParseError(`${label} é obrigatório.`);
   }
 
   return {
@@ -363,7 +352,7 @@ function parseOptionalInteger(formData: FormData, key: string, label: string) {
   }
 
   if (!/^\d+$/.test(value)) {
-    return createParseError(`${label} deve ser um numero inteiro.`);
+    return createParseError(`${label} deve ser um número inteiro.`);
   }
 
   return { ok: true as const, value: Number(value) };
@@ -391,7 +380,7 @@ function parseOptionalMoney(formData: FormData, key: string, label: string) {
   }
 
   if (!/^\d+(?:\.\d{1,2})?$/.test(value)) {
-    return createParseError(`${label} deve usar MZN com ate duas casas decimais.`);
+    return createParseError(`${label} deve usar MZN com até duas casas decimais.`);
   }
 
   const [mznPart, centsPart = ""] = value.split(".");
@@ -412,7 +401,7 @@ function parseOptionalMaputoDate(formData: FormData, key: string) {
   const date = new Date(candidate);
 
   if (!Number.isFinite(date.getTime())) {
-    return createParseError("Data invalida.");
+    return createParseError("Data inválida.");
   }
 
   return { ok: true as const, value: date.toISOString() };

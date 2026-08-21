@@ -16,7 +16,7 @@ const baseCard: DigitalCustomerCard = {
   customerName: "Ana Mucavele",
   cardNumber: "VY-8F2K-91M",
   status: "active",
-  statusLabel: "Cartao digital",
+  statusLabel: "Cartão digital",
   joinedAt: "2026-08-13T06:00:00.000Z",
   availablePoints: 250,
   valueMzn: 250,

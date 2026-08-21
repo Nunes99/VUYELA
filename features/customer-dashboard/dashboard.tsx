@@ -14,11 +14,11 @@ interface CustomerDashboardViewProps {
 }
 
 const navItems = [
-  { href: "#inicio", label: "Inicio", icon: Home },
-  { href: "#cartoes", label: "Cartoes", icon: CreditCard },
+  { href: "#inicio", label: "Início", icon: Home },
+  { href: "#cartoes", label: "Cartões", icon: CreditCard },
   { href: "#explorar", label: "Explorar", icon: Search },
-  { href: "#actividade", label: "Actividade", icon: Activity },
-  { href: "/cliente/indicacoes", label: "Indicacoes", icon: UserPlus },
+  { href: "#actividade", label: "Atividade", icon: Activity },
+  { href: "/cliente/indicacoes", label: "Indicações", icon: UserPlus },
   { href: "#notificacoes", label: "Avisos", icon: Bell },
   { href: "#perfil", label: "Perfil", icon: User }
 ];
@@ -26,8 +26,8 @@ const navItems = [
 export function CustomerDashboardView({ state }: CustomerDashboardViewProps) {
   if (state.status === "error") {
     return (
-      <div className="customer-dashboard-notice customer-dashboard-notice--error" role="status">
-        <h2>Dashboard indisponivel</h2>
+      <div className="customer-painel-notice customer-painel-notice--error" role="status">
+        <h2>Painel indisponível</h2>
         <p>{state.message}</p>
       </div>
     );
@@ -44,7 +44,7 @@ export function CustomerDashboardView({ state }: CustomerDashboardViewProps) {
 
 function CustomerDashboardNav() {
   return (
-    <nav className="customer-dashboard-nav" aria-label="Navegacao do cliente">
+    <nav className="customer-dashboard-nav" aria-label="Navegação do cliente">
       {navItems.map((item) => {
         const Icon = item.icon;
 
@@ -62,10 +62,10 @@ function CustomerDashboardNav() {
 function CustomerDashboardEmpty({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <section className="customer-dashboard-notice" aria-labelledby="customer-dashboard-empty">
-      <h2 id="customer-dashboard-empty">Ainda nao ha actividade</h2>
+      <h2 id="customer-dashboard-empty">Ainda não há atividade</h2>
       <p>
-        {dashboard.profile.displayName}, quando aderir a negocios VUYELA, os seus cartoes,
-        movimentos e ofertas publicas aparecem aqui.
+        {dashboard.profile.displayName}, quando aderir a negócios VUYELA, os seus cartões,
+        movimentos e ofertas públicas aparecem aqui.
       </p>
     </section>
   );
@@ -81,9 +81,9 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
         aria-labelledby="customer-home-title"
       >
         <div>
-          <span className="customer-dashboard-eyebrow">Inicio</span>
-          <h2 id="customer-home-title">Ola, {dashboard.profile.displayName}</h2>
-          <p>Resumo dos seus cartoes VUYELA e pontos promocionais por estabelecimento.</p>
+          <span className="customer-dashboard-eyebrow">Início</span>
+          <h2 id="customer-home-title">Olá, {dashboard.profile.displayName}</h2>
+          <p>Resumo dos seus cartões VUYELA e pontos promocionais por estabelecimento.</p>
         </div>
 
         <div className="customer-dashboard-stats" aria-label="Resumo de pontos">
@@ -94,15 +94,15 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
             Equivalente<strong>{dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN</strong>
           </span>
           <span>
-            Cartoes activos<strong>{dashboard.activeCardCount.toLocaleString("pt-MZ")}</strong>
+            Cartões ativos<strong>{dashboard.activeCardCount.toLocaleString("pt-MZ")}</strong>
           </span>
         </div>
       </section>
 
       <section id="cartoes" aria-labelledby="customer-cards-title">
         <div className="customer-dashboard-section-heading">
-          <span className="customer-dashboard-eyebrow">Cartoes</span>
-          <h2 id="customer-cards-title">Cartoes digitais</h2>
+          <span className="customer-dashboard-eyebrow">Cartões</span>
+          <h2 id="customer-cards-title">Cartões digitais</h2>
         </div>
         <CustomerCardsView
           state={
@@ -116,7 +116,7 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
       <section id="explorar" aria-labelledby="customer-explore-title">
         <div className="customer-dashboard-section-heading">
           <span className="customer-dashboard-eyebrow">Explorar</span>
-          <h2 id="customer-explore-title">Ofertas publicas</h2>
+          <h2 id="customer-explore-title">Ofertas públicas</h2>
         </div>
         {dashboard.hasOffers ? (
           <div className="customer-dashboard-offers">
@@ -131,15 +131,15 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
           </div>
         ) : (
           <SectionEmpty
-            title="Sem ofertas publicas"
-            body="Quando houver ofertas activas, aparecem aqui."
+            title="Sem ofertas públicas"
+            body="Quando houver ofertas ativas, aparecem aqui."
           />
         )}
       </section>
 
       <section id="actividade" aria-labelledby="customer-activity-title">
         <div className="customer-dashboard-section-heading">
-          <span className="customer-dashboard-eyebrow">Actividade</span>
+          <span className="customer-dashboard-eyebrow">Atividade</span>
           <h2 id="customer-activity-title">Movimentos recentes</h2>
         </div>
         {dashboard.hasActivity ? (
@@ -157,17 +157,17 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
           </div>
         ) : (
           <SectionEmpty
-            title="Sem actividade recente"
+            title="Sem atividade recente"
             body="Compras, ganhos e resgates aparecem aqui."
           />
         )}
       </section>
 
       <section id="notificacoes" aria-labelledby="customer-notifications-title">
-        <div className="customer-dashboard-section-heading customer-notification-heading">
+        <div className="customer-painel-section-heading customer-notification-heading">
           <div>
             <span className="customer-dashboard-eyebrow">Avisos</span>
-            <h2 id="customer-notifications-title">Notificacoes</h2>
+            <h2 id="customer-notifications-title">Notificações</h2>
           </div>
           {dashboard.unreadNotificationCount > 0 ? (
             <span className="customer-notification-count">
@@ -189,12 +189,12 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
             <dd>{dashboard.profile.displayName}</dd>
           </div>
           <div>
-            <dt>Email</dt>
-            <dd>{dashboard.profile.email ?? "Nao definido"}</dd>
+            <dt>E-mail</dt>
+            <dd>{dashboard.profile.email ?? "Não definido"}</dd>
           </div>
           <div>
             <dt>Telefone</dt>
-            <dd>{dashboard.profile.phone ?? "Nao definido"}</dd>
+            <dd>{dashboard.profile.phone ?? "Não definido"}</dd>
           </div>
           <div>
             <dt>Idioma</dt>
@@ -202,7 +202,7 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
           </div>
           <div>
             <dt>Marketing</dt>
-            <dd>{dashboard.profile.marketingConsent ? "Consentido" : "Nao consentido"}</dd>
+            <dd>{dashboard.profile.marketingConsent ? "Consentido" : "Não consentido"}</dd>
           </div>
         </dl>
       </section>

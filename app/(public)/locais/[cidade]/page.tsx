@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 
   if (!viewModel) {
     return {
-      title: "Local nao encontrado",
+      title: "Local não encontrado",
       robots: {
         index: false,
         follow: false

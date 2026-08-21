@@ -248,13 +248,13 @@ function buildReports(input: {
     },
     {
       id: "liability",
-      label: "Liability",
+      label: "Responsabilidade",
       value: formatMznMinor(input.liabilityMznMinor),
       detail: "Valor promocional ainda em aberto"
     },
     {
       id: "retention",
-      label: "Retencao",
+      label: "Retenção",
       value: formatPercent(input.retentionRate),
       detail: "Clientes com mais de uma compra"
     },
@@ -262,7 +262,7 @@ function buildReports(input: {
       id: "campaigns",
       label: "Campanhas",
       value: input.campaignCount.toLocaleString("pt-MZ"),
-      detail: "Campanhas no negocio"
+      detail: "Campanhas no negócio"
     }
   ];
 }

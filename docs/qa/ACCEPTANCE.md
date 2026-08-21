@@ -290,3 +290,13 @@ A feature is complete only when:
 - point earning and redemption continue to require online server validation;
 - desktop and mobile Playwright projects verify installation metadata and the offline card flow;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Interface Language And Server Action Acceptance
+
+- all user-visible copy uses reviewed European Portuguese while retaining the `pt-MZ` market locale;
+- account flows use “registar”, “palavra-passe” and “e-mail” consistently;
+- current Portuguese orthography is used for forms such as “atividade”, “atualizar” and “ativo”;
+- technical route names, database values and API contracts remain unchanged;
+- every `use server` module exports only asynchronous runtime functions;
+- client-side initial form state is exported from a separate module;
+- integration tests prevent regressions in both language and server action module boundaries.

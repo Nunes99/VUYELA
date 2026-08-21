@@ -77,7 +77,7 @@ describe("subscription model", () => {
     expect(getUsageRatio(3, 5)).toBe(0.6);
     expect(getUsageRatio(8, 5)).toBe(1);
     expect(getUsageRatio(8, null)).toBe(0);
-    expect(getAnalyticsLabel("advanced")).toBe("Avancada");
+    expect(getAnalyticsLabel("advanced")).toBe("Avançada");
     expect(getFeatureLabel("campaign_delivery")).toBe("Envio de campanhas");
   });
 });

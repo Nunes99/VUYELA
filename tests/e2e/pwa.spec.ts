@@ -84,10 +84,10 @@ test("opens previously loaded card identification while offline", async ({ page,
   await context.setOffline(true);
   try {
     await page.goto("/cliente");
-    await expect(page.getByRole("heading", { name: "Cartoes disponiveis offline" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Cartões disponíveis offline" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Cafe Central" })).toBeVisible();
     await expect(page.getByText("VY-OFFLINE-0001", { exact: true })).toBeVisible();
-    await expect(page.getByText(/usar pontos requer ligacao/i)).toBeVisible();
+    await expect(page.getByText(/usar pontos requer ligação/i)).toBeVisible();
     await expect(page.getByRole("button", { name: "Remover deste dispositivo" })).toBeVisible();
   } finally {
     await context.setOffline(false);

@@ -5,8 +5,8 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { UpdatePasswordForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
-  title: "Definir nova senha",
-  description: "Defina uma nova senha para a sua conta VUYELA.",
+  title: "Definir nova palavra-passe",
+  description: "Defina uma nova palavra-passe para a sua conta VUYELA.",
   robots: {
     index: false,
     follow: false
@@ -21,10 +21,11 @@ export default function UpdatePasswordPage() {
       <section className="auth-shell auth-shell--single" aria-labelledby="update-password-title">
         <div className="auth-panel auth-panel--forms">
           <VuyelaLogo className="auth-brand auth-brand--dark" />
-          <span className="auth-kicker">Nova senha</span>
-          <h1 id="update-password-title">Defina uma nova senha segura.</h1>
+          <span className="auth-kicker">Nova palavra-passe</span>
+          <h1 id="update-password-title">Defina uma nova palavra-passe segura.</h1>
           <p className="auth-intro">
-            O link recebido por email abriu uma sessao temporaria para actualizar a sua senha.
+            O link recebido por e-mail abriu uma sessão temporária para atualizar a sua
+            palavra-passe.
           </p>
           <UpdatePasswordForm />
           <p className="auth-footnote">

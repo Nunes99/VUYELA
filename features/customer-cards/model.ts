@@ -116,12 +116,12 @@ function getStatusLabel(status: CardStatus): string {
     return "Arquivado";
   }
 
-  return "Cartao digital";
+  return "Cartão digital";
 }
 
 function getExpiryLabel(pointsExpireAfterDays: number | null): string {
   if (pointsExpireAfterDays === null) {
-    return "Pontos sem expiracao configurada";
+    return "Pontos sem expiração configurada";
   }
 
   if (pointsExpireAfterDays === 1) {

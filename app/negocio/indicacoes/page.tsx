@@ -6,7 +6,7 @@ import { getBusinessReferrals } from "@/features/referrals/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Indicacoes do negocio",
+  title: "Indicações do negócio",
   robots: {
     index: false,
     follow: false
@@ -34,7 +34,7 @@ export default async function BusinessReferralsPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Indicacoes do negocio">
+    <ProtectedRouteStateView state={state} title="Indicações do negócio">
       {referralState ? <BusinessReferralsView state={referralState} /> : null}
     </ProtectedRouteStateView>
   );

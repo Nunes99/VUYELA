@@ -70,7 +70,7 @@ export async function getCustomerCards(profileId: string): Promise<CustomerCards
     .order("joined_at", { ascending: false });
 
   if (cardError) {
-    return { status: "error", message: "Nao foi possivel carregar os seus cartoes." };
+    return { status: "error", message: "Não foi possível carregar os seus cartões." };
   }
 
   const cardRows = rowsFrom<CustomerCardRow>(cardData).filter(isRenderableCardRow);
@@ -112,7 +112,7 @@ export async function getCustomerCards(profileId: string): Promise<CustomerCards
   ]);
 
   if (profileError || businessError || programError || walletError || tierError) {
-    return { status: "error", message: "Nao foi possivel montar os dados dos cartoes." };
+    return { status: "error", message: "Não foi possível montar os dados dos cartões." };
   }
 
   const profile = rowFrom<ProfileRow>(profileData);

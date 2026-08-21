@@ -20,7 +20,7 @@ function getRequiredFormString(formData: FormData, key: string, label: string) {
       ok: false as const,
       state: {
         status: "error" as const,
-        message: `${label} e obrigatorio.`
+        message: `${label} é obrigatório.`
       }
     };
   }
@@ -45,7 +45,7 @@ function getSupabaseNotConfiguredState(): AuthActionState {
   return {
     status: "error",
     message:
-      "A autenticacao ainda nao esta configurada neste ambiente. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      "A autenticação ainda não está configurada neste ambiente. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY."
   };
 }
 
@@ -89,12 +89,12 @@ export async function signInWithEmailAction(
     return getSupabaseNotConfiguredState();
   }
 
-  const email = getRequiredFormString(formData, "email", "Email");
+  const email = getRequiredFormString(formData, "email", "E-mail");
   if (!email.ok) {
     return email.state;
   }
 
-  const password = getRequiredFormString(formData, "password", "Senha");
+  const password = getRequiredFormString(formData, "password", "Palavra-passe");
   if (!password.ok) {
     return password.state;
   }
@@ -108,7 +108,7 @@ export async function signInWithEmailAction(
   if (error) {
     return {
       status: "error",
-      message: "Nao foi possivel entrar. Confirme o email e a senha."
+      message: "Não foi possível entrar. Confirme o e-mail e a palavra-passe."
     };
   }
 
@@ -126,7 +126,7 @@ export async function requestPhoneOtpAction(
   if (!isPhoneAuthEnabled()) {
     return {
       status: "error",
-      message: "A autenticacao por telefone ainda nao esta disponivel."
+      message: "A autenticação por telefone ainda não está disponível."
     };
   }
 
@@ -143,13 +143,13 @@ export async function requestPhoneOtpAction(
   if (error) {
     return {
       status: "error",
-      message: "Nao foi possivel enviar o codigo. Confirme o telefone."
+      message: "Não foi possível enviar o código. Confirme o telefone."
     };
   }
 
   return {
     status: "success",
-    message: "Codigo enviado. Introduza o codigo recebido por SMS para continuar."
+    message: "Código enviado. Introduza o código recebido por SMS para continuar."
   };
 }
 
@@ -164,7 +164,7 @@ export async function verifyPhoneOtpAction(
   if (!isPhoneAuthEnabled()) {
     return {
       status: "error",
-      message: "A autenticacao por telefone ainda nao esta disponivel."
+      message: "A autenticação por telefone ainda não está disponível."
     };
   }
 
@@ -173,7 +173,7 @@ export async function verifyPhoneOtpAction(
     return phone.state;
   }
 
-  const token = getRequiredFormString(formData, "token", "Codigo");
+  const token = getRequiredFormString(formData, "token", "Código");
   if (!token.ok) {
     return token.state;
   }
@@ -188,7 +188,7 @@ export async function verifyPhoneOtpAction(
   if (error) {
     return {
       status: "error",
-      message: "Codigo invalido ou expirado."
+      message: "Código inválido ou expirado."
     };
   }
 
@@ -208,12 +208,12 @@ export async function signUpWithEmailAction(
     return displayName.state;
   }
 
-  const email = getRequiredFormString(formData, "email", "Email");
+  const email = getRequiredFormString(formData, "email", "E-mail");
   if (!email.ok) {
     return email.state;
   }
 
-  const password = getRequiredFormString(formData, "password", "Senha");
+  const password = getRequiredFormString(formData, "password", "Palavra-passe");
   if (!password.ok) {
     return password.state;
   }
@@ -234,7 +234,7 @@ export async function signUpWithEmailAction(
   if (error) {
     return {
       status: "error",
-      message: "Nao foi possivel criar a conta. Tente novamente."
+      message: "Não foi possível criar a conta. Tente novamente."
     };
   }
 
@@ -244,7 +244,7 @@ export async function signUpWithEmailAction(
 
   return {
     status: "success",
-    message: "Conta criada. Confirme o email para terminar a entrada."
+    message: "Conta criada. Confirme o e-mail para terminar a entrada."
   };
 }
 
@@ -256,7 +256,7 @@ export async function requestPasswordResetAction(
     return getSupabaseNotConfiguredState();
   }
 
-  const email = getRequiredFormString(formData, "email", "Email");
+  const email = getRequiredFormString(formData, "email", "E-mail");
   if (!email.ok) {
     return email.state;
   }
@@ -269,13 +269,13 @@ export async function requestPasswordResetAction(
   if (error) {
     return {
       status: "error",
-      message: "Nao foi possivel enviar o link de recuperacao."
+      message: "Não foi possível enviar o link de recuperação."
     };
   }
 
   return {
     status: "success",
-    message: "Enviamos as instrucoes de recuperacao para o email indicado."
+    message: "Enviamos as instruções de recuperação para o e-mail indicado."
   };
 }
 
@@ -287,7 +287,7 @@ export async function updatePasswordAction(
     return getSupabaseNotConfiguredState();
   }
 
-  const password = getRequiredFormString(formData, "password", "Nova senha");
+  const password = getRequiredFormString(formData, "password", "Nova palavra-passe");
   if (!password.ok) {
     return password.state;
   }
@@ -295,14 +295,14 @@ export async function updatePasswordAction(
   if (password.value.length < 8) {
     return {
       status: "error",
-      message: "A nova senha deve ter pelo menos 8 caracteres."
+      message: "A nova palavra-passe deve ter pelo menos 8 caracteres."
     };
   }
 
   const passwordConfirmation = getRequiredFormString(
     formData,
     "passwordConfirmation",
-    "Confirmacao da senha"
+    "Confirmação da palavra-passe"
   );
   if (!passwordConfirmation.ok) {
     return passwordConfirmation.state;
@@ -311,7 +311,7 @@ export async function updatePasswordAction(
   if (password.value !== passwordConfirmation.value) {
     return {
       status: "error",
-      message: "As senhas introduzidas nao coincidem."
+      message: "As palavras-passe introduzidas não coincidem."
     };
   }
 
@@ -323,7 +323,7 @@ export async function updatePasswordAction(
   if (!user) {
     return {
       status: "error",
-      message: "O link de recuperacao expirou. Solicite um novo link."
+      message: "O link de recuperação expirou. Solicite um novo link."
     };
   }
 
@@ -332,7 +332,7 @@ export async function updatePasswordAction(
   if (error) {
     return {
       status: "error",
-      message: "Nao foi possivel actualizar a senha. Solicite um novo link."
+      message: "Não foi possível atualizar a palavra-passe. Solicite um novo link."
     };
   }
 
@@ -380,13 +380,13 @@ export async function updateCustomerProfileAction(
   if (error) {
     return {
       status: "error",
-      message: "Nao foi possivel guardar o perfil."
+      message: "Não foi possível guardar o perfil."
     };
   }
 
   return {
     status: "success",
-    message: "Perfil guardado. Ja pode avancar para os cartoes digitais."
+    message: "Perfil guardado. Já pode avançar para os cartões digitais."
   };
 }
 
@@ -398,7 +398,7 @@ export async function submitBusinessOnboardingAction(
     return getSupabaseNotConfiguredState();
   }
 
-  const businessName = getRequiredFormString(formData, "businessName", "Nome do negocio");
+  const businessName = getRequiredFormString(formData, "businessName", "Nome do negócio");
   if (!businessName.ok) {
     return businessName.state;
   }
@@ -421,7 +421,7 @@ export async function submitBusinessOnboardingAction(
   if (!user) {
     return {
       status: "error",
-      message: "Entre na sua conta para cadastrar um negocio."
+      message: "Entre na sua conta para registar um negócio."
     };
   }
 
@@ -442,7 +442,7 @@ export async function submitBusinessOnboardingAction(
     if (error.code === "23514" && error.message.includes("businesses_nuit_format")) {
       return {
         status: "error",
-        message: "O NUIT deve ter entre 9 e 12 algarismos. Confirme o numero e tente novamente."
+        message: "O NUIT deve ter entre 9 e 12 algarismos. Confirme o número e tente novamente."
       };
     }
 
@@ -450,19 +450,19 @@ export async function submitBusinessOnboardingAction(
       return {
         status: "error",
         message:
-          "Ja existe um pedido para este negocio nesta conta. Aguarde a validacao da equipa VUYELA."
+          "Já existe um pedido para este negócio nesta conta. Aguarde a validação da equipa VUYELA."
       };
     }
 
     return {
       status: "error",
-      message: "Nao foi possivel cadastrar o negocio agora. Reveja os dados e tente novamente."
+      message: "Não foi possível registar o negócio agora. Reveja os dados e tente novamente."
     };
   }
 
   return {
     status: "success",
-    message: "Pedido recebido. O negocio ficou pendente de validacao da equipa VUYELA."
+    message: "Pedido recebido. O negócio ficou pendente de validação da equipa VUYELA."
   };
 }
 

@@ -11,7 +11,7 @@ import { getAuthContext } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Verificacao adicional",
-  description: "Verificacao multifactor para funcoes privilegiadas VUYELA.",
+  description: "Verificacao multifactor para funções privilegiadas VUYELA.",
   robots: {
     index: false,
     follow: false
@@ -50,11 +50,12 @@ export default async function MfaPage({ searchParams }: MfaPageProps) {
           <span className="auth-kicker">Verificacao em dois passos</span>
           <h1 id="mfa-title">Verificacao adicional necessaria.</h1>
           <p className="auth-intro">
-            Funcoes de suporte e administracao exigem um codigo temporario alem da sua senha.
+            Funções de suporte e administração exigem um código temporário além da sua
+            palavra-passe.
           </p>
           <MfaForm nextPath={nextPath} />
           <p className="auth-footnote">
-            Nao consegue concluir? <Link href="/entrar">Voltar ao login</Link>.
+            Não consegue concluir? <Link href="/entrar">Voltar ao login</Link>.
           </p>
         </div>
       </section>

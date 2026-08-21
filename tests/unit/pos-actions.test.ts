@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   confirmPosTransactionAction,
-  initialPosActionState,
   quotePosTransactionAction,
   submitPosAction
 } from "@/features/pos/actions";
-import type { PosActionState } from "@/features/pos/actions";
+import { initialPosActionState } from "@/features/pos/state";
+import type { PosActionState } from "@/features/pos/state";
 
 const identifiedState: PosActionState = {
   ...initialPosActionState,
@@ -60,7 +60,7 @@ describe("POS server actions", () => {
     const state = await confirmPosTransactionAction(quotedState, formWith({}));
 
     expect(state.status).toBe("error");
-    expect(state.message).toBe("Confirme a autorizacao do cliente antes de concluir.");
+    expect(state.message).toBe("Confirme a autorização do cliente antes de concluir.");
   });
 
   it("routes the unified POS action by intent", async () => {

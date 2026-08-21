@@ -13,14 +13,14 @@ export function BusinessSubscriptionView({ state }: { state: BusinessSubscriptio
     return (
       <section
         className={`business-dashboard-notice${
-          state.status === "error" ? " business-dashboard-notice--error" : ""
+          state.status === "error" ? " business-painel-notice--error" : ""
         }`}
         aria-labelledby="business-subscription-notice"
       >
-        <h2 id="business-subscription-notice">Subscricao indisponivel</h2>
+        <h2 id="business-subscription-notice">Subscrição indisponível</h2>
         <p>{state.message}</p>
         <Link className="business-campaign-link" href="/negocio">
-          Voltar ao dashboard
+          Voltar ao painel
         </Link>
       </section>
     );
@@ -40,9 +40,9 @@ export function BusinessSubscriptionView({ state }: { state: BusinessSubscriptio
 
       <section className="business-subscription-hero" aria-labelledby="subscription-title">
         <div>
-          <span className="business-dashboard-eyebrow">Subscricao</span>
-          <h2 id="subscription-title">{subscription?.plan.name ?? "Sem plano activo"}</h2>
-          <p>{selectedBusiness?.name ?? "Negocio VUYELA"}</p>
+          <span className="business-dashboard-eyebrow">Subscrição</span>
+          <h2 id="subscription-title">{subscription?.plan.name ?? "Sem plano ativo"}</h2>
+          <p>{selectedBusiness?.name ?? "Negócio VUYELA"}</p>
         </div>
         <div className="business-subscription-hero__summary">
           <span
@@ -65,7 +65,7 @@ export function BusinessSubscriptionView({ state }: { state: BusinessSubscriptio
         <section className="business-subscription-section" aria-labelledby="usage-title">
           <div className="business-dashboard-section-heading">
             <span className="business-dashboard-eyebrow">Consumo</span>
-            <h2 id="usage-title">Capacidade actual</h2>
+            <h2 id="usage-title">Capacidade atual</h2>
           </div>
           <div className="business-subscription-usage-grid">
             <UsageMeter
@@ -89,7 +89,7 @@ export function BusinessSubscriptionView({ state }: { state: BusinessSubscriptio
             <article className="business-subscription-usage">
               <div className="business-subscription-usage__heading">
                 <BarChart3 aria-hidden="true" size={20} />
-                <span>Analitica</span>
+                <span>Analítica</span>
               </div>
               <strong>{getAnalyticsLabel(entitlements.analyticsLevel)}</strong>
             </article>
@@ -101,7 +101,7 @@ export function BusinessSubscriptionView({ state }: { state: BusinessSubscriptio
       <section className="business-subscription-section" aria-labelledby="plans-title">
         <div className="business-dashboard-section-heading">
           <span className="business-dashboard-eyebrow">Planos</span>
-          <h2 id="plans-title">Catalogo disponivel</h2>
+          <h2 id="plans-title">Catálogo disponível</h2>
         </div>
         <PlanGrid currentPlanId={subscription?.plan.id ?? null} plans={availablePlans} />
       </section>
@@ -117,13 +117,13 @@ function SubscriptionContextSwitcher({
   selectedBusinessId: string;
 }) {
   return (
-    <section className="business-dashboard-switcher" aria-label="Contexto da subscricao">
+    <section className="business-dashboard-switcher" aria-label="Contexto da subscrição">
       <div>
         <span className="business-dashboard-eyebrow">Contexto</span>
-        <h2>Plano do negocio</h2>
+        <h2>Plano do negócio</h2>
       </div>
       <div className="business-dashboard-switcher__actions">
-        <Link href="/negocio">Dashboard</Link>
+        <Link href="/negocio">Painel</Link>
         {businesses.map((business) => (
           <Link
             className={business.id === selectedBusinessId ? "is-active" : ""}
@@ -201,7 +201,7 @@ function PlanGrid({
   currentPlanId: string | null;
 }) {
   if (plans.length === 0) {
-    return <p className="business-dashboard-empty">Nenhum plano publico disponivel.</p>;
+    return <p className="business-dashboard-empty">Nenhum plano público disponível.</p>;
   }
 
   return (
@@ -215,7 +215,7 @@ function PlanGrid({
         >
           <div className="business-subscription-plan__heading">
             <div>
-              <span>{plan.id === currentPlanId ? "Plano actual" : "Plano"}</span>
+              <span>{plan.id === currentPlanId ? "Plano atual" : "Plano"}</span>
               <h3>{plan.name}</h3>
             </div>
             <CreditCard aria-hidden="true" size={20} />
@@ -230,7 +230,7 @@ function PlanGrid({
             <PlanFact label="Filiais" value={formatEntitlementLimit(plan.branchLimit)} />
             <PlanFact label="Equipa" value={formatEntitlementLimit(plan.staffLimit)} />
             <PlanFact label="Campanhas" value={formatEntitlementLimit(plan.campaignLimit)} />
-            <PlanFact label="Analitica" value={getAnalyticsLabel(plan.analyticsLevel)} />
+            <PlanFact label="Analítica" value={getAnalyticsLabel(plan.analyticsLevel)} />
           </dl>
         </article>
       ))}
@@ -250,12 +250,12 @@ function PlanFact({ label, value }: { label: string; value: string }) {
 function getSubscriptionStatusLabel(status: string | undefined): string {
   const labels: Record<string, string> = {
     trialing: "Em teste",
-    active: "Activa",
+    active: "Ativa",
     past_due: "Pagamento pendente",
     paused: "Pausada"
   };
 
-  return status ? (labels[status] ?? status) : "Sem subscricao";
+  return status ? (labels[status] ?? status) : "Sem subscrição";
 }
 
 function getSubscriptionStatusTone(status: string | undefined): string {

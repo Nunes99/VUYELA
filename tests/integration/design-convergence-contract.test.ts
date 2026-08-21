@@ -24,19 +24,19 @@ describe("approved VUYELA design contract", () => {
     expect(pageStyles).toContain("/brand/pattern.svg");
     expect(homepage).toContain("VuyelaLogo");
     expect(homepage).toContain("Cada compra");
-    expect(homepage).toContain("cria uma razao");
+    expect(homepage).toContain("cria uma razão");
     expect(homepage).toContain("para voltar.");
   });
 
   it("includes the four documented benefit categories", () => {
     expect(homepage).toContain("Descontos exclusivos");
     expect(homepage).toContain("Pontos que tem valor");
-    expect(homepage).toContain("Estabelecimentos proximos");
+    expect(homepage).toContain("Estabelecimentos próximos");
     expect(homepage).toContain("Ofertas personalizadas");
   });
 
   it("retains the five documented customer mobile navigation destinations", () => {
-    for (const label of ["Inicio", "Cartoes", "Explorar", "Actividade", "Perfil"]) {
+    for (const label of ["Início", "Cartões", "Explorar", "Atividade", "Perfil"]) {
       expect(customerDashboard).toContain(`label: "${label}"`);
     }
 
