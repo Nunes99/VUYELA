@@ -2,6 +2,7 @@ import { Activity, Bell, CreditCard, Home, Search, User, UserPlus } from "lucide
 
 import { CustomerCardsView } from "@/features/customer-cards/card-list";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
+import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
 import { TransactionItem } from "../../vuyela-design-system/src/components/Loyalty";
 import { OfferCard } from "../../vuyela-design-system/src/components/Loyalty";
 
@@ -73,6 +74,7 @@ function CustomerDashboardEmpty({ dashboard }: { dashboard: CustomerDashboardVie
 function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <>
+      <OfflineCardSync cards={dashboard.cards} />
       <section
         className="customer-dashboard-home"
         id="inicio"

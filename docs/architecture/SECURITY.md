@@ -85,6 +85,17 @@ The POS route uses centralized protected-route helpers and is limited to active 
 
 FASE 09 adds `lookup_pos_customer_card` for identifying active cards through a server-side RPC guarded by `can_access_transaction`. Transaction completion still uses the FASE 06 loyalty RPCs, so wallet balances and ledger rows are never written directly from browser code.
 
+## PWA Security
+
+FASE 18 never caches authenticated dashboard HTML, API responses, Supabase requests, balances,
+transactions, profile fields, or point authorizations. Cache Storage contains only the public
+offline shell and immutable application assets. IndexedDB contains the minimum active-card
+identification payload and can be cleared from the offline screen.
+
+The service worker handles only `GET` requests and implements no Background Sync queue. Offline QR
+codes identify a card but cannot authorize earning or redemption; all loyalty writes continue
+through the existing online server actions and transactional PostgreSQL RPCs.
+
 The POS confirm action requires customer authorization before calling the transaction RPC. Duplicate submission protection uses disabled pending buttons plus a stable idempotency key sent as `transactions.external_reference`, which is unique per business.
 
 ## Business Dashboard Security

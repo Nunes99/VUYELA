@@ -190,6 +190,18 @@ Phase 17 includes tests that verify:
 - campaign creation reads the authoritative subscription overview;
 - `/negocio/subscricao` remains stable in protected fallback mode.
 
+## Current PWA Coverage
+
+Phase 18 includes tests that verify:
+
+- manifest identity, standalone display, theme, and maskable icons;
+- root service-worker registration and update behavior;
+- public-shell-only caching with network-first navigation;
+- absence of private-page caching, background sync, and offline writes;
+- versioned card-identification parsing and tenant-scoped QR validation;
+- exclusion of balances, MZN values, customer profile fields, and authorizations;
+- real browser access to a previously stored identification after network loss.
+
 ## Priority E2E
 
 Customer:

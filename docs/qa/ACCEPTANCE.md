@@ -263,3 +263,17 @@ A feature is complete only when:
 - the public pricing section is rendered from active public database plans;
 - payment collection remains explicitly outside scope until a provider is configured;
 - format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.
+
+## Phase 18 PWA Acceptance
+
+- the application exposes a valid standalone web manifest with regular and maskable icons;
+- the root service worker installs and updates without using a stale cached worker script;
+- the public offline shell and required static assets are available without a network connection;
+- authenticated pages, API responses, Supabase requests, balances, and transactions are not cached;
+- previously loaded active-card business, number, and identification QR are available offline;
+- offline storage excludes points, MZN values, profile data, tiers, and point authorizations;
+- offline identification can be removed from the device;
+- the service worker ignores non-GET requests and has no background write queue;
+- point earning and redemption continue to require online server validation;
+- desktop and mobile Playwright projects verify installation metadata and the offline card flow;
+- format, lint, typecheck, unit tests, E2E, design-system build, and production build pass.

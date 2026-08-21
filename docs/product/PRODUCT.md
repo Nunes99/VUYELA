@@ -61,6 +61,10 @@ The authenticated customer dashboard is mobile-first and includes:
 
 All populated states use database-backed reads. Empty states explain what appears after the customer joins businesses or starts transacting.
 
+The installed PWA can display previously loaded active-card identification while offline. This
+offline view contains the issuing business, card number, and identification QR only. Balances,
+MZN equivalents, current status checks, transactions, and point use remain online-only.
+
 ## POS
 
 The authenticated POS is built for low-friction cashier use:
