@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { SignUpForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
@@ -20,10 +21,7 @@ export default function SignUpPage() {
     <main className="auth-page">
       <section className="auth-shell auth-shell--compact" aria-labelledby="signup-title">
         <div className="auth-panel auth-panel--copy">
-          <Link className="auth-brand" href="/">
-            <span>VUYELA</span>
-            <small>by LEMOTE</small>
-          </Link>
+          <VuyelaLogo className="auth-brand" inverse />
           <span className="auth-kicker">Nova conta</span>
           <h1 id="signup-title">Crie a base da sua conta VUYELA.</h1>
           <p>

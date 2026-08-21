@@ -8,12 +8,14 @@ import {
   Globe,
   Mail,
   MapPin,
+  Menu,
   Phone,
   ShieldCheck,
   Store,
   Tag
 } from "lucide-react";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import {
   getBusinessCityLabel,
   getBusinessPrimaryCity,
@@ -453,11 +455,8 @@ export function MarketplaceHeader() {
   return (
     <header className="marketplace-header">
       <div className="vy-container marketplace-header__inner">
-        <Link className="marketplace-logo" href="/">
-          <span>VUYELA</span>
-          <small>by LEMOTE</small>
-        </Link>
-        <nav aria-label="Navegacao publica">
+        <VuyelaLogo className="marketplace-logo" />
+        <nav className="marketplace-desktop-nav" aria-label="Navegacao publica">
           <Link href="/estabelecimentos">Estabelecimentos</Link>
           <Link href="/categorias">Categorias</Link>
           <Link href="/locais">Locais</Link>
@@ -467,6 +466,19 @@ export function MarketplaceHeader() {
         <Link className="marketplace-header__cta" href="/entrar">
           Entrar
         </Link>
+        <details className="marketplace-mobile-menu">
+          <summary aria-label="Abrir navegacao publica">
+            <Menu aria-hidden="true" size={20} />
+          </summary>
+          <nav aria-label="Navegacao publica mobile">
+            <Link href="/estabelecimentos">Estabelecimentos</Link>
+            <Link href="/categorias">Categorias</Link>
+            <Link href="/locais">Locais</Link>
+            <Link href="/ofertas">Ofertas</Link>
+            <Link href="/pesquisar">Pesquisar</Link>
+            <Link href="/entrar">Entrar</Link>
+          </nav>
+        </details>
       </div>
     </header>
   );

@@ -2,7 +2,6 @@ import {
   BarChart3,
   Building2,
   ClipboardList,
-  Coins,
   CreditCard,
   Gift,
   LineChart,
@@ -22,18 +21,17 @@ interface BusinessDashboardViewProps {
 }
 
 const navItems = [
-  { href: "#overview", label: "Visao geral", icon: BarChart3 },
+  { href: "#overview", label: "Dashboard", icon: BarChart3 },
   { href: "#customers", label: "Clientes", icon: Users },
   { href: "#transactions", label: "Transaccoes", icon: ClipboardList },
-  { href: "#points", label: "Pontos", icon: Coins },
   { href: "#campaigns", label: "Campanhas", icon: Gift },
-  { href: "/negocio/indicacoes", label: "Indicacoes", icon: UserPlus },
-  { href: "/negocio/subscricao", label: "Subscricao", icon: CreditCard },
   { href: "#program", label: "Programa", icon: LineChart },
   { href: "#branches", label: "Filiais", icon: Store },
-  { href: "#employees", label: "Equipa", icon: Building2 },
+  { href: "#employees", label: "Funcionarios", icon: Building2 },
   { href: "#reports", label: "Relatorios", icon: BarChart3 },
-  { href: "#settings", label: "Definicoes", icon: Settings }
+  { href: "/negocio/subscricao", label: "Facturacao", icon: CreditCard },
+  { href: "#settings", label: "Configuracoes", icon: Settings },
+  { href: "/negocio/indicacoes", label: "Indicacoes", icon: UserPlus }
 ];
 
 export function BusinessDashboardView({ state }: BusinessDashboardViewProps) {

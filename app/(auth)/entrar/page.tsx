@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { EmailSignInForm, PhoneOtpForm } from "@/features/auth/forms";
 import { isPhoneAuthEnabled } from "@/lib/env";
 
@@ -45,10 +46,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     <main className="auth-page">
       <section className="auth-shell" aria-labelledby="signin-title">
         <div className="auth-panel auth-panel--copy">
-          <Link className="auth-brand" href="/">
-            <span>VUYELA</span>
-            <small>by LEMOTE</small>
-          </Link>
+          <VuyelaLogo className="auth-brand" inverse />
           <span className="auth-kicker">Acesso seguro</span>
           <h1 id="signin-title">Entre para ver os seus pontos e negocios.</h1>
           <p>

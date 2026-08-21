@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { UpdatePasswordForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
@@ -19,10 +20,7 @@ export default function UpdatePasswordPage() {
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="update-password-title">
         <div className="auth-panel auth-panel--forms">
-          <Link className="auth-brand auth-brand--dark" href="/">
-            <span>VUYELA</span>
-            <small>by LEMOTE</small>
-          </Link>
+          <VuyelaLogo className="auth-brand auth-brand--dark" />
           <span className="auth-kicker">Nova senha</span>
           <h1 id="update-password-title">Defina uma nova senha segura.</h1>
           <p className="auth-intro">

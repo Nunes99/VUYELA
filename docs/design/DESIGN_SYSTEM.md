@@ -29,6 +29,15 @@ Gold is reserved for rewards, points, and commercial reward accents. Do not use 
 - Financial numbers: bold weight with local separators.
 - Normal text should not go below 14px.
 
+Sora and Inter are self-hosted under `public/fonts` so production rendering does not depend on a
+third-party font request.
+
+## Brand Assets
+
+- Use the official VUYELA mark from `/brand/logo-mark.svg` through the shared `VuyelaLogo` component.
+- Use `/brand/pattern.svg` only as a secondary texture at 3-8% effective opacity.
+- Do not replace the mark with a text-only approximation in product navigation.
+
 ## Required Components
 
 The design system should grow toward:
@@ -42,3 +51,11 @@ The design system should grow toward:
 - QRScanner and QRDisplay.
 
 Each component should cover relevant default, hover, active, focus, disabled, loading, and error states.
+
+## Product Surfaces
+
+- Public and authentication surfaces may use the institutional indigo and cultural texture.
+- Customer, business, POS, and administration screens use light work surfaces with restrained
+  borders and elevation.
+- Gold remains reserved for points, rewards, and the commercial reward action.
+- Operational navigation must never overlap content on small screens.

@@ -9,7 +9,13 @@ test("shows public marketplace empty state when Supabase is not configured", asy
   await expect(
     page.getByRole("heading", { name: "Ainda sem estabelecimentos para publicar" })
   ).toBeVisible();
-  const publicNavigation = page.getByLabel("Navegacao publica");
+  const mobileMenuTrigger = page.getByLabel("Abrir navegacao publica");
+  let publicNavigation = page.getByLabel("Navegacao publica");
+
+  if (await mobileMenuTrigger.isVisible()) {
+    await mobileMenuTrigger.click();
+    publicNavigation = page.getByLabel("Navegacao publica mobile");
+  }
 
   await expect(publicNavigation.getByRole("link", { name: "Categorias" })).toBeVisible();
   await expect(publicNavigation.getByRole("link", { name: "Ofertas" })).toBeVisible();

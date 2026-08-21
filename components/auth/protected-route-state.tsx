@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
 import type { ProtectedRouteState } from "@/lib/auth/session";
 
@@ -28,10 +29,7 @@ function AuthNotice({
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="protected-title">
         <div className="auth-panel auth-panel--forms">
-          <Link className="auth-brand auth-brand--dark" href="/">
-            <span>VUYELA</span>
-            <small>by LEMOTE</small>
-          </Link>
+          <VuyelaLogo className="auth-brand auth-brand--dark" />
           <span className="auth-kicker">{eyebrow}</span>
           <h1 id="protected-title">{title}</h1>
           <p className="auth-intro">{body}</p>
@@ -52,14 +50,15 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
       <main className="dashboard-page">
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
           <header className="dashboard-shell__header">
-            <div>
+            <VuyelaLogo />
+            <div className="dashboard-shell__title">
               <span className="auth-kicker">Area protegida</span>
               <h1 id="dashboard-title">{title}</h1>
             </div>
             <form action={signOutAction}>
               <button className="dashboard-signout" type="submit">
                 <LogOut aria-hidden="true" size={18} />
-                Terminar sessao
+                <span>Terminar sessao</span>
               </button>
             </form>
           </header>

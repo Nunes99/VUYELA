@@ -1,5 +1,18 @@
 # Acceptance
 
+## Design convergence
+
+- the rendered interface uses self-hosted Sora for headings and Inter for UI/body text;
+- all primary surfaces use the official VUYELA mark rather than text-only approximations;
+- the cultural pattern remains subtle and does not reduce text legibility;
+- the homepage follows the approved header, three-line headline, two primary audiences, trust
+  indicators, four steps, and four benefit categories;
+- customer mobile navigation exposes Inicio, Cartoes, Explorar, Actividade, and Perfil without
+  horizontal overflow;
+- business and administration navigation does not overlap content on mobile;
+- authenticated product surfaces use quiet work-focused layouts rather than marketing composition;
+- core widths 320, 375, 390, 430, 768, 1024, 1280, and 1440 have no body overflow.
+
 ## Global Definition of Done
 
 A feature is complete only when:

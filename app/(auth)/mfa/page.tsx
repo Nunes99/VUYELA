@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { redirect } from "next/navigation";
 
 import { MfaForm } from "@/features/auth/mfa-form";
@@ -44,10 +46,7 @@ export default async function MfaPage({ searchParams }: MfaPageProps) {
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="mfa-title">
         <div className="auth-panel auth-panel--forms">
-          <Link className="auth-brand auth-brand--dark" href="/">
-            <span>VUYELA</span>
-            <small>by LEMOTE</small>
-          </Link>
+          <VuyelaLogo className="auth-brand auth-brand--dark" />
           <span className="auth-kicker">Verificacao em dois passos</span>
           <h1 id="mfa-title">Verificacao adicional necessaria.</h1>
           <p className="auth-intro">

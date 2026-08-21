@@ -3,12 +3,15 @@ import Link from "next/link";
 import {
   ArrowRight,
   CheckCircle2,
+  Coins,
   CreditCard,
   Gift,
   MapPin,
   Menu,
+  Percent,
   QrCode,
   ShieldCheck,
+  Sparkles,
   Smartphone,
   Store,
   WalletCards
@@ -22,6 +25,7 @@ import {
   TransactionItem
 } from "../../vuyela-design-system/src/components/Loyalty";
 import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
 import { formatEntitlementLimit, getAnalyticsLabel } from "@/features/subscriptions/model";
 import { getSiteUrl } from "@/lib/env";
@@ -47,18 +51,42 @@ export const metadata: Metadata = {
 };
 
 const navLinks = [
+  { href: "#top", label: "Inicio" },
   { href: "#como-funciona", label: "Como funciona" },
   { href: "#clientes", label: "Para clientes" },
   { href: "#negocios", label: "Para negocios" },
-  { href: "/estabelecimentos", label: "Estabelecimentos" },
   { href: "#precos", label: "Precos" },
-  { href: "#faq", label: "FAQ" }
+  { href: "#recursos", label: "Recursos" },
+  { href: "#blog", label: "Blog" }
 ];
 
 const trustIndicators = [
-  { label: "100% digital", icon: <Smartphone size={16} /> },
-  { label: "Regras claras", icon: <ShieldCheck size={16} /> },
-  { label: "Feito para Mocambique", icon: <MapPin size={16} /> }
+  { label: "100% Digital", icon: <Smartphone size={16} /> },
+  { label: "Seguro & Confiavel", icon: <ShieldCheck size={16} /> },
+  { label: "Feito em Mocambique", icon: <MapPin size={16} /> }
+];
+
+const productBenefits = [
+  {
+    title: "Descontos exclusivos",
+    body: "Beneficios criados pelos estabelecimentos onde ja compra.",
+    icon: <Percent size={22} />
+  },
+  {
+    title: "Pontos que tem valor",
+    body: "Veja sempre os pontos e o equivalente promocional em MZN.",
+    icon: <Coins size={22} />
+  },
+  {
+    title: "Estabelecimentos proximos",
+    body: "Descubra negocios e vantagens disponiveis na sua cidade.",
+    icon: <MapPin size={22} />
+  },
+  {
+    title: "Ofertas personalizadas",
+    body: "Acompanhe campanhas relevantes dos seus negocios preferidos.",
+    icon: <Sparkles size={22} />
+  }
 ];
 
 const steps = [
@@ -144,10 +172,7 @@ export default async function HomePage() {
       <main className="home-page" id="top">
         <header className="home-header" aria-label="Navegacao principal">
           <div className="vy-container home-header__inner">
-            <a className="home-logo" href="#top" aria-label="VUYELA by LEMOTE">
-              <span>VUYELA</span>
-              <small>by LEMOTE</small>
-            </a>
+            <VuyelaLogo className="home-logo" href="#top" inverse />
             <nav className="home-nav" aria-label="Secoes da homepage">
               {navLinks.map((link) => (
                 <a href={link.href} key={link.href}>
@@ -166,7 +191,6 @@ export default async function HomePage() {
             <details className="home-mobile-menu">
               <summary aria-label="Abrir menu">
                 <Menu size={18} />
-                <span>Menu</span>
               </summary>
               <nav aria-label="Menu mobile">
                 {navLinks.map((link) => (
@@ -183,7 +207,11 @@ export default async function HomePage() {
           <div className="vy-container home-hero__inner">
             <div className="home-hero__copy">
               <Badge tone="reward">VUYELA by LEMOTE</Badge>
-              <h1 id="home-title">Cada compra cria uma razao para voltar.</h1>
+              <h1 id="home-title">
+                <span>Cada compra</span>
+                <span>cria uma razao</span>
+                <span>para voltar.</span>
+              </h1>
               <p>
                 Acumule pontos, desbloqueie beneficios e aproveite vantagens exclusivas nos seus
                 estabelecimentos preferidos.
@@ -200,10 +228,6 @@ export default async function HomePage() {
                   <Store size={18} />
                   Sou um negocio
                 </a>
-                <Link className="home-link-button home-link-button--outline" href="/pesquisar">
-                  <MapPin size={18} />
-                  Explorar beneficios
-                </Link>
               </div>
               <ul className="home-trust-list" aria-label="Indicadores de confianca">
                 {trustIndicators.map((item) => (
@@ -262,6 +286,25 @@ export default async function HomePage() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section className="home-section home-section--benefits" id="recursos">
+          <div className="vy-container">
+            <div className="home-section__header home-section__header--centered">
+              <span>Beneficios</span>
+              <h2>Mais valor em cada regresso.</h2>
+              <p>Uma experiencia simples para descobrir, acumular e utilizar beneficios locais.</p>
+            </div>
+            <div className="home-benefit-grid">
+              {productBenefits.map((benefit) => (
+                <article key={benefit.title}>
+                  <span>{benefit.icon}</span>
+                  <h3>{benefit.title}</h3>
+                  <p>{benefit.body}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -399,6 +442,31 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        <section className="home-journal" id="blog" aria-labelledby="home-journal-title">
+          <div className="vy-container home-journal__inner">
+            <div>
+              <span>Recursos VUYELA</span>
+              <h2 id="home-journal-title">Fidelizacao explicada com clareza.</h2>
+              <p>
+                Consulte estabelecimentos, ofertas e respostas praticas para clientes e negocios.
+              </p>
+            </div>
+            <nav aria-label="Recursos VUYELA">
+              <Link href="/estabelecimentos">Estabelecimentos</Link>
+              <Link href="/ofertas">Ofertas activas</Link>
+              <a href="#faq">Perguntas frequentes</a>
+            </nav>
+          </div>
+        </section>
+
+        <footer className="home-footer">
+          <div className="vy-container home-footer__inner">
+            <VuyelaLogo inverse />
+            <p>Volte. Ganhe. Cresca.</p>
+            <small>VUYELA by LEMOTE. Tecnologia de fidelizacao para Mocambique.</small>
+          </div>
+        </footer>
       </main>
     </>
   );
