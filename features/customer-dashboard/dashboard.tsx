@@ -1,4 +1,20 @@
-import { Activity, Bell, CreditCard, Home, Save, Search, User, UserPlus } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Activity,
+  Bell,
+  ChevronRight,
+  Clock3,
+  Compass,
+  CreditCard,
+  Gift,
+  Home,
+  Save,
+  Search,
+  User,
+  UserPlus,
+  WalletCards
+} from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input } from "../../vuyela-design-system/src/components/Field";
@@ -6,7 +22,7 @@ import { CustomerCardsView } from "@/features/customer-cards/card-list";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
 import { TransactionItem } from "../../vuyela-design-system/src/components/Loyalty";
-import { OfferCard } from "../../vuyela-design-system/src/components/Loyalty";
+import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
 
 import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
@@ -53,10 +69,10 @@ function CustomerDashboardNav() {
         const Icon = item.icon;
 
         return (
-          <a href={item.href} key={item.href} title={item.label}>
+          <Link href={item.href} key={item.href} title={item.label}>
             <Icon size={18} aria-hidden="true" />
             <span>{item.label}</span>
-          </a>
+          </Link>
         );
       })}
     </nav>
@@ -82,6 +98,8 @@ function CustomerDashboardContent({
   dashboard: CustomerDashboardViewModel;
   profileStatus?: string;
 }) {
+  const featuredCard = dashboard.cards[0];
+
   return (
     <>
       <OfflineCardSync cards={dashboard.cards} />
@@ -90,53 +108,58 @@ function CustomerDashboardContent({
         id="inicio"
         aria-labelledby="customer-home-title"
       >
-        <div>
-          <span className="customer-dashboard-eyebrow">Início</span>
-          <h2 id="customer-home-title">Olá, {dashboard.profile.displayName}</h2>
-          <p>Resumo dos seus cartões VUYELA e pontos promocionais por estabelecimento.</p>
+        <div className="customer-dashboard-home__heading">
+          <h2 id="customer-home-title">Olá, {firstName(dashboard.profile.displayName)} 👋</h2>
+          <a href="#cartoes">
+            {dashboard.activeCardCount.toLocaleString("pt-MZ")} cartões
+            <ChevronRight aria-hidden="true" size={20} />
+          </a>
         </div>
-
-        <div className="customer-dashboard-stats" aria-label="Resumo de pontos">
-          <span>
-            Pontos<strong>{dashboard.totalPoints.toLocaleString("pt-MZ")}</strong>
-          </span>
-          <span>
-            Equivalente<strong>{dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN</strong>
-          </span>
-          <span>
-            Cartões ativos<strong>{dashboard.activeCardCount.toLocaleString("pt-MZ")}</strong>
-          </span>
-        </div>
+        {featuredCard ? (
+          <LoyaltyCard
+            businessName={featuredCard.businessName}
+            cardNumber={featuredCard.cardNumber}
+            customerName={featuredCard.customerName}
+            points={featuredCard.availablePoints}
+            statusLabel={featuredCard.statusLabel}
+            valueMzn={featuredCard.valueMzn}
+          />
+        ) : (
+          <div className="customer-dashboard-home__empty">
+            <strong>O seu primeiro cartão aparecerá aqui.</strong>
+            <span>Explore negócios VUYELA e adira ao programa que preferir.</span>
+          </div>
+        )}
       </section>
 
-      <section id="cartoes" aria-labelledby="customer-cards-title">
-        <div className="customer-dashboard-section-heading">
-          <span className="customer-dashboard-eyebrow">Cartões</span>
-          <h2 id="customer-cards-title">Cartões digitais</h2>
-        </div>
-        <CustomerCardsView
-          state={
-            dashboard.hasCards
-              ? { status: "populated", cards: dashboard.cards }
-              : { status: "empty" }
-          }
-        />
-      </section>
+      <CustomerQuickActions />
 
-      <section id="explorar" aria-labelledby="customer-explore-title">
+      <section
+        className="customer-dashboard-offers-section"
+        id="explorar"
+        aria-labelledby="customer-explore-title"
+      >
         <div className="customer-dashboard-section-heading">
-          <span className="customer-dashboard-eyebrow">Explorar</span>
-          <h2 id="customer-explore-title">Ofertas públicas</h2>
+          <h2 id="customer-explore-title">Ofertas para si</h2>
+          <Link href="/ofertas">Ver todas</Link>
         </div>
         {dashboard.hasOffers ? (
           <div className="customer-dashboard-offers">
-            {dashboard.offers.map((offer) => (
-              <OfferCard
-                businessName={offer.businessName}
-                description={offer.description}
-                key={offer.id}
-                title={offer.title}
-              />
+            {dashboard.offers.map((offer, index) => (
+              <article className="customer-offer-tile" key={offer.id}>
+                <Image
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(max-width: 760px) 50vw, 24rem"
+                  src={index % 2 === 0 ? "/images/offer-prawns.jpg" : "/images/offer-bakery.jpg"}
+                />
+                <div>
+                  <strong>{offer.title}</strong>
+                  <span>{offer.businessName}</span>
+                  <small>{offer.description}</small>
+                </div>
+              </article>
             ))}
           </div>
         ) : (
@@ -145,6 +168,20 @@ function CustomerDashboardContent({
             body="Quando houver ofertas ativas, aparecem aqui."
           />
         )}
+      </section>
+
+      <section id="cartoes" aria-labelledby="customer-cards-title">
+        <div className="customer-dashboard-section-heading">
+          <span className="customer-dashboard-eyebrow">Cartões</span>
+          <h2 id="customer-cards-title">Os meus cartões</h2>
+        </div>
+        <CustomerCardsView
+          state={
+            dashboard.hasCards
+              ? { status: "populated", cards: dashboard.cards }
+              : { status: "empty" }
+          }
+        />
       </section>
 
       <section id="actividade" aria-labelledby="customer-activity-title">
@@ -254,6 +291,31 @@ function CustomerDashboardContent({
   );
 }
 
+function CustomerQuickActions() {
+  const actions = [
+    { href: "#cartoes", label: "Meus cartões", icon: WalletCards },
+    { href: "#actividade", label: "Histórico", icon: Clock3 },
+    { href: "#explorar", label: "Ofertas", icon: Gift },
+    { href: "/estabelecimentos", label: "Explorar", icon: Compass }
+  ];
+
+  return (
+    <nav className="customer-dashboard-shortcuts" aria-label="Ações rápidas">
+      {actions.map((action) => {
+        const Icon = action.icon;
+        return (
+          <Link href={action.href} key={action.label}>
+            <span>
+              <Icon aria-hidden="true" size={23} />
+            </span>
+            {action.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
 function SectionEmpty({ title, body }: { title: string; body: string }) {
   return (
     <div className="customer-dashboard-section-empty" role="status">
@@ -269,4 +331,8 @@ function formatDate(value: string): string {
     month: "short",
     year: "numeric"
   }).format(new Date(value));
+}
+
+function firstName(displayName: string): string {
+  return displayName.trim().split(/\s+/)[0] || "Cliente";
 }

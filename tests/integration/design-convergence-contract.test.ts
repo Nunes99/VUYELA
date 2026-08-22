@@ -45,4 +45,14 @@ describe("approved VUYELA design contract", () => {
     expect(pageStyles).toContain(".customer-dashboard-nav a span");
     expect(pageStyles).toContain("color: var(--vy-text-muted)");
   });
+
+  it("implements the approved member-card and customer-home composition", () => {
+    expect(homepage).toContain("home-member-card");
+    expect(homepage).toContain("QRCodeSVG");
+    expect(customerDashboard).toContain("CustomerQuickActions");
+    expect(customerDashboard).toContain("/images/offer-prawns.jpg");
+    expect(customerDashboard).toContain("/images/offer-bakery.jpg");
+    expect(pageStyles).toContain(".customer-dashboard-home");
+    expect(pageStyles).toContain(".customer-dashboard-shortcuts");
+  });
 });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -17,8 +18,6 @@ import {
   WalletCards
 } from "lucide-react";
 
-import { RewardBadge } from "../../vuyela-design-system/src/components/Loyalty";
-import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
 import { formatEntitlementLimit, getAnalyticsLabel } from "@/features/subscriptions/model";
@@ -353,14 +352,28 @@ export default async function HomePage() {
               </ul>
             </div>
             <div className="home-audience__panel">
-              <RewardBadge label="Benefício ativo" points={50} />
-              <LoyaltyCard
-                businessName="Cafe Central"
-                points={180}
-                valueMzn={180}
-                customerName="Amilcar M."
-                cardNumber="VY-2408-0180"
-              />
+              <article className="home-member-card" aria-label="Cartão VUYELA com QR">
+                <VuyelaLogo inverse />
+                <div className="home-member-card__qr">
+                  <QRCodeSVG
+                    aria-label="Exemplo de QR de identificação VUYELA"
+                    bgColor="#ffffff"
+                    fgColor="#032b38"
+                    level="M"
+                    marginSize={1}
+                    role="img"
+                    size={156}
+                    value="VUYELA:CARD:DEMO:VY-DEMO-250"
+                  />
+                </div>
+              </article>
+              <div className="home-reward-note">
+                <Sparkles aria-hidden="true" size={24} />
+                <span>
+                  <strong>Parabéns!</strong>
+                  Ganhou 50 pontos na sua última compra.
+                </span>
+              </div>
             </div>
           </div>
         </section>

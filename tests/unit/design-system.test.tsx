@@ -20,9 +20,10 @@ describe("VUYELA design system components", () => {
     ).toBeVisible();
   });
 
-  it("renders QR fallback code text", () => {
+  it("renders a scannable QR code and its accessible fallback text", () => {
     render(<QRDisplay code="VY-8F2K-91M" />);
 
+    expect(screen.getByRole("img", { name: "Código QR: VY-8F2K-91M" })).toBeVisible();
     expect(screen.getByText("VY-8F2K-91M")).toBeVisible();
   });
 

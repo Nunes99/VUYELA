@@ -626,22 +626,23 @@ textarea.vy-field__control {
   isolation: isolate;
   min-height: 13.75rem;
   overflow: hidden;
-  border-radius: var(--vy-radius-lg);
-  padding: var(--vy-space-6);
-  background: linear-gradient(135deg, #075564, var(--vy-color-indigo-900));
+  border: 1px solid rgba(242, 181, 68, 0.38);
+  border-radius: 0.5rem;
+  padding: var(--vy-space-5);
+  background: #075564;
   color: #fff;
   box-shadow: var(--vy-shadow-md);
 }
 .vy-loyalty-card::after {
   content: "";
   position: absolute;
-  inset: 0 0 0 42%;
+  inset: 0 0 0 48%;
   z-index: -1;
   background: var(
     --vy-loyalty-pattern,
-    radial-gradient(circle at 20% 20%, rgba(242, 181, 68, 0.2), transparent 32%)
+    url("/brand/pattern.svg") right center / 14rem auto no-repeat
   );
-  opacity: 0.75;
+  opacity: 0.52;
 }
 .vy-loyalty-card__top,
 .vy-loyalty-card__bottom {
@@ -650,19 +651,34 @@ textarea.vy-field__control {
   gap: var(--vy-space-4);
 }
 .vy-loyalty-card__brand {
+  display: grid;
+  gap: 0.1rem;
   font-size: var(--vy-text-sm);
-  font-weight: 850;
-  letter-spacing: var(--vy-tracking-wide);
+}
+.vy-loyalty-card__brand strong {
+  overflow-wrap: anywhere;
+  font-size: var(--vy-text-lg);
+  line-height: 1.1;
+}
+.vy-loyalty-card__brand small {
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.625rem;
+  font-weight: 800;
   text-transform: uppercase;
 }
 .vy-loyalty-card__status {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid rgba(242, 181, 68, 0.68);
+  border-radius: 50%;
   color: var(--vy-reward);
-  font-size: var(--vy-text-xs);
-  font-weight: 850;
-  text-transform: uppercase;
+  font-size: 0.6875rem;
+  font-weight: 900;
 }
 .vy-loyalty-card__balance {
-  margin-block: var(--vy-space-8) var(--vy-space-6);
+  margin-block: var(--vy-space-5) var(--vy-space-4);
 }
 .vy-loyalty-card__label {
   color: rgba(255, 255, 255, 0.72);
@@ -688,20 +704,33 @@ textarea.vy-field__control {
   display: inline-flex;
   margin-top: var(--vy-space-3);
   border-radius: var(--vy-radius-full);
-  padding: 0.35rem 0.7rem;
+  padding: 0.3rem 0.65rem;
   background: var(--vy-reward);
   color: var(--vy-color-indigo-950);
   font-size: var(--vy-text-sm);
   font-weight: 850;
 }
 .vy-loyalty-card__meta {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: var(--vy-text-xs);
+  align-self: center;
+  color: rgba(255, 255, 255, 0.64);
+  font-family: var(--vy-font-mono);
+  font-size: 0.625rem;
 }
 .vy-loyalty-card__meta strong {
   display: block;
   color: #fff;
   font-size: var(--vy-text-sm);
+}
+.vy-loyalty-card__action {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  border: 1px solid var(--vy-reward);
+  border-radius: var(--vy-radius-full);
+  padding-inline: var(--vy-space-3);
+  color: #ffffff;
+  font-size: var(--vy-text-xs);
+  font-weight: 750;
 }
 
 /* Loyalty */
@@ -850,17 +879,17 @@ textarea.vy-field__control {
   display: grid;
   width: 10rem;
   height: 10rem;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.28rem;
-  border: 0.75rem solid #fff;
+  place-items: center;
+  overflow: hidden;
+  border: 0.5rem solid #fff;
+  border-radius: 0.375rem;
   background: #fff;
   box-shadow: 0 0 0 1px var(--vy-border);
 }
-.vy-qr-display__matrix i {
-  background: #edf3f4;
-}
-.vy-qr-display__matrix i[data-on="true"] {
-  background: var(--vy-color-indigo);
+.vy-qr-display__matrix svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .vy-qr-scanner__frame {
   display: grid;

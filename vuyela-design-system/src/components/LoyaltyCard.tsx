@@ -23,11 +23,15 @@ export function LoyaltyCard({
       aria-label={`Cartão de fidelização ${businessName}`}
     >
       <div className="vy-loyalty-card__top">
-        <span className="vy-loyalty-card__brand">{businessName}</span>
-        <span className="vy-loyalty-card__status">{statusLabel}</span>
+        <span className="vy-loyalty-card__brand">
+          <strong>{businessName}</strong>
+          <small>Rewards</small>
+        </span>
+        <span className="vy-loyalty-card__status" title={statusLabel}>
+          {businessName.slice(0, 2).toUpperCase()}
+        </span>
       </div>
       <div className="vy-loyalty-card__balance">
-        <span className="vy-loyalty-card__label">Saldo disponível</span>
         <div className="vy-loyalty-card__points">
           {points.toLocaleString("pt-MZ")} <small>pontos</small>
         </div>
@@ -36,11 +40,10 @@ export function LoyaltyCard({
         </span>
       </div>
       <div className="vy-loyalty-card__bottom">
+        <span className="vy-loyalty-card__action">Usar pontos</span>
         <span className="vy-loyalty-card__meta">
-          Cliente<strong>{customerName}</strong>
-        </span>
-        <span className="vy-loyalty-card__meta">
-          N.º do cartão<strong>{cardNumber}</strong>
+          <span className="vy-sr-only">Cliente: {customerName}. </span>
+          {cardNumber}
         </span>
       </div>
     </article>

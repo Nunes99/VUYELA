@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { QRCodeSVG } from "qrcode.react";
 
 export interface PointsBalanceProps extends HTMLAttributes<HTMLDivElement> {
   businessName: string;
@@ -156,10 +157,17 @@ export function QRDisplay({
   return (
     <div className={["vy-qr-display", className].filter(Boolean).join(" ")} {...props}>
       <span>{label}</span>
-      <div className="vy-qr-display__matrix" aria-hidden="true">
-        {Array.from({ length: 25 }).map((_, index) => (
-          <i key={index} data-on={(index + code.length) % 3 !== 0 ? "true" : undefined} />
-        ))}
+      <div className="vy-qr-display__matrix">
+        <QRCodeSVG
+          aria-label={`${label}: ${code}`}
+          bgColor="#ffffff"
+          fgColor="#032b38"
+          level="M"
+          marginSize={1}
+          role="img"
+          size={176}
+          value={code}
+        />
       </div>
       <strong>{code}</strong>
       {expiresAt ? <small>Expira em {expiresAt}</small> : null}

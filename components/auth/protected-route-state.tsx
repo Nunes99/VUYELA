@@ -19,6 +19,7 @@ interface ProtectedRouteStateViewProps {
   state: ProtectedRouteState;
   title: string;
   children: ReactNode;
+  variant?: "default" | "customer";
 }
 
 function AuthNotice({
@@ -53,13 +54,23 @@ function AuthNotice({
   );
 }
 
-export function ProtectedRouteStateView({ state, title, children }: ProtectedRouteStateViewProps) {
+export function ProtectedRouteStateView({
+  state,
+  title,
+  children,
+  variant = "default"
+}: ProtectedRouteStateViewProps) {
   if (state.status === "authorized") {
+    const pageClassName = [
+      "dashboard-page",
+      variant === "customer" ? "dashboard-page--customer" : "dashboard-page--default"
+    ].join(" ");
+
     return (
-      <main className="dashboard-page">
+      <main className={pageClassName}>
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
           <header className="dashboard-shell__header">
-            <VuyelaLogo />
+            <VuyelaLogo inverse={variant === "customer"} />
             <div className="dashboard-shell__title">
               <span className="auth-kicker">Área protegida</span>
               <h1 id="dashboard-title">{title}</h1>

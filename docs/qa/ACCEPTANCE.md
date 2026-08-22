@@ -7,6 +7,8 @@
 - the cultural pattern remains subtle and does not reduce text legibility;
 - the homepage follows the approved header, three-line headline, two primary audiences, trust
   indicators, four steps, and four benefit categories;
+- the homepage member-card visual uses the approved navy, gold cultural pattern, and a real QR;
+- the customer home uses the approved dark shell, teal featured card, shortcuts, and visual offers;
 - customer mobile navigation exposes Inicio, Cartoes, Explorar, Actividade, and Perfil without
   horizontal overflow;
 - business and administration navigation does not overlap content on mobile;
@@ -130,6 +132,8 @@ A feature is complete only when:
 
 - `/cliente` is a mobile-first customer dashboard, not a placeholder;
 - navigation includes Inicio, Cartoes, Explorar, Actividade, and Perfil;
+- the first mobile viewport prioritizes the greeting, active-card count, featured card, and quick
+  actions before secondary management sections;
 - populated dashboard state uses real Supabase/RLS reads for cards, offers, transactions, and profile summary;
 - loading, empty, error, and populated states exist;
 - no demo customer dashboard data is used outside seed environments;
