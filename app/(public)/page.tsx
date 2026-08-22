@@ -29,6 +29,7 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
 import { formatEntitlementLimit, getAnalyticsLabel } from "@/features/subscriptions/model";
 import { getSiteUrl } from "@/lib/env";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const siteUrl = getSiteUrl();
 
@@ -167,7 +168,7 @@ export default async function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationJsonLd) }}
       />
       <main className="home-page" id="top">
         <header className="home-header" aria-label="Navegação principal">

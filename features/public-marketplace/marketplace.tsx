@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 import {
   getBusinessCityLabel,
   getBusinessPrimaryCity,
@@ -447,7 +448,10 @@ export function MarketplaceSearchPage({ viewModel }: { viewModel: MarketplaceSea
 
 export function MarketplaceJsonLd({ data }: { data: Record<string, unknown> }) {
   return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
+    />
   );
 }
 
