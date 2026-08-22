@@ -9,10 +9,9 @@ test("shows the public homepage", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Quero um cartão" })).toBeVisible();
   await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toBeVisible();
   await expect(page.getByText("Seguro & Confiável")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Mais valor em cada regresso." })).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Voltar fica simples quando o benefício é claro." })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Como funciona?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Vantagens para si" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Negócios que já confiam" })).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Pontos VUYELA são promocionais, claros e locais ao negócio."
@@ -28,17 +27,25 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
 
     const layout = await page.evaluate(() => {
       const title = document.querySelector("h1");
+      const productVisual = document.querySelector(".home-product-visual img");
+      const productRect = productVisual?.getBoundingClientRect();
       const body = document.body;
 
       return {
         bodyFont: getComputedStyle(body).fontFamily,
         headingFont: title ? getComputedStyle(title).fontFamily : "",
         heroLines: title?.querySelectorAll(":scope > span").length ?? 0,
-        overflow: document.documentElement.scrollWidth - window.innerWidth
+        overflow: document.documentElement.scrollWidth - window.innerWidth,
+        productVisible:
+          Boolean(productRect) &&
+          productRect!.width > 0 &&
+          productRect!.right > 0 &&
+          productRect!.left < window.innerWidth
       };
     });
 
     expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
+    expect(layout.productVisible, `product visual outside viewport at ${width}px`).toBe(true);
     expect(layout.heroLines).toBe(3);
     expect(layout.headingFont).toContain("Sora");
     expect(layout.bodyFont).toContain("Inter");

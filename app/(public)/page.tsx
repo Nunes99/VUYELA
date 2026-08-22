@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -9,7 +10,6 @@ import {
   MapPin,
   Menu,
   Percent,
-  QrCode,
   ShieldCheck,
   Sparkles,
   Smartphone,
@@ -17,13 +17,7 @@ import {
   WalletCards
 } from "lucide-react";
 
-import { Badge } from "../../vuyela-design-system/src/components/Badge";
-import {
-  PointsBalance,
-  QRDisplay,
-  RewardBadge,
-  TransactionItem
-} from "../../vuyela-design-system/src/components/Loyalty";
+import { RewardBadge } from "../../vuyela-design-system/src/components/Loyalty";
 import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
@@ -62,9 +56,21 @@ const navLinks = [
 ];
 
 const trustIndicators = [
-  { label: "100% Digital", icon: <Smartphone size={16} /> },
-  { label: "Seguro & Confiável", icon: <ShieldCheck size={16} /> },
-  { label: "Feito em Moçambique", icon: <MapPin size={16} /> }
+  {
+    label: "100% Digital",
+    body: "Tudo no seu telemóvel",
+    icon: <Smartphone size={22} />
+  },
+  {
+    label: "Seguro & Confiável",
+    body: "Os seus dados sempre protegidos",
+    icon: <ShieldCheck size={22} />
+  },
+  {
+    label: "Feito em Moçambique",
+    body: "Tecnologia que valoriza o que é nosso",
+    icon: <MapPin size={22} />
+  }
 ];
 
 const productBenefits = [
@@ -74,13 +80,13 @@ const productBenefits = [
     icon: <Percent size={22} />
   },
   {
-    title: "Pontos que tem valor",
-    body: "Veja sempre os pontos e o equivalente promocional em MZN.",
+    title: "Pontos que valem",
+    body: "1 ponto equivale a 1 MZN promocional no negócio emissor.",
     icon: <Coins size={22} />
   },
   {
-    title: "Estabelecimentos próximos",
-    body: "Descubra negócios e vantagens disponíveis na sua cidade.",
+    title: "Válido em vários lugares",
+    body: "Descubra estabelecimentos parceiros perto de si.",
     icon: <MapPin size={22} />
   },
   {
@@ -93,24 +99,33 @@ const productBenefits = [
 const steps = [
   {
     title: "Compre",
-    body: "O cliente compra num estabelecimento participante.",
+    body: "Faça as suas compras nos estabelecimentos parceiros.",
     icon: <CreditCard size={22} />
   },
   {
     title: "Acumule pontos",
-    body: "A regra do negócio transforma a compra em pontos promocionais.",
+    body: "Ganhe pontos a cada compra realizada.",
     icon: <Gift size={22} />
   },
   {
     title: "Volte",
-    body: "O saldo fica associado ao mesmo estabelecimento emissor.",
+    body: "Regresse sempre que quiser aproveitar mais.",
     icon: <Store size={22} />
   },
   {
-    title: "Use e poupe",
-    body: "Os pontos podem reduzir o valor de uma compra futura nesse negócio.",
+    title: "Use e economize",
+    body: "Use os seus pontos como desconto e economize dinheiro.",
     icon: <WalletCards size={22} />
   }
+];
+
+const trustedBusinesses = [
+  { name: "MARÉS", detail: "RESTAURANTE" },
+  { name: "ENERGIA GINÁSIO", detail: "BEM-ESTAR" },
+  { name: "MAIS SAÚDE", detail: "FARMÁCIA" },
+  { name: "BELEZA & CIA", detail: "SALÃO" },
+  { name: "Hotel VIP", detail: "MAPUTO" },
+  { name: "techpoint", detail: "INFORMÁTICA" }
 ];
 
 const customerBenefits = [
@@ -207,11 +222,15 @@ export default async function HomePage() {
         <section className="home-hero" aria-labelledby="home-title">
           <div className="vy-container home-hero__inner">
             <div className="home-hero__copy">
-              <Badge tone="reward">VUYELA by LEMOTE</Badge>
+              <span className="home-hero__eyebrow">Plataforma de fidelização digital</span>
               <h1 id="home-title">
                 <span>Cada compra</span>
-                <span>cria uma razão</span>
-                <span>para voltar.</span>
+                <span>
+                  cria uma <em>razão</em>
+                </span>
+                <span>
+                  para <strong>voltar.</strong>
+                </span>
               </h1>
               <p>
                 Acumule pontos, desbloqueie benefícios e aproveite vantagens exclusivas nos seus
@@ -219,83 +238,71 @@ export default async function HomePage() {
               </p>
               <div className="home-hero__actions">
                 <a className="home-link-button home-link-button--reward" href="/cadastrar">
-                  <CreditCard size={18} />
                   Quero um cartão
+                  <ArrowRight size={18} />
                 </a>
                 <a
                   className="home-link-button home-link-button--outline"
                   href="/onboarding/negocio"
                 >
-                  <Store size={18} />
                   Sou um negócio
                 </a>
               </div>
               <ul className="home-trust-list" aria-label="Indicadores de confiança">
                 {trustIndicators.map((item) => (
                   <li key={item.label}>
-                    {item.icon}
-                    {item.label}
+                    <span className="home-trust-list__icon">{item.icon}</span>
+                    <span>
+                      <strong>{item.label}</strong>
+                      <small>{item.body}</small>
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
 
             <div className="home-product-visual" aria-label="Pré-visualização do produto VUYELA">
-              <div className="home-phone" aria-hidden="true">
-                <div className="home-phone__top">
-                  <span>VUYELA</span>
-                  <small>Hoje</small>
-                </div>
-                <PointsBalance businessName="Restaurante Mares" points={250} />
-                <TransactionItem
-                  title="Pontos recebidos"
-                  description="Compra registada"
-                  points={50}
-                  timestamp="Agora"
-                />
-                <QRDisplay code="VY-8F2K-91M" expiresAt="02:00" />
-              </div>
-              <LoyaltyCard
-                businessName="Restaurante Mares"
-                points={250}
-                valueMzn={250}
-                customerName="Maria da Silva"
-                cardNumber="VY-2408-0025"
-                className="home-floating-card"
+              <Image
+                alt="Aplicação VUYELA num smartphone com cartão QR de fidelização e confirmação de pontos"
+                className="home-product-visual__image"
+                height={1024}
+                priority
+                sizes="(max-width: 639px) 135vw, (max-width: 1023px) 72vw, 55vw"
+                src="/images/vuyela-hero-product.png"
+                width={1536}
               />
-              <div className="home-points-note">
-                <QrCode size={18} />
-                <span>QR pronto para consultar ou usar saldo</span>
-              </div>
             </div>
           </div>
         </section>
 
         <section className="home-section home-section--steps" id="como-funciona">
           <div className="vy-container">
-            <div className="home-section__header">
-              <span>Como funciona</span>
-              <h2>Voltar fica simples quando o benefício é claro.</h2>
+            <div className="home-section__header home-section__header--centered">
+              <h2>Como funciona?</h2>
             </div>
             <ol className="home-step-grid">
               {steps.map((step, index) => (
                 <li key={step.title}>
-                  <span className="home-step-grid__number">{index + 1}</span>
-                  <span className="home-step-grid__icon">{step.icon}</span>
+                  <span className="home-step-grid__icon" data-step={index + 1}>
+                    {step.icon}
+                  </span>
                   <h3>{step.title}</h3>
                   <p>{step.body}</p>
                 </li>
               ))}
             </ol>
+            <a className="home-section-link" href="#clientes">
+              Ver como funciona
+              <ArrowRight size={16} />
+            </a>
           </div>
         </section>
 
         <section className="home-section home-section--benefits" id="recursos">
           <div className="vy-container">
             <div className="home-section__header home-section__header--centered">
-              <span>Benefícios</span>
-              <h2>Mais valor em cada regresso.</h2>
-              <p>Uma experiência simples para descobrir, acumular e utilizar benefícios locais.</p>
+              <h2>Vantagens para si</h2>
+              <p>Muito mais que pontos, uma experiência completa.</p>
             </div>
             <div className="home-benefit-grid">
               {productBenefits.map((benefit) => (
@@ -306,6 +313,24 @@ export default async function HomePage() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="home-partners" aria-labelledby="home-partners-title">
+          <div className="vy-container">
+            <h2 id="home-partners-title">Negócios que já confiam</h2>
+            <div className="home-partners__list">
+              {trustedBusinesses.map((business) => (
+                <span key={business.name}>
+                  <small>{business.detail}</small>
+                  <strong>{business.name}</strong>
+                </span>
+              ))}
+            </div>
+            <Link href="/estabelecimentos">
+              Ver todos os parceiros
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </section>
 
@@ -372,7 +397,7 @@ export default async function HomePage() {
           <div className="vy-container home-pricing">
             <div className="home-section__header">
               <span>Preços</span>
-              <h2>Planos para comecar pequeno e crescer com controlo.</h2>
+              <h2>Planos para começar pequeno e crescer com controlo.</h2>
               <p>
                 A VUYELA foi pensada para negócios que querem validar fidelização digital antes de
                 escalar para POS, campanhas e relatórios.
