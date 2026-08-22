@@ -1,9 +1,18 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  LayoutGrid,
+  LogOut,
+  ScanLine,
+  ShieldCheck,
+  UserRound
+} from "lucide-react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
+import { canAccessRoute } from "@/lib/auth/rbac";
+import type { AuthPrincipal } from "@/lib/auth/rbac";
 import type { ProtectedRouteState } from "@/lib/auth/session";
 
 interface ProtectedRouteStateViewProps {
@@ -55,6 +64,7 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
               <span className="auth-kicker">Área protegida</span>
               <h1 id="dashboard-title">{title}</h1>
             </div>
+            <DashboardAreaMenu principal={state.principal} />
             <form action={signOutAction}>
               <button className="dashboard-signout" type="submit">
                 <LogOut aria-hidden="true" size={18} />
@@ -110,5 +120,50 @@ export function ProtectedRouteStateView({ state, title, children }: ProtectedRou
       actionHref="/cliente"
       actionLabel="Ir para cliente"
     />
+  );
+}
+
+function DashboardAreaMenu({ principal }: { principal: AuthPrincipal }) {
+  const areas = [
+    { href: "/cliente", label: "Cliente", icon: UserRound, visible: true },
+    {
+      href: "/negocio",
+      label: "Negócio",
+      icon: BriefcaseBusiness,
+      visible: canAccessRoute(principal, "/negocio")
+    },
+    {
+      href: "/pos",
+      label: "POS",
+      icon: ScanLine,
+      visible: canAccessRoute(principal, "/pos")
+    },
+    {
+      href: "/admin",
+      label: "Administração",
+      icon: ShieldCheck,
+      visible: canAccessRoute(principal, "/admin")
+    }
+  ].filter((area) => area.visible);
+
+  return (
+    <details className="dashboard-area-menu">
+      <summary title="Mudar de área">
+        <LayoutGrid aria-hidden="true" size={18} />
+        <span>Áreas</span>
+      </summary>
+      <nav aria-label="Mudar de área">
+        {areas.map((area) => {
+          const Icon = area.icon;
+
+          return (
+            <Link href={area.href} key={area.href}>
+              <Icon aria-hidden="true" size={18} />
+              <span>{area.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </details>
   );
 }

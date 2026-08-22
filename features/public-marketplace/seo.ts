@@ -6,6 +6,7 @@ import {
   getBusinessCityLabel,
   getBusinessPrimaryCity,
   getPointValueLabel,
+  isIndexableBusiness,
   isIndexableOffer
 } from "./model";
 import type {
@@ -30,9 +31,11 @@ export function buildBusinessMetadata(business: MarketplaceBusiness): Metadata {
 
   return buildMetadata({
     title: `${business.name} - pontos e benefícios em ${cityLabel}`,
-    description: `${business.description} Veja pontos, filiais, regras e ofertas públicas de ${business.name}.`,
+    description: business.description
+      ? `${business.description} Veja pontos, filiais, regras e ofertas públicas de ${business.name}.`
+      : `Conheça ${business.name}, as suas filiais e o programa de benefícios VUYELA.`,
     canonicalPath: `/estabelecimentos/${business.slug}`,
-    indexable: true,
+    indexable: isIndexableBusiness(business),
     imageUrl: business.coverUrl ?? business.logoUrl
   });
 }
@@ -113,7 +116,7 @@ export function buildLocalBusinessJsonLd(business: MarketplaceBusiness): Record<
     "@type": "LocalBusiness",
     name: business.name,
     url: `${siteUrl}/estabelecimentos/${business.slug}`,
-    description: business.description,
+    description: business.description || undefined,
     image: business.coverUrl ?? business.logoUrl ?? undefined,
     logo: business.logoUrl ?? undefined,
     telephone: business.phone ?? primaryBranch?.phone ?? undefined,

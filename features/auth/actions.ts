@@ -31,7 +31,7 @@ function getRequiredFormString(formData: FormData, key: string, label: string) {
   };
 }
 
-function getSafeNextPath(formData: FormData, fallback = "/cliente") {
+function getSafeNextPath(formData: FormData, fallback = "/conta") {
   const next = getFormString(formData, "next");
 
   if (!next || !next.startsWith("/") || next.startsWith("//")) {

@@ -5,6 +5,13 @@ test("hides phone authentication while no SMS provider is configured", async ({ 
 
   await expect(page.getByRole("heading", { name: "E-mail e palavra-passe" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Telefone com código" })).toHaveCount(0);
+  await expect(page.locator('input[name="next"]')).toHaveValue("/conta");
+});
+
+test("protects the account router before choosing the correct dashboard", async ({ page }) => {
+  await page.goto("/conta");
+
+  await expect(page).toHaveURL(/\/entrar\?next=%2Fconta$/);
 });
 
 test("shows the complete password recovery forms", async ({ page }) => {

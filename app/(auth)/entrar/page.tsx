@@ -26,11 +26,11 @@ interface SignInPageProps {
 
 function getNextPath(next: string | string[] | undefined) {
   if (Array.isArray(next)) {
-    return "/cliente";
+    return "/conta";
   }
 
   if (!next || !next.startsWith("/") || next.startsWith("//")) {
-    return "/cliente";
+    return "/conta";
   }
 
   return next;

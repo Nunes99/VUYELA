@@ -17,6 +17,7 @@ import {
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { serializeJsonLd } from "@/lib/seo/json-ld";
+import { joinBusinessLoyaltyProgramAction } from "./actions";
 import {
   getBusinessCityLabel,
   getBusinessPrimaryCity,
@@ -108,7 +109,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
       <MarketplaceHero
         eyebrow={business.category?.name ?? "Estabelecimento VUYELA"}
         title={business.name}
-        description={business.description}
+        description={getBusinessDescription(business)}
         breadcrumbs={viewModel.breadcrumbs}
         imageUrl={business.coverUrl}
       />
@@ -145,7 +146,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
             </div>
 
             <DetailSection title="Sobre">
-              <p>{business.description}</p>
+              <p>{getBusinessDescription(business)}</p>
             </DetailSection>
 
             {business.program?.terms ? (
@@ -192,7 +193,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
                 <details>
                   <summary>Os pontos podem ser levantados em dinheiro?</summary>
                   <p>
-                    Não. Pontos VUYELA não são saldo bancário, dinheiro electronico ou valor
+                    Não. Pontos VUYELA não são saldo bancário, dinheiro eletrónico ou valor
                     transferível.
                   </p>
                 </details>
@@ -203,11 +204,21 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
           <aside className="marketplace-detail-aside" aria-label="Resumo do estabelecimento">
             <div className="marketplace-action-panel">
               <h2>Adesão ao programa</h2>
-              <p>Entre ou crie uma conta para ver o seu cartão digital deste negócio.</p>
-              <Link className="marketplace-button marketplace-button--reward" href="/cadastrar">
-                Quero aderir
-                <ArrowRight size={18} />
-              </Link>
+              <p>
+                {business.program
+                  ? "Entre ou crie uma conta para emitir o seu cartão digital deste negócio."
+                  : "O programa de pontos deste negócio está a ser preparado."}
+              </p>
+              {business.program ? (
+                <form action={joinBusinessLoyaltyProgramAction}>
+                  <input name="businessId" type="hidden" value={business.id} />
+                  <input name="businessSlug" type="hidden" value={business.slug} />
+                  <button className="marketplace-button marketplace-button--reward" type="submit">
+                    Quero aderir
+                    <ArrowRight size={18} />
+                  </button>
+                </form>
+              ) : null}
               <Link className="marketplace-button marketplace-button--ghost" href="/entrar">
                 Já tenho conta
               </Link>
@@ -558,7 +569,7 @@ export function BusinessCard({ business }: { business: MarketplaceBusiness }) {
         <div className="marketplace-business-card__body">
           <span>{business.category?.name ?? "Estabelecimento"}</span>
           <h2>{business.name}</h2>
-          <p>{business.description}</p>
+          <p>{getBusinessDescription(business)}</p>
           <div className="marketplace-business-card__meta">
             <span>
               <MapPin size={15} />
@@ -576,6 +587,13 @@ export function BusinessCard({ business }: { business: MarketplaceBusiness }) {
         </div>
       </Link>
     </article>
+  );
+}
+
+function getBusinessDescription(business: MarketplaceBusiness): string {
+  return (
+    business.description ||
+    `${business.name} é um estabelecimento VUYELA com benefícios digitais para clientes.`
   );
 }
 

@@ -22,5 +22,7 @@ Apply them in this exact order:
 16. `implement_platform_administration.sql`
 17. `harden_platform_administration.sql`
 18. `implement_subscription_entitlements.sql`
+19. `restrict_business_sensitive_columns.sql`
+20. `provision_loyalty_programs_and_card_membership.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

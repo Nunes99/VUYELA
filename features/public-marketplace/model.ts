@@ -184,7 +184,7 @@ export function buildMarketplaceSnapshot(input: BuildMarketplaceInput): PublicMa
       branches: business.branches.slice().sort(compareBranches),
       offers: (offersByBusinessId.get(business.id) ?? []).slice().sort(compareOffers)
     }))
-    .filter(isIndexableBusiness)
+    .filter(isPublishedBusiness)
     .sort(compareBusinesses);
   const indexableBusinessIds = new Set(businesses.map((business) => business.id));
   const categories = buildCategories(input.categories, businesses, offers);
@@ -209,7 +209,7 @@ export function buildEstablishmentsList(
     description:
       "Descubra negócios ativos em Moçambique com programas de pontos, benefícios e ofertas públicas.",
     canonicalPath: "/estabelecimentos",
-    indexable: snapshot.businesses.length > 0,
+    indexable: snapshot.businesses.some(isIndexableBusiness),
     businesses: snapshot.businesses,
     categories: snapshot.categories,
     cities: snapshot.cities,
@@ -532,6 +532,10 @@ export function isIndexableBusiness(business: MarketplaceBusiness): boolean {
     business.program &&
     business.branches.length > 0
   );
+}
+
+export function isPublishedBusiness(business: MarketplaceBusiness): boolean {
+  return Boolean(business.name.trim() && business.slug.trim() && business.branches.length > 0);
 }
 
 export function isIndexableCategory(category: MarketplaceCategory): boolean {

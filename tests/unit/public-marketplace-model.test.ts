@@ -154,6 +154,31 @@ describe("public marketplace model", () => {
     expect(buildCityCategoryList(snapshot, "maputo", "restaurantes")).toBeNull();
   });
 
+  it("shows active businesses with a branch while keeping incomplete profiles out of SEO", () => {
+    const snapshot = buildMarketplaceSnapshot({
+      categories,
+      businesses: [
+        business({
+          id: "business-incomplete",
+          slug: "negocio-em-configuracao",
+          name: "Negócio em configuração",
+          description: "",
+          category: null,
+          program: null
+        })
+      ],
+      offers: []
+    });
+
+    const list = buildEstablishmentsList(snapshot);
+
+    expect(list.businesses).toHaveLength(1);
+    expect(list.indexable).toBe(false);
+    expect(buildBusinessDetail(snapshot, "negocio-em-configuracao")?.business.name).toBe(
+      "Negócio em configuração"
+    );
+  });
+
   it("indexes offer detail pages only when the public offer slug is unique", () => {
     const businesses = [
       business({ id: "business-1", slug: "restaurante-mares", name: "Restaurante Mares" }),

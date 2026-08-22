@@ -30,8 +30,8 @@ describe("approved VUYELA design contract", () => {
 
   it("includes the four documented benefit categories", () => {
     expect(homepage).toContain("Descontos exclusivos");
-    expect(homepage).toContain("Pontos que tem valor");
-    expect(homepage).toContain("Estabelecimentos próximos");
+    expect(homepage).toContain("Pontos que valem");
+    expect(homepage).toContain("Válido em vários lugares");
     expect(homepage).toContain("Ofertas personalizadas");
   });
 
