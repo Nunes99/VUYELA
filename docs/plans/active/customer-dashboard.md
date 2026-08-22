@@ -11,12 +11,14 @@ Implemented.
 - `features/customer-dashboard/model.ts` summarizes cards and maps transaction activity.
 - `features/customer-dashboard/data.ts` loads profile, cards, public offers, and recent transactions through Supabase/RLS.
 - `features/customer-dashboard/dashboard.tsx` renders loading, empty, error, and populated dashboard surfaces.
+- Customers can maintain their display name, optional telephone number, and marketing preference from Perfil.
 
 ## Decisions
 
 - The dashboard remains server-rendered for private customer data.
 - Existing customer-card components are reused inside the Cartoes section.
 - Public offers are read from the database policy surface; no hard-coded offers are rendered.
+- The optional telephone supports customer identification at POS without replacing QR or card validation.
 - E2E workers remain serial because `next dev` cold compiles were flaky with parallel navigation.
 
 ## Next Integration Points

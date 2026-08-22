@@ -144,6 +144,7 @@ A feature is complete only when:
 - `/pos` renders a mobile-first cashier workflow, not a placeholder;
 - authorized cashier, branch manager, business admin, and business owner roles use centralized RBAC before rendering POS data;
 - POS context is loaded server-side from active business memberships and active branches;
+- cashiers can identify a customer by camera-scanned QR, card number, or optional telephone;
 - customer identification accepts card number or identification QR payload through a tenant/branch-scoped RPC;
 - purchase quote shows points and MZN equivalent before confirmation;
 - earning and redemption calculations use shared loyalty helpers outside presentation components;
@@ -252,7 +253,7 @@ A feature is complete only when:
 ## Phase 16 Platform Administration Acceptance
 
 - `/admin` requires a platform role and a verified AAL2 session;
-- the admin console provides platform metrics, business approval, user management, subscription visibility, support, fraud review, and audit views;
+- the admin console provides platform metrics, business approval, category management, user management, subscription visibility, support, fraud review, and audit views;
 - support agents cannot approve businesses, change profile roles, or read the global audit trail;
 - platform admins cannot change their own role or manage platform-admin and super-admin roles;
 - the final super admin cannot be demoted;

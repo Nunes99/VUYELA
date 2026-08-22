@@ -4,6 +4,7 @@ export const adminCapabilities = [
   "platform_metrics_read",
   "businesses_read",
   "businesses_review",
+  "categories_manage",
   "users_read",
   "users_manage",
   "subscriptions_read",

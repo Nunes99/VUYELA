@@ -4,6 +4,7 @@ import {
   BarChart3,
   Building2,
   ClipboardList,
+  LayoutList,
   CreditCard,
   FileClock,
   Search,
@@ -18,6 +19,7 @@ import type { AuthPrincipal } from "@/lib/auth/rbac";
 
 import {
   BusinessReviewForm,
+  BusinessCategoryForm,
   FraudReviewForm,
   PlanEntitlementsForm,
   SubscriptionPlanForm,
@@ -28,6 +30,7 @@ import { formatAdminDate, formatMznMinor } from "./model";
 import type {
   AdminAuditEntry,
   AdminBusiness,
+  AdminCategory,
   AdminDashboardReadyState,
   AdminDashboardState,
   AdminFraudEvent,
@@ -47,6 +50,7 @@ const adminNavigation: Array<{
 }> = [
   { view: "overview", label: "Visão geral", icon: BarChart3, capability: "platform_metrics_read" },
   { view: "businesses", label: "Negócios", icon: Building2, capability: "businesses_read" },
+  { view: "categories", label: "Categorias", icon: LayoutList, capability: "categories_manage" },
   { view: "users", label: "Utilizadores", icon: Users, capability: "users_read" },
   {
     view: "subscriptions",
@@ -76,34 +80,39 @@ export function AdminDashboard({
         <Shield aria-hidden="true" size={22} />
       </header>
 
-      <nav className="admin-console__nav" aria-label="Administração da plataforma">
-        {adminNavigation
-          .filter((item) => hasAdminCapability(principal.profileRole, item.capability))
-          .map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                aria-current={state.view === item.view ? "page" : undefined}
-                className={state.view === item.view ? "is-active" : undefined}
-                href={`/admin?view=${item.view}`}
-                key={item.view}
-                title={item.label}
-              >
-                <Icon aria-hidden="true" size={18} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-      </nav>
+      <div className="admin-console__workspace">
+        <nav className="admin-console__nav" aria-label="Administração da plataforma">
+          <span className="admin-console__nav-label">Gestão</span>
+          {adminNavigation
+            .filter((item) => hasAdminCapability(principal.profileRole, item.capability))
+            .map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  aria-current={state.view === item.view ? "page" : undefined}
+                  className={state.view === item.view ? "is-active" : undefined}
+                  href={`/admin?view=${item.view}`}
+                  key={item.view}
+                  title={item.label}
+                >
+                  <Icon aria-hidden="true" size={18} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+        </nav>
 
-      {state.status === "denied" || state.status === "error" ? (
-        <section className="admin-console__notice" role="alert">
-          <h2>{state.status === "denied" ? "Acesso limitado" : "Dados indisponíveis"}</h2>
-          <p>{state.message}</p>
-        </section>
-      ) : (
-        <AdminViewContent principal={principal} state={state} />
-      )}
+        <div className="admin-console__content">
+          {state.status === "denied" || state.status === "error" ? (
+            <section className="admin-console__notice" role="alert">
+              <h2>{state.status === "denied" ? "Acesso limitado" : "Dados indisponíveis"}</h2>
+              <p>{state.message}</p>
+            </section>
+          ) : (
+            <AdminViewContent principal={principal} state={state} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -135,6 +144,7 @@ function AdminViewContent({
           canReview={state.capabilities.includes("businesses_review")}
         />
       ) : null}
+      {state.view === "categories" ? <CategoryManagement categories={state.categories} /> : null}
       {state.view === "users" ? (
         <UserList
           actor={principal}
@@ -155,6 +165,43 @@ function AdminViewContent({
       {state.view === "fraud" ? <FraudList events={state.fraudEvents} /> : null}
       {state.view === "audit" ? <AuditList entries={state.auditEntries} /> : null}
     </section>
+  );
+}
+
+function CategoryManagement({ categories }: { categories: AdminCategory[] }) {
+  return (
+    <div className="admin-management-stack">
+      <div>
+        <h3>Nova categoria</h3>
+        <BusinessCategoryForm />
+      </div>
+      <div>
+        <h3>Categorias publicadas</h3>
+        {categories.length === 0 ? (
+          <EmptyState label="Nenhuma categoria encontrada." />
+        ) : (
+          <div className="admin-record-list">
+            {categories.map((category) => (
+              <article className="admin-record" key={category.id}>
+                <div className="admin-record__header">
+                  <div>
+                    <h3>{category.name}</h3>
+                    <p>{category.description}</p>
+                  </div>
+                  <StatusBadge value={category.isActive ? "active" : "paused"} />
+                </div>
+                <dl className="admin-record__facts">
+                  <Fact label="Identificador" value={category.slug} />
+                  <Fact label="Ordem" value={category.sortOrder.toLocaleString("pt-MZ")} />
+                  <Fact label="Negócios" value={category.businessCount.toLocaleString("pt-MZ")} />
+                </dl>
+                <BusinessCategoryForm category={category} />
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -570,6 +617,7 @@ function viewEyebrow(view: AdminView): string {
   const labels: Record<AdminView, string> = {
     overview: "Plataforma",
     businesses: "Aprovação e estado",
+    categories: "Conteúdo público",
     users: "Identidade e acesso",
     subscriptions: "Planos por negócio",
     support: "Fila operacional",

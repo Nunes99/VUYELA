@@ -1,5 +1,7 @@
-import { Activity, Bell, CreditCard, Home, Search, User, UserPlus } from "lucide-react";
+import { Activity, Bell, CreditCard, Home, Save, Search, User, UserPlus } from "lucide-react";
 
+import { Button } from "../../vuyela-design-system/src/components/Button";
+import { Input } from "../../vuyela-design-system/src/components/Field";
 import { CustomerCardsView } from "@/features/customer-cards/card-list";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
@@ -8,9 +10,11 @@ import { OfferCard } from "../../vuyela-design-system/src/components/Loyalty";
 
 import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
+import { updateCustomerProfileAction } from "./actions";
 
 interface CustomerDashboardViewProps {
   state: CustomerDashboardState;
+  profileStatus?: string;
 }
 
 const navItems = [
@@ -23,7 +27,7 @@ const navItems = [
   { href: "#perfil", label: "Perfil", icon: User }
 ];
 
-export function CustomerDashboardView({ state }: CustomerDashboardViewProps) {
+export function CustomerDashboardView({ state, profileStatus }: CustomerDashboardViewProps) {
   if (state.status === "error") {
     return (
       <div className="customer-painel-notice customer-painel-notice--error" role="status">
@@ -37,7 +41,7 @@ export function CustomerDashboardView({ state }: CustomerDashboardViewProps) {
     <div className="customer-dashboard">
       <CustomerDashboardNav />
       {state.status === "empty" ? <CustomerDashboardEmpty dashboard={state.dashboard} /> : null}
-      <CustomerDashboardContent dashboard={state.dashboard} />
+      <CustomerDashboardContent dashboard={state.dashboard} profileStatus={profileStatus} />
     </div>
   );
 }
@@ -71,7 +75,13 @@ function CustomerDashboardEmpty({ dashboard }: { dashboard: CustomerDashboardVie
   );
 }
 
-function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
+function CustomerDashboardContent({
+  dashboard,
+  profileStatus
+}: {
+  dashboard: CustomerDashboardViewModel;
+  profileStatus?: string;
+}) {
   return (
     <>
       <OfflineCardSync cards={dashboard.cards} />
@@ -183,28 +193,62 @@ function CustomerDashboardContent({ dashboard }: { dashboard: CustomerDashboardV
           <span className="customer-dashboard-eyebrow">Perfil</span>
           <h2 id="customer-profile-title">Dados da conta</h2>
         </div>
-        <dl className="customer-dashboard-profile">
-          <div>
-            <dt>Nome</dt>
-            <dd>{dashboard.profile.displayName}</dd>
+        {profileStatus === "guardado" ? (
+          <p className="customer-profile-message customer-profile-message--success" role="status">
+            Perfil atualizado. O telefone já pode ser usado para identificação no POS.
+          </p>
+        ) : null}
+        {profileStatus === "erro" ? (
+          <p className="customer-profile-message customer-profile-message--error" role="alert">
+            Não foi possível atualizar o perfil. Confirme o nome e o formato do telefone.
+          </p>
+        ) : null}
+        <form action={updateCustomerProfileAction} className="customer-profile-form">
+          <div className="customer-profile-form__grid">
+            <Input
+              autoComplete="name"
+              defaultValue={dashboard.profile.displayName}
+              label="Nome"
+              maxLength={100}
+              minLength={2}
+              name="displayName"
+              required
+              requiredMark
+            />
+            <Input
+              autoComplete="tel"
+              defaultValue={dashboard.profile.phone ?? ""}
+              hint="Opcional. Permite identificar o seu cartão no POS sem usar o QR."
+              inputMode="tel"
+              label="Telefone"
+              name="phone"
+              placeholder="+258 84 000 0000"
+            />
           </div>
-          <div>
-            <dt>E-mail</dt>
-            <dd>{dashboard.profile.email ?? "Não definido"}</dd>
+          <div className="customer-profile-form__email">
+            <span>E-mail</span>
+            <strong>{dashboard.profile.email ?? "Não definido"}</strong>
+            <small>O e-mail é gerido pelo sistema de autenticação.</small>
           </div>
-          <div>
-            <dt>Telefone</dt>
-            <dd>{dashboard.profile.phone ?? "Não definido"}</dd>
-          </div>
-          <div>
-            <dt>Idioma</dt>
-            <dd>{dashboard.profile.locale}</dd>
-          </div>
-          <div>
-            <dt>Marketing</dt>
-            <dd>{dashboard.profile.marketingConsent ? "Consentido" : "Não consentido"}</dd>
-          </div>
-        </dl>
+          <label className="customer-profile-consent">
+            <input
+              defaultChecked={dashboard.profile.marketingConsent}
+              name="marketingConsent"
+              type="checkbox"
+            />
+            <span>
+              <strong>Comunicações de benefícios</strong>
+              <small>Receber ofertas e novidades dos programas a que aderiu.</small>
+            </span>
+          </label>
+          <Button
+            leadingIcon={<Save aria-hidden="true" size={18} />}
+            type="submit"
+            variant="primary"
+          >
+            Guardar perfil
+          </Button>
+        </form>
       </section>
     </>
   );

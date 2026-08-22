@@ -13,9 +13,10 @@ import {
   reviewFraudEventAction,
   updatePlanEntitlementsAction,
   updateProfileRoleAction,
-  updateSupportTicketAction
+  updateSupportTicketAction,
+  saveBusinessCategoryAction
 } from "./actions";
-import type { AdminOperator, AdminPlan } from "./model";
+import type { AdminCategory, AdminOperator, AdminPlan } from "./model";
 import { initialAdminActionState } from "./state";
 
 interface BusinessReviewFormProps {
@@ -56,6 +57,64 @@ export function BusinessReviewForm({ businessId, status }: BusinessReviewFormPro
         <input maxLength={1000} name="note" placeholder="Registo interno" />
       </label>
       <SubmitButton label="Aplicar" pending={pending} />
+      <ActionMessage state={state} />
+    </form>
+  );
+}
+
+export function BusinessCategoryForm({ category }: { category?: AdminCategory }) {
+  const [state, action, pending] = useActionState(
+    saveBusinessCategoryAction,
+    initialAdminActionState
+  );
+
+  return (
+    <form action={action} className="admin-inline-form admin-category-form">
+      <input name="categoryId" type="hidden" value={category?.id ?? ""} />
+      <label>
+        <span>Nome</span>
+        <input defaultValue={category?.name ?? ""} maxLength={100} name="name" required />
+      </label>
+      <label>
+        <span>Identificador</span>
+        <input
+          defaultValue={category?.slug ?? ""}
+          maxLength={100}
+          name="slug"
+          pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+          placeholder="exemplo-categoria"
+          required
+        />
+      </label>
+      <label>
+        <span>Ordem</span>
+        <input
+          defaultValue={category?.sortOrder ?? 100}
+          min="0"
+          max="9999"
+          name="sortOrder"
+          required
+          type="number"
+        />
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Descrição pública</span>
+        <input
+          defaultValue={category?.description ?? ""}
+          maxLength={500}
+          name="description"
+          required
+        />
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input defaultChecked={category?.isActive ?? true} name="isActive" type="checkbox" />
+        <span>Categoria ativa</span>
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Motivo</span>
+        <input maxLength={1000} name="note" placeholder="Obrigatório para auditoria" required />
+      </label>
+      <SubmitButton label={category ? "Guardar" : "Criar"} pending={pending} />
       <ActionMessage state={state} />
     </form>
   );

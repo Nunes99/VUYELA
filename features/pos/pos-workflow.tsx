@@ -1,11 +1,14 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
   Calculator,
+  Camera,
   CheckCircle2,
   CreditCard,
+  Hash,
+  Phone,
   Receipt,
   RotateCcw,
   ScanLine,
@@ -16,6 +19,7 @@ import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select } from "../../vuyela-design-system/src/components/Field";
 import { submitPosAction } from "./actions";
 import { formatMznMinor, posSteps } from "./model";
+import { PosQrScanner } from "./pos-qr-scanner";
 import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
 import type { PosBusinessContext, PosContextState } from "./data";
@@ -182,10 +186,32 @@ function IdentifyForm({
   const selectedBusiness =
     businesses.find((business) => business.id === selectedBusinessId) ?? firstBusiness;
   const [selectedBranchId, setSelectedBranchId] = useState(selectedBusiness.defaultBranchId);
+  const [lookupMethod, setLookupMethod] = useState<"qr" | "card" | "phone">("qr");
+  const [lookupValue, setLookupValue] = useState("");
+  const lookupInputRef = useRef<HTMLInputElement>(null);
+
+  const methodConfig = {
+    qr: {
+      label: "Código QR",
+      placeholder: "VUYELA:CARD:...",
+      inputMode: "text" as const
+    },
+    card: {
+      label: "Número do cartão",
+      placeholder: "VY-...",
+      inputMode: "text" as const
+    },
+    phone: {
+      label: "Telefone do cliente",
+      placeholder: "+258 84 000 0000",
+      inputMode: "tel" as const
+    }
+  }[lookupMethod];
 
   return (
     <form action={formAction} className="pos-form">
       <input type="hidden" name="intent" value="identify" />
+      <input type="hidden" name="lookupMethod" value={lookupMethod} />
 
       <div className="pos-form-grid">
         <Select
@@ -229,15 +255,68 @@ function IdentifyForm({
         </Select>
       </div>
 
+      <fieldset className="pos-lookup-methods">
+        <legend>Como pretende identificar o cliente?</legend>
+        <div role="radiogroup" aria-label="Método de identificação">
+          {(
+            [
+              { id: "qr", label: "Ler QR", icon: Camera },
+              { id: "card", label: "Cartão", icon: Hash },
+              { id: "phone", label: "Telefone", icon: Phone }
+            ] as const
+          ).map((method) => {
+            const Icon = method.icon;
+            const selected = lookupMethod === method.id;
+
+            return (
+              <button
+                aria-checked={selected}
+                className={selected ? "is-active" : undefined}
+                key={method.id}
+                onClick={() => {
+                  setLookupMethod(method.id);
+                  setLookupValue("");
+                }}
+                role="radio"
+                type="button"
+              >
+                <Icon aria-hidden="true" size={18} />
+                <span>{method.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      {lookupMethod === "qr" ? (
+        <PosQrScanner
+          onDetected={(value) => {
+            setLookupValue(value);
+            lookupInputRef.current?.focus();
+          }}
+        />
+      ) : null}
+
       <Input
-        label="Cartão ou QR"
-        name="cardCode"
+        label={methodConfig.label}
+        name="lookupValue"
         autoComplete="off"
-        inputMode="text"
-        placeholder="VY-..."
+        inputMode={methodConfig.inputMode}
+        onChange={(event) => setLookupValue(event.currentTarget.value)}
+        placeholder={methodConfig.placeholder}
+        ref={lookupInputRef}
         requiredMark
         required
+        value={lookupValue}
       />
+
+      <p className="pos-form-hint">
+        {lookupMethod === "phone"
+          ? "O telefone é apenas uma alternativa de identificação e deve estar associado ao cartão do cliente."
+          : lookupMethod === "card"
+            ? "Introduza o número visível no cartão digital do cliente."
+            : "A leitura usa apenas o código de identificação; o saldo é sempre consultado no servidor."}
+      </p>
 
       <Button
         type="submit"
@@ -245,9 +324,9 @@ function IdentifyForm({
         size="lg"
         fullWidth
         loading={pending}
-        leadingIcon={<ScanLine size={20} />}
+        leadingIcon={<ScanLine aria-hidden="true" size={20} />}
       >
-        Identificar cliente
+        Validar cliente
       </Button>
     </form>
   );

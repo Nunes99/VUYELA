@@ -7,6 +7,8 @@ const serverActionModules = [
   "features/admin/actions.ts",
   "features/auth/actions.ts",
   "features/business-campaigns/actions.ts",
+  "features/business-settings/actions.ts",
+  "features/customer-dashboard/actions.ts",
   "features/notifications/actions.ts",
   "features/pos/actions.ts",
   "features/referrals/actions.ts"

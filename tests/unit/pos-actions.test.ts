@@ -68,6 +68,21 @@ describe("POS server actions", () => {
 
     expect(state).toEqual(initialPosActionState);
   });
+
+  it("rejects an unknown customer identification method before querying Supabase", async () => {
+    const state = await submitPosAction(
+      initialPosActionState,
+      formWith({
+        intent: "identify",
+        businessId: "business-1",
+        lookupMethod: "email",
+        lookupValue: "cliente@example.com"
+      })
+    );
+
+    expect(state.status).toBe("error");
+    expect(state.message).toBe("Selecione um método de identificação válido.");
+  });
 });
 
 function formWith(values: Record<string, string>): FormData {

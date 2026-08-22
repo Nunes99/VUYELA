@@ -10,6 +10,7 @@ import {
 describe("admin view model", () => {
   it("accepts only known views and bounded search input", () => {
     expect(parseAdminView("fraud")).toBe("fraud");
+    expect(parseAdminView("categories")).toBe("categories");
     expect(parseAdminView("unknown")).toBe("overview");
     expect(parseAdminView(["support", "audit"])).toBe("support");
     expect(normalizeAdminQuery(`  ${"a".repeat(100)}  `)).toHaveLength(80);

@@ -13,6 +13,7 @@ import { describeAuditChange, summarizeJson } from "./model";
 import type {
   AdminAuditEntry,
   AdminBusiness,
+  AdminCategory,
   AdminDashboardReadyState,
   AdminDashboardState,
   AdminFraudEvent,
@@ -43,6 +44,15 @@ interface BusinessRow {
   created_at: string;
   reviewed_at: string | null;
   review_note: string | null;
+}
+
+interface CategoryRow {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  sort_order: number;
+  is_active: boolean;
 }
 
 interface PlanRow {
@@ -119,6 +129,7 @@ interface AuditLogRow {
 const viewCapabilities: Record<AdminView, AdminCapability> = {
   overview: "platform_metrics_read",
   businesses: "businesses_read",
+  categories: "categories_manage",
   users: "users_read",
   subscriptions: "subscriptions_read",
   support: "support_manage",
@@ -152,6 +163,7 @@ export async function getAdminDashboardState(
       capabilities,
       metrics: null,
       businesses: [],
+      categories: [],
       users: [],
       subscriptions: [],
       plans: [],
@@ -165,6 +177,8 @@ export async function getAdminDashboardState(
       baseState.metrics = await loadMetrics(supabase, principal.profileId);
     } else if (view === "businesses") {
       baseState.businesses = await loadBusinesses(supabase, query);
+    } else if (view === "categories") {
+      baseState.categories = await loadCategories(supabase, query);
     } else if (view === "users") {
       baseState.users = await loadUsers(supabase, query);
     } else if (view === "subscriptions") {
@@ -201,6 +215,43 @@ export async function getAdminDashboardState(
       message: "Não foi possível carregar os dados administrativos. Tente novamente."
     };
   }
+}
+
+async function loadCategories(supabase: SupabaseClient, query: string): Promise<AdminCategory[]> {
+  const [
+    { data: categoryData, error: categoryError },
+    { data: businessData, error: businessError }
+  ] = await Promise.all([
+    supabase
+      .from("business_categories")
+      .select("id, slug, name, description, sort_order, is_active")
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase.from("businesses").select("category_id")
+  ]);
+
+  if (categoryError || businessError) {
+    throw categoryError ?? businessError;
+  }
+
+  const counts = new Map<string, number>();
+  for (const row of (businessData ?? []) as Array<{ category_id: string | null }>) {
+    if (row.category_id) {
+      counts.set(row.category_id, (counts.get(row.category_id) ?? 0) + 1);
+    }
+  }
+
+  return ((categoryData ?? []) as CategoryRow[])
+    .filter((row) => matchesQuery(query, row.name, row.slug, row.description))
+    .map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      description: row.description ?? "",
+      sortOrder: row.sort_order,
+      isActive: row.is_active,
+      businessCount: counts.get(row.id) ?? 0
+    }));
 }
 
 function getAdminDataErrorCode(error: unknown) {

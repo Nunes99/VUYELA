@@ -24,5 +24,10 @@ Apply them in this exact order:
 18. `implement_subscription_entitlements.sql`
 19. `restrict_business_sensitive_columns.sql`
 20. `provision_loyalty_programs_and_card_membership.sql`
+21. `extend_pos_customer_identification.sql`
+22. `manage_business_configuration.sql`
+23. `seed_business_categories.sql`
+24. `fix_business_configuration_email_assignment.sql`
+25. `manage_business_categories.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

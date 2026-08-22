@@ -7,7 +7,8 @@ Implemented.
 ## Scope
 
 - `/pos` now renders a responsive POS workflow.
-- Cashiers identify a customer card by card number or identification QR payload.
+- Cashiers identify a customer by QR code, card number, or optional telephone number.
+- QR identification supports the device camera and retains a manual fallback.
 - Transaction quote calculates points earned, points redeemed, redeemed MZN value, and final MZN amount.
 - Customer authorization is required before confirmation.
 - Transaction confirmation calls the server-side loyalty RPCs from FASE 06.
@@ -22,6 +23,5 @@ Implemented.
 
 ## Next Integration Points
 
-- Replace manual card input with camera scanning once PWA device APIs are added.
 - Add receipt/payment metadata after the payments model is wired into POS.
 - Surface POS transaction history in the future business dashboard.

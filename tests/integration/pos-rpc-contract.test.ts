@@ -7,6 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/create_pos_card_lookup_rpc.sql"),
   "utf8"
 );
+const extendedLookupMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/extend_pos_customer_identification.sql"),
+  "utf8"
+);
 
 describe("POS card lookup RPC contract", () => {
   it("uses a tenant-scoped security-definer lookup instead of browser wallet writes", () => {
@@ -35,5 +39,20 @@ describe("POS card lookup RPC contract", () => {
     );
     expect(migration).not.toMatch(/grant\s+insert[^;]+public\.transactions/i);
     expect(migration).not.toMatch(/grant\s+update[^;]+public\.point_wallets/i);
+  });
+
+  it("supports tenant-scoped QR, card and phone identification", () => {
+    expect(extendedLookupMigration).toContain(
+      "create or replace function public.lookup_pos_customer"
+    );
+    expect(extendedLookupMigration).toContain("v_lookup_method not in ('qr', 'card', 'phone')");
+    expect(extendedLookupMigration).toContain(
+      "public.can_access_transaction(p_business_id, p_branch_id)"
+    );
+    expect(extendedLookupMigration).toContain("cc.business_id = p_business_id");
+    expect(extendedLookupMigration).toContain("regexp_replace(p.phone, '[^0-9]', '', 'g')");
+    expect(extendedLookupMigration).toContain("v_qr_business_id <> p_business_id::text");
+    expect(extendedLookupMigration).not.toMatch(/update public\.point_wallets/i);
+    expect(extendedLookupMigration).not.toMatch(/insert into public\.point_ledger/i);
   });
 });

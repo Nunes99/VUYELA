@@ -12,14 +12,15 @@ describe("platform administration permissions", () => {
     expect(hasAdminCapability("support_agent", "support_manage")).toBe(true);
     expect(hasAdminCapability("support_agent", "fraud_review")).toBe(true);
     expect(hasAdminCapability("support_agent", "businesses_review")).toBe(false);
+    expect(hasAdminCapability("support_agent", "categories_manage")).toBe(false);
     expect(hasAdminCapability("support_agent", "users_manage")).toBe(false);
     expect(hasAdminCapability("support_agent", "subscriptions_manage")).toBe(false);
     expect(hasAdminCapability("support_agent", "audit_read")).toBe(false);
   });
 
   it("gives platform and super admins the complete capability set", () => {
-    expect(getAdminCapabilities("platform_admin")).toHaveLength(10);
-    expect(getAdminCapabilities("super_admin")).toHaveLength(10);
+    expect(getAdminCapabilities("platform_admin")).toHaveLength(11);
+    expect(getAdminCapabilities("super_admin")).toHaveLength(11);
     expect(getAdminCapabilities("customer")).toEqual([]);
   });
 

@@ -70,7 +70,7 @@ MZN equivalents, current status checks, transactions, and point use remain onlin
 The authenticated POS is built for low-friction cashier use:
 
 - select the active business and branch context available to the cashier;
-- identify a customer by card number or identification QR payload;
+- identify a customer by camera-scanned QR code, card number, or optional telephone number;
 - enter the transaction value and optional discount/points to use;
 - show the points and MZN equivalent before confirmation;
 - require explicit customer authorization before writing a redemption;
@@ -94,6 +94,7 @@ It includes:
 - active employees and roles;
 - report tiles for sales, liability, retention, and campaigns;
 - settings/status summary.
+- editable public profile, loyalty rules, and primary branch configuration for business admins and owners.
 
 Branch managers receive branch-scoped data. Business admins and owners can view whole-business metrics and branch-specific views.
 

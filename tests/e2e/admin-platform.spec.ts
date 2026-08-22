@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 for (const view of [
   "overview",
   "businesses",
+  "categories",
   "users",
   "subscriptions",
   "support",

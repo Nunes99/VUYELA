@@ -15,14 +15,25 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function CustomerAreaPage() {
+function param(value: string | string[] | undefined): string | undefined {
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+export default async function CustomerAreaPage({
+  searchParams
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const state = await getProtectedRouteState("/cliente", "/cliente");
+  const params = (await searchParams) ?? {};
   const dashboardState =
     state.status === "authorized" ? await getCustomerDashboard(state.principal.profileId) : null;
 
   return (
     <ProtectedRouteStateView state={state} title="Painel do cliente">
-      {dashboardState ? <CustomerDashboardView state={dashboardState} /> : null}
+      {dashboardState ? (
+        <CustomerDashboardView profileStatus={param(params.perfil)} state={dashboardState} />
+      ) : null}
     </ProtectedRouteStateView>
   );
 }

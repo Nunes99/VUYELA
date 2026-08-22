@@ -10,6 +10,8 @@
 - Support ticket assignment and resolution.
 - Fraud review and reopening.
 - Platform metrics and append-only audit history.
+- Marketplace category creation, ordering, editing, and activation.
+- A task-oriented desktop sidebar and responsive navigation for operational views.
 
 ## Security Decisions
 
@@ -21,6 +23,7 @@
 - Audit rows cannot be updated or deleted.
 - Platform admins cannot modify platform-admin or super-admin roles.
 - Only a super admin can assign privileged platform roles, and the final super admin cannot be demoted.
+- Categories in use cannot be deactivated, preventing broken public business pages.
 
 ## Verification
 

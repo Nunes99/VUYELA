@@ -236,7 +236,7 @@ Self-referrals, existing customers, reciprocal referrals, expired invitations, d
 
 ## POS Lookup RPC
 
-`lookup_pos_customer_card` resolves an active card for an authenticated business/branch operator. It accepts a plain card number or the identification QR payload produced by customer cards, validates access with `can_access_transaction`, and returns only the fields needed for the POS quote:
+`lookup_pos_customer` resolves an active card for an authenticated business/branch operator. It accepts an explicit `qr`, `card`, or `phone` lookup method, validates access with `can_access_transaction`, and returns only the fields needed for the POS quote:
 
 - customer card id;
 - customer display name;

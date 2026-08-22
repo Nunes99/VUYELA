@@ -4,6 +4,7 @@ import type { ProfileRole } from "@/lib/auth/rbac";
 export const adminViews = [
   "overview",
   "businesses",
+  "categories",
   "users",
   "subscriptions",
   "support",
@@ -37,6 +38,16 @@ export interface AdminBusiness {
   createdAt: string;
   reviewedAt: string | null;
   reviewNote: string | null;
+}
+
+export interface AdminCategory {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+  isActive: boolean;
+  businessCount: number;
 }
 
 export interface AdminUser {
@@ -130,6 +141,7 @@ export interface AdminDashboardReadyState {
   capabilities: AdminCapability[];
   metrics: PlatformMetrics | null;
   businesses: AdminBusiness[];
+  categories: AdminCategory[];
   users: AdminUser[];
   subscriptions: AdminSubscription[];
   plans: AdminPlan[];

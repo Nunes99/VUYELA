@@ -50,6 +50,59 @@ export async function reviewBusinessAction(
   return adminSuccess("Estado do negócio atualizado e auditado.");
 }
 
+export async function saveBusinessCategoryAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const categoryId = getFormString(formData, "categoryId");
+  const slug = getFormString(formData, "slug").toLowerCase();
+  const name = getFormString(formData, "name");
+  const description = getFormString(formData, "description");
+  const sortOrder = parseRequiredInteger(formData.get("sortOrder"), 0, 9999);
+  const note = getFormString(formData, "note");
+
+  if (
+    (categoryId && !isUuid(categoryId)) ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) ||
+    name.length < 2 ||
+    description.length < 10 ||
+    sortOrder === undefined ||
+    note.length < 4
+  ) {
+    return adminError("Revise o nome, identificador, descrição, ordem e motivo da alteração.");
+  }
+
+  const principal = await getActionPrincipal("categories_manage");
+  if (!principal) {
+    return adminError("A sua função não permite gerir categorias.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc("admin_save_business_category", {
+    p_actor_profile_id: principal.profileId,
+    p_category_id: categoryId || null,
+    p_slug: slug,
+    p_name: name,
+    p_description: description,
+    p_sort_order: sortOrder,
+    p_is_active: formData.get("isActive") === "on",
+    p_note: note,
+    p_ip_address: auditContext.ipAddress,
+    p_user_agent: auditContext.userAgent
+  });
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateAdmin();
+  revalidatePath("/estabelecimentos");
+  revalidatePath("/");
+  return adminSuccess(
+    categoryId ? "Categoria atualizada e auditada." : "Categoria criada e auditada."
+  );
+}
+
 export async function updateProfileRoleAction(
   _previousState: AdminActionState,
   formData: FormData
@@ -376,6 +429,14 @@ function getDatabaseActionMessage(message: string): string {
 
   if (message.includes("limit reached for subscription plan")) {
     return "O limite configurado no plano foi atingido.";
+  }
+
+  if (message.includes("category is assigned to businesses")) {
+    return "Esta categoria ainda está associada a negócios e não pode ser desativada.";
+  }
+
+  if (message.includes("duplicate key")) {
+    return "Já existe uma categoria com este identificador.";
   }
 
   return "Não foi possível concluir a operação administrativa.";

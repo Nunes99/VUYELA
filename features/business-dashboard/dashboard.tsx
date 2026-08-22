@@ -1,12 +1,10 @@
 import {
   BarChart3,
-  Building2,
   ClipboardList,
   CreditCard,
   Gift,
-  LineChart,
+  ScanLine,
   Settings,
-  Store,
   Users,
   UserPlus
 } from "lucide-react";
@@ -25,13 +23,10 @@ const navItems = [
   { href: "#customers", label: "Clientes", icon: Users },
   { href: "#transactions", label: "Transações", icon: ClipboardList },
   { href: "#campaigns", label: "Campanhas", icon: Gift },
-  { href: "#program", label: "Programa", icon: LineChart },
-  { href: "#branches", label: "Filiais", icon: Store },
-  { href: "#employees", label: "Funcionários", icon: Building2 },
-  { href: "#reports", label: "Relatórios", icon: BarChart3 },
-  { href: "/negocio/subscricao", label: "Faturação", icon: CreditCard },
-  { href: "#settings", label: "Configurações", icon: Settings },
-  { href: "/negocio/indicacoes", label: "Indicações", icon: UserPlus }
+  { href: "/pos", label: "Abrir POS", icon: ScanLine },
+  { href: "/negocio/definicoes", label: "Definições", icon: Settings },
+  { href: "/negocio/indicacoes", label: "Indicações", icon: UserPlus },
+  { href: "/negocio/subscricao", label: "Subscrição", icon: CreditCard }
 ];
 
 export function BusinessDashboardView({ state }: BusinessDashboardViewProps) {
@@ -292,12 +287,22 @@ function BusinessDashboardContent({ dashboard }: { dashboard: BusinessDashboardV
         className="business-dashboard-section"
         aria-labelledby="settings-title"
       >
-        <SectionHeading
-          eyebrow="Definições"
-          title="Estado operacional"
-          id="settings-title"
-          body="Resumo de estados que afetam o painel e o POS."
-        />
+        <div className="business-dashboard-section-toolbar">
+          <SectionHeading
+            eyebrow="Definições"
+            title="Estado operacional"
+            id="settings-title"
+            body="Resumo de estados que afetam o painel e o POS."
+          />
+          {dashboard.hasManagerScope ? (
+            <Link
+              className="business-dashboard-link-button"
+              href={`/negocio/definicoes?businessId=${encodeURIComponent(dashboard.business.id)}`}
+            >
+              Configurar negócio
+            </Link>
+          ) : null}
+        </div>
         <SettingsPanel dashboard={dashboard} />
       </section>
     </>

@@ -94,36 +94,51 @@ export async function identifyPosCustomerAction(
   previousState: PosActionState,
   formData: FormData
 ): Promise<PosActionState> {
-  if (!isSupabaseConfigured()) {
-    return getSupabaseNotConfiguredState();
-  }
-
   const businessId = getRequiredFormString(formData, "businessId", "Negócio");
   if (!businessId.ok) {
     return businessId.state;
   }
   const branchId = getFormString(formData, "branchId");
 
-  const cardCode = getRequiredFormString(formData, "cardCode", "Cartão ou QR");
-  if (!cardCode.ok) {
-    return cardCode.state;
+  const lookupMethod = getFormString(formData, "lookupMethod");
+  if (!isLookupMethod(lookupMethod)) {
+    return createErrorState("Selecione um método de identificação válido.", previousState);
+  }
+
+  const lookupValue = getRequiredFormString(
+    formData,
+    "lookupValue",
+    lookupMethod === "phone" ? "Telefone" : lookupMethod === "card" ? "Número do cartão" : "QR"
+  );
+  if (!lookupValue.ok) {
+    return lookupValue.state;
+  }
+
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState();
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("lookup_pos_customer_card", {
+  const { data, error } = await supabase.rpc("lookup_pos_customer", {
     p_business_id: businessId.value,
     p_branch_id: branchId || null,
-    p_card_code: cardCode.value
+    p_lookup_method: lookupMethod,
+    p_lookup_value: lookupValue.value
   });
 
   if (error) {
-    return createErrorState("Não foi possível identificar o cartão.", previousState);
+    return createErrorState("Não foi possível identificar o cliente.", previousState);
   }
 
   const row = Array.isArray(data) ? (data[0] as PosLookupRow | undefined) : undefined;
 
   if (!row) {
-    return createErrorState("Cartão ativo não encontrado para este negócio.", previousState);
+    return createErrorState(
+      lookupMethod === "phone"
+        ? "Não existe um cartão ativo associado a este telefone neste negócio."
+        : "Cartão ativo não encontrado para este negócio.",
+      previousState
+    );
   }
 
   return {
@@ -142,6 +157,10 @@ export async function identifyPosCustomerAction(
       earnRate: String(row.earn_rate)
     }
   };
+}
+
+function isLookupMethod(value: string): value is "qr" | "card" | "phone" {
+  return value === "qr" || value === "card" || value === "phone";
 }
 
 export async function quotePosTransactionAction(
