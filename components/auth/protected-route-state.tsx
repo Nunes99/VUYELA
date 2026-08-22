@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import {
+  Bell,
   BriefcaseBusiness,
+  ChevronDown,
   LayoutGrid,
   LogOut,
   ScanLine,
@@ -20,6 +22,7 @@ interface ProtectedRouteStateViewProps {
   title: string;
   children: ReactNode;
   variant?: "default" | "customer";
+  customerName?: string | undefined;
 }
 
 function AuthNotice({
@@ -58,30 +61,48 @@ export function ProtectedRouteStateView({
   state,
   title,
   children,
-  variant = "default"
+  variant = "default",
+  customerName
 }: ProtectedRouteStateViewProps) {
   if (state.status === "authorized") {
+    const isCustomer = variant === "customer";
     const pageClassName = [
       "dashboard-page",
-      variant === "customer" ? "dashboard-page--customer" : "dashboard-page--default"
+      isCustomer ? "dashboard-page--customer" : "dashboard-page--default"
     ].join(" ");
 
     return (
       <main className={pageClassName}>
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
           <header className="dashboard-shell__header">
-            <VuyelaLogo inverse={variant === "customer"} />
+            <VuyelaLogo inverse={isCustomer} />
             <div className="dashboard-shell__title">
-              <span className="auth-kicker">Área protegida</span>
+              {!isCustomer ? <span className="auth-kicker">Área protegida</span> : null}
               <h1 id="dashboard-title">{title}</h1>
             </div>
-            <DashboardAreaMenu principal={state.principal} />
-            <form action={signOutAction}>
-              <button className="dashboard-signout" type="submit">
-                <LogOut aria-hidden="true" size={18} />
-                <span>Terminar sessão</span>
-              </button>
-            </form>
+            {isCustomer ? (
+              <a
+                aria-label="Ver notificações"
+                className="customer-shell-alert"
+                href="#notificacoes"
+              >
+                <Bell aria-hidden="true" size={22} />
+                <span aria-hidden="true" />
+              </a>
+            ) : null}
+            <DashboardAreaMenu
+              customerName={customerName}
+              principal={state.principal}
+              variant={variant}
+            />
+            {!isCustomer ? (
+              <form action={signOutAction}>
+                <button className="dashboard-signout" type="submit">
+                  <LogOut aria-hidden="true" size={18} />
+                  <span>Terminar sessão</span>
+                </button>
+              </form>
+            ) : null}
           </header>
           {children}
         </section>
@@ -134,7 +155,15 @@ export function ProtectedRouteStateView({
   );
 }
 
-function DashboardAreaMenu({ principal }: { principal: AuthPrincipal }) {
+function DashboardAreaMenu({
+  principal,
+  variant,
+  customerName
+}: {
+  principal: AuthPrincipal;
+  variant: "default" | "customer";
+  customerName?: string | undefined;
+}) {
   const areas = [
     { href: "/cliente", label: "Cliente", icon: UserRound, visible: true },
     {
@@ -158,10 +187,27 @@ function DashboardAreaMenu({ principal }: { principal: AuthPrincipal }) {
   ].filter((area) => area.visible);
 
   return (
-    <details className="dashboard-area-menu">
+    <details
+      className={`dashboard-area-menu${variant === "customer" ? " dashboard-area-menu--customer" : ""}`}
+    >
       <summary title="Mudar de área">
-        <LayoutGrid aria-hidden="true" size={18} />
-        <span>Áreas</span>
+        {variant === "customer" ? (
+          <>
+            <span className="dashboard-area-menu__avatar" aria-hidden="true">
+              {initials(customerName)}
+            </span>
+            <span className="dashboard-area-menu__identity">
+              <strong>{customerName || "Cliente VUYELA"}</strong>
+              <small>Cliente</small>
+            </span>
+            <ChevronDown aria-hidden="true" size={17} />
+          </>
+        ) : (
+          <>
+            <LayoutGrid aria-hidden="true" size={18} />
+            <span>Áreas</span>
+          </>
+        )}
       </summary>
       <nav aria-label="Mudar de área">
         {areas.map((area) => {
@@ -174,7 +220,25 @@ function DashboardAreaMenu({ principal }: { principal: AuthPrincipal }) {
             </Link>
           );
         })}
+        {variant === "customer" ? (
+          <form action={signOutAction}>
+            <button type="submit">
+              <LogOut aria-hidden="true" size={18} />
+              <span>Terminar sessão</span>
+            </button>
+          </form>
+        ) : null}
       </nav>
     </details>
   );
+}
+
+function initials(name: string | undefined): string {
+  const parts = name?.trim().split(/\s+/).filter(Boolean) ?? [];
+
+  if (parts.length === 0) {
+    return "CV";
+  }
+
+  return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
 }

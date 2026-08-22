@@ -14,6 +14,7 @@ export default defineConfig({
   webServer: {
     command: "pnpm dev --hostname 127.0.0.1",
     url: "http://127.0.0.1:3000",
+    timeout: 180_000,
     reuseExistingServer: !process.env.CI,
     env: {
       NEXT_PUBLIC_SUPABASE_URL: "",

@@ -11,6 +11,10 @@ const customerDashboard = readFileSync(
   join(root, "features/customer-dashboard/dashboard.tsx"),
   "utf8"
 );
+const customerCard = readFileSync(
+  join(root, "features/customer-cards/customer-card-visual.tsx"),
+  "utf8"
+);
 
 describe("approved VUYELA design contract", () => {
   it("self-hosts the approved Sora and Inter typefaces", () => {
@@ -46,13 +50,16 @@ describe("approved VUYELA design contract", () => {
     expect(pageStyles).toContain("color: var(--vy-text-muted)");
   });
 
-  it("implements the approved member-card and customer-home composition", () => {
+  it("implements the approved member-card and NEW PHAS customer composition", () => {
     expect(homepage).toContain("home-member-card");
     expect(homepage).toContain("QRCodeSVG");
-    expect(customerDashboard).toContain("CustomerQuickActions");
-    expect(customerDashboard).toContain("/images/offer-prawns.jpg");
-    expect(customerDashboard).toContain("/images/offer-bakery.jpg");
-    expect(pageStyles).toContain(".customer-dashboard-home");
-    expect(pageStyles).toContain(".customer-dashboard-shortcuts");
+    expect(customerDashboard).toContain("CustomerSummaryCard");
+    expect(customerDashboard).toContain("Resumo da sua conta VUYELA");
+    expect(customerDashboard).toContain("Cartões digitais");
+    expect(customerCard).toContain("showBack");
+    expect(customerCard).toContain("QRCodeSVG");
+    expect(pageStyles).toContain("NEW PHAS nodes 418:4266, 428:4266 and 428:4436");
+    expect(pageStyles).toContain(".customer-dashboard-stats");
+    expect(pageStyles).toContain(".customer-digital-card__back-content");
   });
 });

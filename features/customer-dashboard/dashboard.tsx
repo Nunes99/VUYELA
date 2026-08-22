@@ -1,19 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   Activity,
+  Banknote,
   Bell,
-  ChevronRight,
-  Clock3,
-  Compass,
   CreditCard,
   Gift,
   Home,
   Save,
   Search,
+  Star,
   User,
-  UserPlus,
-  WalletCards
+  UserPlus
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
@@ -22,7 +19,6 @@ import { CustomerCardsView } from "@/features/customer-cards/card-list";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
 import { TransactionItem } from "../../vuyela-design-system/src/components/Loyalty";
-import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
 
 import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
@@ -98,82 +94,56 @@ function CustomerDashboardContent({
   dashboard: CustomerDashboardViewModel;
   profileStatus?: string;
 }) {
-  const featuredCard = dashboard.cards[0];
-
   return (
     <>
       <OfflineCardSync cards={dashboard.cards} />
       <section
-        className="customer-dashboard-home"
+        className="customer-dashboard-overview"
         id="inicio"
         aria-labelledby="customer-home-title"
       >
-        <div className="customer-dashboard-home__heading">
-          <h2 id="customer-home-title">Olá, {firstName(dashboard.profile.displayName)} 👋</h2>
-          <a href="#cartoes">
-            {dashboard.activeCardCount.toLocaleString("pt-MZ")} cartões
-            <ChevronRight aria-hidden="true" size={20} />
-          </a>
+        <div className="customer-dashboard-overview__heading">
+          <span className="customer-dashboard-eyebrow">Início</span>
+          <h2 id="customer-home-title">Olá, {dashboard.profile.displayName}</h2>
+          <p>Resumo da sua conta VUYELA</p>
         </div>
-        {featuredCard ? (
-          <LoyaltyCard
-            businessName={featuredCard.businessName}
-            cardNumber={featuredCard.cardNumber}
-            customerName={featuredCard.customerName}
-            points={featuredCard.availablePoints}
-            statusLabel={featuredCard.statusLabel}
-            valueMzn={featuredCard.valueMzn}
+        <div className="customer-dashboard-stats" aria-label="Resumo da conta">
+          <CustomerSummaryCard
+            icon={Star}
+            label="Pontos"
+            note="pontos acumulados"
+            tone="points"
+            value={dashboard.totalPoints.toLocaleString("pt-MZ")}
           />
-        ) : (
-          <div className="customer-dashboard-home__empty">
-            <strong>O seu primeiro cartão aparecerá aqui.</strong>
-            <span>Explore negócios VUYELA e adira ao programa que preferir.</span>
-          </div>
-        )}
+          <CustomerSummaryCard
+            icon={Banknote}
+            label="Equivalente"
+            mobileLabel="Valor"
+            note="valor resgatável"
+            tone="value"
+            value={`${dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN`}
+          />
+          <CustomerSummaryCard
+            icon={CreditCard}
+            label="Cartões"
+            mobileLabel="Ativos"
+            note={dashboard.activeCardCount === 1 ? "cartão ativo" : "cartões ativos"}
+            tone="cards"
+            value={dashboard.activeCardCount.toLocaleString("pt-MZ")}
+          />
+        </div>
       </section>
-
-      <CustomerQuickActions />
 
       <section
-        className="customer-dashboard-offers-section"
-        id="explorar"
-        aria-labelledby="customer-explore-title"
+        className="customer-dashboard-cards-section"
+        id="cartoes"
+        aria-labelledby="customer-cards-title"
       >
         <div className="customer-dashboard-section-heading">
-          <h2 id="customer-explore-title">Ofertas para si</h2>
-          <Link href="/ofertas">Ver todas</Link>
-        </div>
-        {dashboard.hasOffers ? (
-          <div className="customer-dashboard-offers">
-            {dashboard.offers.map((offer, index) => (
-              <article className="customer-offer-tile" key={offer.id}>
-                <Image
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  sizes="(max-width: 760px) 50vw, 24rem"
-                  src={index % 2 === 0 ? "/images/offer-prawns.jpg" : "/images/offer-bakery.jpg"}
-                />
-                <div>
-                  <strong>{offer.title}</strong>
-                  <span>{offer.businessName}</span>
-                  <small>{offer.description}</small>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <SectionEmpty
-            title="Sem ofertas públicas"
-            body="Quando houver ofertas ativas, aparecem aqui."
-          />
-        )}
-      </section>
-
-      <section id="cartoes" aria-labelledby="customer-cards-title">
-        <div className="customer-dashboard-section-heading">
           <span className="customer-dashboard-eyebrow">Cartões</span>
-          <h2 id="customer-cards-title">Os meus cartões</h2>
+          <h2 id="customer-cards-title">
+            {dashboard.cards.length === 1 ? "Cartão digital" : "Cartões digitais"}
+          </h2>
         </div>
         <CustomerCardsView
           state={
@@ -184,31 +154,70 @@ function CustomerDashboardContent({
         />
       </section>
 
-      <section id="actividade" aria-labelledby="customer-activity-title">
-        <div className="customer-dashboard-section-heading">
-          <span className="customer-dashboard-eyebrow">Atividade</span>
-          <h2 id="customer-activity-title">Movimentos recentes</h2>
-        </div>
-        {dashboard.hasActivity ? (
-          <div className="customer-dashboard-activity">
-            {dashboard.activity.map((item) => (
-              <TransactionItem
-                description={item.description}
-                key={item.id}
-                points={item.points}
-                timestamp={formatDate(item.occurredAt)}
-                title={item.businessName}
-                tone={item.tone}
-              />
-            ))}
+      <div className="customer-dashboard-columns">
+        <section
+          className="customer-dashboard-offers-section"
+          id="explorar"
+          aria-labelledby="customer-explore-title"
+        >
+          <div className="customer-dashboard-section-heading">
+            <div>
+              <span className="customer-dashboard-eyebrow">Explorar</span>
+              <h2 id="customer-explore-title">Ofertas públicas</h2>
+            </div>
+            {dashboard.hasOffers ? <Link href="/ofertas">Ver todas</Link> : null}
           </div>
-        ) : (
-          <SectionEmpty
-            title="Sem atividade recente"
-            body="Compras, ganhos e resgates aparecem aqui."
-          />
-        )}
-      </section>
+          {dashboard.hasOffers ? (
+            <div className="customer-dashboard-offers">
+              {dashboard.offers.map((offer) => (
+                <article className="customer-dashboard-offer" key={offer.id}>
+                  <span>
+                    <Gift aria-hidden="true" size={20} />
+                  </span>
+                  <div>
+                    <strong>{offer.title}</strong>
+                    <b>{offer.businessName}</b>
+                    <small>{offer.description}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <SectionEmpty
+              icon={Gift}
+              title="Sem ofertas públicas"
+              body="Quando houver ofertas ativas de estabelecimentos parceiros, elas aparecerão aqui."
+            />
+          )}
+        </section>
+
+        <section id="actividade" aria-labelledby="customer-activity-title">
+          <div className="customer-dashboard-section-heading">
+            <span className="customer-dashboard-eyebrow">Atividade</span>
+            <h2 id="customer-activity-title">Movimentos recentes</h2>
+          </div>
+          {dashboard.hasActivity ? (
+            <div className="customer-dashboard-activity">
+              {dashboard.activity.map((item) => (
+                <TransactionItem
+                  description={item.description}
+                  key={item.id}
+                  points={item.points}
+                  timestamp={formatDate(item.occurredAt)}
+                  title={item.businessName}
+                  tone={item.tone}
+                />
+              ))}
+            </div>
+          ) : (
+            <SectionEmpty
+              icon={Activity}
+              title="Sem movimentos recentes"
+              body="O seu histórico de compras, pontos ganhos e resgates aparecerá aqui."
+            />
+          )}
+        </section>
+      </div>
 
       <section id="notificacoes" aria-labelledby="customer-notifications-title">
         <div className="customer-painel-section-heading customer-notification-heading">
@@ -291,34 +300,52 @@ function CustomerDashboardContent({
   );
 }
 
-function CustomerQuickActions() {
-  const actions = [
-    { href: "#cartoes", label: "Meus cartões", icon: WalletCards },
-    { href: "#actividade", label: "Histórico", icon: Clock3 },
-    { href: "#explorar", label: "Ofertas", icon: Gift },
-    { href: "/estabelecimentos", label: "Explorar", icon: Compass }
-  ];
-
+function CustomerSummaryCard({
+  icon: Icon,
+  label,
+  mobileLabel,
+  note,
+  tone,
+  value
+}: {
+  icon: typeof Star;
+  label: string;
+  mobileLabel?: string | undefined;
+  note: string;
+  tone: "points" | "value" | "cards";
+  value: string;
+}) {
   return (
-    <nav className="customer-dashboard-shortcuts" aria-label="Ações rápidas">
-      {actions.map((action) => {
-        const Icon = action.icon;
-        return (
-          <Link href={action.href} key={action.label}>
-            <span>
-              <Icon aria-hidden="true" size={23} />
-            </span>
-            {action.label}
-          </Link>
-        );
-      })}
-    </nav>
+    <article className={`customer-summary-card customer-summary-card--${tone}`}>
+      <span className="customer-summary-card__label" data-mobile-label={mobileLabel}>
+        {label}
+      </span>
+      <span className="customer-summary-card__icon">
+        <Icon aria-hidden="true" size={22} />
+      </span>
+      <strong>{value}</strong>
+      <small>{note}</small>
+      <span className="customer-summary-card__sparkline" aria-hidden="true" />
+    </article>
   );
 }
 
-function SectionEmpty({ title, body }: { title: string; body: string }) {
+function SectionEmpty({
+  title,
+  body,
+  icon: Icon
+}: {
+  title: string;
+  body: string;
+  icon?: typeof Gift | undefined;
+}) {
   return (
     <div className="customer-dashboard-section-empty" role="status">
+      {Icon ? (
+        <span className="customer-dashboard-section-empty__icon">
+          <Icon aria-hidden="true" size={24} />
+        </span>
+      ) : null}
       <h3>{title}</h3>
       <p>{body}</p>
     </div>
@@ -331,8 +358,4 @@ function formatDate(value: string): string {
     month: "short",
     year: "numeric"
   }).format(new Date(value));
-}
-
-function firstName(displayName: string): string {
-  return displayName.trim().split(/\s+/)[0] || "Cliente";
 }

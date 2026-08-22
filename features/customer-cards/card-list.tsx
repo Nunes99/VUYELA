@@ -1,7 +1,7 @@
 import { QRDisplay, RewardBadge } from "../../vuyela-design-system/src/components/Loyalty";
-import { LoyaltyCard } from "../../vuyela-design-system/src/components/LoyaltyCard";
 
 import type { CustomerCardsState } from "./data";
+import { CustomerCardVisual } from "./customer-card-visual";
 
 interface CustomerCardsViewProps {
   state: CustomerCardsState;
@@ -46,14 +46,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
             key={card.id}
           >
             <div className="customer-card-row__main">
-              <LoyaltyCard
-                businessName={card.businessName}
-                points={card.availablePoints}
-                valueMzn={card.valueMzn}
-                customerName={card.customerName}
-                cardNumber={card.cardNumber}
-                statusLabel={card.statusLabel}
-              />
+              <CustomerCardVisual card={card} />
             </div>
 
             <div className="customer-card-row__details">

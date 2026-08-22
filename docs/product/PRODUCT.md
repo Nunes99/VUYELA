@@ -53,17 +53,17 @@ Card balances remain business-specific and read through authenticated server-sid
 
 The authenticated customer dashboard is mobile-first and includes:
 
-- Inicio: greeting, featured active card, points with MZN equivalent, and active-card count;
-- quick actions for cards, history, offers, and business discovery;
+- Inicio: greeting and three summary indicators for points, MZN equivalent, and active cards;
 - Cartoes: digital cards from the issuing businesses;
-- Explorar: image-led public active offers;
+- Explorar: public active offers;
 - Actividade: recent customer transactions;
 - Perfil: customer account summary.
 
-The customer home follows the approved VUYELA member-app composition: dark brand shell, teal
-business card, gold rewards, cultural pattern, compact circular shortcuts, and a persistent mobile
-navigation bar. The public homepage uses the matching physical member-card treatment with a real
-scannable QR example.
+The customer area follows the approved NEW PHAS desktop and mobile compositions. Desktop uses a
+dark fixed sidebar, white account header, summary indicators, and a detailed card row. Mobile uses a
+compact white header, three stable summary columns, a persistent bottom navigation bar, and an
+interactive digital card with front and back faces. Both card faces use the real private
+identification payload without exposing balances inside the QR code.
 
 All populated states use database-backed reads. Empty states explain what appears after the customer joins businesses or starts transacting.
 
