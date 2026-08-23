@@ -3,15 +3,12 @@ import Link from "next/link";
 import {
   Activity,
   ArrowLeft,
-  ArrowRight,
   Bell,
   Check,
   ChevronRight,
   CreditCard,
   Gift,
   Home,
-  Languages,
-  LockKeyhole,
   LogOut,
   Mail,
   MapPin,
@@ -20,7 +17,6 @@ import {
   Pencil,
   Phone,
   Save,
-  Settings2,
   ShieldCheck,
   Star,
   User
@@ -226,12 +222,7 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
                   href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
                   key={card.id}
                 >
-                  <div className="customer-mobile-only">
-                    <CustomerMobileCardPreview card={card} />
-                  </div>
-                  <div className="customer-desktop-only">
-                    <CustomerCardVisual card={card} compact />
-                  </div>
+                  <CustomerCardVisual card={card} compact />
                   <span>
                     Ver detalhes <ChevronRight aria-hidden="true" size={16} />
                   </span>
@@ -259,18 +250,10 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
 
         <nav className="customer-quick-actions" aria-label="Ações rápidas">
           <h2>Ações Rápidas</h2>
-          <button disabled title="Transferências ainda não disponíveis" type="button">
-            <ArrowRight aria-hidden="true" />
-            <span>Transferir</span>
-          </button>
-          <button disabled title="Recargas ainda não disponíveis" type="button">
-            <Plus aria-hidden="true" />
-            <span>Recarregar</span>
-          </button>
-          <button disabled title="Pagamentos ainda não disponíveis" type="button">
+          <Link href="/cliente?vista=cartoes">
             <CreditCard aria-hidden="true" />
-            <span>Pagar</span>
-          </button>
+            <span>Cartões</span>
+          </Link>
           <Link
             href={
               dashboard.cards[0]
@@ -280,6 +263,14 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
           >
             <QrCode aria-hidden="true" />
             <span>QR Code</span>
+          </Link>
+          <Link href="/cliente?vista=atividade">
+            <Activity aria-hidden="true" />
+            <span>Histórico</span>
+          </Link>
+          <Link href="/cliente?vista=ofertas">
+            <Gift aria-hidden="true" />
+            <span>Ofertas</span>
           </Link>
         </nav>
       </div>
@@ -315,21 +306,20 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
       {dashboard.hasCards ? (
         <div className="customer-cards-hub-grid">
           {dashboard.cards.map((card) => (
-            <article className="customer-card-hub-item" key={card.id}>
+            <Link
+              aria-label={`Abrir cartão ${card.businessName}`}
+              className="customer-card-hub-item"
+              href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
+              key={card.id}
+            >
               <CustomerCardVisual card={card} compact />
               <div className="customer-card-hub-item__content">
-                <div>
-                  <span>{card.currentTierName}</span>
-                  <h3>{card.businessName}</h3>
-                  <p>Número: {card.cardNumber}</p>
-                </div>
-                <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pontos</strong>
-                <small>Equivale a {card.valueMzn.toLocaleString("pt-MZ")} MZN</small>
-                <Link href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}>
-                  Ver detalhes <ChevronRight aria-hidden="true" size={16} />
-                </Link>
+                <span>{card.currentTierName}</span>
+                <h3>{card.businessName}</h3>
+                <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
               </div>
-            </article>
+              <ChevronRight aria-hidden="true" size={18} />
+            </Link>
           ))}
           <Link className="customer-add-card" href="/estabelecimentos">
             <Plus aria-hidden="true" size={16} /> Adicionar novo cartão digital
@@ -586,21 +576,21 @@ function CustomerProfile({
       <div className="customer-mobile-profile-preferences">
         <h3>Segurança e preferências</h3>
         <Link href="/cliente?vista=perfil&editar=1">
-          <LockKeyhole aria-hidden="true" /> Alterar código PIN de segurança
+          <Pencil aria-hidden="true" /> Editar dados pessoais
           <ChevronRight aria-hidden="true" />
         </Link>
-        <button disabled type="button">
-          <Settings2 aria-hidden="true" /> Configurações de biometria / FaceID
-          <ChevronRight aria-hidden="true" />
-        </button>
         <Link href="/cliente?vista=notificacoes">
-          <Bell aria-hidden="true" /> Notificações e alertas push
+          <Bell aria-hidden="true" /> Avisos e alertas
           <ChevronRight aria-hidden="true" />
         </Link>
-        <button disabled type="button">
-          <Languages aria-hidden="true" /> Idioma e moedas secundárias
+        <Link href="/estabelecimentos">
+          <MapPin aria-hidden="true" /> Explorar estabelecimentos
           <ChevronRight aria-hidden="true" />
-        </button>
+        </Link>
+        <Link href="/cliente/indicacoes">
+          <Gift aria-hidden="true" /> Programa de indicações
+          <ChevronRight aria-hidden="true" />
+        </Link>
       </div>
       <form action={signOutAction} className="customer-mobile-signout">
         <button type="submit">
@@ -763,7 +753,7 @@ function CustomerOfferGrid({
             <small>{offer.businessName}</small>
             <h3>{offer.title}</h3>
             <p>{offer.description}</p>
-            <Link href="/ofertas">Ativar Benefício</Link>
+            <Link href="/ofertas">Ver oferta</Link>
           </div>
         </article>
       ))}
@@ -897,30 +887,6 @@ function CustomerMobileHeader({
         </button>
       )}
     </header>
-  );
-}
-
-function CustomerMobileCardPreview({
-  card
-}: {
-  card: CustomerDashboardViewModel["cards"][number];
-}) {
-  const cardSuffix = card.cardNumber.replace(/\D/g, "").slice(-4);
-
-  return (
-    <article className="customer-mobile-card-preview" aria-label={`Cartão ${card.businessName}`}>
-      <span className="customer-mobile-card-preview__pattern" aria-hidden="true" />
-      <header>
-        <strong>{card.businessName}</strong>
-        <span>{card.currentTierName}</span>
-      </header>
-      <div>
-        <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
-        <small>
-          {card.customerName} •••• {cardSuffix}
-        </small>
-      </div>
-    </article>
   );
 }
 

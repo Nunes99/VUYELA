@@ -37,6 +37,9 @@ describe("customer digital card visual", () => {
 
     expect(screen.getByLabelText("Verso do cartão Barbershop 21")).toBeVisible();
     expect(screen.getByRole("button", { name: "Mostrar a frente do cartão" })).toBeVisible();
-    expect(screen.getByText("Apresente este código no estabelecimento.")).toBeVisible();
+    expect(screen.getByText("Validade")).toBeVisible();
+    expect(
+      screen.getByRole("img", { name: `QR de identificação: ${card.cardNumber}`, hidden: true })
+    ).toBeInTheDocument();
   });
 });

@@ -12,6 +12,8 @@ Implemented.
 - `features/customer-dashboard/data.ts` loads profile, cards, public offers, and recent transactions through Supabase/RLS.
 - `features/customer-dashboard/dashboard.tsx` renders loading, empty, error, and populated dashboard surfaces.
 - Customers can maintain their display name, optional telephone number, and marketing preference from Perfil.
+- Mobile quick actions only expose working destinations: cards, QR identification, activity, and offers.
+- The five-item bottom navigation and all dedicated customer views follow the approved 402px NEW PHAS composition without horizontal page overflow down to 320px.
 
 ## Decisions
 
@@ -19,6 +21,7 @@ Implemented.
 - Existing customer-card components are reused inside the Cartoes section.
 - Public offers are read from the database policy surface; no hard-coded offers are rendered.
 - The optional telephone supports customer identification at POS without replacing QR or card validation.
+- Unsupported transfer, recharge, payment, card blocking, biometric, and currency controls are not presented as actionable features.
 - E2E workers remain serial because `next dev` cold compiles were flaky with parallel navigation.
 
 ## Next Integration Points

@@ -79,123 +79,6 @@
   }
 }
 
-/* Exact mobile refinements from Figma node 435:4275. */
-@media (max-width: 47.5rem) {
-  .customer-page-heading {
-    display: none !important;
-  }
-
-  .customer-mobile-card-preview {
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 10.625rem;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-    border-radius: 1rem;
-    padding: 1.25rem;
-    background: linear-gradient(72deg, #011c28 17%, #022c3a 50%, #073b4c 92%);
-    color: #ffffff;
-    box-shadow: 0 0.5rem 1rem rgba(1, 28, 40, 0.19);
-  }
-
-  .customer-mobile-card-preview__pattern {
-    position: absolute;
-    top: -2.5rem;
-    left: 9.375rem;
-    width: 11.25rem;
-    height: 11.25rem;
-    border: 2px solid #f2b544;
-    border-radius: 0.25rem;
-    background: rgba(242, 181, 68, 0.02);
-    transform: rotate(45deg);
-  }
-
-  .customer-mobile-card-preview__pattern::before,
-  .customer-mobile-card-preview__pattern::after {
-    position: absolute;
-    border: 1.5px solid #f2b544;
-    border-radius: 0.2rem;
-    background: rgba(242, 181, 68, 0.05);
-    content: "";
-  }
-
-  .customer-mobile-card-preview__pattern::before {
-    top: 2.6rem;
-    left: -4.15rem;
-    width: 8.75rem;
-    height: 8.75rem;
-  }
-
-  .customer-mobile-card-preview__pattern::after {
-    top: 5.4rem;
-    left: -1.35rem;
-    width: 6.25rem;
-    height: 6.25rem;
-    border-width: 1px;
-    background: rgba(242, 181, 68, 0.07);
-  }
-
-  .customer-mobile-card-preview header,
-  .customer-mobile-card-preview > div {
-    position: relative;
-    z-index: 1;
-  }
-
-  .customer-mobile-card-preview header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-
-  .customer-mobile-card-preview header > strong {
-    overflow: hidden;
-    font-family: var(--vy-font-display);
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .customer-mobile-card-preview header > span {
-    flex: 0 0 auto;
-    border-radius: 999px;
-    padding: 0.15rem 0.4rem;
-    background: linear-gradient(90deg, #f2b544, #d4920a);
-    color: #ffffff;
-    font-size: 0.44rem;
-    font-weight: 850;
-    text-transform: uppercase;
-  }
-
-  .customer-mobile-card-preview > div {
-    display: grid;
-    justify-items: start;
-    gap: 0.25rem;
-  }
-
-  .customer-mobile-card-preview > div > strong {
-    font-family: var(--vy-font-display);
-    font-size: 1.25rem;
-    line-height: 1.25;
-  }
-
-  .customer-mobile-card-preview > div > small {
-    color: #7aa8b8;
-    font-size: 0.56rem;
-  }
-
-  .customer-activity-preview article > span.is-earn,
-  .customer-activity-preview article > span.is-redeem,
-  .customer-activity-preview article > span.is-neutral {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-}
-
 .ds-page {
   min-height: 100vh;
   background: var(--vy-bg);
@@ -7917,26 +7800,10 @@
   box-shadow: 0 0 0 2px #f2b544;
 }
 
-.customer-digital-card__front-qr svg,
-.customer-digital-card__back-qr svg {
+.customer-digital-card__front-qr svg {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.customer-digital-card__flip {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  cursor: pointer;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
 }
 
 .customer-digital-card__back-content {
@@ -7950,15 +7817,6 @@
 
 .customer-digital-card__back-content .customer-digital-card__face-label {
   top: -2.7rem;
-}
-
-.customer-digital-card__back-qr {
-  width: 7.2rem;
-  aspect-ratio: 1;
-  border: 0.35rem solid #ffffff;
-  border-radius: 0.5rem;
-  background: #ffffff;
-  box-shadow: 0 0 0 2px #f2b544;
 }
 
 .customer-digital-card__back-content > strong {
@@ -8491,17 +8349,8 @@
     width: 5.75rem;
   }
 
-  .customer-digital-card__flip {
-    right: 0.75rem;
-    bottom: 0.75rem;
-  }
-
   .customer-digital-card__back-content {
     inset: 3.75rem 1rem 1rem;
-  }
-
-  .customer-digital-card__back-qr {
-    width: 5.75rem;
   }
 
   .customer-dashboard-columns {
@@ -8930,125 +8779,7 @@
     margin-bottom: 1.25rem;
   }
 
-  .customer-mobile-card-face {
-    position: relative;
-    display: block;
-    width: 100%;
-    min-height: 13.6rem;
-    overflow: hidden;
-    border: 0;
-    border-radius: 0.9rem;
-    padding: 0;
-    background: #003b49;
-    color: #ffffff;
-    box-shadow: 0 0.65rem 1.3rem rgba(15, 40, 50, 0.22);
-    text-align: left;
-  }
-
-  .customer-mobile-card-face__pattern {
-    position: absolute;
-    inset: -4rem -2rem -2rem 42%;
-    border: 2px solid #f5ad20;
-    transform: rotate(45deg);
-  }
-
-  .customer-mobile-card-face__pattern::before,
-  .customer-mobile-card-face__pattern::after {
-    position: absolute;
-    width: 6.5rem;
-    height: 6.5rem;
-    border: 2px solid #f5ad20;
-    content: "";
-  }
-
-  .customer-mobile-card-face__pattern::before {
-    top: 4rem;
-    left: 4rem;
-  }
-  .customer-mobile-card-face__pattern::after {
-    right: 4rem;
-    bottom: 4rem;
-  }
-
-  .customer-mobile-card-face__brand,
-  .customer-mobile-card-face__tier,
-  .customer-mobile-card-face__balance,
-  .customer-mobile-card-face__customer,
-  .customer-mobile-card-face__back-meta {
-    position: absolute;
-    z-index: 1;
-  }
-
-  .customer-mobile-card-face__brand {
-    top: 1.5rem;
-    left: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.72rem;
-    font-weight: 900;
-    text-transform: uppercase;
-  }
-
-  .customer-mobile-card-face__brand b {
-    display: grid;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 0.35rem;
-    background: #00bfbf;
-    place-items: center;
-  }
-
-  .customer-mobile-card-face__tier {
-    top: 1.5rem;
-    right: 1.5rem;
-    border-radius: 999px;
-    padding: 0.3rem 0.65rem;
-    background: #f5ad20;
-    font-size: 0.5rem;
-    font-weight: 900;
-    text-transform: uppercase;
-  }
-
-  .customer-mobile-card-face__balance {
-    bottom: 1.35rem;
-    left: 1.5rem;
-    display: grid;
-  }
-
-  .customer-mobile-card-face__balance small,
-  .customer-mobile-card-face__customer small,
-  .customer-mobile-card-face__back-meta small {
-    color: #a5c1ca;
-    font-size: 0.6rem;
-  }
-
-  .customer-mobile-card-face__balance strong {
-    font-size: 1.8rem;
-  }
-
-  .customer-mobile-card-face__balance b {
-    color: #00d1c7;
-    font-size: 0.58rem;
-  }
-
-  .customer-mobile-card-face__customer {
-    right: 1.5rem;
-    bottom: 1.5rem;
-    display: grid;
-    font-size: 0.6rem;
-    text-align: right;
-  }
-
-  .customer-mobile-card-face__back-meta {
-    right: 1.5rem;
-    bottom: 1.5rem;
-    display: grid;
-    font-size: 0.7rem;
-  }
-
-  .customer-mobile-reward,
-  .customer-mobile-qr-panel {
+  .customer-mobile-reward {
     margin-top: 1.25rem;
     border: 1px solid #d7e0e5;
     border-radius: 0.85rem;
@@ -9063,8 +8794,7 @@
   }
 
   .customer-mobile-reward h3,
-  .customer-mobile-card-activity h3,
-  .customer-mobile-qr-panel h3 {
+  .customer-mobile-card-activity h3 {
     margin: 0;
     font-size: 0.78rem;
   }
@@ -9160,41 +8890,6 @@
   }
   .customer-mobile-card-activity article b {
     font-size: 0.7rem;
-  }
-
-  .customer-mobile-qr-panel {
-    display: grid;
-    min-height: 21rem;
-    justify-items: center;
-    align-content: center;
-    gap: 1rem;
-  }
-
-  .customer-mobile-qr-panel svg {
-    width: min(11rem, 60vw);
-    height: auto;
-  }
-
-  .customer-mobile-qr-panel > strong {
-    font-size: 0.72rem;
-  }
-
-  .customer-mobile-card-turn {
-    display: flex;
-    margin: 0.75rem auto 0;
-    align-items: center;
-    gap: 0.3rem;
-    border: 0;
-    background: transparent;
-    color: #00a6a6;
-    font: inherit;
-    font-size: 0.65rem;
-    font-weight: 800;
-  }
-
-  .customer-mobile-card-turn svg {
-    width: 0.8rem;
-    height: 0.8rem;
   }
 
   .customer-activity-panel {
@@ -11424,5 +11119,924 @@
     color: #64748b;
     font-size: 0.625rem;
     white-space: nowrap;
+  }
+
+  .customer-notifications-panel {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .customer-notifications-panel__heading {
+    min-height: 1.5rem;
+    align-items: center;
+  }
+
+  .customer-notifications-panel__heading h3 {
+    font-size: 0;
+  }
+
+  .customer-notifications-panel__heading h3::after {
+    color: #64748b;
+    font-size: 0.58rem;
+    content: "Recentes";
+  }
+
+  .customer-notifications-panel__heading span {
+    font-size: 0.58rem;
+  }
+
+  .customer-notification-filters {
+    display: none;
+  }
+
+  .customer-notification-list {
+    display: grid;
+    gap: 0.75rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .customer-notification {
+    display: grid;
+    min-height: 4rem;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0;
+    border: 1px solid #d7e0e5;
+    border-radius: 0.75rem;
+    padding: 0.65rem;
+    background: #ffffff;
+  }
+
+  .customer-notification.is-unread {
+    border: 1.5px solid #00bfbf;
+  }
+
+  .customer-notification__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+  }
+
+  .customer-notification h3 {
+    margin: 0;
+    font-size: 0.72rem;
+  }
+
+  .customer-notification p {
+    overflow: hidden;
+    margin: 0.12rem 0;
+    color: #64748b;
+    font-size: 0.58rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .customer-notification time {
+    color: #94a3b8;
+    font-size: 0.52rem;
+  }
+
+  .customer-notification .customer-dashboard-eyebrow,
+  .customer-notification form,
+  .customer-notification__read {
+    display: none;
+  }
+}
+
+/* Canonical customer loyalty card: shared by home, card hub and detail views. */
+.customer-digital-card {
+  width: 100%;
+  perspective: 75rem;
+}
+
+.customer-digital-card__surface {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  cursor: pointer;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+  font: inherit;
+  text-align: left;
+}
+
+.customer-digital-card__inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.645 / 1;
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.customer-digital-card[data-face="back"] .customer-digital-card__inner {
+  transform: rotateY(180deg);
+}
+
+.customer-digital-card__face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  background: linear-gradient(120deg, #011c28 0%, #063e4a 100%);
+  color: #ffffff;
+  box-shadow: 0 0.75rem 1.5rem rgba(1, 28, 40, 0.2);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.customer-digital-card__face--back {
+  transform: rotateY(180deg);
+}
+
+.customer-digital-card__pattern {
+  position: absolute;
+  top: -42%;
+  right: -8%;
+  display: block;
+  width: 62%;
+  aspect-ratio: 1;
+  border: 2px solid #f2b544;
+  background: rgba(242, 181, 68, 0.025);
+  transform: rotate(45deg);
+}
+
+.customer-digital-card__pattern::before,
+.customer-digital-card__pattern::after {
+  position: absolute;
+  border: 2px solid #f2b544;
+  content: "";
+}
+
+.customer-digital-card__pattern::before {
+  inset: 22%;
+}
+
+.customer-digital-card__pattern::after {
+  inset: 47%;
+}
+
+.customer-digital-card__brand {
+  position: absolute;
+  top: 11%;
+  left: 6.5%;
+  z-index: 1;
+  display: flex;
+  max-width: 52%;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.customer-digital-card__brand > b {
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  flex: 0 0 auto;
+  border-radius: 0.35rem;
+  background: #00bfbf;
+  color: #ffffff;
+  font-family: var(--vy-font-display);
+  font-size: 0.8rem;
+  font-weight: 850;
+  place-items: center;
+}
+
+.customer-digital-card__brand > strong {
+  overflow: hidden;
+  color: #ffffff;
+  font-family: var(--vy-font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.customer-digital-card__face-label {
+  position: absolute;
+  top: 11%;
+  right: 6.5%;
+  z-index: 1;
+  border-radius: 999px;
+  padding: 0.28rem 0.6rem;
+  background: #f2b544;
+  color: #ffffff;
+  font-size: 0.48rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer-digital-card__balance {
+  position: absolute;
+  bottom: 12%;
+  left: 6.5%;
+  z-index: 1;
+  display: grid;
+  gap: 0.08rem;
+}
+
+.customer-digital-card__balance > span {
+  color: #a8c2cc;
+  font-size: 0.58rem;
+}
+
+.customer-digital-card__balance > strong {
+  color: #ffffff;
+  font-family: var(--vy-font-display);
+  font-size: 1.75rem;
+  line-height: 1.05;
+}
+
+.customer-digital-card__balance > strong small {
+  font-size: 0.62em;
+}
+
+.customer-digital-card__balance > b {
+  color: #18cec5;
+  font-size: 0.56rem;
+  font-weight: 650;
+}
+
+.customer-digital-card__customer {
+  position: absolute;
+  right: 6.5%;
+  bottom: 43%;
+  z-index: 1;
+  display: grid;
+  max-width: 34%;
+  color: #ffffff;
+  font-size: 0.52rem;
+  text-align: right;
+}
+
+.customer-digital-card__customer small {
+  overflow: hidden;
+  color: #a8c2cc;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer-digital-card__front-qr {
+  position: absolute;
+  right: 6.5%;
+  bottom: 9%;
+  z-index: 1;
+  display: grid;
+  width: 20%;
+  min-width: 2.9rem;
+  max-width: 4.25rem;
+  aspect-ratio: 1;
+  border: 2px solid #f2b544;
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+  background: #ffffff;
+  place-items: center;
+}
+
+.customer-digital-card__front-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.customer-digital-card__back-content {
+  position: absolute;
+  right: 6.5%;
+  bottom: 11%;
+  left: 6.5%;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1.25rem;
+}
+
+.customer-digital-card__back-content > span {
+  display: grid;
+  min-width: 0;
+  gap: 0.12rem;
+}
+
+.customer-digital-card__back-content small {
+  color: #86a8b4;
+  font-size: 0.52rem;
+  text-transform: uppercase;
+}
+
+.customer-digital-card__back-content strong {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customer-digital-card__surface:focus-visible {
+  border-radius: 1rem;
+  outline: 3px solid rgba(0, 191, 191, 0.52);
+  outline-offset: 0.25rem;
+}
+
+.customer-digital-card--compact .customer-digital-card__surface {
+  cursor: default;
+}
+
+.customer-card-hub-item .customer-digital-card__front-qr,
+.customer-card-hub-item .customer-digital-card__customer,
+.customer-card-hub-item .customer-digital-card__face-label {
+  display: none;
+}
+
+.customer-card-hub-item .customer-digital-card__brand {
+  top: 18%;
+  left: 9%;
+  max-width: 82%;
+}
+
+.customer-card-hub-item .customer-digital-card__brand > b {
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.55rem;
+}
+
+.customer-card-hub-item .customer-digital-card__brand > strong {
+  font-size: 0.52rem;
+}
+
+.customer-card-hub-item .customer-digital-card__balance {
+  bottom: 14%;
+  left: 9%;
+}
+
+.customer-card-hub-item .customer-digital-card__balance > span,
+.customer-card-hub-item .customer-digital-card__balance > b {
+  display: none;
+}
+
+.customer-card-hub-item .customer-digital-card__balance > strong {
+  font-size: 0.72rem;
+}
+
+.customer-card-hub-item > svg {
+  color: #0f2832;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .customer-digital-card__inner {
+    transition-duration: 1ms;
+  }
+}
+
+@media (max-width: 47.5rem) {
+  .customer-page-heading {
+    display: none !important;
+  }
+
+  .customer-dashboard {
+    padding-top: 1.25rem;
+  }
+
+  .customer-dashboard-overview__heading h2 {
+    margin-top: 0.2rem;
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .customer-dashboard-overview__heading p {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .customer-mobile-total {
+    min-height: 7.2rem;
+    align-content: center;
+    gap: 0.2rem;
+    border-radius: 1rem;
+    padding: 1rem 4.5rem 1rem 1.2rem;
+  }
+
+  .customer-mobile-total > span {
+    font-size: 0.62rem;
+  }
+
+  .customer-mobile-total > strong {
+    font-size: 1.8rem;
+  }
+
+  .customer-mobile-total > small {
+    font-size: 0.68rem;
+  }
+
+  .customer-mobile-total > svg {
+    top: 1.5rem;
+    right: 1.25rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0.7rem;
+  }
+
+  .customer-dashboard-nav {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 50%;
+    z-index: 50;
+    display: grid;
+    width: min(100%, 30rem);
+    min-height: calc(4.5rem + env(safe-area-inset-bottom));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-top: 1px solid #d7e0e5;
+    padding: 0 max(0.25rem, env(safe-area-inset-right)) env(safe-area-inset-bottom)
+      max(0.25rem, env(safe-area-inset-left));
+    background: #ffffff;
+    box-shadow: 0 -0.25rem 0.9rem rgba(15, 40, 50, 0.05);
+    transform: translateX(-50%);
+  }
+
+  .customer-dashboard-nav > a {
+    display: grid;
+    min-width: 0;
+    min-height: 4.5rem;
+    align-content: center;
+    justify-items: center;
+    gap: 0.28rem;
+    border-radius: 0;
+    padding: 0.4rem 0.1rem;
+    background: transparent;
+  }
+
+  .customer-dashboard-nav > a:first-child,
+  .customer-dashboard-nav > a.is-active {
+    background: transparent;
+    color: #64748b;
+  }
+
+  .customer-dashboard-nav > a.is-active {
+    color: #00a6a6;
+  }
+
+  .customer-dashboard-nav > a svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .customer-dashboard-nav > a span::after {
+    font-size: 0.625rem;
+  }
+
+  .customer-home-card-link .customer-digital-card__surface,
+  .customer-mobile-card-detail .customer-digital-card__surface {
+    min-height: 0;
+  }
+
+  .customer-mobile-card-detail .customer-digital-card__inner {
+    aspect-ratio: 1.645 / 1;
+  }
+
+  .customer-mobile-card-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .customer-mobile-card-actions > :first-child {
+    border-color: #00bfbf;
+    background: #00bfbf;
+    color: #ffffff;
+  }
+
+  .customer-mobile-profile-preferences > a {
+    min-height: 2.75rem;
+  }
+
+  .customer-offers-heading {
+    display: none;
+  }
+
+  .customer-offer-card a {
+    color: #ffffff;
+    opacity: 1;
+  }
+
+  .customer-profile-layout {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .customer-profile-card {
+    display: grid;
+    min-height: 6rem;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    align-items: center;
+    gap: 0.15rem 0.75rem;
+    border: 1px solid #d7e0e5;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: #ffffff;
+    box-shadow: none;
+    text-align: left;
+  }
+
+  .customer-profile-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .customer-profile-card h3 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    font-size: 0.82rem;
+  }
+
+  .customer-profile-card p {
+    display: none;
+  }
+
+  .customer-profile-card > strong {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+    color: #64748b;
+    font-size: 0.58rem;
+    font-weight: 500;
+  }
+
+  .customer-profile-information {
+    border: 1px solid #d7e0e5;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: #ffffff;
+    box-shadow: none;
+  }
+
+  .customer-profile-information__heading {
+    align-items: center;
+  }
+
+  .customer-profile-information__heading h3 {
+    margin: 0;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+  }
+
+  .customer-profile-information__heading .customer-dashboard-eyebrow {
+    display: none;
+  }
+
+  .customer-profile-information__heading > a {
+    min-height: 2rem;
+    gap: 0.25rem;
+    font-size: 0.65rem;
+  }
+
+  .customer-profile-information dl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+    margin: 0.8rem 0 0;
+  }
+
+  .customer-profile-information dl > div {
+    display: grid;
+    min-height: 0;
+    gap: 0.08rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+  }
+
+  .customer-profile-information dt {
+    color: #64748b;
+    font-size: 0.56rem;
+  }
+
+  .customer-profile-information dt svg {
+    display: none;
+  }
+
+  .customer-profile-information dd {
+    margin: 0;
+    color: #0f2832;
+    font-size: 0.66rem;
+    font-weight: 650;
+  }
+
+  .customer-profile-preferences {
+    display: none;
+  }
+
+  .customer-mobile-profile-preferences {
+    margin-top: 0.75rem;
+    border: 1px solid #d7e0e5;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+  }
+
+  .customer-mobile-profile-preferences h3 {
+    margin: 0 0 0.35rem;
+    color: #00a6a6;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+  }
+
+  .customer-mobile-profile-preferences > a {
+    min-height: 2rem;
+    border: 0;
+    padding: 0;
+    font-size: 0.6rem;
+  }
+
+  .customer-mobile-profile-preferences > a svg {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+
+  .customer-mobile-profile-preferences > a svg:last-child {
+    margin-left: auto;
+  }
+
+  .customer-mobile-signout {
+    margin-top: 0.75rem;
+  }
+
+  .customer-back-link {
+    display: none;
+  }
+
+  .customer-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+  }
+
+  .customer-profile-form > h3,
+  .customer-profile-form__email {
+    display: none;
+  }
+
+  .customer-profile-form__grid,
+  .customer-mobile-profile-extra-fields {
+    display: contents;
+  }
+
+  .customer-profile-form__grid > :first-child {
+    order: 1;
+  }
+
+  .customer-mobile-profile-extra-fields > :first-child {
+    order: 2;
+  }
+
+  .customer-profile-form__grid > :nth-child(2) {
+    order: 3;
+  }
+
+  .customer-mobile-profile-extra-fields > :nth-child(2) {
+    order: 4;
+  }
+
+  .customer-profile-consent {
+    order: 5;
+  }
+
+  .customer-profile-form > button[type="submit"] {
+    order: 6;
+    min-height: 2.75rem;
+    background: #00a6a6;
+    color: #ffffff;
+  }
+
+  .customer-activity-panel {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .customer-activity-toolbar {
+    gap: 0.75rem;
+    border: 0;
+    padding: 0;
+  }
+
+  .customer-activity-search {
+    min-height: 2.75rem;
+    border: 1px solid #d7e0e5;
+    border-radius: 0.65rem;
+    background: #ffffff;
+  }
+
+  .customer-activity-filters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .customer-activity-filters button {
+    min-height: 2rem;
+    border: 0;
+    border-radius: 999px;
+    background: #ffffff;
+    font-size: 0.65rem;
+  }
+
+  .customer-activity-table-wrap {
+    overflow: visible;
+    margin-top: 1.25rem;
+  }
+
+  .customer-activity-table,
+  .customer-activity-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .customer-activity-table tr {
+    position: relative;
+    display: grid;
+    min-height: 4rem;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #d7e0e5;
+    border-radius: 0.75rem;
+    padding: 0.65rem;
+    background: #ffffff;
+  }
+
+  .customer-activity-table tr::before {
+    position: static;
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 0.55rem;
+    background: #effafa;
+    color: #00a6a6;
+    font-size: 1rem;
+    content: "☆";
+    place-items: center;
+  }
+
+  .customer-activity-table td {
+    display: none;
+    width: auto;
+    border: 0;
+    padding: 0;
+  }
+
+  .customer-activity-table td:nth-child(2) {
+    display: grid;
+    min-width: 0;
+    grid-column: 2;
+    grid-row: 1;
+    gap: 0.12rem;
+  }
+
+  .customer-activity-table td:nth-child(2) strong {
+    font-size: 0.72rem;
+  }
+
+  .customer-activity-table td:nth-child(2) small {
+    overflow: hidden;
+    color: #64748b;
+    font-size: 0.56rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .customer-activity-table td:last-child {
+    position: static;
+    display: block;
+    width: auto;
+    grid-column: 3;
+    grid-row: 1;
+    padding: 0;
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+  .customer-card-filters {
+    margin: 0 0 1.25rem;
+  }
+
+  .customer-cards-hub-grid {
+    gap: 0.75rem;
+  }
+
+  .customer-card-hub-item {
+    display: grid;
+    min-height: 4.5rem;
+    grid-template-columns: 4rem minmax(0, 1fr) 2.125rem;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid #d7e0e5;
+    border-radius: 1rem;
+    padding: 0.65rem 0.75rem;
+    background: #ffffff;
+    box-shadow: none;
+  }
+
+  .customer-card-hub-item .customer-digital-card__inner {
+    aspect-ratio: 1.6 / 1;
+  }
+
+  .customer-card-hub-item__content {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    grid-column: 2;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 0.15rem;
+  }
+
+  .customer-card-hub-item__content > span {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: start;
+    border: 1px solid #b8e2d4;
+    border-radius: 999px;
+    padding: 0.05rem 0.3rem;
+    background: #effaf6;
+    color: #0b7a5b;
+    font-size: 0.46rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .customer-card-hub-item__content h3 {
+    overflow: hidden;
+    margin: 0;
+    grid-column: 1;
+    grid-row: 1;
+    padding-right: 0;
+    color: #0f2832;
+    font-size: 0.76rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .customer-card-hub-item__content > strong {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0;
+    color: #64748b;
+    font-size: 0.7rem;
+  }
+
+  .customer-card-hub-item > svg {
+    grid-column: 3;
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 50%;
+    padding: 0.55rem;
+    background: #f0f4f8;
+  }
+
+  .customer-card-hub-item .customer-digital-card__pattern {
+    top: -60%;
+    right: -5%;
+    width: 80%;
+  }
+}
+
+@media (max-width: 22rem) {
+  .customer-home-card-grid {
+    margin-right: -1rem;
+  }
+
+  .customer-digital-card__brand > strong {
+    font-size: 0.66rem;
+  }
+
+  .customer-digital-card__balance > strong {
+    font-size: 1.25rem;
+  }
+
+  .customer-digital-card__front-qr {
+    min-width: 2.55rem;
   }
 }

@@ -64,7 +64,8 @@ describe("approved VUYELA design contract", () => {
     expect(customerDashboard).toContain("Histórico de Atividade");
     expect(customerDashboard).toContain("Editar Dados Pessoais");
     expect(customerDashboard).toContain("Seus Cartões Digitais");
-    expect(customerCard).toContain("showBack");
+    expect(customerCard).toContain("CustomerCardFace");
+    expect(customerCard).toContain("data-face={currentFace}");
     expect(customerCard).toContain("QRCodeSVG");
     expect(pageStyles).toContain("NEW PHAS nodes 418:4266, 428:4266 and 428:4436");
     expect(pageStyles).toContain("NEW PHAS nodes 435:4274, 436:4270, 436:5129,");

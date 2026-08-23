@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 test("keeps the NEW PHAS customer composition across desktop and mobile", async ({ page }) => {
-  await page.goto("/dev/customer");
+  test.setTimeout(120_000);
 
   for (const viewport of [
     { width: 1440, height: 1000, mobile: false },
     { width: 390, height: 844, mobile: true }
   ]) {
     await page.setViewportSize(viewport);
-    await page.reload();
+    await page.goto("/dev/customer");
 
     await expect(page.getByRole("heading", { name: "Olá, Nunes José" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Seus Cartões" })).toBeVisible();
@@ -50,16 +50,11 @@ test("renders the customer activity, notifications and card identification views
   await expect(page.getByText("Pontos acumulados", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=cartoes&cartao=card-1");
-  const desktopFlip = page.getByRole("button", { name: "Mostrar o verso do cartão" });
-  const mobileFlip = page.getByRole("button", { name: "Mostrar o QR Code do cartão" });
-  if (await desktopFlip.isVisible()) {
-    await desktopFlip.click();
-    await expect(page.getByLabel("Verso do cartão Barbershop 21")).toBeVisible();
-  } else {
-    await mobileFlip.click();
-    await expect(page.getByRole("heading", { name: "QR Code de identificação" })).toBeVisible();
-  }
-  await expect(page.getByLabel(/QR de identificação/).first()).toBeVisible();
+  await expect(page.locator('[aria-label^="QR de identificação:"]:visible')).toBeVisible();
+  await page.locator('button[aria-label="Mostrar o verso do cartão"]:visible').click();
+  await expect(
+    page.locator('[role="img"][aria-label="Verso do cartão Barbershop 21"]:visible')
+  ).toBeVisible();
 });
 
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {
@@ -72,7 +67,7 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await page.goto("/dev/customer?vista=ofertas");
   await expect(page.getByRole("heading", { name: "Explorar Ofertas" }).first()).toBeVisible();
   await expect(page.getByText("Restaurantes", { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Ativar Benefício" }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ver oferta" }).first()).toBeVisible();
 
   await page.goto("/dev/customer?vista=perfil");
   await expect(page.getByRole("heading", { name: "O Seu Perfil" }).first()).toBeVisible();
