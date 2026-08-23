@@ -28,14 +28,24 @@ describe("customer digital card visual", () => {
   it("switches accessibly between the front and back without changing the QR payload", () => {
     render(<CustomerCardVisual card={card} />);
 
-    expect(screen.getByLabelText("Frente do cartão Barbershop 21")).toBeVisible();
+    expect(screen.getByLabelText("Frente do cartão Barbershop 21")).toHaveAttribute(
+      "aria-hidden",
+      "false"
+    );
+    expect(screen.getAllByRole("presentation", { hidden: true })).toHaveLength(2);
     expect(
       screen.getByRole("img", { name: `QR de identificação: ${card.cardNumber}` })
     ).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: "Mostrar o verso do cartão" }));
 
-    expect(screen.getByLabelText("Verso do cartão Barbershop 21")).toBeVisible();
+    expect(screen.getByLabelText("Verso do cartão Barbershop 21")).toHaveAttribute(
+      "aria-hidden",
+      "false"
+    );
+    expect(
+      screen.getByLabelText("Frente do cartão Barbershop 21", { selector: "span" })
+    ).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("button", { name: "Mostrar a frente do cartão" })).toBeVisible();
     expect(screen.getByText("Validade")).toBeVisible();
     expect(

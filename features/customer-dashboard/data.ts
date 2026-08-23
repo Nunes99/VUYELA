@@ -45,6 +45,14 @@ interface TransactionRow {
 interface BusinessNameRow {
   id: string;
   name: string;
+  slug: string | null;
+  category_id: string | null;
+}
+
+interface CategoryRow {
+  id: string;
+  slug: string;
+  name: string;
 }
 
 interface OfferRow {
@@ -105,8 +113,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
       .from("offers")
       .select("id, business_id, title, description")
       .eq("is_public", true)
-      .eq("is_active", true)
-      .limit(6),
+      .eq("is_active", true),
     supabase
       .from("notifications")
       .select("id, business_id, subject, body, created_at, read_at")
@@ -133,19 +140,38 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
   ]);
   const { data: businessData, error: businessError } =
     businessesToFetch.length > 0
-      ? await supabase.from("businesses").select("id, name").in("id", businessesToFetch)
+      ? await supabase
+          .from("businesses")
+          .select("id, name, slug, category_id")
+          .in("id", businessesToFetch)
       : { data: [], error: null };
 
   if (businessError) {
     return { status: "error", message: "Não foi possível carregar negócios do painel." };
   }
 
-  const businessById = toMap(rowsFrom<BusinessNameRow>(businessData), (business) => business.id);
+  const businessRows = rowsFrom<BusinessNameRow>(businessData);
+  const categoryIds = uniqueValues(
+    businessRows
+      .map((business) => business.category_id)
+      .filter((categoryId): categoryId is string => Boolean(categoryId))
+  );
+  const { data: categoryData, error: categoryError } =
+    categoryIds.length > 0
+      ? await supabase.from("business_categories").select("id, slug, name").in("id", categoryIds)
+      : { data: [], error: null };
+
+  if (categoryError) {
+    return { status: "error", message: "Não foi possível carregar categorias das ofertas." };
+  }
+
+  const businessById = toMap(businessRows, (business) => business.id);
+  const categoryById = toMap(rowsFrom<CategoryRow>(categoryData), (category) => category.id);
   const cardById = toMap(cards, (card) => card.id);
   const dashboard = buildCustomerDashboardViewModel({
     cards,
     activity: buildActivity(rowsFrom<TransactionRow>(transactionData), businessById, cardById),
-    offers: buildOffers(offerRows, businessById),
+    offers: buildOffers(offerRows, businessById, categoryById),
     notifications: buildNotifications(notificationRows, businessById),
     profile: buildProfile(rowFrom<ProfileRow>(profileData))
   });
@@ -207,14 +233,23 @@ function buildActivity(
 
 function buildOffers(
   rows: OfferRow[],
-  businessById: Map<string, BusinessNameRow>
+  businessById: Map<string, BusinessNameRow>,
+  categoryById: Map<string, CategoryRow>
 ): CustomerExploreOffer[] {
-  return rows.map((row) => ({
-    id: row.id,
-    businessName: businessById.get(row.business_id)?.name ?? "Negócio VUYELA",
-    title: row.title,
-    description: row.description
-  }));
+  return rows.map((row) => {
+    const business = businessById.get(row.business_id);
+    const category = business?.category_id ? categoryById.get(business.category_id) : null;
+
+    return {
+      id: row.id,
+      businessName: business?.name ?? "Negócio VUYELA",
+      title: row.title,
+      description: row.description,
+      categorySlug: category?.slug ?? null,
+      categoryName: category?.name ?? null,
+      href: business?.slug ? `/estabelecimentos/${business.slug}` : "/ofertas"
+    };
+  });
 }
 
 function buildProfile(profile: ProfileRow | null): CustomerProfileSummary {

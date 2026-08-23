@@ -4,6 +4,7 @@ import {
   Activity,
   ArrowLeft,
   Bell,
+  BriefcaseBusiness,
   Check,
   ChevronRight,
   CreditCard,
@@ -17,6 +18,7 @@ import {
   Pencil,
   Phone,
   Save,
+  ScanLine,
   ShieldCheck,
   Star,
   User
@@ -24,6 +26,7 @@ import {
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input } from "../../vuyela-design-system/src/components/Field";
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
@@ -32,6 +35,7 @@ import { signOutAction } from "@/features/auth/actions";
 import { updateCustomerProfileAction } from "./actions";
 import { CustomerActivityTable } from "./activity-table";
 import { CustomerMobileCardDetail } from "./mobile-card-detail";
+import { CustomerOfferGrid } from "./offer-grid";
 import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
 
@@ -44,6 +48,12 @@ interface CustomerDashboardViewProps {
   cardId?: string | undefined;
   editProfile?: boolean;
   profileStatus?: string;
+  workspaceAccess?: CustomerWorkspaceAccess;
+}
+
+export interface CustomerWorkspaceAccess {
+  business: boolean;
+  pos: boolean;
 }
 
 const navItems = [
@@ -77,7 +87,8 @@ export function CustomerDashboardView({
   activeView = "inicio",
   cardId,
   editProfile = false,
-  profileStatus
+  profileStatus,
+  workspaceAccess = { business: false, pos: false }
 }: CustomerDashboardViewProps) {
   if (state.status === "error") {
     return (
@@ -97,7 +108,9 @@ export function CustomerDashboardView({
       <CustomerDashboardNav activeView={activeView} />
       <OfflineCardSync cards={state.dashboard.cards} />
       <main className="customer-dashboard-view">
-        {activeView === "inicio" ? <CustomerHome dashboard={state.dashboard} /> : null}
+        {activeView === "inicio" ? (
+          <CustomerHome dashboard={state.dashboard} workspaceAccess={workspaceAccess} />
+        ) : null}
         {activeView === "cartoes" ? (
           selectedCard ? (
             <CustomerCardDetail card={selectedCard} dashboard={state.dashboard} />
@@ -160,7 +173,13 @@ function CustomerDashboardNav({ activeView }: { activeView: CustomerDashboardVie
   );
 }
 
-function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
+function CustomerHome({
+  dashboard,
+  workspaceAccess
+}: {
+  dashboard: CustomerDashboardViewModel;
+  workspaceAccess: CustomerWorkspaceAccess;
+}) {
   return (
     <>
       <section className="customer-dashboard-overview" aria-labelledby="customer-home-title">
@@ -272,6 +291,18 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
             <Gift aria-hidden="true" />
             <span>Ofertas</span>
           </Link>
+          {workspaceAccess.business ? (
+            <Link href="/negocio">
+              <BriefcaseBusiness aria-hidden="true" />
+              <span>Negócios</span>
+            </Link>
+          ) : null}
+          {workspaceAccess.pos ? (
+            <Link href="/pos">
+              <ScanLine aria-hidden="true" />
+              <span>POS</span>
+            </Link>
+          ) : null}
         </nav>
       </div>
 
@@ -282,7 +313,7 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
           title="Ofertas em Destaque"
           titleId="home-offers-title"
         />
-        <CustomerOfferGrid dashboard={dashboard} limit={3} />
+        <CustomerOfferGrid offers={dashboard.offers} limit={3} />
       </section>
     </>
   );
@@ -449,12 +480,7 @@ function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }
         <h3>Todas as Ofertas Disponíveis</h3>
         <span>{dashboard.offers.length.toLocaleString("pt-MZ")} ofertas</span>
       </div>
-      <div className="customer-offer-filters" aria-label="Categorias de ofertas">
-        <span className="is-active">Restaurantes</span>
-        <span>Compras</span>
-        <span>Saúde</span>
-      </div>
-      <CustomerOfferGrid dashboard={dashboard} />
+      <CustomerOfferGrid offers={dashboard.offers} showFilters />
     </section>
   );
 }
@@ -717,50 +743,6 @@ function CustomerActivityPreview({ dashboard }: { dashboard: CustomerDashboardVi
   );
 }
 
-function CustomerOfferGrid({
-  dashboard,
-  limit
-}: {
-  dashboard: CustomerDashboardViewModel;
-  limit?: number;
-}) {
-  const offers = typeof limit === "number" ? dashboard.offers.slice(0, limit) : dashboard.offers;
-
-  if (offers.length === 0) {
-    return (
-      <SectionEmpty
-        icon={Gift}
-        title="Sem ofertas públicas"
-        body="As campanhas dos estabelecimentos parceiros aparecerão aqui."
-      />
-    );
-  }
-
-  return (
-    <div className="customer-offer-grid">
-      {offers.map((offer, index) => (
-        <article className="customer-offer-card" key={offer.id}>
-          <div className="customer-offer-card__image">
-            <Image
-              alt=""
-              fill
-              sizes="(max-width: 760px) 100vw, 32vw"
-              src={index % 2 === 0 ? "/images/offer-prawns.jpg" : "/images/offer-bakery.jpg"}
-            />
-            <span>Oferta</span>
-          </div>
-          <div>
-            <small>{offer.businessName}</small>
-            <h3>{offer.title}</h3>
-            <p>{offer.description}</p>
-            <Link href="/ofertas">Ver oferta</Link>
-          </div>
-        </article>
-      ))}
-    </div>
-  );
-}
-
 function CustomerSummaryCard({
   icon: Icon,
   label,
@@ -868,9 +850,7 @@ function CustomerMobileHeader({
           <ArrowLeft />
         </Link>
       ) : (
-        <span className="customer-mobile-header__mark" aria-hidden="true">
-          V
-        </span>
+        <VuyelaLogo className="customer-mobile-header__logo" compact href="/cliente" />
       )}
       <h2>{title}</h2>
       {action === "notifications" ? (

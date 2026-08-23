@@ -75,7 +75,7 @@ export function ProtectedRouteStateView({
       <main className={pageClassName}>
         <section className="dashboard-shell" aria-labelledby="dashboard-title">
           <header className="dashboard-shell__header">
-            <VuyelaLogo inverse={isCustomer} />
+            <VuyelaLogo href={isCustomer ? "/cliente" : "/"} inverse={isCustomer} />
             <div className="dashboard-shell__title">
               {!isCustomer ? <span className="auth-kicker">Área protegida</span> : null}
               <h1 id="dashboard-title">{title}</h1>

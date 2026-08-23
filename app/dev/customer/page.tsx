@@ -64,19 +64,28 @@ const dashboard = buildCustomerDashboardViewModel({
       id: "offer-1",
       businessName: "Barbershop 21",
       title: "20% no corte premium",
-      description: "Válido até ao final do mês."
+      description: "Válido até ao final do mês.",
+      categorySlug: "beleza",
+      categoryName: "Beleza",
+      href: "/estabelecimentos/barbershop-21"
     },
     {
       id: "offer-2",
       businessName: "Café Maputo",
       title: "Compre 1 e ganhe outro café",
-      description: "Disponível em todas as lojas."
+      description: "Disponível em todas as lojas.",
+      categorySlug: "restaurantes",
+      categoryName: "Restaurantes",
+      href: "/estabelecimentos/cafe-maputo"
     },
     {
       id: "offer-3",
       businessName: "Farmácia Central",
       title: "10% em vitaminas",
-      description: "Benefício para clientes VUYELA."
+      description: "Benefício para clientes VUYELA.",
+      categorySlug: "saude",
+      categoryName: "Saúde",
+      href: "/estabelecimentos/farmacia-central"
     }
   ],
   notifications: [
@@ -143,6 +152,7 @@ export default async function CustomerPreviewPage({
         cardId={typeof params.cartao === "string" ? params.cartao : undefined}
         editProfile={params.editar === "1"}
         state={{ status: "populated", dashboard }}
+        workspaceAccess={{ business: true, pos: true }}
       />
     </ProtectedRouteStateView>
   );

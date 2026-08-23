@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useState } from "react";
 
@@ -127,7 +128,7 @@ function CardPattern() {
 function CardBrand({ businessName }: { businessName: string }) {
   return (
     <span className="customer-digital-card__brand">
-      <b aria-hidden="true">V</b>
+      <Image alt="" aria-hidden="true" height={28} src="/brand/logo-mark.svg" width={28} />
       <strong>{businessName}</strong>
     </span>
   );

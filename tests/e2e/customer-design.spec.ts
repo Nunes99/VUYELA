@@ -14,6 +14,11 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     await expect(page.getByRole("heading", { name: "Seus Cartões" })).toBeVisible();
     await expect(page.getByLabel("Navegação do cliente")).toBeVisible();
 
+    if (viewport.mobile) {
+      await expect(page.getByRole("link", { name: "Negócios" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "POS" })).toBeVisible();
+    }
+
     const layout = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth - window.innerWidth,
       mobileTotalVisible:
@@ -59,17 +64,32 @@ test("renders the customer activity, notifications and card identification views
 
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chrome", "Mobile-only design contract");
+  test.setTimeout(180_000);
 
   await page.goto("/dev/customer?vista=cartoes");
   await expect(page.getByRole("heading", { name: "Gerir Cartões" })).toBeVisible();
   await expect(page.getByText("Adicionar novo cartão digital")).toBeVisible();
+  await expect(page.locator(".customer-mobile-header__logo")).toHaveAttribute("href", "/cliente");
 
   await page.goto("/dev/customer?vista=ofertas");
   await expect(page.getByRole("heading", { name: "Explorar Ofertas" }).first()).toBeVisible();
-  await expect(page.getByText("Restaurantes", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Todas" })).toBeVisible();
+  await page.getByRole("button", { name: "Saúde" }).click();
+  await expect(page.getByText("Farmácia Central", { exact: true })).toBeVisible();
+  await expect(page.getByText("Restaurante Marés", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Ver oferta" }).first()).toBeVisible();
 
   await page.goto("/dev/customer?vista=perfil");
   await expect(page.getByRole("heading", { name: "O Seu Perfil" }).first()).toBeVisible();
   await expect(page.getByText("Segurança e preferências", { exact: true })).toBeVisible();
+
+  await page.goto("/dev/customer?vista=perfil&editar=1");
+  const consent = page.getByRole("checkbox", { name: "Comunicações de benefícios" });
+  await expect(consent).toBeVisible();
+  const checkboxSize = await consent.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  });
+  expect(checkboxSize.width).toBeGreaterThanOrEqual(20);
+  expect(checkboxSize.height).toBeGreaterThanOrEqual(20);
 });

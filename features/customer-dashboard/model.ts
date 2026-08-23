@@ -17,6 +17,9 @@ export interface CustomerExploreOffer {
   businessName: string;
   title: string;
   description: string;
+  categorySlug?: string | null;
+  categoryName?: string | null;
+  href?: string;
 }
 
 export interface CustomerProfileSummary {
