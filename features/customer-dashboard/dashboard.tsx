@@ -4,20 +4,26 @@ import {
   Activity,
   ArrowLeft,
   ArrowRight,
+  Bell,
+  Check,
   ChevronRight,
   CreditCard,
   Gift,
   Home,
+  Languages,
+  LockKeyhole,
   LogOut,
   Mail,
   MapPin,
+  Plus,
+  QrCode,
   Pencil,
   Phone,
   Save,
+  Settings2,
   ShieldCheck,
   Star,
-  User,
-  WalletCards
+  User
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
@@ -29,6 +35,7 @@ import { signOutAction } from "@/features/auth/actions";
 
 import { updateCustomerProfileAction } from "./actions";
 import { CustomerActivityTable } from "./activity-table";
+import { CustomerMobileCardDetail } from "./mobile-card-detail";
 import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
 
@@ -97,7 +104,7 @@ export function CustomerDashboardView({
         {activeView === "inicio" ? <CustomerHome dashboard={state.dashboard} /> : null}
         {activeView === "cartoes" ? (
           selectedCard ? (
-            <CustomerCardDetail card={selectedCard} />
+            <CustomerCardDetail card={selectedCard} dashboard={state.dashboard} />
           ) : (
             <CustomerCardsHub dashboard={state.dashboard} />
           )
@@ -208,7 +215,7 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
           <CustomerSectionHeader
             actionHref="/cliente?vista=cartoes"
             actionLabel={`Ver todos (${dashboard.cards.length.toLocaleString("pt-MZ")})`}
-            title="Seus Cartões Digitais"
+            title="Seus Cartões"
             titleId="home-cards-title"
           />
           {dashboard.hasCards ? (
@@ -247,20 +254,26 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
 
         <nav className="customer-quick-actions" aria-label="Ações rápidas">
           <h2>Ações Rápidas</h2>
-          <Link href="/cliente?vista=cartoes">
+          <button disabled title="Transferências ainda não disponíveis" type="button">
             <ArrowRight aria-hidden="true" />
-            <span>Cartões</span>
-          </Link>
-          <Link href="/cliente?vista=ofertas">
-            <Gift aria-hidden="true" />
-            <span>Ofertas</span>
-          </Link>
-          <Link href="/cliente?vista=atividade">
-            <Activity aria-hidden="true" />
-            <span>Atividade</span>
-          </Link>
-          <Link href="/cliente?vista=cartoes">
-            <WalletCards aria-hidden="true" />
+            <span>Transferir</span>
+          </button>
+          <button disabled title="Recargas ainda não disponíveis" type="button">
+            <Plus aria-hidden="true" />
+            <span>Recarregar</span>
+          </button>
+          <button disabled title="Pagamentos ainda não disponíveis" type="button">
+            <CreditCard aria-hidden="true" />
+            <span>Pagar</span>
+          </button>
+          <Link
+            href={
+              dashboard.cards[0]
+                ? `/cliente?vista=cartoes&cartao=${encodeURIComponent(dashboard.cards[0].id)}`
+                : "/cliente?vista=cartoes"
+            }
+          >
+            <QrCode aria-hidden="true" />
             <span>QR Code</span>
           </Link>
         </nav>
@@ -282,15 +295,17 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
 function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <section aria-labelledby="customer-cards-title">
+      <CustomerMobileHeader action="add" title="Gerir Cartões" />
       <CustomerPageHeading
         title="Seus Cartões Digitais"
         description="Aceda ao saldo de fidelidade de cada estabelecimento."
         titleId="customer-cards-title"
       />
       <div className="customer-card-filters" aria-label="Resumo dos cartões">
-        <span className="is-active">Todos os Cartões</span>
-        <span>{dashboard.cards.filter((card) => card.status === "active").length} Ativos</span>
-        <span>{dashboard.cards.filter((card) => card.status === "blocked").length} Bloqueados</span>
+        <span className="is-active">Todos</span>
+        <span>Parceiros</span>
+        <span>Lojas</span>
+        <span>Favoritos</span>
       </div>
       {dashboard.hasCards ? (
         <div className="customer-cards-hub-grid">
@@ -311,6 +326,9 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
               </div>
             </article>
           ))}
+          <Link className="customer-add-card" href="/estabelecimentos">
+            <Plus aria-hidden="true" size={16} /> Adicionar novo cartão digital
+          </Link>
         </div>
       ) : (
         <SectionEmpty
@@ -323,48 +341,62 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
   );
 }
 
-function CustomerCardDetail({ card }: { card: CustomerDashboardViewModel["cards"][number] }) {
+function CustomerCardDetail({
+  card,
+  dashboard
+}: {
+  card: CustomerDashboardViewModel["cards"][number];
+  dashboard: CustomerDashboardViewModel;
+}) {
   return (
     <section aria-labelledby="customer-card-detail-title">
-      <CustomerPageHeading
-        breadcrumb="Seus Cartões"
-        title="Detalhes do Cartão"
-        description={`${card.businessName} · ${card.currentTierName} · ${card.statusLabel}`}
-        titleId="customer-card-detail-title"
-      />
-      <div className="customer-card-detail-grid">
-        <div className="customer-card-detail-visual">
-          <CustomerCardVisual card={card} />
-          <p>Use o botão no cartão para alternar entre a frente e o verso.</p>
-        </div>
-        <div className="customer-card-identification">
-          <h3>QR Code de identificação em loja</h3>
-          <p>
-            Apresente este QR Code no momento do pagamento para acumular pontos ou resgatar
-            recompensas pendentes. O número do cartão ou o telefone associado também podem ser
-            usados no POS.
-          </p>
-          <div className="customer-card-identification__facts">
-            <span>
-              Número do cliente<strong>{card.cardNumber}</strong>
-            </span>
-            <span>
-              Saldo disponível
-              <strong>{card.availablePoints.toLocaleString("pt-MZ")} pontos</strong>
-            </span>
-            <span>
-              Valor equivalente<strong>{card.valueMzn.toLocaleString("pt-MZ")} MZN</strong>
-            </span>
-            <span>
-              Validade<strong>{card.expiryLabel}</strong>
-            </span>
+      <div className="customer-mobile-only">
+        <CustomerMobileCardDetail
+          activity={dashboard.activity.filter((item) => item.businessName === card.businessName)}
+          card={card}
+        />
+      </div>
+      <div className="customer-desktop-only">
+        <CustomerPageHeading
+          breadcrumb="Seus Cartões"
+          title="Detalhes do Cartão"
+          description={`${card.businessName} · ${card.currentTierName} · ${card.statusLabel}`}
+          titleId="customer-card-detail-title"
+        />
+        <div className="customer-card-detail-grid">
+          <div className="customer-card-detail-visual">
+            <CustomerCardVisual card={card} />
+            <p>Use o botão no cartão para alternar entre a frente e o verso.</p>
           </div>
-          <div className="customer-card-security-note">
-            <ShieldCheck aria-hidden="true" size={20} />
-            <span>
-              <strong>Código pessoal e seguro</strong>
-              <small>Não partilhe capturas do seu QR Code com terceiros.</small>
-            </span>
+          <div className="customer-card-identification">
+            <h3>QR Code de identificação em loja</h3>
+            <p>
+              Apresente este QR Code no momento do pagamento para acumular pontos ou resgatar
+              recompensas pendentes. O número do cartão ou o telefone associado também podem ser
+              usados no POS.
+            </p>
+            <div className="customer-card-identification__facts">
+              <span>
+                Número do cliente<strong>{card.cardNumber}</strong>
+              </span>
+              <span>
+                Saldo disponível
+                <strong>{card.availablePoints.toLocaleString("pt-MZ")} pontos</strong>
+              </span>
+              <span>
+                Valor equivalente<strong>{card.valueMzn.toLocaleString("pt-MZ")} MZN</strong>
+              </span>
+              <span>
+                Validade<strong>{card.expiryLabel}</strong>
+              </span>
+            </div>
+            <div className="customer-card-security-note">
+              <ShieldCheck aria-hidden="true" size={20} />
+              <span>
+                <strong>Código pessoal e seguro</strong>
+                <small>Não partilhe capturas do seu QR Code com terceiros.</small>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -375,6 +407,7 @@ function CustomerCardDetail({ card }: { card: CustomerDashboardViewModel["cards"
 function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <section aria-labelledby="customer-activity-title">
+      <CustomerMobileHeader action="notifications" title="Histórico de Pontos" />
       <CustomerPageHeading
         breadcrumb="Início"
         title="Histórico de Atividade"
@@ -397,6 +430,7 @@ function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel
 function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <section aria-labelledby="customer-offers-title">
+      <CustomerMobileHeader action="notifications" title="Explorar Ofertas" />
       <CustomerPageHeading
         title="Explorar Ofertas"
         description="Descubra benefícios exclusivos dos estabelecimentos VUYELA."
@@ -420,6 +454,11 @@ function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }
         <h3>Todas as Ofertas Disponíveis</h3>
         <span>{dashboard.offers.length.toLocaleString("pt-MZ")} ofertas</span>
       </div>
+      <div className="customer-offer-filters" aria-label="Categorias de ofertas">
+        <span className="is-active">Restaurantes</span>
+        <span>Compras</span>
+        <span>Saúde</span>
+      </div>
       <CustomerOfferGrid dashboard={dashboard} />
     </section>
   );
@@ -428,6 +467,7 @@ function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }
 function CustomerNotifications({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <section aria-labelledby="customer-notifications-title">
+      <CustomerMobileHeader action="read" back title="Avisos e Alertas" />
       <CustomerPageHeading
         breadcrumb="Início"
         title="Avisos e Alertas"
@@ -463,6 +503,7 @@ function CustomerProfile({
   if (editProfile) {
     return (
       <section aria-labelledby="customer-profile-edit-title">
+        <CustomerMobileEditHeader />
         <Link className="customer-back-link" href="/cliente?vista=perfil">
           <ArrowLeft aria-hidden="true" size={17} /> Voltar ao perfil
         </Link>
@@ -489,6 +530,7 @@ function CustomerProfile({
 
   return (
     <section aria-labelledby="customer-profile-title">
+      <CustomerMobileHeader action="notifications" title="O Seu Perfil" />
       <CustomerPageHeading
         title="O Seu Perfil"
         description="Consulte os seus dados pessoais e preferências."
@@ -536,6 +578,30 @@ function CustomerProfile({
           </div>
         </div>
       </div>
+      <div className="customer-mobile-profile-preferences">
+        <h3>Segurança e preferências</h3>
+        <Link href="/cliente?vista=perfil&editar=1">
+          <LockKeyhole aria-hidden="true" /> Alterar código PIN de segurança
+          <ChevronRight aria-hidden="true" />
+        </Link>
+        <button disabled type="button">
+          <Settings2 aria-hidden="true" /> Configurações de biometria / FaceID
+          <ChevronRight aria-hidden="true" />
+        </button>
+        <Link href="/cliente?vista=notificacoes">
+          <Bell aria-hidden="true" /> Notificações e alertas push
+          <ChevronRight aria-hidden="true" />
+        </Link>
+        <button disabled type="button">
+          <Languages aria-hidden="true" /> Idioma e moedas secundárias
+          <ChevronRight aria-hidden="true" />
+        </button>
+      </div>
+      <form action={signOutAction} className="customer-mobile-signout">
+        <button type="submit">
+          <LogOut aria-hidden="true" /> Terminar sessão da conta
+        </button>
+      </form>
     </section>
   );
 }
@@ -561,7 +627,11 @@ function ProfileFact({
 
 function CustomerProfileForm({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
-    <form action={updateCustomerProfileAction} className="customer-profile-form">
+    <form
+      action={updateCustomerProfileAction}
+      className="customer-profile-form"
+      id="customer-profile-edit-form"
+    >
       <h3>Editar Dados Pessoais</h3>
       <div className="customer-profile-form__grid">
         <Input
@@ -583,6 +653,16 @@ function CustomerProfileForm({ dashboard }: { dashboard: CustomerDashboardViewMo
           name="phone"
           placeholder="+258 84 000 0000"
         />
+      </div>
+      <div className="customer-mobile-profile-extra-fields">
+        <label>
+          <span>E-mail de acesso</span>
+          <input readOnly type="email" value={dashboard.profile.email ?? ""} />
+        </label>
+        <label>
+          <span>Data de nascimento</span>
+          <input disabled placeholder="Ex.: 24/09/1995" type="text" />
+        </label>
       </div>
       <div className="customer-profile-form__email">
         <span>E-mail</span>
@@ -675,9 +755,7 @@ function CustomerOfferGrid({
             <small>{offer.businessName}</small>
             <h3>{offer.title}</h3>
             <p>{offer.description}</p>
-            <Link href="/ofertas">
-              Ver oferta <ChevronRight aria-hidden="true" size={16} />
-            </Link>
+            <Link href="/ofertas">Ativar Benefício</Link>
           </div>
         </article>
       ))}
@@ -765,6 +843,65 @@ function CustomerSectionHeader({
         {actionLabel} <ChevronRight aria-hidden="true" size={16} />
       </Link>
     </div>
+  );
+}
+
+function CustomerMobileHeader({
+  action,
+  back = false,
+  title
+}: {
+  action: "add" | "notifications" | "read";
+  back?: boolean;
+  title: string;
+}) {
+  const actionContent = action === "add" ? <Plus /> : action === "read" ? <Check /> : <Bell />;
+  const actionLabel =
+    action === "add"
+      ? "Adicionar cartão"
+      : action === "read"
+        ? "Marcar todas como lidas"
+        : "Ver avisos";
+
+  return (
+    <header className="customer-mobile-header">
+      {back ? (
+        <Link aria-label="Voltar ao início" href="/cliente">
+          <ArrowLeft />
+        </Link>
+      ) : (
+        <span className="customer-mobile-header__mark" aria-hidden="true">
+          V
+        </span>
+      )}
+      <h2>{title}</h2>
+      {action === "notifications" ? (
+        <Link aria-label={actionLabel} href="/cliente?vista=notificacoes">
+          {actionContent}
+        </Link>
+      ) : (
+        <button
+          aria-label={actionLabel}
+          disabled={action === "add"}
+          title={actionLabel}
+          type="button"
+        >
+          {actionContent}
+        </button>
+      )}
+    </header>
+  );
+}
+
+function CustomerMobileEditHeader() {
+  return (
+    <header className="customer-mobile-edit-header">
+      <Link href="/cliente?vista=perfil">Cancelar</Link>
+      <h2>Editar Dados</h2>
+      <button form="customer-profile-edit-form" type="submit">
+        Gravar
+      </button>
+    </header>
   );
 }
 
