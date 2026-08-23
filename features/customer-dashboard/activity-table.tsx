@@ -6,23 +6,27 @@ import { Search } from "lucide-react";
 import type { CustomerActivityItem } from "./model";
 
 type ActivityFilter = "all" | "earn" | "redeem";
+type ActivityPeriod = "30" | "90" | "all";
 
 export function CustomerActivityTable({ activity }: { activity: CustomerActivityItem[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<ActivityFilter>("all");
+  const [period, setPeriod] = useState<ActivityPeriod>("30");
   const filteredActivity = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("pt-MZ");
+    const periodStart = getPeriodStart(period);
 
     return activity.filter((item) => {
       const matchesFilter = filter === "all" || item.tone === filter;
+      const matchesPeriod = periodStart === null || new Date(item.occurredAt) >= periodStart;
       const matchesQuery =
         !normalizedQuery ||
         item.businessName.toLocaleLowerCase("pt-MZ").includes(normalizedQuery) ||
         item.description.toLocaleLowerCase("pt-MZ").includes(normalizedQuery);
 
-      return matchesFilter && matchesQuery;
+      return matchesFilter && matchesPeriod && matchesQuery;
     });
-  }, [activity, filter, query]);
+  }, [activity, filter, period, query]);
 
   return (
     <div className="customer-activity-panel">
@@ -36,6 +40,17 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
             type="search"
             value={query}
           />
+        </label>
+        <label className="customer-activity-period">
+          <span className="sr-only">Período</span>
+          <select
+            value={period}
+            onChange={(event) => setPeriod(event.target.value as ActivityPeriod)}
+          >
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="all">Todo o período</option>
+          </select>
         </label>
         <div className="customer-activity-filters" aria-label="Filtrar atividade">
           <button aria-pressed={filter === "all"} onClick={() => setFilter("all")} type="button">
@@ -62,6 +77,7 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
                 <th>Data</th>
                 <th>Estabelecimento</th>
                 <th>Movimento</th>
+                <th>Cartão vinculado</th>
                 <th>Pontos</th>
               </tr>
             </thead>
@@ -74,6 +90,7 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
                     <small>{item.description}</small>
                   </td>
                   <td>{item.tone === "redeem" ? "Utilização de pontos" : "Compra realizada"}</td>
+                  <td>{item.cardName ?? "Cartão VUYELA"}</td>
                   <td className={`is-${item.tone}`}>
                     {item.points > 0 ? "+" : ""}
                     {item.points.toLocaleString("pt-MZ")} Pts
@@ -96,6 +113,16 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
       )}
     </div>
   );
+}
+
+function getPeriodStart(period: ActivityPeriod): Date | null {
+  if (period === "all") {
+    return null;
+  }
+
+  const start = new Date();
+  start.setDate(start.getDate() - Number(period));
+  return start;
 }
 
 function formatActivityDate(value: string): string {

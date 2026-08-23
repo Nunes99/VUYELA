@@ -3,22 +3,21 @@ import Link from "next/link";
 import {
   Activity,
   ArrowLeft,
-  Banknote,
-  Bell,
+  ArrowRight,
   ChevronRight,
   CreditCard,
   Gift,
   Home,
+  LogOut,
   Mail,
   MapPin,
   Pencil,
   Phone,
   Save,
-  Search,
   ShieldCheck,
   Star,
   User,
-  UserPlus
+  WalletCards
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
@@ -26,6 +25,7 @@ import { Input } from "../../vuyela-design-system/src/components/Field";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
+import { signOutAction } from "@/features/auth/actions";
 
 import { updateCustomerProfileAction } from "./actions";
 import { CustomerActivityTable } from "./activity-table";
@@ -45,17 +45,28 @@ interface CustomerDashboardViewProps {
 
 const navItems = [
   { href: "/cliente", view: "inicio", label: "Início", icon: Home },
-  { href: "/cliente?vista=cartoes", view: "cartoes", label: "Cartões", icon: CreditCard },
-  { href: "/cliente?vista=ofertas", view: "ofertas", label: "Explorar", icon: Search },
-  { href: "/cliente?vista=atividade", view: "atividade", label: "Atividade", icon: Activity },
-  { href: "/cliente/indicacoes", view: "indicacoes", label: "Indicações", icon: UserPlus },
   {
-    href: "/cliente?vista=notificacoes",
-    view: "notificacoes",
-    label: "Avisos",
-    icon: Bell
+    href: "/cliente?vista=cartoes",
+    view: "cartoes",
+    label: "Gerir Cartões",
+    mobileLabel: "Cartões",
+    icon: CreditCard
   },
-  { href: "/cliente?vista=perfil", view: "perfil", label: "Perfil", icon: User }
+  {
+    href: "/cliente?vista=ofertas",
+    view: "ofertas",
+    label: "Explorar Ofertas",
+    mobileLabel: "Ofertas",
+    icon: Gift
+  },
+  { href: "/cliente?vista=atividade", view: "atividade", label: "Atividade", icon: Activity },
+  {
+    href: "/cliente?vista=perfil",
+    view: "perfil",
+    label: "O Seu Perfil",
+    mobileLabel: "Perfil",
+    icon: User
+  }
 ] as const;
 
 export function CustomerDashboardView({
@@ -81,9 +92,6 @@ export function CustomerDashboardView({
   return (
     <div className="customer-dashboard">
       <CustomerDashboardNav activeView={activeView} />
-      {state.status === "empty" && activeView === "inicio" ? (
-        <CustomerDashboardEmpty dashboard={state.dashboard} />
-      ) : null}
       <OfflineCardSync cards={state.dashboard.cards} />
       <main className="customer-dashboard-view">
         {activeView === "inicio" ? <CustomerHome dashboard={state.dashboard} /> : null}
@@ -127,23 +135,25 @@ function CustomerDashboardNav({ activeView }: { activeView: CustomerDashboardVie
             title={item.label}
           >
             <Icon size={18} aria-hidden="true" />
-            <span>{item.label}</span>
+            <span data-mobile-label={"mobileLabel" in item ? item.mobileLabel : item.label}>
+              {item.label}
+            </span>
           </Link>
         );
       })}
+      <form action={signOutAction} className="customer-dashboard-nav__signout">
+        <button type="submit">
+          <LogOut aria-hidden="true" size={17} /> Terminar sessão
+        </button>
+      </form>
+      <div className="customer-dashboard-nav__security">
+        <ShieldCheck aria-hidden="true" size={15} />
+        <span>
+          <strong>Área protegida</strong>
+          <small>Encriptação de nível bancário</small>
+        </span>
+      </div>
     </nav>
-  );
-}
-
-function CustomerDashboardEmpty({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
-  return (
-    <section className="customer-dashboard-notice" aria-labelledby="customer-dashboard-empty">
-      <h2 id="customer-dashboard-empty">Ainda não há atividade</h2>
-      <p>
-        {dashboard.profile.displayName}, quando aderir a negócios VUYELA, os seus cartões,
-        movimentos e ofertas públicas aparecem aqui.
-      </p>
-    </section>
   );
 }
 
@@ -152,91 +162,119 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
     <>
       <section className="customer-dashboard-overview" aria-labelledby="customer-home-title">
         <div className="customer-dashboard-overview__heading">
-          <span className="customer-dashboard-eyebrow">Painel</span>
+          <span className="customer-dashboard-eyebrow">Moçambique</span>
           <h2 id="customer-home-title">Olá, {dashboard.profile.displayName}</h2>
-          <p>Acompanhe os seus pontos, cartões e benefícios num só lugar.</p>
+          <p>
+            <span>Seu resumo de fidelidade digital</span>
+            <span className="customer-dashboard-overview__date">Hoje, {formatToday()}</span>
+          </p>
         </div>
-        <div className="customer-dashboard-stats" aria-label="Resumo da conta">
+        <div className="customer-mobile-total" aria-label="Total acumulado">
+          <span>Total acumulado</span>
+          <strong>{dashboard.totalPoints.toLocaleString("pt-MZ")} Pts</strong>
+          <small>Equivale a ~ {dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN</small>
+          <Star aria-hidden="true" size={28} />
+        </div>
+        <div
+          className={["customer-dashboard-stats", "customer-summary-grid--wide"].join(" ")}
+          aria-label="Resumo da conta"
+        >
           <CustomerSummaryCard
             icon={Star}
-            label="Pontos"
-            note="pontos acumulados"
+            label="Pontos acumulados"
+            note={`Equivale a ~ ${dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN`}
             tone="points"
-            value={dashboard.totalPoints.toLocaleString("pt-MZ")}
-          />
-          <CustomerSummaryCard
-            icon={Banknote}
-            label="Equivalente"
-            mobileLabel="Valor"
-            note="valor disponível"
-            tone="value"
-            value={`${dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN`}
+            value={`${dashboard.totalPoints.toLocaleString("pt-MZ")} Pts`}
           />
           <CustomerSummaryCard
             icon={CreditCard}
-            label="Cartões"
-            mobileLabel="Ativos"
-            note={dashboard.activeCardCount === 1 ? "cartão ativo" : "cartões ativos"}
+            label="Cartões ativos"
+            note={`Em ${dashboard.activeCardCount.toLocaleString("pt-MZ")} estabelecimentos`}
             tone="cards"
-            value={dashboard.activeCardCount.toLocaleString("pt-MZ")}
+            value={`${dashboard.activeCardCount.toLocaleString("pt-MZ")} Cartões`}
+          />
+          <CustomerSummaryCard
+            icon={Gift}
+            label="Ofertas disponíveis"
+            note="Explore descontos"
+            tone="value"
+            value={`${dashboard.offers.length.toLocaleString("pt-MZ")} Ativas`}
           />
         </div>
       </section>
 
-      <section className="customer-home-section" aria-labelledby="home-cards-title">
-        <CustomerSectionHeader
-          actionHref="/cliente?vista=cartoes"
-          actionLabel="Gerir cartões"
-          eyebrow="Os seus cartões"
-          title="Cartões digitais"
-          titleId="home-cards-title"
-        />
-        {dashboard.hasCards ? (
-          <div className="customer-home-card-grid">
-            {dashboard.cards.slice(0, 2).map((card) => (
-              <Link
-                className="customer-home-card-link"
-                href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
-                key={card.id}
-              >
-                <CustomerCardVisual card={card} compact />
-                <span>
-                  Ver detalhes <ChevronRight aria-hidden="true" size={16} />
-                </span>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <SectionEmpty
-            icon={CreditCard}
-            title="Ainda não tem cartões"
-            body="Quando aderir a um negócio VUYELA, o cartão digital aparecerá aqui."
+      <div className="customer-home-primary-grid">
+        <section className="customer-home-section" aria-labelledby="home-cards-title">
+          <CustomerSectionHeader
+            actionHref="/cliente?vista=cartoes"
+            actionLabel={`Ver todos (${dashboard.cards.length.toLocaleString("pt-MZ")})`}
+            title="Seus Cartões Digitais"
+            titleId="home-cards-title"
           />
-        )}
-      </section>
+          {dashboard.hasCards ? (
+            <div className="customer-home-card-grid">
+              {dashboard.cards.slice(0, 2).map((card) => (
+                <Link
+                  className="customer-home-card-link"
+                  href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
+                  key={card.id}
+                >
+                  <CustomerCardVisual card={card} compact />
+                  <span>
+                    Ver detalhes <ChevronRight aria-hidden="true" size={16} />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <SectionEmpty
+              icon={CreditCard}
+              title="Ainda não tem cartões"
+              body="Quando aderir a um negócio VUYELA, o cartão digital aparecerá aqui."
+            />
+          )}
+        </section>
 
-      <div className="customer-dashboard-columns">
-        <section>
+        <section className="customer-home-activity">
           <CustomerSectionHeader
             actionHref="/cliente?vista=atividade"
-            actionLabel="Ver histórico"
-            eyebrow="Atividade"
-            title="Movimentos recentes"
+            actionLabel="Ver extrato"
+            title="Atividade Recente"
             titleId="home-activity-title"
           />
           <CustomerActivityPreview dashboard={dashboard} />
         </section>
-        <section>
-          <CustomerSectionHeader
-            actionHref="/cliente?vista=ofertas"
-            actionLabel="Ver todas"
-            eyebrow="Explorar"
-            title="Ofertas em destaque"
-            titleId="home-offers-title"
-          />
-          <CustomerOfferGrid dashboard={dashboard} limit={2} />
-        </section>
+
+        <nav className="customer-quick-actions" aria-label="Ações rápidas">
+          <h2>Ações Rápidas</h2>
+          <Link href="/cliente?vista=cartoes">
+            <ArrowRight aria-hidden="true" />
+            <span>Cartões</span>
+          </Link>
+          <Link href="/cliente?vista=ofertas">
+            <Gift aria-hidden="true" />
+            <span>Ofertas</span>
+          </Link>
+          <Link href="/cliente?vista=atividade">
+            <Activity aria-hidden="true" />
+            <span>Atividade</span>
+          </Link>
+          <Link href="/cliente?vista=cartoes">
+            <WalletCards aria-hidden="true" />
+            <span>QR Code</span>
+          </Link>
+        </nav>
       </div>
+
+      <section className="customer-home-offers">
+        <CustomerSectionHeader
+          actionHref="/cliente?vista=ofertas"
+          actionLabel="Ver todas"
+          title="Ofertas em Destaque"
+          titleId="home-offers-title"
+        />
+        <CustomerOfferGrid dashboard={dashboard} limit={3} />
+      </section>
     </>
   );
 }
@@ -245,11 +283,15 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
   return (
     <section aria-labelledby="customer-cards-title">
       <CustomerPageHeading
-        eyebrow="Gerir cartões"
-        title="Painel de Cartões"
-        description="Consulte os saldos e os benefícios de cada programa de fidelização."
+        title="Seus Cartões Digitais"
+        description="Aceda ao saldo de fidelidade de cada estabelecimento."
         titleId="customer-cards-title"
       />
+      <div className="customer-card-filters" aria-label="Resumo dos cartões">
+        <span className="is-active">Todos os Cartões</span>
+        <span>{dashboard.cards.filter((card) => card.status === "active").length} Ativos</span>
+        <span>{dashboard.cards.filter((card) => card.status === "blocked").length} Bloqueados</span>
+      </div>
       {dashboard.hasCards ? (
         <div className="customer-cards-hub-grid">
           {dashboard.cards.map((card) => (
@@ -259,12 +301,12 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
                 <div>
                   <span>{card.currentTierName}</span>
                   <h3>{card.businessName}</h3>
-                  <p>{card.cardNumber}</p>
+                  <p>Número: {card.cardNumber}</p>
                 </div>
-                <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
-                <small>{card.valueMzn.toLocaleString("pt-MZ")} MZN</small>
+                <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pontos</strong>
+                <small>Equivale a {card.valueMzn.toLocaleString("pt-MZ")} MZN</small>
                 <Link href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}>
-                  Ver cartão <ChevronRight aria-hidden="true" size={16} />
+                  Ver detalhes <ChevronRight aria-hidden="true" size={16} />
                 </Link>
               </div>
             </article>
@@ -284,13 +326,10 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
 function CustomerCardDetail({ card }: { card: CustomerDashboardViewModel["cards"][number] }) {
   return (
     <section aria-labelledby="customer-card-detail-title">
-      <Link className="customer-back-link" href="/cliente?vista=cartoes">
-        <ArrowLeft aria-hidden="true" size={17} /> Voltar aos cartões
-      </Link>
       <CustomerPageHeading
-        eyebrow="Detalhes do cartão"
-        title={card.businessName}
-        description={`${card.currentTierName} · ${card.statusLabel}`}
+        breadcrumb="Seus Cartões"
+        title="Detalhes do Cartão"
+        description={`${card.businessName} · ${card.currentTierName} · ${card.statusLabel}`}
         titleId="customer-card-detail-title"
       />
       <div className="customer-card-detail-grid">
@@ -299,11 +338,11 @@ function CustomerCardDetail({ card }: { card: CustomerDashboardViewModel["cards"
           <p>Use o botão no cartão para alternar entre a frente e o verso.</p>
         </div>
         <div className="customer-card-identification">
-          <span className="customer-dashboard-eyebrow">Identificação no estabelecimento</span>
-          <h3>QR Code do cartão</h3>
+          <h3>QR Code de identificação em loja</h3>
           <p>
-            Apresente este código no momento da compra. O número do cartão ou o telefone associado
-            também podem ser usados no POS.
+            Apresente este QR Code no momento do pagamento para acumular pontos ou resgatar
+            recompensas pendentes. O número do cartão ou o telefone associado também podem ser
+            usados no POS.
           </p>
           <div className="customer-card-identification__facts">
             <span>
@@ -337,7 +376,7 @@ function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel
   return (
     <section aria-labelledby="customer-activity-title">
       <CustomerPageHeading
-        eyebrow="Atividade"
+        breadcrumb="Início"
         title="Histórico de Atividade"
         description="Consulte todos os pontos ganhos e utilizados nos seus cartões."
         titleId="customer-activity-title"
@@ -359,8 +398,7 @@ function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }
   return (
     <section aria-labelledby="customer-offers-title">
       <CustomerPageHeading
-        eyebrow="Explorar ofertas"
-        title="Ganhe e dobre os pontos"
+        title="Explorar Ofertas"
         description="Descubra benefícios exclusivos dos estabelecimentos VUYELA."
         titleId="customer-offers-title"
       />
@@ -373,13 +411,13 @@ function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }
           src="/images/offer-prawns.jpg"
         />
         <div>
-          <span>Benefícios exclusivos</span>
-          <h3>Cada compra pode valer ainda mais.</h3>
-          <p>Consulte as campanhas disponíveis e acumule pontos nos negócios que prefere.</p>
+          <span>Campanha em destaque</span>
+          <h3>Ganhe mais pontos nos estabelecimentos que prefere.</h3>
+          <p>Ative um benefício disponível e volte a comprar com mais vantagens.</p>
         </div>
       </div>
       <div className="customer-offers-heading">
-        <h3>Todas as ofertas disponíveis</h3>
+        <h3>Todas as Ofertas Disponíveis</h3>
         <span>{dashboard.offers.length.toLocaleString("pt-MZ")} ofertas</span>
       </div>
       <CustomerOfferGrid dashboard={dashboard} />
@@ -391,19 +429,24 @@ function CustomerNotifications({ dashboard }: { dashboard: CustomerDashboardView
   return (
     <section aria-labelledby="customer-notifications-title">
       <CustomerPageHeading
-        eyebrow="Centro de avisos"
-        title="Notificações"
+        breadcrumb="Início"
+        title="Avisos e Alertas"
         description="Novidades, movimentos e campanhas dos seus programas."
         titleId="customer-notifications-title"
       />
-      <div className="customer-notifications-summary">
-        <Bell aria-hidden="true" size={22} />
-        <span>
-          <strong>{dashboard.unreadNotificationCount.toLocaleString("pt-MZ")}</strong>
-          <small>por ler</small>
-        </span>
+      <div className="customer-notifications-panel">
+        <div className="customer-notifications-panel__heading">
+          <h3>Últimas notificações</h3>
+          <span>{dashboard.unreadNotificationCount.toLocaleString("pt-MZ")} por ler</span>
+        </div>
+        <div className="customer-notification-filters" aria-label="Categorias de notificações">
+          <span className="is-active">Todas</span>
+          <span>Transações</span>
+          <span>Ofertas</span>
+          <span>Sistema</span>
+        </div>
+        <InAppNotificationList notifications={dashboard.notifications} />
       </div>
-      <InAppNotificationList notifications={dashboard.notifications} />
     </section>
   );
 }
@@ -424,9 +467,9 @@ function CustomerProfile({
           <ArrowLeft aria-hidden="true" size={17} /> Voltar ao perfil
         </Link>
         <CustomerPageHeading
-          eyebrow="Definições"
-          title="Editar Perfil"
-          description="Mantenha os seus dados atualizados para facilitar a identificação no POS."
+          breadcrumb="Perfil"
+          title="O Seu Perfil"
+          description="Edite os seus dados pessoais e mantenha a identificação no POS atualizada."
           titleId="customer-profile-edit-title"
         />
         {profileStatus === "guardado" ? (
@@ -447,7 +490,6 @@ function CustomerProfile({
   return (
     <section aria-labelledby="customer-profile-title">
       <CustomerPageHeading
-        eyebrow="Conta"
         title="O Seu Perfil"
         description="Consulte os seus dados pessoais e preferências."
         titleId="customer-profile-title"
@@ -520,6 +562,7 @@ function ProfileFact({
 function CustomerProfileForm({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <form action={updateCustomerProfileAction} className="customer-profile-form">
+      <h3>Editar Dados Pessoais</h3>
       <div className="customer-profile-form__grid">
         <Input
           autoComplete="name"
@@ -674,19 +717,26 @@ function CustomerSummaryCard({
 
 function CustomerPageHeading({
   eyebrow,
+  breadcrumb,
   title,
   description,
   titleId
 }: {
-  eyebrow: string;
+  eyebrow?: string;
+  breadcrumb?: string;
   title: string;
   description: string;
   titleId: string;
 }) {
   return (
     <header className="customer-page-heading">
-      <span className="customer-dashboard-eyebrow">{eyebrow}</span>
+      {eyebrow ? <span className="customer-dashboard-eyebrow">{eyebrow}</span> : null}
       <h2 id={titleId}>{title}</h2>
+      {breadcrumb ? (
+        <span className="customer-page-heading__breadcrumb">
+          {breadcrumb} <ChevronRight aria-hidden="true" size={14} /> <strong>{title}</strong>
+        </span>
+      ) : null}
       <p>{description}</p>
     </header>
   );
@@ -699,7 +749,7 @@ function CustomerSectionHeader({
   actionHref,
   actionLabel
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   titleId: string;
   actionHref: string;
@@ -708,7 +758,7 @@ function CustomerSectionHeader({
   return (
     <div className="customer-dashboard-section-heading">
       <div>
-        <span className="customer-dashboard-eyebrow">{eyebrow}</span>
+        {eyebrow ? <span className="customer-dashboard-eyebrow">{eyebrow}</span> : null}
         <h2 id={titleId}>{title}</h2>
       </div>
       <Link href={actionHref}>
@@ -749,4 +799,11 @@ function formatMemberDate(value: string | undefined): string {
   return value
     ? new Intl.DateTimeFormat("pt-MZ", { month: "long", year: "numeric" }).format(new Date(value))
     : "hoje";
+}
+
+function formatToday(): string {
+  return new Intl.DateTimeFormat("pt-MZ", {
+    day: "2-digit",
+    month: "long"
+  }).format(new Date());
 }

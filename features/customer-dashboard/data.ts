@@ -35,6 +35,7 @@ interface ProfileRow {
 interface TransactionRow {
   id: string;
   business_id: string;
+  customer_card_id: string;
   points_earned: number;
   points_redeemed: number;
   net_amount_mzn_minor: number;
@@ -94,7 +95,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
       ? supabase
           .from("transactions")
           .select(
-            "id, business_id, points_earned, points_redeemed, net_amount_mzn_minor, occurred_at"
+            "id, business_id, customer_card_id, points_earned, points_redeemed, net_amount_mzn_minor, occurred_at"
           )
           .in("customer_card_id", cardIds)
           .order("occurred_at", { ascending: false })
@@ -140,9 +141,10 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
   }
 
   const businessById = toMap(rowsFrom<BusinessNameRow>(businessData), (business) => business.id);
+  const cardById = toMap(cards, (card) => card.id);
   const dashboard = buildCustomerDashboardViewModel({
     cards,
-    activity: buildActivity(rowsFrom<TransactionRow>(transactionData), businessById),
+    activity: buildActivity(rowsFrom<TransactionRow>(transactionData), businessById, cardById),
     offers: buildOffers(offerRows, businessById),
     notifications: buildNotifications(notificationRows, businessById),
     profile: buildProfile(rowFrom<ProfileRow>(profileData))
@@ -178,7 +180,8 @@ function buildNotifications(
 
 function buildActivity(
   rows: TransactionRow[],
-  businessById: Map<string, BusinessNameRow>
+  businessById: Map<string, BusinessNameRow>,
+  cardById: Map<string, CustomerDashboardViewModel["cards"][number]>
 ): CustomerActivityItem[] {
   return rows.map((row) => {
     const points = getActivityPoints({
@@ -189,6 +192,7 @@ function buildActivity(
     return {
       id: row.id,
       businessName: businessById.get(row.business_id)?.name ?? "Negócio VUYELA",
+      cardName: cardById.get(row.customer_card_id)?.currentTierName ?? "Cartão VUYELA",
       description: getActivityDescription({
         pointsEarned: row.points_earned,
         pointsRedeemed: row.points_redeemed,

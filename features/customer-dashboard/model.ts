@@ -5,6 +5,7 @@ import { countUnreadNotifications } from "@/features/notifications/model";
 export interface CustomerActivityItem {
   id: string;
   businessName: string;
+  cardName?: string;
   description: string;
   points: number;
   occurredAt: string;

@@ -40,7 +40,13 @@ describe("approved VUYELA design contract", () => {
   });
 
   it("retains the five documented customer mobile navigation destinations", () => {
-    for (const label of ["Início", "Cartões", "Explorar", "Atividade", "Perfil"]) {
+    for (const label of [
+      "Início",
+      "Gerir Cartões",
+      "Explorar Ofertas",
+      "Atividade",
+      "O Seu Perfil"
+    ]) {
       expect(customerDashboard).toContain(`label: "${label}"`);
     }
 
@@ -54,15 +60,16 @@ describe("approved VUYELA design contract", () => {
     expect(homepage).toContain("home-member-card");
     expect(homepage).toContain("QRCodeSVG");
     expect(customerDashboard).toContain("CustomerSummaryCard");
-    expect(customerDashboard).toContain("Painel de Cartões");
+    expect(customerDashboard).toContain("Seus Cartões Digitais");
     expect(customerDashboard).toContain("Histórico de Atividade");
-    expect(customerDashboard).toContain("Editar Perfil");
-    expect(customerDashboard).toContain("Cartões digitais");
+    expect(customerDashboard).toContain("Editar Dados Pessoais");
+    expect(customerDashboard).toContain("Seus Cartões Digitais");
     expect(customerCard).toContain("showBack");
     expect(customerCard).toContain("QRCodeSVG");
     expect(pageStyles).toContain("NEW PHAS nodes 418:4266, 428:4266 and 428:4436");
     expect(pageStyles).toContain("NEW PHAS nodes 435:4274, 436:4270, 436:5129,");
     expect(pageStyles).toContain(".customer-dashboard-stats");
     expect(pageStyles).toContain(".customer-digital-card__back-content");
+    expect(pageStyles).toContain("NEW PHAS (2): customer flows exported 23 Aug 2026");
   });
 });

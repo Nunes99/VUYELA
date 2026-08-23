@@ -37,12 +37,12 @@ function viewParam(value: string | string[] | undefined): CustomerDashboardViewN
 }
 
 const viewTitles: Record<CustomerDashboardViewName, string> = {
-  inicio: "Painel do cliente",
-  cartoes: "Cartões",
-  ofertas: "Explorar ofertas",
-  atividade: "Histórico de atividade",
-  notificacoes: "Notificações",
-  perfil: "Perfil"
+  inicio: "Painel do Cliente",
+  cartoes: "Gerir Cartões",
+  ofertas: "Explorar Ofertas",
+  atividade: "Histórico de Atividade",
+  notificacoes: "Avisos e Alertas",
+  perfil: "O Seu Perfil"
 };
 
 export default async function CustomerAreaPage({
