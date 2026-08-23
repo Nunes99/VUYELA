@@ -7,6 +7,7 @@ import {
   buildFallbackIdempotencyKey,
   buildPosQuote,
   isValidIdempotencyKey,
+  normalizePosCustomerLookup,
   parseMznToMinorUnits
 } from "./model";
 import { initialPosActionState } from "./state";
@@ -113,6 +114,7 @@ export async function identifyPosCustomerAction(
   if (!lookupValue.ok) {
     return lookupValue.state;
   }
+  const normalizedLookup = normalizePosCustomerLookup(lookupMethod, lookupValue.value);
 
   if (!isSupabaseConfigured()) {
     return getSupabaseNotConfiguredState();
@@ -122,8 +124,8 @@ export async function identifyPosCustomerAction(
   const { data, error } = await supabase.rpc("lookup_pos_customer", {
     p_business_id: businessId.value,
     p_branch_id: branchId || null,
-    p_lookup_method: lookupMethod,
-    p_lookup_value: lookupValue.value
+    p_lookup_method: normalizedLookup.method,
+    p_lookup_value: normalizedLookup.value
   });
 
   if (error) {

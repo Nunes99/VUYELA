@@ -5,6 +5,7 @@ import {
   buildPosQuote,
   formatMznMinor,
   isValidIdempotencyKey,
+  normalizePosCustomerLookup,
   parseMznToMinorUnits
 } from "@/features/pos/model";
 
@@ -68,5 +69,21 @@ describe("POS model", () => {
         pointsToRedeem: 10
       })
     );
+  });
+
+  it("accepts compact card QR payloads while preserving legacy QR payloads", () => {
+    expect(normalizePosCustomerLookup("qr", " vy-8f2k-91m ")).toEqual({
+      method: "card",
+      value: "VY-8F2K-91M"
+    });
+    expect(
+      normalizePosCustomerLookup(
+        "qr",
+        "VUYELA:CARD:6ab0d80e-e6f2-4ad2-b747-75876d1c70ba:VY-8F2K-91M"
+      )
+    ).toEqual({
+      method: "qr",
+      value: "VUYELA:CARD:6ab0d80e-e6f2-4ad2-b747-75876d1c70ba:VY-8F2K-91M"
+    });
   });
 });

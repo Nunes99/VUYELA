@@ -31,6 +31,13 @@ export interface PosQuote {
   netAmountMznMinor: number;
 }
 
+export type PosLookupMethod = "qr" | "card" | "phone";
+
+export interface NormalizedPosLookup {
+  method: PosLookupMethod;
+  value: string;
+}
+
 export type PosStepId = "identify" | "amount" | "authorization" | "confirm" | "success";
 
 export const posSteps: ReadonlyArray<{ id: PosStepId; label: string }> = [
@@ -43,6 +50,29 @@ export const posSteps: ReadonlyArray<{ id: PosStepId; label: string }> = [
 
 const MONEY_PATTERN = /^\d+(?:[,.]\d{1,2})?$/;
 const IDEMPOTENCY_PATTERN = /^[A-Za-z0-9_-]{12,80}$/;
+const CARD_NUMBER_PATTERN = /^VY-[0-9A-Z-]{6,32}$/;
+
+export function normalizePosCustomerLookup(
+  method: PosLookupMethod,
+  value: string
+): NormalizedPosLookup {
+  const normalizedValue = value.trim();
+
+  if (method !== "qr") {
+    return {
+      method,
+      value: method === "card" ? normalizedValue.toUpperCase() : normalizedValue
+    };
+  }
+
+  const upperValue = normalizedValue.toUpperCase();
+
+  if (CARD_NUMBER_PATTERN.test(upperValue)) {
+    return { method: "card", value: upperValue };
+  }
+
+  return { method: "qr", value: normalizedValue };
+}
 
 export function parseMznToMinorUnits(value: string): number {
   const normalized = value.trim().replace(",", ".");

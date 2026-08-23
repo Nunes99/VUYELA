@@ -11365,7 +11365,7 @@
 .customer-digital-card__customer {
   position: absolute;
   top: 35%;
-  right: 27%;
+  right: 32%;
   bottom: auto;
   left: 6.5%;
   z-index: 1;
@@ -11396,9 +11396,9 @@
   bottom: 9%;
   z-index: 1;
   display: grid;
-  width: 20%;
-  min-width: 2.9rem;
-  max-width: 4.25rem;
+  width: 23.5%;
+  min-width: 4.15rem;
+  max-width: 5.1rem;
   aspect-ratio: 1;
   border: 2px solid #f2b544;
   border-radius: 0.5rem;
@@ -12074,7 +12074,7 @@
   }
 
   .customer-digital-card__front-qr {
-    min-width: 2.55rem;
+    min-width: 4rem;
   }
 }
 

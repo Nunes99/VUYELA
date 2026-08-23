@@ -85,7 +85,7 @@ export function buildDigitalCustomerCard(source: CustomerCardSource): DigitalCus
       ? Math.max(nextTier.minimumLifetimePoints - source.lifetimeEarned, 0)
       : null,
     expiryLabel: getExpiryLabel(source.pointsExpireAfterDays),
-    qrCode: buildIdentificationQrCode(source.businessId, source.cardNumber)
+    qrCode: buildIdentificationQrCode(source.cardNumber)
   };
 }
 
@@ -96,15 +96,15 @@ export function calculatePointsValueMzn(points: number, pointValueMznMinor: numb
   return Math.floor((points * pointValueMznMinor) / 100);
 }
 
-export function buildIdentificationQrCode(businessId: string, cardNumber: string): string {
-  const normalizedBusinessId = businessId.trim();
-  const normalizedCardNumber = cardNumber.trim();
+export function buildIdentificationQrCode(cardNumber: string): string {
+  const normalizedCardNumber = cardNumber.trim().toUpperCase();
 
-  if (!normalizedBusinessId || !normalizedCardNumber) {
-    throw new Error("businessId and cardNumber are required for card QR code");
+  if (!normalizedCardNumber) {
+    throw new Error("cardNumber is required for card QR code");
   }
 
-  return `VUYELA:CARD:${normalizedBusinessId}:${normalizedCardNumber}`;
+  // A compact payload keeps the printed modules large enough for reliable mobile scanning.
+  return normalizedCardNumber;
 }
 
 function getStatusLabel(status: CardStatus): string {

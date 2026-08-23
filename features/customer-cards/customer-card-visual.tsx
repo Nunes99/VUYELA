@@ -61,9 +61,9 @@ export function CustomerCardVisual({
             bgColor="#ffffff"
             fgColor="#022c3a"
             level="M"
-            marginSize={1}
+            marginSize={2}
             role="img"
-            size={128}
+            size={160}
             value={card.qrCode}
           />
         </span>

@@ -55,7 +55,7 @@ describe("customer card model", () => {
       nextTierName: "Ouro",
       pointsUntilNextTier: 750,
       expiryLabel: "Pontos expiram 180 dias após serem ganhos",
-      qrCode: "VUYELA:CARD:business-1:VY-8F2K-91M"
+      qrCode: "VY-8F2K-91M"
     });
   });
 
@@ -86,9 +86,9 @@ describe("customer card model", () => {
   });
 
   it("keeps QR codes scoped to identification, not wallet balances", () => {
-    const qrCode = buildIdentificationQrCode("business-1", "VY-8F2K-91M");
+    const qrCode = buildIdentificationQrCode("VY-8F2K-91M");
 
-    expect(qrCode).toBe("VUYELA:CARD:business-1:VY-8F2K-91M");
+    expect(qrCode).toBe("VY-8F2K-91M");
     expect(qrCode).not.toContain("250");
     expect(qrCode).not.toContain("MZN");
   });

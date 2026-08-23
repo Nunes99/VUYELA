@@ -21,7 +21,7 @@ const card: DigitalCustomerCard = {
   nextTierName: null,
   pointsUntilNextTier: null,
   expiryLabel: "Pontos sem expiração configurada",
-  qrCode: "VUYELA:CARD:business-1:VY-6885-B19F"
+  qrCode: "VY-6885-B19F"
 };
 
 describe("customer digital card visual", () => {

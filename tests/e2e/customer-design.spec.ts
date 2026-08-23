@@ -55,7 +55,21 @@ test("renders the customer activity, notifications and card identification views
   await expect(page.getByText("Pontos acumulados", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=cartoes&cartao=card-1");
-  await expect(page.locator('[aria-label^="QR de identificação:"]:visible')).toBeVisible();
+  const visibleQr = page.locator('[aria-label^="QR de identificação:"]:visible');
+  await expect(visibleQr).toBeVisible();
+  const qrGeometry = await visibleQr.evaluate((qr) => {
+    const bounds = qr.getBoundingClientRect();
+    const viewBox = (qr as SVGSVGElement).viewBox.baseVal;
+
+    return {
+      height: bounds.height,
+      moduleGridWidth: viewBox.width,
+      width: bounds.width
+    };
+  });
+  expect(qrGeometry.width).toBeGreaterThanOrEqual(64);
+  expect(qrGeometry.height).toBeGreaterThanOrEqual(64);
+  expect(qrGeometry.moduleGridWidth).toBeLessThanOrEqual(25);
   const detailGeometry = await page
     .locator(".customer-mobile-card-detail .customer-digital-card")
     .evaluate((card) => {
@@ -83,12 +97,15 @@ test("renders the customer activity, notifications and card identification views
         return {
           complete:
             value.scrollHeight <= value.clientHeight && value.scrollWidth <= value.clientWidth,
-          width: field.getBoundingClientRect().width
+          width: field.clientWidth
         };
       })
     );
   expect(backFields).toHaveLength(4);
-  expect(backFields.every((field) => field.complete && field.width > 100)).toBe(true);
+  expect(
+    backFields.every((field) => field.complete && field.width > 100),
+    JSON.stringify(backFields)
+  ).toBe(true);
 });
 
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {

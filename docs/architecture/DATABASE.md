@@ -248,6 +248,10 @@ Self-referrals, existing customers, reciprocal referrals, expired invitations, d
 
 The lookup does not mutate wallets, ledger, or transactions. Balance-changing POS completion continues through `record_purchase_points` and `redeem_purchase_points`.
 
+Digital cards encode the public card number as a compact QR payload so the modules remain
+readable at mobile-card size. The POS normalizes that payload to a tenant-scoped card lookup and
+continues to accept the legacy `VUYELA:CARD:<business-id>:<card-number>` payload.
+
 ## Business Dashboard RPC
 
 `get_business_dashboard` is a read-only reporting boundary for `/negocio`.

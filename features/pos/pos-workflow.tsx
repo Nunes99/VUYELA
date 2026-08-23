@@ -193,7 +193,7 @@ function IdentifyForm({
   const methodConfig = {
     qr: {
       label: "Código QR",
-      placeholder: "VUYELA:CARD:...",
+      placeholder: "VY-...",
       inputMode: "text" as const
     },
     card: {
