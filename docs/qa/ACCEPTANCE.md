@@ -10,6 +10,9 @@
 - the homepage member-card visual uses the approved navy, gold cultural pattern, and a real QR;
 - the customer area matches the approved NEW PHAS desktop and mobile frames;
 - the digital card supports accessible front/back switching and a real identification QR;
+- cards, activity, offers, notifications, profile, and profile editing use dedicated responsive
+  customer views matching the supplied NEW PHAS frames;
+- customer activity supports local search and earned/redeemed filters without changing ledger data;
 - customer mobile navigation exposes Inicio, Cartoes, Explorar, Actividade, and Perfil without
   horizontal overflow;
 - business and administration navigation does not overlap content on mobile;

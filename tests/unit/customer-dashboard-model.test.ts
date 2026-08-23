@@ -23,7 +23,7 @@ const baseCard: DigitalCustomerCard = {
   currentTierName: "Prata",
   nextTierName: "Ouro",
   pointsUntilNextTier: 750,
-  expiryLabel: "Pontos expiram 180 dias apos serem ganhos",
+  expiryLabel: "Pontos expiram 180 dias após serem ganhos",
   qrCode: "VUYELA:CARD:business-1:VY-8F2K-91M"
 };
 

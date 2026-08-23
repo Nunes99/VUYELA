@@ -12,16 +12,16 @@ function value(formData: FormData, key: string): string {
 }
 
 export async function updateCustomerProfileAction(formData: FormData): Promise<void> {
-  const principal = await requireAuthenticatedUser("/cliente#perfil");
+  const principal = await requireAuthenticatedUser("/cliente?vista=perfil&editar=1");
   const displayName = value(formData, "displayName");
   const phone = value(formData, "phone");
 
   if (displayName.length < 2 || displayName.length > 100) {
-    redirect("/cliente?perfil=erro#perfil");
+    redirect("/cliente?vista=perfil&editar=1&perfil=erro");
   }
 
   if (phone && !/^\+?[0-9 ]{8,20}$/.test(phone)) {
-    redirect("/cliente?perfil=erro#perfil");
+    redirect("/cliente?vista=perfil&editar=1&perfil=erro");
   }
 
   const supabase = await createSupabaseServerClient();
@@ -37,9 +37,9 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
     .eq("id", principal.profileId);
 
   if (error) {
-    redirect("/cliente?perfil=erro#perfil");
+    redirect("/cliente?vista=perfil&editar=1&perfil=erro");
   }
 
   revalidatePath("/cliente");
-  redirect("/cliente?perfil=guardado#perfil");
+  redirect("/cliente?vista=perfil&editar=1&perfil=guardado");
 }

@@ -125,10 +125,10 @@ function getExpiryLabel(pointsExpireAfterDays: number | null): string {
   }
 
   if (pointsExpireAfterDays === 1) {
-    return "Pontos expiram 1 dia apos serem ganhos";
+    return "Pontos expiram 1 dia após serem ganhos";
   }
 
-  return `Pontos expiram ${pointsExpireAfterDays} dias apos serem ganhos`;
+  return `Pontos expiram ${pointsExpireAfterDays} dias após serem ganhos`;
 }
 
 function assertPositiveInteger(fieldName: string, value: number): void {

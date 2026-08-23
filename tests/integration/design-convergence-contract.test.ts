@@ -54,11 +54,14 @@ describe("approved VUYELA design contract", () => {
     expect(homepage).toContain("home-member-card");
     expect(homepage).toContain("QRCodeSVG");
     expect(customerDashboard).toContain("CustomerSummaryCard");
-    expect(customerDashboard).toContain("Resumo da sua conta VUYELA");
+    expect(customerDashboard).toContain("Painel de Cartões");
+    expect(customerDashboard).toContain("Histórico de Atividade");
+    expect(customerDashboard).toContain("Editar Perfil");
     expect(customerDashboard).toContain("Cartões digitais");
     expect(customerCard).toContain("showBack");
     expect(customerCard).toContain("QRCodeSVG");
     expect(pageStyles).toContain("NEW PHAS nodes 418:4266, 428:4266 and 428:4436");
+    expect(pageStyles).toContain("NEW PHAS nodes 435:4274, 436:4270, 436:5129,");
     expect(pageStyles).toContain(".customer-dashboard-stats");
     expect(pageStyles).toContain(".customer-digital-card__back-content");
   });

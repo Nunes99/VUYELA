@@ -8,14 +8,18 @@ import type { DigitalCustomerCard } from "./model";
 
 interface CustomerCardVisualProps {
   card: DigitalCustomerCard;
+  compact?: boolean;
 }
 
-export function CustomerCardVisual({ card }: CustomerCardVisualProps) {
+export function CustomerCardVisual({ card, compact = false }: CustomerCardVisualProps) {
   const [showBack, setShowBack] = useState(false);
   const faceLabel = showBack ? "Mostrar a frente do cartão" : "Mostrar o verso do cartão";
 
   return (
-    <div className="customer-digital-card" data-face={showBack ? "back" : "front"}>
+    <div
+      className={`customer-digital-card${compact ? " customer-digital-card--compact" : ""}`}
+      data-face={showBack ? "back" : "front"}
+    >
       <article
         aria-label={`${showBack ? "Verso" : "Frente"} do cartão ${card.businessName}`}
         className="customer-digital-card__surface"
@@ -71,15 +75,17 @@ export function CustomerCardVisual({ card }: CustomerCardVisualProps) {
           </>
         )}
 
-        <button
-          aria-label={faceLabel}
-          className="customer-digital-card__flip"
-          onClick={() => setShowBack((current) => !current)}
-          title={faceLabel}
-          type="button"
-        >
-          <RefreshCw aria-hidden="true" size={17} />
-        </button>
+        {!compact ? (
+          <button
+            aria-label={faceLabel}
+            className="customer-digital-card__flip"
+            onClick={() => setShowBack((current) => !current)}
+            title={faceLabel}
+            type="button"
+          >
+            <RefreshCw aria-hidden="true" size={17} />
+          </button>
+        ) : null}
       </article>
     </div>
   );

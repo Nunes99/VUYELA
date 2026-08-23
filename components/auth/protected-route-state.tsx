@@ -84,7 +84,7 @@ export function ProtectedRouteStateView({
               <a
                 aria-label="Ver notificações"
                 className="customer-shell-alert"
-                href="#notificacoes"
+                href="/cliente?vista=notificacoes"
               >
                 <Bell aria-hidden="true" size={22} />
                 <span aria-hidden="true" />

@@ -65,6 +65,11 @@ compact white header, three stable summary columns, a persistent bottom navigati
 interactive digital card with front and back faces. Both card faces use the real private
 identification payload without exposing balances inside the QR code.
 
+The complete flow provides dedicated views for the home dashboard, card hub, card detail and back,
+searchable activity, offers, notifications, profile, and profile editing. Navigation preserves the
+same information architecture on desktop and mobile while adapting its presentation to each
+viewport.
+
 All populated states use database-backed reads. Empty states explain what appears after the customer joins businesses or starts transacting.
 
 The installed PWA can display previously loaded active-card identification while offline. This
