@@ -11,6 +11,7 @@ import {
   MapPin,
   Menu,
   Percent,
+  Search,
   ShieldCheck,
   Sparkles,
   Smartphone,
@@ -52,6 +53,14 @@ const navLinks = [
   { href: "#precos", label: "Preços" },
   { href: "#recursos", label: "Recursos" },
   { href: "#blog", label: "Blog" }
+];
+
+const discoveryLinks = [
+  { href: "/estabelecimentos", label: "Estabelecimentos", icon: <Store size={20} /> },
+  { href: "/categorias", label: "Categorias", icon: <WalletCards size={20} /> },
+  { href: "/locais", label: "Locais", icon: <MapPin size={20} /> },
+  { href: "/ofertas", label: "Ofertas ativas", icon: <Sparkles size={20} /> },
+  { href: "/pesquisar", label: "Pesquisar", icon: <Search size={20} /> }
 ];
 
 const trustIndicators = [
@@ -274,6 +283,21 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <nav className="home-discovery" aria-label="Descobrir benefícios VUYELA">
+          <div className="vy-container home-discovery__inner">
+            <span>Descubra VUYELA</span>
+            <div>
+              {discoveryLinks.map((link) => (
+                <Link href={link.href} key={link.href}>
+                  {link.icon}
+                  <strong>{link.label}</strong>
+                  <ArrowRight aria-hidden="true" size={16} />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </nav>
+
         <section className="home-section home-section--steps" id="como-funciona">
           <div className="vy-container">
             <div className="home-section__header home-section__header--centered">
@@ -360,10 +384,10 @@ export default async function HomePage() {
                     bgColor="#ffffff"
                     fgColor="#032b38"
                     level="M"
-                    marginSize={1}
+                    marginSize={2}
                     role="img"
                     size={156}
-                    value="VUYELA:CARD:DEMO:VY-DEMO-250"
+                    value="VY-DEMO-250"
                   />
                 </div>
               </article>
@@ -396,12 +420,15 @@ export default async function HomePage() {
                 </article>
               ))}
             </div>
-            <div className="home-marketplace-links" aria-label="Links de descoberta pública">
-              <Link href="/estabelecimentos">Ver estabelecimentos</Link>
-              <Link href="/categorias">Explorar categorias</Link>
-              <Link href="/locais">Explorar locais</Link>
-              <Link href="/ofertas">Ver ofertas ativas</Link>
-              <Link href="/pesquisar">Pesquisar benefícios</Link>
+            <div className="home-business__actions">
+              <a className="home-link-button home-link-button--reward" href="/onboarding/negocio">
+                Sou um negócio
+                <ArrowRight aria-hidden="true" size={18} />
+              </a>
+              <Link href="/estabelecimentos">
+                Ver negócios VUYELA
+                <ArrowRight aria-hidden="true" size={16} />
+              </Link>
             </div>
           </div>
         </section>

@@ -12,6 +12,7 @@ test("shows the public homepage", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Como funciona?" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Vantagens para si" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Negócios que já confiam" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Descobrir benefícios VUYELA" })).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Pontos VUYELA são promocionais, claros e locais ao negócio."
@@ -40,12 +41,19 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
           Boolean(productRect) &&
           productRect!.width > 0 &&
           productRect!.right > 0 &&
-          productRect!.left < window.innerWidth
+          productRect!.left < window.innerWidth,
+        discoveryLabelsFit: Array.from(
+          document.querySelectorAll<HTMLElement>(".home-discovery a strong")
+        ).every(
+          (label) =>
+            label.scrollWidth <= label.clientWidth && label.scrollHeight <= label.clientHeight
+        )
       };
     });
 
     expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
     expect(layout.productVisible, `product visual outside viewport at ${width}px`).toBe(true);
+    expect(layout.discoveryLabelsFit, `clipped discovery label at ${width}px`).toBe(true);
     expect(layout.heroLines).toBe(3);
     expect(layout.headingFont).toContain("Sora");
     expect(layout.bodyFont).toContain("Inter");

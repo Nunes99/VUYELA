@@ -17,6 +17,16 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     if (viewport.mobile) {
       await expect(page.getByRole("link", { name: "Negócios" })).toBeVisible();
       await expect(page.getByRole("link", { name: "POS" })).toBeVisible();
+
+      const cardAlignment = await page.evaluate(() => {
+        const heading = document.querySelector<HTMLElement>("#home-cards-title")!;
+        const firstCard = document.querySelector<HTMLElement>(".customer-home-card-link")!;
+
+        return firstCard.getBoundingClientRect().left - heading.getBoundingClientRect().left;
+      });
+
+      expect(cardAlignment).toBeGreaterThanOrEqual(0);
+      expect(cardAlignment).toBeLessThanOrEqual(12);
     }
 
     const layout = await page.evaluate(() => ({
@@ -55,6 +65,10 @@ test("renders the customer activity, notifications and card identification views
   await expect(page.getByText("Pontos acumulados", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=cartoes&cartao=card-1");
+  const cardDetailSelector =
+    testInfo.project.name === "mobile-chrome"
+      ? ".customer-mobile-card-detail"
+      : ".customer-card-detail-visual";
   const visibleQr = page.locator('[aria-label^="QR de identificação:"]:visible');
   await expect(visibleQr).toBeVisible();
   const qrGeometry = await visibleQr.evaluate((qr) => {
@@ -71,7 +85,7 @@ test("renders the customer activity, notifications and card identification views
   expect(qrGeometry.height).toBeGreaterThanOrEqual(64);
   expect(qrGeometry.moduleGridWidth).toBeLessThanOrEqual(25);
   const detailGeometry = await page
-    .locator(".customer-mobile-card-detail .customer-digital-card")
+    .locator(`${cardDetailSelector} .customer-digital-card`)
     .evaluate((card) => {
       const surface = card.querySelector<HTMLElement>(".customer-digital-card__surface")!;
       const inner = card.querySelector<HTMLElement>(".customer-digital-card__inner")!;
@@ -90,7 +104,7 @@ test("renders the customer activity, notifications and card identification views
     page.locator('[role="img"][aria-label="Verso do cartão Barbershop 21"]:visible')
   ).toBeVisible();
   const backFields = await page
-    .locator(".customer-mobile-card-detail .customer-digital-card__back-content > span")
+    .locator(`${cardDetailSelector} .customer-digital-card__back-content > span`)
     .evaluateAll((fields) =>
       fields.map((field) => {
         const value = field.querySelector<HTMLElement>("strong")!;
