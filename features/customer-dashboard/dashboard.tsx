@@ -226,7 +226,12 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
                   href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
                   key={card.id}
                 >
-                  <CustomerCardVisual card={card} compact />
+                  <div className="customer-mobile-only">
+                    <CustomerMobileCardPreview card={card} />
+                  </div>
+                  <div className="customer-desktop-only">
+                    <CustomerCardVisual card={card} compact />
+                  </div>
                   <span>
                     Ver detalhes <ChevronRight aria-hidden="true" size={16} />
                   </span>
@@ -709,10 +714,13 @@ function CustomerActivityPreview({ dashboard }: { dashboard: CustomerDashboardVi
             <strong>{item.businessName}</strong>
             <small>{item.description}</small>
           </div>
-          <b className={`is-${item.tone}`}>
-            {item.points > 0 ? "+" : ""}
-            {item.points.toLocaleString("pt-MZ")} Pts
-          </b>
+          <span className="customer-activity-preview__amount">
+            <b className={`is-${item.tone}`}>
+              {item.points > 0 ? "+" : ""}
+              {item.points.toLocaleString("pt-MZ")} Pts
+            </b>
+            <time dateTime={item.occurredAt}>{formatActivityPreviewDate(item.occurredAt)}</time>
+          </span>
         </article>
       ))}
     </div>
@@ -879,17 +887,40 @@ function CustomerMobileHeader({
         <Link aria-label={actionLabel} href="/cliente?vista=notificacoes">
           {actionContent}
         </Link>
+      ) : action === "add" ? (
+        <Link aria-label={actionLabel} href="/estabelecimentos">
+          {actionContent}
+        </Link>
       ) : (
-        <button
-          aria-label={actionLabel}
-          disabled={action === "add"}
-          title={actionLabel}
-          type="button"
-        >
+        <button aria-label={actionLabel} disabled title={actionLabel} type="button">
           {actionContent}
         </button>
       )}
     </header>
+  );
+}
+
+function CustomerMobileCardPreview({
+  card
+}: {
+  card: CustomerDashboardViewModel["cards"][number];
+}) {
+  const cardSuffix = card.cardNumber.replace(/\D/g, "").slice(-4);
+
+  return (
+    <article className="customer-mobile-card-preview" aria-label={`Cartão ${card.businessName}`}>
+      <span className="customer-mobile-card-preview__pattern" aria-hidden="true" />
+      <header>
+        <strong>{card.businessName}</strong>
+        <span>{card.currentTierName}</span>
+      </header>
+      <div>
+        <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
+        <small>
+          {card.customerName} •••• {cardSuffix}
+        </small>
+      </div>
+    </article>
   );
 }
 
@@ -943,4 +974,25 @@ function formatToday(): string {
     day: "2-digit",
     month: "long"
   }).format(new Date());
+}
+
+function formatActivityPreviewDate(value: string): string {
+  const date = new Date(value);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  const time = new Intl.DateTimeFormat("pt-MZ", {
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(date);
+
+  if (date.toDateString() === today.toDateString()) return `Hoje, ${time}`;
+  if (date.toDateString() === yesterday.toDateString()) return `Ontem, ${time}`;
+
+  return new Intl.DateTimeFormat("pt-MZ", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(date);
 }

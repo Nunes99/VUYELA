@@ -32,10 +32,18 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
 
 test("renders the customer activity, notifications and card identification views", async ({
   page
-}) => {
+}, testInfo) => {
   await page.goto("/dev/customer?vista=atividade");
-  await expect(page.getByRole("heading", { name: "Histórico de Atividade" }).last()).toBeVisible();
-  await expect(page.getByRole("columnheader", { name: "Cartão vinculado" })).toBeVisible();
+  if (testInfo.project.name === "mobile-chrome") {
+    await expect(page.getByRole("heading", { name: "Histórico de Pontos" })).toBeVisible();
+    await expect(page.getByRole("searchbox", { name: "Pesquisar atividade" })).toBeVisible();
+    await expect(page.getByText("Barbershop 21", { exact: true }).first()).toBeVisible();
+  } else {
+    await expect(
+      page.getByRole("heading", { name: "Histórico de Atividade" }).last()
+    ).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: "Cartão vinculado" })).toBeVisible();
+  }
 
   await page.goto("/dev/customer?vista=notificacoes");
   await expect(page.getByRole("heading", { name: "Avisos e Alertas" }).last()).toBeVisible();
@@ -51,7 +59,7 @@ test("renders the customer activity, notifications and card identification views
     await mobileFlip.click();
     await expect(page.getByRole("heading", { name: "QR Code de identificação" })).toBeVisible();
   }
-  await expect(page.getByLabel(/QR de identificação/)).toBeVisible();
+  await expect(page.getByLabel(/QR de identificação/).first()).toBeVisible();
 });
 
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {
@@ -62,11 +70,11 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await expect(page.getByText("Adicionar novo cartão digital")).toBeVisible();
 
   await page.goto("/dev/customer?vista=ofertas");
-  await expect(page.getByRole("heading", { name: "Explorar Ofertas" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Explorar Ofertas" }).first()).toBeVisible();
   await expect(page.getByText("Restaurantes", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Ativar Benefício" }).first()).toBeVisible();
 
   await page.goto("/dev/customer?vista=perfil");
-  await expect(page.getByRole("heading", { name: "O Seu Perfil" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "O Seu Perfil" }).first()).toBeVisible();
   await expect(page.getByText("Segurança e preferências", { exact: true })).toBeVisible();
 });
