@@ -11207,6 +11207,8 @@
   display: block;
   width: 100%;
   min-height: 0;
+  aspect-ratio: auto;
+  overflow: visible;
   cursor: pointer;
   border: 0;
   border-radius: 0;
@@ -11413,32 +11415,50 @@
 
 .customer-digital-card__back-content {
   position: absolute;
+  top: 34%;
   right: 6.5%;
-  bottom: 11%;
+  bottom: auto;
   left: 6.5%;
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem 1.25rem;
+  align-content: start;
+  justify-items: stretch;
+  gap: 0.65rem 1.25rem;
+}
+
+.customer-digital-card__face--back .customer-digital-card__pattern {
+  opacity: 0.42;
 }
 
 .customer-digital-card__back-content > span {
   display: grid;
   min-width: 0;
-  gap: 0.12rem;
+  min-height: 2.45rem;
+  align-content: start;
+  gap: 0.18rem;
+  border-top: 1px solid rgba(134, 168, 180, 0.38);
+  padding-top: 0.45rem;
 }
 
 .customer-digital-card__back-content small {
   color: #86a8b4;
   font-size: 0.52rem;
+  font-weight: 700;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
 .customer-digital-card__back-content strong {
   color: #ffffff;
-  font-size: 0.66rem;
-  line-height: 1.2;
+  font-size: 0.7rem;
+  font-weight: 750;
+  line-height: 1.25;
   overflow-wrap: anywhere;
+}
+
+.customer-digital-card__back-content > span:first-child strong {
+  font-family: var(--vy-font-mono);
 }
 
 .customer-digital-card__surface:focus-visible {
@@ -11950,7 +11970,7 @@
     align-items: center;
     gap: 0.75rem;
     border: 1px solid #d7e0e5;
-    border-radius: 1rem;
+    border-radius: 0.65rem;
     padding: 0.65rem 0.75rem;
     background: #ffffff;
     box-shadow: none;
@@ -11958,6 +11978,11 @@
 
   .customer-card-hub-item .customer-digital-card__inner {
     aspect-ratio: 1.6 / 1;
+  }
+
+  .customer-card-hub-item .customer-digital-card__face {
+    border-radius: 0.3rem;
+    box-shadow: none;
   }
 
   .customer-card-hub-item .customer-digital-card__brand {
@@ -12214,7 +12239,10 @@
     margin-top: 0;
   }
 
-  .customer-card-hub-item,
+  .customer-card-hub-item {
+    overflow: visible;
+  }
+
   .customer-card-hub-item__content {
     overflow: hidden;
   }

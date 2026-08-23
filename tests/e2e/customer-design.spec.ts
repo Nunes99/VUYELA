@@ -56,10 +56,39 @@ test("renders the customer activity, notifications and card identification views
 
   await page.goto("/dev/customer?vista=cartoes&cartao=card-1");
   await expect(page.locator('[aria-label^="QR de identificação:"]:visible')).toBeVisible();
+  const detailGeometry = await page
+    .locator(".customer-mobile-card-detail .customer-digital-card")
+    .evaluate((card) => {
+      const surface = card.querySelector<HTMLElement>(".customer-digital-card__surface")!;
+      const inner = card.querySelector<HTMLElement>(".customer-digital-card__inner")!;
+      const face = card.querySelector<HTMLElement>(".customer-digital-card__face--front")!;
+
+      return {
+        surfaceHeight: surface.getBoundingClientRect().height,
+        innerHeight: inner.getBoundingClientRect().height,
+        faceHeight: face.getBoundingClientRect().height
+      };
+    });
+  expect(Math.abs(detailGeometry.surfaceHeight - detailGeometry.innerHeight)).toBeLessThan(1);
+  expect(Math.abs(detailGeometry.surfaceHeight - detailGeometry.faceHeight)).toBeLessThan(1);
   await page.locator('button[aria-label="Mostrar o verso do cartão"]:visible').click();
   await expect(
     page.locator('[role="img"][aria-label="Verso do cartão Barbershop 21"]:visible')
   ).toBeVisible();
+  const backFields = await page
+    .locator(".customer-mobile-card-detail .customer-digital-card__back-content > span")
+    .evaluateAll((fields) =>
+      fields.map((field) => {
+        const value = field.querySelector<HTMLElement>("strong")!;
+        return {
+          complete:
+            value.scrollHeight <= value.clientHeight && value.scrollWidth <= value.clientWidth,
+          width: field.getBoundingClientRect().width
+        };
+      })
+    );
+  expect(backFields).toHaveLength(4);
+  expect(backFields.every((field) => field.complete && field.width > 100)).toBe(true);
 });
 
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {
@@ -70,6 +99,22 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await expect(page.getByRole("heading", { name: "Gerir Cartões" })).toBeVisible();
   await expect(page.getByText("Adicionar novo cartão digital")).toBeVisible();
   await expect(page.locator(".customer-mobile-header__logo")).toHaveAttribute("href", "/cliente");
+  const thumbnailGeometry = await page
+    .locator(".customer-card-hub-item")
+    .first()
+    .evaluate((row) => {
+      const surface = row.querySelector<HTMLElement>(".customer-digital-card__surface")!;
+      const face = row.querySelector<HTMLElement>(".customer-digital-card__face--front")!;
+      const surfaceRect = surface.getBoundingClientRect();
+      const faceRect = face.getBoundingClientRect();
+
+      return {
+        clippedBottom: Math.abs(surfaceRect.bottom - faceRect.bottom) > 0.5,
+        radius: Number.parseFloat(getComputedStyle(face).borderRadius)
+      };
+    });
+  expect(thumbnailGeometry.clippedBottom).toBe(false);
+  expect(thumbnailGeometry.radius).toBeLessThanOrEqual(5);
 
   await page.goto("/dev/customer?vista=ofertas");
   await expect(page.getByRole("heading", { name: "Explorar Ofertas" }).first()).toBeVisible();
