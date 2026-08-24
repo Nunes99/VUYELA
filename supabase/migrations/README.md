@@ -31,5 +31,7 @@ Apply them in this exact order:
 25. `manage_business_categories.sql`
 26. `create_operational_flow_foundation.sql`
 27. `secure_operational_flow_foundation.sql`
+28. `restrict_operational_flow_privileges.sql`
+29. `index_operational_foreign_keys.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

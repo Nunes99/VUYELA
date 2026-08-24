@@ -229,6 +229,20 @@ alter table public.offer_claims enable row level security;
 alter table public.support_ticket_messages enable row level security;
 alter table public.platform_settings enable row level security;
 
+revoke all on table
+  public.business_catalog_items,
+  public.pos_terminals,
+  public.pos_terminal_settings,
+  public.pos_terminal_devices,
+  public.business_payment_channels,
+  public.payment_attempts,
+  public.business_member_invitations,
+  public.customer_business_preferences,
+  public.offer_claims,
+  public.support_ticket_messages,
+  public.platform_settings
+from public, anon, authenticated;
+
 grant select on public.business_catalog_items,
   public.pos_terminals,
   public.pos_terminal_settings,

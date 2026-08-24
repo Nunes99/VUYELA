@@ -9,6 +9,10 @@ const migration = readFileSync(
 );
 const posSettings = readFileSync(join(process.cwd(), "features/pos/pos-settings.tsx"), "utf8");
 const posActions = readFileSync(join(process.cwd(), "features/pos/actions.ts"), "utf8");
+const privilegeMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/restrict_operational_flow_privileges.sql"),
+  "utf8"
+);
 
 const privateTables = [
   "business_catalog_items",
@@ -29,6 +33,14 @@ describe("operational flow security boundary", () => {
     for (const table of privateTables) {
       expect(migration).toContain(`alter table public.${table} enable row level security`);
     }
+  });
+
+  it("revokes automatic API grants before restoring least privilege", () => {
+    expect(migration).toContain("revoke all on table");
+    expect(migration).toContain("from public, anon, authenticated");
+    expect(privilegeMigration).toContain("revoke all on table");
+    expect(privilegeMigration).not.toMatch(/\sto anon/i);
+    expect(privilegeMigration).not.toMatch(/grant[\s\S]*?on public\.platform_settings/i);
   });
 
   it("checks tenant and branch access before returning POS configuration", () => {

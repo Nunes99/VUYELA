@@ -7,6 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/create_operational_flow_foundation.sql"),
   "utf8"
 );
+const indexMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/index_operational_foreign_keys.sql"),
+  "utf8"
+);
 
 const operationalTables = [
   "business_catalog_items",
@@ -66,5 +70,13 @@ describe("operational flow data foundation", () => {
     expect(migration).toContain("platform_settings_value_no_secrets");
     expect(migration).toContain("'client_secret'");
     expect(migration).toContain("'private_key'");
+  });
+
+  it("covers the operational composite foreign-key lookup paths", () => {
+    expect(indexMigration).toContain("business_catalog_items_branch_business_fk_idx");
+    expect(indexMigration).toContain("payment_attempts_channel_business_method_fk_idx");
+    expect(indexMigration).toContain("offer_claims_transaction_business_card_fk_idx");
+    expect(indexMigration).toContain("transaction_payments_attempt_business_method_fk_idx");
+    expect(indexMigration).toContain("pos_terminal_devices_terminal_business_fk_idx");
   });
 });
