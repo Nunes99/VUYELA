@@ -21,7 +21,7 @@ interface ProtectedRouteStateViewProps {
   state: ProtectedRouteState;
   title: string;
   children: ReactNode;
-  variant?: "default" | "customer" | "admin";
+  variant?: "default" | "customer" | "admin" | "business" | "pos";
   customerName?: string | undefined;
 }
 
@@ -65,8 +65,15 @@ export function ProtectedRouteStateView({
   customerName
 }: ProtectedRouteStateViewProps) {
   if (state.status === "authorized") {
-    if (variant === "admin") {
-      return <main className="admin-page">{children}</main>;
+    if (variant === "admin" || variant === "business" || variant === "pos") {
+      const className =
+        variant === "admin"
+          ? "admin-page"
+          : variant === "business"
+            ? "business-portal-page"
+            : "pos-portal-page";
+
+      return <main className={className}>{children}</main>;
     }
 
     const isCustomer = variant === "customer";
@@ -159,7 +166,7 @@ export function ProtectedRouteStateView({
   );
 }
 
-function DashboardAreaMenu({
+export function DashboardAreaMenu({
   principal,
   variant,
   customerName

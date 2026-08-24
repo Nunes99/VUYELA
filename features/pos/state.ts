@@ -1,4 +1,4 @@
-import type { PosCustomerCard, PosQuote } from "./model";
+import type { PosCustomerCard, PosPaymentMethod, PosQuote } from "./model";
 
 export interface PosActionState {
   status: "idle" | "error" | "success";
@@ -9,6 +9,8 @@ export interface PosActionState {
   quote: PosQuote | null;
   transactionId: string | null;
   idempotencyKey: string;
+  serviceDescription: string;
+  paymentMethod: PosPaymentMethod | null;
 }
 
 export const initialPosActionState: PosActionState = {
@@ -19,5 +21,7 @@ export const initialPosActionState: PosActionState = {
   card: null,
   quote: null,
   transactionId: null,
-  idempotencyKey: ""
+  idempotencyKey: "",
+  serviceDescription: "",
+  paymentMethod: null
 };

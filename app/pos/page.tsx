@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
 import { getPosContext } from "@/features/pos/data";
+import { PosPortalShell } from "@/features/pos/pos-shell";
 import { PosWorkflow } from "@/features/pos/pos-workflow";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
@@ -20,8 +21,12 @@ export default async function PosPage() {
   const posContext = state.status === "authorized" ? await getPosContext(state.principal) : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="POS VUYELA">
-      {posContext ? <PosWorkflow context={posContext} /> : null}
+    <ProtectedRouteStateView state={state} title="POS VUYELA" variant="pos">
+      {state.status === "authorized" && posContext ? (
+        <PosPortalShell context={posContext} principal={state.principal}>
+          <PosWorkflow context={posContext} />
+        </PosPortalShell>
+      ) : null}
     </ProtectedRouteStateView>
   );
 }

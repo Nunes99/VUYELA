@@ -1,10 +1,25 @@
 import { expect, test } from "@playwright/test";
 
-test("shows the protected business dashboard fallback", async ({ page }) => {
-  await page.goto("/negocio");
+test.setTimeout(180_000);
 
-  await expect(
-    page.getByRole("heading", { name: "Autenticação ainda não está ligada." })
-  ).toBeVisible();
-  await expect(page.getByText("Configurar Supabase")).toBeVisible();
+const dashboardViews = [
+  "dashboard",
+  "filiais",
+  "cartoes",
+  "clientes",
+  "fidelizacao",
+  "analitica",
+  "pos",
+  "transacoes"
+];
+
+test("protects every business dashboard view", async ({ page }) => {
+  for (const view of dashboardViews) {
+    await page.goto(`/negocio?vista=${view}`);
+
+    await expect(
+      page.getByRole("heading", { name: "Autenticação ainda não está ligada." })
+    ).toBeVisible();
+    await expect(page.getByText("Configurar Supabase")).toBeVisible();
+  }
 });

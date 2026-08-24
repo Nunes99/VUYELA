@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
+import { BusinessPortalShell } from "@/features/business-dashboard/portal-shell";
 import { BusinessReferralsView } from "@/features/referrals/business-referrals";
 import { getBusinessReferrals } from "@/features/referrals/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
@@ -34,8 +35,16 @@ export default async function BusinessReferralsPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Indicações do negócio">
-      {referralState ? <BusinessReferralsView state={referralState} /> : null}
+    <ProtectedRouteStateView state={state} title="Indicações do negócio" variant="business">
+      {state.status === "authorized" && referralState ? (
+        <BusinessPortalShell
+          activeSection="referrals"
+          principal={state.principal}
+          title="Indicações"
+        >
+          <BusinessReferralsView state={referralState} />
+        </BusinessPortalShell>
+      ) : null}
     </ProtectedRouteStateView>
   );
 }

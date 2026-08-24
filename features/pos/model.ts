@@ -32,21 +32,32 @@ export interface PosQuote {
 }
 
 export type PosLookupMethod = "qr" | "card" | "phone";
+export type PosPaymentMethod = "mpesa" | "emola" | "mkesh" | "cash" | "card";
 
 export interface NormalizedPosLookup {
   method: PosLookupMethod;
   value: string;
 }
 
-export type PosStepId = "identify" | "amount" | "authorization" | "confirm" | "success";
+export type PosStepId = "identify" | "services" | "authorize" | "confirm" | "success";
 
 export const posSteps: ReadonlyArray<{ id: PosStepId; label: string }> = [
   { id: "identify", label: "Identificar" },
-  { id: "amount", label: "Valor" },
-  { id: "authorization", label: "Autorizar" },
+  { id: "services", label: "Serviços" },
+  { id: "authorize", label: "Autorizar" },
   { id: "confirm", label: "Confirmar" },
   { id: "success", label: "Sucesso" }
 ];
+
+export function isPosPaymentMethod(value: string): value is PosPaymentMethod {
+  return (
+    value === "mpesa" ||
+    value === "emola" ||
+    value === "mkesh" ||
+    value === "cash" ||
+    value === "card"
+  );
+}
 
 const MONEY_PATTERN = /^\d+(?:[,.]\d{1,2})?$/;
 const IDEMPOTENCY_PATTERN = /^[A-Za-z0-9_-]{12,80}$/;

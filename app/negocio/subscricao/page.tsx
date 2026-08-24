@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
+import { BusinessPortalShell } from "@/features/business-dashboard/portal-shell";
 import { getBusinessSubscription } from "@/features/subscriptions/data";
 import { BusinessSubscriptionView } from "@/features/subscriptions/subscription-dashboard";
 import { getProtectedRouteState } from "@/lib/auth/session";
@@ -29,8 +30,16 @@ export default async function BusinessSubscriptionPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Subscrição do negócio">
-      {subscriptionState ? <BusinessSubscriptionView state={subscriptionState} /> : null}
+    <ProtectedRouteStateView state={state} title="Subscrição do negócio" variant="business">
+      {state.status === "authorized" && subscriptionState ? (
+        <BusinessPortalShell
+          activeSection="subscription"
+          principal={state.principal}
+          title="Subscrição"
+        >
+          <BusinessSubscriptionView state={subscriptionState} />
+        </BusinessPortalShell>
+      ) : null}
     </ProtectedRouteStateView>
   );
 }

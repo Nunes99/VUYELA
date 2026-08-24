@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
-import { BusinessDashboardView } from "@/features/business-dashboard/dashboard";
+import {
+  BusinessDashboardView,
+  parseBusinessDashboardView
+} from "@/features/business-dashboard/dashboard";
 import { getBusinessDashboard } from "@/features/business-dashboard/data";
+import {
+  BusinessPortalShell,
+  type BusinessPortalSection
+} from "@/features/business-dashboard/portal-shell";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
@@ -26,6 +33,7 @@ export default async function BusinessAreaPage({
 }) {
   const state = await getProtectedRouteState("/negocio", "/negocio");
   const params = (await searchParams) ?? {};
+  const view = parseBusinessDashboardView(params.vista);
   const dashboardState =
     state.status === "authorized"
       ? await getBusinessDashboard(state.principal, {
@@ -34,9 +42,28 @@ export default async function BusinessAreaPage({
         })
       : null;
 
+  const sectionByView: Record<typeof view, BusinessPortalSection> = {
+    dashboard: "dashboard",
+    filiais: "branches",
+    cartoes: "cards",
+    clientes: "customers",
+    fidelizacao: "loyalty",
+    analitica: "analytics",
+    pos: "pos",
+    transacoes: "analytics"
+  };
+
   return (
-    <ProtectedRouteStateView state={state} title="Painel do negócio">
-      {dashboardState ? <BusinessDashboardView state={dashboardState} /> : null}
+    <ProtectedRouteStateView state={state} title="Painel do negócio" variant="business">
+      {state.status === "authorized" && dashboardState ? (
+        <BusinessPortalShell
+          activeSection={sectionByView[view]}
+          principal={state.principal}
+          title={view === "dashboard" ? "Painel do Negócio" : undefined}
+        >
+          <BusinessDashboardView state={dashboardState} view={view} />
+        </BusinessPortalShell>
+      ) : null}
     </ProtectedRouteStateView>
   );
 }

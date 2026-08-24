@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
+import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 import { updateBusinessSettingsAction } from "./actions";
 import type { BusinessSettingsState } from "./data";
 
@@ -28,6 +29,15 @@ export function BusinessSettingsView({
 
   return (
     <div className="business-settings">
+      <BusinessProfileHeader
+        activeTab="definicoes"
+        business={{
+          id: settings.business.id,
+          name: settings.business.name,
+          status: "active"
+        }}
+        scopeLabel="Perfil público e configuração operacional"
+      />
       <header className="business-settings__header">
         <div>
           <span className="business-dashboard-eyebrow">Gestão do conteúdo</span>

@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   buildFallbackIdempotencyKey,
   buildPosQuote,
+  isPosPaymentMethod,
   isValidIdempotencyKey,
   normalizePosCustomerLookup,
   parseMznToMinorUnits
@@ -207,12 +208,14 @@ export async function quotePosTransactionAction(
     requestedPointsToRedeem: pointsToRedeem.value,
     card: previousState.card
   });
+  const serviceDescription = getFormString(formData, "serviceDescription").slice(0, 160);
 
   return {
     ...previousState,
     status: "success",
     message: "Valor calculado. Confirme com o cliente.",
     quote,
+    serviceDescription,
     transactionId: null,
     idempotencyKey: getIdempotencyKey(formData, { ...previousState, quote })
   };
@@ -238,6 +241,11 @@ export async function confirmPosTransactionAction(
 
   const branchId = getFormString(formData, "branchId") || previousState.branchId || null;
   const cashierMemberId = getFormString(formData, "cashierMemberId") || null;
+  const paymentMethodValue = getFormString(formData, "paymentMethod");
+
+  if (!isPosPaymentMethod(paymentMethodValue)) {
+    return createErrorState("Selecione um método de pagamento válido.", previousState);
+  }
   const idempotencyKey = getIdempotencyKey(formData, previousState);
 
   if (!isValidIdempotencyKey(idempotencyKey)) {
@@ -264,7 +272,9 @@ export async function confirmPosTransactionAction(
     p_external_reference: idempotencyKey,
     p_metadata: {
       source: "pos",
-      customer_authorized: getFormString(formData, "customerAuthorized") === "on"
+      customer_authorized: getFormString(formData, "customerAuthorized") === "on",
+      service_description: previousState.serviceDescription || null,
+      payment_method: paymentMethodValue
     }
   });
 
@@ -289,7 +299,8 @@ export async function confirmPosTransactionAction(
     status: "success",
     message: "Transação confirmada com sucesso.",
     transactionId: row?.transaction_id ?? null,
-    idempotencyKey
+    idempotencyKey,
+    paymentMethod: paymentMethodValue
   };
 }
 

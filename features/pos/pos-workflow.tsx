@@ -3,22 +3,27 @@
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
   BadgeCheck,
+  Banknote,
   Calculator,
   Camera,
   CheckCircle2,
+  ChevronLeft,
   CreditCard,
   Hash,
   Phone,
   Receipt,
   RotateCcw,
   ScanLine,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone,
+  WalletCards
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select } from "../../vuyela-design-system/src/components/Field";
 import { submitPosAction } from "./actions";
 import { formatMznMinor, posSteps } from "./model";
+import type { PosPaymentMethod } from "./model";
 import { PosQrScanner } from "./pos-qr-scanner";
 import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
@@ -31,6 +36,7 @@ interface PosWorkflowProps {
 export function PosWorkflow({ context }: PosWorkflowProps) {
   const [state, formAction, pending] = useActionState(submitPosAction, initialPosActionState);
   const [customerAuthorized, setCustomerAuthorized] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PosPaymentMethod | null>(null);
   const selectedBusiness = useMemo(() => {
     if (context.status !== "ready") {
       return null;
@@ -44,12 +50,12 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
   }, [context, state.businessId]);
   const activeStep = state.transactionId
     ? "success"
-    : state.quote && customerAuthorized
+    : state.quote && paymentMethod
       ? "confirm"
       : state.quote
-        ? "authorization"
+        ? "authorize"
         : state.card
-          ? "amount"
+          ? "services"
           : "identify";
   const [quoteIdempotencyKey, setQuoteIdempotencyKey] = useState("");
 
@@ -100,15 +106,22 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
           ) : null}
 
           {state.card && state.quote && !state.transactionId ? (
-            <ConfirmForm
-              branchId={state.branchId}
-              businessId={state.businessId}
-              customerAuthorized={customerAuthorized}
-              formAction={formAction}
-              idempotencyKey={state.idempotencyKey}
-              onAuthorizationChange={setCustomerAuthorized}
-              pending={pending}
-            />
+            paymentMethod ? (
+              <ConfirmForm
+                branchId={state.branchId}
+                businessId={state.businessId}
+                customerAuthorized={customerAuthorized}
+                formAction={formAction}
+                idempotencyKey={state.idempotencyKey}
+                onAuthorizationChange={setCustomerAuthorized}
+                onBack={() => setPaymentMethod(null)}
+                paymentMethod={paymentMethod}
+                pending={pending}
+                state={state}
+              />
+            ) : (
+              <AuthorizationStep onSelect={setPaymentMethod} quote={state.quote} />
+            )
           ) : null}
 
           {state.card && state.quote && state.transactionId ? (
@@ -118,8 +131,9 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
               onReset={() => {
                 setQuoteIdempotencyKey(createBrowserIdempotencyKey());
                 setCustomerAuthorized(false);
+                setPaymentMethod(null);
               }}
-              transactionId={state.transactionId}
+              state={state}
             />
           ) : null}
 
@@ -135,6 +149,7 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
 
           <CustomerSummary state={state} />
           <QuoteSummary state={state} />
+          {paymentMethod ? <PaymentSummary method={paymentMethod} /> : null}
         </aside>
       </div>
     </div>
@@ -354,14 +369,32 @@ function QuoteForm({
       <input type="hidden" name="branchId" value={branchId} />
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
 
+      <div className="pos-form__intro">
+        <span className="pos-form__step-number">02</span>
+        <div>
+          <h3>Serviços e valor da compra</h3>
+          <p>Registe o serviço ou produto prestado antes de calcular os pontos.</p>
+        </div>
+      </div>
+
       <Input
-        label="Valor da compra"
-        name="grossAmountMzn"
-        inputMode="decimal"
-        placeholder="0,00"
-        requiredMark
-        required
+        label="Descrição do serviço ou produto"
+        name="serviceDescription"
+        maxLength={160}
+        placeholder="Ex.: Corte masculino + barba"
       />
+
+      <div className="pos-amount-field">
+        <Input
+          label="Valor da compra"
+          name="grossAmountMzn"
+          inputMode="decimal"
+          placeholder="0,00"
+          requiredMark
+          required
+        />
+        <span>MZN</span>
+      </div>
 
       <div className="pos-form-grid">
         <Input label="Desconto" name="discountAmountMzn" inputMode="decimal" placeholder="0,00" />
@@ -384,9 +417,64 @@ function QuoteForm({
         loading={pending}
         leadingIcon={<Calculator size={20} />}
       >
-        Calcular
+        Rever pagamento
       </Button>
     </form>
+  );
+}
+
+function AuthorizationStep({
+  quote,
+  onSelect
+}: {
+  quote: NonNullable<PosActionState["quote"]>;
+  onSelect: (method: PosPaymentMethod) => void;
+}) {
+  const methods: Array<{
+    id: PosPaymentMethod;
+    label: string;
+    detail: string;
+    icon: typeof Smartphone;
+  }> = [
+    { id: "mpesa", label: "M-Pesa", detail: "Pagamento móvel", icon: Smartphone },
+    { id: "emola", label: "e-Mola", detail: "Carteira móvel", icon: Smartphone },
+    { id: "mkesh", label: "mKesh", detail: "Carteira móvel", icon: Smartphone },
+    { id: "cash", label: "Dinheiro", detail: "Pagamento no balcão", icon: Banknote },
+    { id: "card", label: "Cartão", detail: "Terminal bancário", icon: WalletCards }
+  ];
+
+  return (
+    <section className="pos-authorization" aria-labelledby="pos-payment-title">
+      <div className="pos-form__intro">
+        <span className="pos-form__step-number">03</span>
+        <div>
+          <h3 id="pos-payment-title">Autorizar pagamento</h3>
+          <p>Selecione como o cliente vai pagar o valor final.</p>
+        </div>
+      </div>
+      <div className="pos-payment-total">
+        <span>Total a pagar</span>
+        <strong>{formatMznMinor(quote.netAmountMznMinor)}</strong>
+      </div>
+      <div className="pos-payment-methods">
+        {methods.map((method) => {
+          const Icon = method.icon;
+          return (
+            <button key={method.id} onClick={() => onSelect(method.id)} type="button">
+              <span>
+                <Icon aria-hidden="true" size={20} />
+              </span>
+              <strong>{method.label}</strong>
+              <small>{method.detail}</small>
+            </button>
+          );
+        })}
+      </div>
+      <p className="pos-form-hint">
+        O POS regista o método escolhido; a confirmação financeira permanece no provedor de
+        pagamento correspondente.
+      </p>
+    </section>
   );
 }
 
@@ -397,6 +485,9 @@ function ConfirmForm({
   idempotencyKey,
   customerAuthorized,
   onAuthorizationChange,
+  onBack,
+  paymentMethod,
+  state,
   pending
 }: {
   businessId: string;
@@ -405,6 +496,9 @@ function ConfirmForm({
   idempotencyKey: string;
   customerAuthorized: boolean;
   onAuthorizationChange: (value: boolean) => void;
+  onBack: () => void;
+  paymentMethod: PosPaymentMethod;
+  state: PosActionState;
   pending: boolean;
 }) {
   return (
@@ -413,6 +507,34 @@ function ConfirmForm({
       <input type="hidden" name="businessId" value={businessId} />
       <input type="hidden" name="branchId" value={branchId} />
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
+      <input type="hidden" name="paymentMethod" value={paymentMethod} />
+
+      <div className="pos-form__intro">
+        <span className="pos-form__step-number">04</span>
+        <div>
+          <h3>Confirmar transação</h3>
+          <p>Revise os dados antes de emitir ou resgatar os pontos.</p>
+        </div>
+      </div>
+
+      <dl className="pos-confirmation-list">
+        <div>
+          <dt>Cliente</dt>
+          <dd>{state.card?.customerName}</dd>
+        </div>
+        <div>
+          <dt>Serviço</dt>
+          <dd>{state.serviceDescription || "Compra no estabelecimento"}</dd>
+        </div>
+        <div>
+          <dt>Pagamento</dt>
+          <dd>{paymentMethodLabel(paymentMethod)}</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd>{state.quote ? formatMznMinor(state.quote.netAmountMznMinor) : "-"}</dd>
+        </div>
+      </dl>
 
       <label className="pos-check">
         <input
@@ -440,6 +562,10 @@ function ConfirmForm({
       >
         Confirmar transação
       </Button>
+      <button className="pos-back-button" onClick={onBack} type="button">
+        <ChevronLeft aria-hidden="true" size={17} />
+        Alterar método de pagamento
+      </button>
     </form>
   );
 }
@@ -448,21 +574,41 @@ function SuccessState({
   formAction,
   idempotencyKey,
   onReset,
-  transactionId
+  state
 }: {
   formAction: (formData: FormData) => void;
   idempotencyKey: string;
   onReset: () => void;
-  transactionId: string;
+  state: PosActionState;
 }) {
   return (
     <div className="pos-success" role="status">
-      <BadgeCheck size={44} aria-hidden="true" />
+      <span className="pos-success__icon">
+        <BadgeCheck size={48} aria-hidden="true" />
+      </span>
       <div>
         <h3>Transação concluída</h3>
-        <p>Referencia: {transactionId}</p>
-        <small>Anti-duplicação: {idempotencyKey}</small>
+        <p>Os pontos e o saldo do cliente foram atualizados.</p>
       </div>
+      <dl className="pos-success__receipt">
+        <div>
+          <dt>Referência</dt>
+          <dd>{state.transactionId ?? "-"}</dd>
+        </div>
+        <div>
+          <dt>Total pago</dt>
+          <dd>{state.quote ? formatMznMinor(state.quote.netAmountMznMinor) : "-"}</dd>
+        </div>
+        <div>
+          <dt>Pontos ganhos</dt>
+          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} Pts</dd>
+        </div>
+        <div>
+          <dt>Método</dt>
+          <dd>{state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}</dd>
+        </div>
+      </dl>
+      <small className="pos-success__key">Anti-duplicação: {idempotencyKey}</small>
       <form action={formAction}>
         <input type="hidden" name="intent" value="reset" />
         <Button
@@ -554,6 +700,16 @@ function QuoteSummary({ state }: { state: PosActionState }) {
   );
 }
 
+function PaymentSummary({ method }: { method: PosPaymentMethod }) {
+  return (
+    <div className="pos-summary__section pos-summary__payment">
+      <span className="pos-eyebrow">Pagamento</span>
+      <strong>{paymentMethodLabel(method)}</strong>
+      <small>Selecionado para esta transação</small>
+    </div>
+  );
+}
+
 function ActionMessage({ status, message }: { status: string; message: string }) {
   if (!message) {
     return null;
@@ -578,6 +734,18 @@ function getBranchLabel(
   }
 
   return business?.branches.find((branch) => branch.id === id)?.name ?? "Filial selecionada";
+}
+
+function paymentMethodLabel(method: PosPaymentMethod): string {
+  const labels: Record<PosPaymentMethod, string> = {
+    mpesa: "M-Pesa",
+    emola: "e-Mola",
+    mkesh: "mKesh",
+    cash: "Dinheiro",
+    card: "Cartão bancário"
+  };
+
+  return labels[method];
 }
 
 function createBrowserIdempotencyKey() {

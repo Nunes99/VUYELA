@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { formatPercent } from "@/features/business-dashboard/model";
+import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 
 import { CampaignCreationForm } from "./campaign-form";
 import { getCampaignStatusLabel, getCampaignTypeLabel } from "./model";
@@ -37,6 +38,13 @@ export function BusinessCampaignsView({ state }: { state: BusinessCampaignsState
         businesses={state.businesses}
         selectedBusinessId={state.selectedBusinessId}
       />
+      {selectedBusiness ? (
+        <BusinessProfileHeader
+          activeTab="campanhas"
+          business={{ ...selectedBusiness, status: "active" }}
+          scopeLabel="Campanhas e comunicação com clientes"
+        />
+      ) : null}
 
       <section className="business-dashboard-hero" aria-labelledby="business-campaigns-title">
         <div>

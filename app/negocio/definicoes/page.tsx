@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
+import { BusinessPortalShell } from "@/features/business-dashboard/portal-shell";
 import { BusinessSettingsView } from "@/features/business-settings/business-settings";
 import { getBusinessSettings } from "@/features/business-settings/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
@@ -29,9 +30,15 @@ export default async function BusinessSettingsPage({
       : null;
 
   return (
-    <ProtectedRouteStateView state={state} title="Definições do negócio">
-      {settingsState ? (
-        <BusinessSettingsView saveStatus={param(params.estado)} state={settingsState} />
+    <ProtectedRouteStateView state={state} title="Definições do negócio" variant="business">
+      {state.status === "authorized" && settingsState ? (
+        <BusinessPortalShell
+          activeSection="settings"
+          principal={state.principal}
+          title="Definições"
+        >
+          <BusinessSettingsView saveStatus={param(params.estado)} state={settingsState} />
+        </BusinessPortalShell>
       ) : null}
     </ProtectedRouteStateView>
   );

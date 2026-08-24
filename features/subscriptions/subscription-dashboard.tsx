@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { formatMznMinor } from "@/features/business-dashboard/model";
+import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 
 import type { BusinessSubscriptionState, SubscriptionBusinessOption } from "./data";
 import { formatEntitlementLimit, getAnalyticsLabel, getFeatureLabel, getUsageRatio } from "./model";
@@ -37,6 +38,13 @@ export function BusinessSubscriptionView({ state }: { state: BusinessSubscriptio
         businesses={state.businesses}
         selectedBusinessId={state.selectedBusinessId}
       />
+      {selectedBusiness ? (
+        <BusinessProfileHeader
+          activeTab="subscricao"
+          business={{ ...selectedBusiness, status: "active" }}
+          scopeLabel="Plano, capacidade e funcionalidades disponíveis"
+        />
+      ) : null}
 
       <section className="business-subscription-hero" aria-labelledby="subscription-title">
         <div>

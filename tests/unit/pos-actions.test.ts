@@ -49,6 +49,18 @@ describe("POS server actions", () => {
     expect(state.idempotencyKey).toBe("pos_1234567890ab");
   });
 
+  it("preserves the service description for the confirmation receipt", async () => {
+    const state = await quotePosTransactionAction(
+      identifiedState,
+      formWith({
+        grossAmountMzn: "200",
+        serviceDescription: "Corte masculino e barba"
+      })
+    );
+
+    expect(state.serviceDescription).toBe("Corte masculino e barba");
+  });
+
   it("requires customer authorization before confirmation reaches Supabase", async () => {
     const quotedState = await quotePosTransactionAction(
       identifiedState,
@@ -61,6 +73,23 @@ describe("POS server actions", () => {
 
     expect(state.status).toBe("error");
     expect(state.message).toBe("Confirme a autorização do cliente antes de concluir.");
+  });
+
+  it("rejects an unsupported payment method before confirmation", async () => {
+    const quotedState = await quotePosTransactionAction(
+      identifiedState,
+      formWith({
+        grossAmountMzn: "200",
+        idempotencyKey: "pos_1234567890ab"
+      })
+    );
+    const state = await confirmPosTransactionAction(
+      quotedState,
+      formWith({ customerAuthorized: "on", paymentMethod: "crypto" })
+    );
+
+    expect(state.status).toBe("error");
+    expect(state.message).toBe("Selecione um método de pagamento válido.");
   });
 
   it("routes the unified POS action by intent", async () => {

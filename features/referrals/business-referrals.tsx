@@ -2,6 +2,8 @@ import { AlertTriangle, CheckCircle2, Gift, Hourglass, Users } from "lucide-reac
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
+
 import { ReferralProgramForm } from "./business-form";
 import { calculatePointsValueMznMinor, formatMznMinor, getReferralStatusLabel } from "./model";
 import type { BusinessReferralsReadyState, BusinessReferralsState } from "./data";
@@ -27,6 +29,15 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
   return (
     <div className="business-painel business-referrals">
       <BusinessReferralSwitcher state={state} />
+      <BusinessProfileHeader
+        activeTab="indicacoes"
+        business={{
+          id: state.selectedBusinessId,
+          name: state.selectedBusinessName,
+          status: "active"
+        }}
+        scopeLabel="Indicações, prémios e regras de elegibilidade"
+      />
 
       <section className="business-dashboard-hero" aria-labelledby="business-referrals-title">
         <div>
