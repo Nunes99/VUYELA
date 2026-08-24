@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   describeAuditChange,
+  normalizeAdminId,
   normalizeAdminQuery,
   parseAdminView,
   summarizeJson
@@ -14,6 +15,10 @@ describe("admin view model", () => {
     expect(parseAdminView("unknown")).toBe("overview");
     expect(parseAdminView(["support", "audit"])).toBe("support");
     expect(normalizeAdminQuery(`  ${"a".repeat(100)}  `)).toHaveLength(80);
+    expect(normalizeAdminId("a824c6e1-14d8-4a6f-ae4b-927a85e83c1d")).toBe(
+      "a824c6e1-14d8-4a6f-ae4b-927a85e83c1d"
+    );
+    expect(normalizeAdminId("../outro-registo")).toBe("");
   });
 
   it("summarizes operational JSON without rendering unbounded payloads", () => {

@@ -7,12 +7,17 @@ import { getAdminCapabilities, hasAdminCapability } from "@/lib/auth/admin-permi
 import type { AdminCapability } from "@/lib/auth/admin-permissions";
 import { isProfileRole } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
+import { getSiteUrl, isNotificationEmailConfigured, isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 
 import { describeAuditChange, summarizeJson } from "./model";
 import type {
+  AdminAnalyticsData,
+  AdminAnalyticsPoint,
+  AdminAnalyticsShare,
   AdminAuditEntry,
   AdminBusiness,
+  AdminBusinessDetail,
   AdminCategory,
   AdminDashboardReadyState,
   AdminDashboardState,
@@ -22,6 +27,8 @@ import type {
   AdminSubscription,
   AdminSupportTicket,
   AdminUser,
+  AdminUserDetail,
+  AdminViewer,
   AdminView,
   PlatformMetrics
 } from "./model";
@@ -32,6 +39,9 @@ interface ProfileRow {
   email: string | null;
   phone: string | null;
   role: string;
+  locale?: string;
+  marketing_consent_at?: string | null;
+  terms_accepted_at?: string | null;
   created_at: string;
 }
 
@@ -44,6 +54,40 @@ interface BusinessRow {
   created_at: string;
   reviewed_at: string | null;
   review_note: string | null;
+  category_id?: string | null;
+  legal_name?: string | null;
+  nuit?: string | null;
+  description?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  website_url?: string | null;
+  activated_at?: string | null;
+}
+
+interface AnalyticsTransactionRow {
+  id: string;
+  business_id: string;
+  gross_amount_mzn_minor: number;
+  points_earned: number;
+  points_redeemed: number;
+  occurred_at: string;
+}
+
+interface AnalyticsPaymentRow {
+  method: string;
+  amount_mzn_minor: number;
+}
+
+interface CustomerCardRow {
+  id: string;
+  business_id: string;
+  card_number: string;
+  status: string;
+}
+
+interface PointWalletRow {
+  customer_card_id: string;
+  available_balance: number;
 }
 
 interface CategoryRow {
@@ -134,13 +178,18 @@ const viewCapabilities: Record<AdminView, AdminCapability> = {
   subscriptions: "subscriptions_read",
   support: "support_manage",
   fraud: "fraud_review",
-  audit: "audit_read"
+  audit: "audit_read",
+  analytics: "platform_metrics_read",
+  settings: "users_manage",
+  "business-detail": "businesses_read",
+  "user-detail": "users_read"
 };
 
 export async function getAdminDashboardState(
   principal: AuthPrincipal,
   view: AdminView,
-  query: string
+  query: string,
+  selectedId = ""
 ): Promise<AdminDashboardState> {
   const capabilities = getAdminCapabilities(principal.profileRole);
 
@@ -156,25 +205,38 @@ export async function getAdminDashboardState(
   try {
     assertAdminCapability(principal, viewCapabilities[view]);
     const supabase = createSupabaseServiceRoleClient();
+    const viewer = await loadViewer(supabase, principal.profileId);
     const baseState: AdminDashboardReadyState = {
       status: "ready",
       view,
       query,
       capabilities,
+      viewer,
       metrics: null,
+      analytics: null,
       businesses: [],
+      businessDetail: null,
       categories: [],
       users: [],
+      userDetail: null,
       subscriptions: [],
       plans: [],
       tickets: [],
       operators: [],
       fraudEvents: [],
-      auditEntries: []
+      auditEntries: [],
+      settings: null
     };
 
     if (view === "overview") {
-      baseState.metrics = await loadMetrics(supabase, principal.profileId);
+      const [metrics, analytics, auditEntries] = await Promise.all([
+        loadMetrics(supabase, principal.profileId),
+        loadAnalytics(supabase),
+        loadAuditEntries(supabase, "")
+      ]);
+      baseState.metrics = metrics;
+      baseState.analytics = analytics;
+      baseState.auditEntries = auditEntries.slice(0, 4);
     } else if (view === "businesses") {
       baseState.businesses = await loadBusinesses(supabase, query);
     } else if (view === "categories") {
@@ -197,8 +259,21 @@ export async function getAdminDashboardState(
       baseState.operators = operators;
     } else if (view === "fraud") {
       baseState.fraudEvents = await loadFraudEvents(supabase, query);
-    } else {
+    } else if (view === "audit") {
       baseState.auditEntries = await loadAuditEntries(supabase, query);
+    } else if (view === "analytics") {
+      const [metrics, analytics] = await Promise.all([
+        loadMetrics(supabase, principal.profileId),
+        loadAnalytics(supabase)
+      ]);
+      baseState.metrics = metrics;
+      baseState.analytics = analytics;
+    } else if (view === "business-detail") {
+      baseState.businessDetail = selectedId ? await loadBusinessDetail(supabase, selectedId) : null;
+    } else if (view === "user-detail") {
+      baseState.userDetail = selectedId ? await loadUserDetail(supabase, selectedId) : null;
+    } else {
+      baseState.settings = loadSystemSettings();
     }
 
     return baseState;
@@ -215,6 +290,453 @@ export async function getAdminDashboardState(
       message: "Não foi possível carregar os dados administrativos. Tente novamente."
     };
   }
+}
+
+async function loadViewer(supabase: SupabaseClient, profileId: string): Promise<AdminViewer> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("display_name, email")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  const row = data as { display_name: string | null; email: string | null } | null;
+
+  return {
+    displayName: row?.display_name ?? "Admin VUYELA",
+    email: row?.email ?? "Administração da plataforma"
+  };
+}
+
+function loadSystemSettings(): AdminDashboardReadyState["settings"] {
+  return {
+    platformName: "VUYELA",
+    publicUrl: getSiteUrl(),
+    locale: "Português (Moçambique)",
+    currency: "MZN (Metical)",
+    timeZone: "Africa/Maputo (GMT+2)",
+    privilegedMfaRequired: true,
+    leakedPasswordProtection: process.env.SUPABASE_LEAKED_PASSWORD_PROTECTION_ENABLED === "true",
+    supabaseConnected: isSupabaseConfigured(),
+    emailConfigured: isNotificationEmailConfigured(),
+    vercelDeployment: Boolean(process.env.VERCEL),
+    securityEmail: process.env.SECURITY_EMAIL?.trim() || "Não configurado"
+  };
+}
+
+async function loadAnalytics(supabase: SupabaseClient): Promise<AdminAnalyticsData> {
+  const now = new Date();
+  const firstMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1));
+  const firstDay = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 6)
+  );
+  const [transactionResult, paymentResult, businessResult, categoryResult] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select(
+        "id, business_id, gross_amount_mzn_minor, points_earned, points_redeemed, occurred_at"
+      )
+      .eq("status", "completed")
+      .gte("occurred_at", firstMonth.toISOString())
+      .order("occurred_at", { ascending: true })
+      .limit(5000),
+    supabase
+      .from("transaction_payments")
+      .select("method, amount_mzn_minor")
+      .gte("created_at", firstMonth.toISOString())
+      .limit(5000),
+    supabase.from("businesses").select("id, name, category_id"),
+    supabase.from("business_categories").select("id, name")
+  ]);
+
+  const error =
+    transactionResult.error ?? paymentResult.error ?? businessResult.error ?? categoryResult.error;
+  if (error) {
+    throw error;
+  }
+
+  const transactions = (transactionResult.data ?? []) as AnalyticsTransactionRow[];
+  const payments = (paymentResult.data ?? []) as AnalyticsPaymentRow[];
+  const businesses = (businessResult.data ?? []) as Array<{
+    id: string;
+    name: string;
+    category_id: string | null;
+  }>;
+  const categoryNames = new Map(
+    ((categoryResult.data ?? []) as Array<{ id: string; name: string }>).map((row) => [
+      row.id,
+      row.name
+    ])
+  );
+  const businessMap = new Map(businesses.map((row) => [row.id, row]));
+  const monthly = createAnalyticsBuckets(firstMonth, 6, "month");
+  const daily = createAnalyticsBuckets(firstDay, 7, "day");
+
+  for (const transaction of transactions) {
+    addToAnalyticsBucket(monthly, transaction, "month");
+    addToAnalyticsBucket(daily, transaction, "day");
+  }
+
+  const paymentMethods = buildShares(
+    payments.reduce((totals, payment) => {
+      totals.set(payment.method, (totals.get(payment.method) ?? 0) + payment.amount_mzn_minor);
+      return totals;
+    }, new Map<string, number>()),
+    paymentMethodLabel
+  );
+
+  const categoryTotals = new Map<string, number>();
+  const businessTotals = new Map<
+    string,
+    { transactions: number; volumeMznMinor: number; pointsIssued: number }
+  >();
+  let issued = 0;
+  let redeemed = 0;
+
+  for (const transaction of transactions) {
+    const business = businessMap.get(transaction.business_id);
+    const category = business?.category_id
+      ? (categoryNames.get(business.category_id) ?? "Outros")
+      : "Outros";
+    categoryTotals.set(
+      category,
+      (categoryTotals.get(category) ?? 0) + transaction.gross_amount_mzn_minor
+    );
+    const aggregate = businessTotals.get(transaction.business_id) ?? {
+      transactions: 0,
+      volumeMznMinor: 0,
+      pointsIssued: 0
+    };
+    aggregate.transactions += 1;
+    aggregate.volumeMznMinor += transaction.gross_amount_mzn_minor;
+    aggregate.pointsIssued += transaction.points_earned;
+    businessTotals.set(transaction.business_id, aggregate);
+    issued += transaction.points_earned;
+    redeemed += transaction.points_redeemed;
+  }
+
+  const topBusinesses = Array.from(businessTotals.entries())
+    .map(([businessId, totals]) => ({
+      businessId,
+      name: businessMap.get(businessId)?.name ?? "Negócio removido",
+      ...totals
+    }))
+    .sort((left, right) => right.volumeMznMinor - left.volumeMznMinor)
+    .slice(0, 5);
+
+  return {
+    monthly,
+    daily,
+    paymentMethods,
+    categories: buildShares(categoryTotals),
+    topBusinesses,
+    redemptionRate: issued + redeemed === 0 ? 0 : Math.round((redeemed / (issued + redeemed)) * 100)
+  };
+}
+
+function createAnalyticsBuckets(
+  start: Date,
+  count: number,
+  unit: "month" | "day"
+): AdminAnalyticsPoint[] {
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(start);
+    if (unit === "month") {
+      date.setUTCMonth(start.getUTCMonth() + index);
+    } else {
+      date.setUTCDate(start.getUTCDate() + index);
+    }
+
+    return {
+      label:
+        unit === "month"
+          ? new Intl.DateTimeFormat("pt-MZ", { month: "short" }).format(date)
+          : new Intl.DateTimeFormat("pt-MZ", { weekday: "short" }).format(date),
+      transactions: 0,
+      volumeMznMinor: 0,
+      pointsIssued: 0
+    };
+  });
+}
+
+function addToAnalyticsBucket(
+  buckets: AdminAnalyticsPoint[],
+  transaction: AnalyticsTransactionRow,
+  unit: "month" | "day"
+) {
+  const transactionDate = new Date(transaction.occurred_at);
+  const bucket = buckets.find((candidate, index) => {
+    const bucketDate = new Date(transactionDate);
+    if (unit === "month") {
+      const first = new Date();
+      first.setUTCMonth(first.getUTCMonth() - (buckets.length - 1 - index), 1);
+      return (
+        first.getUTCFullYear() === transactionDate.getUTCFullYear() &&
+        first.getUTCMonth() === transactionDate.getUTCMonth()
+      );
+    }
+
+    const expected = new Date();
+    expected.setUTCDate(expected.getUTCDate() - (buckets.length - 1 - index));
+    return expected.toISOString().slice(0, 10) === bucketDate.toISOString().slice(0, 10);
+  });
+
+  if (bucket) {
+    bucket.transactions += 1;
+    bucket.volumeMznMinor += transaction.gross_amount_mzn_minor;
+    bucket.pointsIssued += transaction.points_earned;
+  }
+}
+
+function buildShares(
+  totals: Map<string, number>,
+  labeler: (value: string) => string = (value) => value
+): AdminAnalyticsShare[] {
+  const total = Array.from(totals.values()).reduce((sum, value) => sum + value, 0);
+
+  return Array.from(totals.entries())
+    .map(([label, value]) => ({
+      label: labeler(label),
+      value,
+      percentage: total === 0 ? 0 : Math.round((value / total) * 100)
+    }))
+    .sort((left, right) => right.value - left.value);
+}
+
+function paymentMethodLabel(value: string): string {
+  const labels: Record<string, string> = {
+    mpesa: "M-Pesa",
+    emola: "e-Mola",
+    mkesh: "mKesh",
+    cash: "Dinheiro",
+    card: "Cartão",
+    bank_transfer: "Transferência"
+  };
+
+  return labels[value] ?? value;
+}
+
+async function loadBusinessDetail(
+  supabase: SupabaseClient,
+  businessId: string
+): Promise<AdminBusinessDetail | null> {
+  const [
+    businessResult,
+    branchResult,
+    memberResult,
+    cardResult,
+    transactionResult,
+    subscriptionResult
+  ] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select(
+        "id, name, slug, status, owner_profile_id, category_id, legal_name, nuit, description, phone, email, website_url, created_at, reviewed_at, review_note, activated_at"
+      )
+      .eq("id", businessId)
+      .maybeSingle(),
+    supabase
+      .from("branches")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", businessId),
+    supabase
+      .from("business_members")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", businessId)
+      .eq("status", "active"),
+    supabase
+      .from("customer_cards")
+      .select("id", { count: "exact", head: true })
+      .eq("business_id", businessId),
+    supabase
+      .from("transactions")
+      .select("gross_amount_mzn_minor")
+      .eq("business_id", businessId)
+      .eq("status", "completed")
+      .limit(5000),
+    supabase
+      .from("subscriptions")
+      .select("id, business_id, plan_id, status, current_period_end, trial_ends_at")
+      .eq("business_id", businessId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+  ]);
+
+  const error =
+    businessResult.error ??
+    branchResult.error ??
+    memberResult.error ??
+    cardResult.error ??
+    transactionResult.error ??
+    subscriptionResult.error;
+  if (error) {
+    throw error;
+  }
+  if (!businessResult.data) {
+    return null;
+  }
+
+  const business = businessResult.data as BusinessRow;
+  const [profiles, categories, plans] = await Promise.all([
+    loadProfileMap(supabase, business.owner_profile_id ? [business.owner_profile_id] : []),
+    supabase.from("business_categories").select("id, name"),
+    loadAdminPlans(supabase)
+  ]);
+  if (categories.error) {
+    throw categories.error;
+  }
+  const categoryName = new Map(
+    ((categories.data ?? []) as Array<{ id: string; name: string }>).map((row) => [
+      row.id,
+      row.name
+    ])
+  ).get(business.category_id ?? "");
+  const subscriptionRow = subscriptionResult.data as SubscriptionRow | null;
+  const plan = subscriptionRow
+    ? (plans.find((item) => item.id === subscriptionRow.plan_id) ?? null)
+    : null;
+  const subscription: AdminSubscription | null = subscriptionRow
+    ? {
+        id: subscriptionRow.id,
+        businessId: business.id,
+        planId: subscriptionRow.plan_id,
+        businessName: business.name,
+        planName: plan?.name ?? "Plano removido",
+        monthlyPriceMznMinor: plan?.monthlyPriceMznMinor ?? null,
+        status: subscriptionRow.status,
+        currentPeriodEnd: subscriptionRow.current_period_end,
+        trialEndsAt: subscriptionRow.trial_ends_at
+      }
+    : null;
+  const transactions = (transactionResult.data ?? []) as Array<{ gross_amount_mzn_minor: number }>;
+
+  return {
+    id: business.id,
+    name: business.name,
+    slug: business.slug,
+    status: business.status,
+    ownerName: business.owner_profile_id
+      ? getProfileLabel(profiles.get(business.owner_profile_id))
+      : "Sem proprietário",
+    createdAt: business.created_at,
+    reviewedAt: business.reviewed_at,
+    reviewNote: business.review_note,
+    legalName: business.legal_name ?? "Não indicada",
+    nuit: business.nuit ?? "Não indicado",
+    description: business.description ?? "Sem descrição",
+    phone: business.phone ?? "Não indicado",
+    email: business.email ?? "Não indicado",
+    websiteUrl: business.website_url ?? "Não indicado",
+    categoryName: categoryName ?? "Sem categoria",
+    activatedAt: business.activated_at ?? null,
+    branchCount: branchResult.count ?? 0,
+    memberCount: memberResult.count ?? 0,
+    cardCount: cardResult.count ?? 0,
+    transactionCount: transactions.length,
+    grossVolumeMznMinor: transactions.reduce(
+      (sum, transaction) => sum + transaction.gross_amount_mzn_minor,
+      0
+    ),
+    subscription,
+    plan
+  };
+}
+
+async function loadUserDetail(
+  supabase: SupabaseClient,
+  profileId: string
+): Promise<AdminUserDetail | null> {
+  const { data: profileData, error: profileError } = await supabase
+    .from("profiles")
+    .select(
+      "id, display_name, email, phone, role, locale, marketing_consent_at, terms_accepted_at, created_at"
+    )
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (profileError) {
+    throw profileError;
+  }
+  const profile = profileData as ProfileRow | null;
+  if (!profile || !isProfileRole(profile.role)) {
+    return null;
+  }
+
+  const { data: cardData, error: cardError } = await supabase
+    .from("customer_cards")
+    .select("id, business_id, card_number, status")
+    .eq("customer_profile_id", profileId)
+    .order("created_at", { ascending: false });
+  if (cardError) {
+    throw cardError;
+  }
+  const cardRows = (cardData ?? []) as CustomerCardRow[];
+  const cardIds = cardRows.map((card) => card.id);
+  const [walletResult, transactionResult, businesses] = await Promise.all([
+    cardIds.length > 0
+      ? supabase
+          .from("point_wallets")
+          .select("customer_card_id, available_balance")
+          .in("customer_card_id", cardIds)
+      : Promise.resolve({ data: [], error: null }),
+    cardIds.length > 0
+      ? supabase
+          .from("transactions")
+          .select(
+            "id, business_id, gross_amount_mzn_minor, points_earned, points_redeemed, occurred_at"
+          )
+          .in("customer_card_id", cardIds)
+          .eq("status", "completed")
+          .order("occurred_at", { ascending: false })
+          .limit(10)
+      : Promise.resolve({ data: [], error: null }),
+    loadBusinessMap(supabase, Array.from(new Set(cardRows.map((card) => card.business_id))))
+  ]);
+
+  if (walletResult.error || transactionResult.error) {
+    throw walletResult.error ?? transactionResult.error;
+  }
+  const wallets = new Map(
+    ((walletResult.data ?? []) as PointWalletRow[]).map((wallet) => [
+      wallet.customer_card_id,
+      wallet.available_balance
+    ])
+  );
+
+  return {
+    id: profile.id,
+    displayName: profile.display_name ?? "Utilizador sem nome",
+    email: profile.email ?? "Sem e-mail",
+    phone: profile.phone ?? "Sem telefone",
+    role: profile.role,
+    createdAt: profile.created_at,
+    locale: profile.locale ?? "pt-MZ",
+    marketingConsentAt: profile.marketing_consent_at ?? null,
+    termsAcceptedAt: profile.terms_accepted_at ?? null,
+    cards: cardRows.map((card) => ({
+      id: card.id,
+      businessName: businesses.get(card.business_id) ?? "Negócio removido",
+      cardNumber: card.card_number,
+      status: card.status,
+      availablePoints: wallets.get(card.id) ?? 0
+    })),
+    transactions: ((transactionResult.data ?? []) as AnalyticsTransactionRow[]).map(
+      (transaction) => ({
+        id: transaction.id,
+        businessName: businesses.get(transaction.business_id) ?? "Negócio removido",
+        occurredAt: transaction.occurred_at,
+        points:
+          transaction.points_redeemed > 0
+            ? -transaction.points_redeemed
+            : transaction.points_earned,
+        type: transaction.points_redeemed > 0 ? ("redeem" as const) : ("earn" as const)
+      })
+    )
+  };
 }
 
 async function loadCategories(supabase: SupabaseClient, query: string): Promise<AdminCategory[]> {

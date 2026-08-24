@@ -9,7 +9,11 @@ export const adminViews = [
   "subscriptions",
   "support",
   "fraud",
-  "audit"
+  "audit",
+  "analytics",
+  "settings",
+  "business-detail",
+  "user-detail"
 ] as const;
 
 export type AdminView = (typeof adminViews)[number];
@@ -29,6 +33,41 @@ export interface PlatformMetrics {
   transactionsLast30Days: number;
 }
 
+export interface AdminViewer {
+  displayName: string;
+  email: string;
+}
+
+export interface AdminAnalyticsPoint {
+  label: string;
+  transactions: number;
+  volumeMznMinor: number;
+  pointsIssued: number;
+}
+
+export interface AdminAnalyticsShare {
+  label: string;
+  value: number;
+  percentage: number;
+}
+
+export interface AdminTopBusiness {
+  businessId: string;
+  name: string;
+  transactions: number;
+  volumeMznMinor: number;
+  pointsIssued: number;
+}
+
+export interface AdminAnalyticsData {
+  monthly: AdminAnalyticsPoint[];
+  daily: AdminAnalyticsPoint[];
+  paymentMethods: AdminAnalyticsShare[];
+  categories: AdminAnalyticsShare[];
+  topBusinesses: AdminTopBusiness[];
+  redemptionRate: number;
+}
+
 export interface AdminBusiness {
   id: string;
   name: string;
@@ -38,6 +77,24 @@ export interface AdminBusiness {
   createdAt: string;
   reviewedAt: string | null;
   reviewNote: string | null;
+}
+
+export interface AdminBusinessDetail extends AdminBusiness {
+  legalName: string;
+  nuit: string;
+  description: string;
+  phone: string;
+  email: string;
+  websiteUrl: string;
+  categoryName: string;
+  activatedAt: string | null;
+  branchCount: number;
+  memberCount: number;
+  cardCount: number;
+  transactionCount: number;
+  grossVolumeMznMinor: number;
+  subscription: AdminSubscription | null;
+  plan: AdminPlan | null;
 }
 
 export interface AdminCategory {
@@ -57,6 +114,44 @@ export interface AdminUser {
   phone: string;
   role: ProfileRole;
   createdAt: string;
+}
+
+export interface AdminUserCard {
+  id: string;
+  businessName: string;
+  cardNumber: string;
+  status: string;
+  availablePoints: number;
+}
+
+export interface AdminUserTransaction {
+  id: string;
+  businessName: string;
+  occurredAt: string;
+  points: number;
+  type: "earn" | "redeem";
+}
+
+export interface AdminUserDetail extends AdminUser {
+  locale: string;
+  marketingConsentAt: string | null;
+  termsAcceptedAt: string | null;
+  cards: AdminUserCard[];
+  transactions: AdminUserTransaction[];
+}
+
+export interface AdminSystemSettings {
+  platformName: string;
+  publicUrl: string;
+  locale: string;
+  currency: string;
+  timeZone: string;
+  privilegedMfaRequired: boolean;
+  leakedPasswordProtection: boolean;
+  supabaseConnected: boolean;
+  emailConfigured: boolean;
+  vercelDeployment: boolean;
+  securityEmail: string;
 }
 
 export interface AdminSubscription {
@@ -139,16 +234,21 @@ export interface AdminDashboardReadyState {
   view: AdminView;
   query: string;
   capabilities: AdminCapability[];
+  viewer: AdminViewer;
   metrics: PlatformMetrics | null;
+  analytics: AdminAnalyticsData | null;
   businesses: AdminBusiness[];
+  businessDetail: AdminBusinessDetail | null;
   categories: AdminCategory[];
   users: AdminUser[];
+  userDetail: AdminUserDetail | null;
   subscriptions: AdminSubscription[];
   plans: AdminPlan[];
   tickets: AdminSupportTicket[];
   operators: AdminOperator[];
   fraudEvents: AdminFraudEvent[];
   auditEntries: AdminAuditEntry[];
+  settings: AdminSystemSettings | null;
 }
 
 export type AdminDashboardState =
@@ -166,6 +266,15 @@ export function normalizeAdminQuery(value: string | string[] | undefined): strin
   const candidate = Array.isArray(value) ? value[0] : value;
 
   return (candidate ?? "").trim().slice(0, 80);
+}
+
+export function normalizeAdminId(value: string | string[] | undefined): string {
+  const candidate = Array.isArray(value) ? value[0] : value;
+
+  return candidate &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
+    ? candidate
+    : "";
 }
 
 export function formatMznMinor(value: number): string {

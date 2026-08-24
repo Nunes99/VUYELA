@@ -8,7 +8,11 @@ for (const view of [
   "subscriptions",
   "support",
   "fraud",
-  "audit"
+  "audit",
+  "analytics",
+  "settings",
+  "business-detail",
+  "user-detail"
 ]) {
   test(`protects the ${view} administration view`, async ({ page }) => {
     await page.goto(`/admin?view=${view}`);
