@@ -24,12 +24,13 @@ export default async function PricingPage() {
           <span>Preçário inteligente</span>
           <h1 id="prices-title">Planos para começar pequeno e crescer com controlo.</h1>
           <p>
-            Escolha de acordo com o número de filiais, utilizadores, campanhas e nível de analítica.
+            Escolha o plano ideal para a escala atual do seu negócio. Pode subir de nível à medida
+            que o número de clientes fidelizados aumenta na rede VUYELA.
           </p>
         </div>
       </section>
 
-      <section className="marketing-section marketing-section--soft">
+      <section className="marketing-section marketing-section--soft marketing-pricing-plans">
         <div className="marketing-container">
           <PricingSelector plans={plans} />
         </div>
@@ -43,7 +44,7 @@ export default async function PricingPage() {
           <div className="marketing-container">
             <div className="marketing-ornament" aria-hidden="true" />
             <div className="marketing-heading">
-              <h2 id="comparison-title">Comparação detalhada de recursos</h2>
+              <h2 id="comparison-title">Comparação rápida de recursos</h2>
             </div>
             <div className="pricing-table-wrap">
               <table>
@@ -123,10 +124,13 @@ export default async function PricingPage() {
 
       <section className="marketing-cta marketing-pattern">
         <div className="marketing-container">
-          <h2>Precisa de ajuda para escolher o plano?</h2>
-          <p>Converse com a equipa e avalie as necessidades reais do seu negócio.</p>
-          <Link className="marketing-button marketing-button--teal" href="/ajuda">
-            Contactar a equipa
+          <h2>Precisa de ajuda para escolher?</h2>
+          <p>A nossa equipa desenha planos à medida da realidade moçambicana.</p>
+          <Link
+            className="marketing-button marketing-button--teal"
+            href="https://wa.me/258841234567"
+          >
+            Conversar no WhatsApp
           </Link>
         </div>
       </section>

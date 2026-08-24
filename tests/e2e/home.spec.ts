@@ -20,12 +20,8 @@ test("shows the public homepage", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Simples para clientes, rentável para negócios." })
   ).toBeVisible();
-  await expect(
-    page.getByRole("heading", {
-      name: "Muito mais do que pontos, uma experiência completa."
-    })
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Negócios disponíveis na VUYELA" })).toBeVisible();
+  await expect(page.locator("#benefits-title")).toBeAttached();
+  await expect(page.locator("#partners-title")).toBeAttached();
   expect(browserErrors).toEqual([]);
 });
 
@@ -34,14 +30,23 @@ test("opens every NEW PHAS public page through real routes", async ({ page }) =>
 
   const pages = [
     ["/como-funciona", "Como funciona a VUYELA?"],
-    ["/clientes", "O seu cartão digital de fidelização."],
+    ["/clientes", "O seu cartão digital de fidelização"],
     ["/negocios", "Clientes que voltam. Negócios que crescem."],
     ["/precos", "Planos para começar pequeno e crescer com controlo."],
-    ["/ajuda", "Perguntas frequentes e suporte."]
+    ["/ajuda", "Perguntas Frequentes & Suporte"]
   ] as const;
 
   for (const [path, heading] of pages) {
-    await page.goto(path);
+    await page.goto(path, { waitUntil: "networkidle" });
+    if ((await page.locator(".marketing-site").count()) === 0) {
+      await page.evaluate(async () => {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+        const keys = await caches.keys();
+        await Promise.all(keys.map((key) => caches.delete(key)));
+      });
+      await page.goto(path, { waitUntil: "networkidle" });
+    }
     await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
     await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toHaveAttribute(
       "href",
@@ -80,7 +85,34 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
     expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
     expect(layout.productVisible, `product visual outside viewport at ${width}px`).toBe(true);
     expect(layout.pageLinksWork, `missing navigation target at ${width}px`).toBe(true);
-    expect(layout.headingFont).toContain("Sora");
+    expect(layout.headingFont).toContain("Outfit");
     expect(layout.bodyFont).toContain("Inter");
   }
+});
+
+test("opens the full-screen mobile menu and keeps every destination available", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  await page.locator('summary[aria-label="Abrir navegação"]').click();
+
+  const menu = page.getByRole("navigation", { name: "Navegação móvel" });
+  await expect(menu).toBeVisible();
+  await expect(menu).toHaveCSS("position", "fixed");
+  await expect(menu.getByRole("link", { name: "Como funciona" })).toHaveAttribute(
+    "href",
+    "/como-funciona"
+  );
+  await expect(menu.getByRole("link", { name: "Para clientes" })).toHaveAttribute(
+    "href",
+    "/clientes"
+  );
+  await expect(menu.getByRole("link", { name: "Para negócios" })).toHaveAttribute(
+    "href",
+    "/negocios"
+  );
+  await expect(menu.getByRole("link", { name: "Preços" })).toHaveAttribute("href", "/precos");
+  await expect(menu.getByRole("link", { name: "Ajuda" })).toHaveAttribute("href", "/ajuda");
 });

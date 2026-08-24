@@ -13,71 +13,46 @@ export const metadata: Metadata = {
 
 const faqItems: MarketingFaqItem[] = [
   {
-    category: "Geral",
-    question: "Os pontos podem ser levantados em dinheiro?",
+    category: "Clientes",
+    question: "Como posso acumular pontos?",
     answer:
-      "Não. Os pontos representam valor promocional no negócio emissor e não são saldo bancário, numerário ou moeda eletrónica."
+      "Ao pagar num estabelecimento parceiro, apresente o QR Code no seu telemóvel para o operador fazer a leitura rápida."
   },
   {
     category: "Clientes",
-    question: "Posso usar pontos noutro negócio?",
+    question: "Os pontos têm valor monetário fora da rede?",
     answer:
-      "Não. Cada carteira pertence ao negócio que atribuiu os pontos e só pode ser utilizada nesse mesmo programa."
+      "Não. Os pontos representam descontos promocionais exclusivos e benefícios em compras futuras nos parceiros."
   },
   {
-    category: "Geral",
-    question: "A VUYELA assume a responsabilidade financeira pelos pontos?",
+    category: "Clientes",
+    question: "Posso transferir pontos para outro número?",
     answer:
-      "Não. A responsabilidade promocional pertence ao negócio emissor. A VUYELA calcula, valida e regista os movimentos."
+      "Não. Os pontos acumulados são de gestão direta e pessoal, associados ao número de telefone registado."
   },
   {
-    category: "Negócios",
-    question: "Como configuro o POS VUYELA?",
+    category: "Clientes",
+    question: "Como funciona o resgate de recompensas?",
     answer:
-      "Depois da aprovação do negócio, os utilizadores autorizados podem aceder ao POS e selecionar a filial atribuída."
-  },
-  {
-    category: "Pagamentos",
-    question: "Que métodos existem para pagar a subscrição?",
-    answer:
-      "A recolha automática ainda não está ativa. As condições são confirmadas diretamente pela equipa VUYELA durante a adesão."
-  },
-  {
-    category: "Técnico",
-    question: "Como é identificado o cliente no POS?",
-    answer:
-      "O POS aceita um QR válido, o número do cartão ou, quando disponível, o telefone associado ao cliente."
+      "Basta indicar ao operador que deseja descontar os seus pontos disponíveis no momento do pagamento."
   },
   {
     category: "Negócios",
-    question: "Posso gerir várias filiais?",
+    question: "É possível gerir múltiplas lojas como negócio?",
     answer:
-      "Sim, desde que o plano ativo permita a capacidade necessária. As permissões podem ser limitadas por filial."
+      "Sim, o nosso painel corporativo permite gerir várias filiais físicas com relatórios unificados."
   },
   {
-    category: "Técnico",
-    question: "Como funciona a segurança dos saldos?",
-    answer:
-      "As alterações de saldo são executadas no servidor, dentro de transações PostgreSQL, e criam sempre movimentos no ledger."
+    category: "Negócios",
+    question: "Onde posso integrar a API de vendas?",
+    answer: "A equipa VUYELA apoia a preparação de integrações com sistemas de faturação digital."
   }
 ];
 
 export default function HelpPage() {
   return (
     <PublicSiteShell active="help">
-      <section className="marketing-help-hero marketing-pattern" aria-labelledby="help-title">
-        <div className="marketing-container marketing-heading marketing-heading--center marketing-heading--inverse">
-          <span>Centro de ajuda</span>
-          <h1 id="help-title">Perguntas frequentes e suporte.</h1>
-          <p>Encontre respostas sobre pontos, segurança, cartões e operação do negócio.</p>
-        </div>
-      </section>
-
-      <section className="marketing-section marketing-section--plain">
-        <div className="marketing-container">
-          <FaqExplorer items={faqItems} />
-        </div>
-      </section>
+      <FaqExplorer items={faqItems} pageLayout />
 
       <section
         className="marketing-section marketing-section--soft"
@@ -91,21 +66,21 @@ export default function HelpPage() {
           <div className="marketing-support-grid">
             <article>
               <Mail size={22} />
-              <h3>E-mail de suporte</h3>
+              <h3>Email de suporte</h3>
               <a href="mailto:suporte@vuyela.co.mz">suporte@vuyela.co.mz</a>
-              <p>Resposta nos dias úteis.</p>
+              <p>Resposta rápida no prazo de 24 horas.</p>
             </article>
             <article>
               <MessageSquareText size={22} />
-              <h3>Suporte ao cliente</h3>
-              <Link href="/conta">Abrir a área da conta</Link>
-              <p>Consulte primeiro a sua sessão e os dados da conta.</p>
+              <h3>WhatsApp</h3>
+              <a href="https://wa.me/258841234567">+258 84 123 4567</a>
+              <p>Disponível todos os dias das 8h às 18h.</p>
             </article>
             <article>
               <Clock3 size={22} />
-              <h3>Horário de atendimento</h3>
-              <strong>Segunda a sexta-feira</strong>
-              <p>Pedidos críticos de segurança são priorizados.</p>
+              <h3>Horário</h3>
+              <strong>Seg a Sex, 8h às 18h</strong>
+              <p>Fins de semana encerrados.</p>
             </article>
           </div>
         </div>
@@ -117,20 +92,20 @@ export default function HelpPage() {
       >
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--center">
-            <h2 id="resources-title">Recursos úteis</h2>
+            <h2 id="resources-title">Recursos para programadores</h2>
           </div>
           <div className="marketing-resource-links">
             <Link href="/como-funciona">
               <BookOpen size={19} />
-              Como funciona
+              Documentação da API
             </Link>
             <Link href="/precos">
               <FileText size={19} />
-              Planos e preços
+              Termos e condições
             </Link>
             <Link href="/estabelecimentos">
               <ShieldCheck size={19} />
-              Negócios publicados
+              Políticas de privacidade
             </Link>
           </div>
         </div>

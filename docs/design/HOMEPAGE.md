@@ -13,9 +13,14 @@ six independent page copies:
 - `/precos` reads the public plan catalogue and compares database-owned entitlements;
 - `/ajuda` provides searchable, category-filtered FAQs and working support destinations.
 
-All six pages reuse `PublicSiteShell`, the official `VuyelaLogo`, `/brand/pattern.svg`, Sora and
-Inter. Navigation links resolve to real routes, while unavailable payment-provider integrations
-are not advertised as active capabilities.
+All six pages reuse `PublicSiteShell`, the official `VuyelaLogo`, the exported Capulana textures,
+Outfit for public display typography and Inter for body copy. Navigation links resolve to real
+routes, while unavailable payment-provider integrations are not advertised as active capabilities.
+
+The mobile layouts follow the approved 390 px Figma frames (nodes `546:4269`, `546:4441`,
+`546:4546`, `546:4670`, `546:4843`, `546:5042` and `552:4266`). The menu is a full-screen surface,
+and each public page uses the texture exported for its corresponding design rather than a generic
+repeating substitute.
 
 ## Experience direction
 

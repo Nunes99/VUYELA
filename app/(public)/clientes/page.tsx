@@ -24,10 +24,10 @@ export default async function CustomersPage() {
       <section className="marketing-page-hero marketing-pattern" aria-labelledby="customers-title">
         <div className="marketing-container marketing-heading marketing-heading--center marketing-heading--inverse">
           <span>Aplicação de fidelização</span>
-          <h1 id="customers-title">O seu cartão digital de fidelização.</h1>
+          <h1 id="customers-title">O seu cartão digital de fidelização</h1>
           <p>
-            Os seus negócios favoritos, cartões, pontos e ofertas reunidos numa experiência móvel
-            leve e simples.
+            Todos os seus negócios favoritos de Moçambique reunidos numa única aplicação leve e
+            fácil de utilizar no dia a dia.
           </p>
         </div>
       </section>
@@ -39,12 +39,12 @@ export default async function CustomersPage() {
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--center">
             <span>Vantagens no seu bolso</span>
-            <h2 id="rewards-title">Consiga recompensas em cada compra.</h2>
+            <h2 id="rewards-title">Consiga recompensas reais em cada compra</h2>
           </div>
           <article className="marketing-alert-banner">
             <div>
               <h3>Alertas de ofertas</h3>
-              <p>Saiba quando os negócios que acompanha publicam novas campanhas.</p>
+              <p>Saiba no momento quando as suas lojas favoritas lançam campanhas.</p>
               <Link className="marketing-button marketing-button--teal" href="/cadastrar">
                 <Bell size={17} /> Ativar alertas
               </Link>
@@ -64,7 +64,7 @@ export default async function CustomersPage() {
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--inverse">
             <span>Campanhas ativas</span>
-            <h2 id="offers-title">Poupe nos parceiros publicados.</h2>
+            <h2 id="offers-title">Poupe hoje mesmo nestes parceiros</h2>
           </div>
           {offers.length > 0 ? (
             <div className="marketing-offer-grid">

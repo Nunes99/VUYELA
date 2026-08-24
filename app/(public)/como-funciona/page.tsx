@@ -13,23 +13,23 @@ export const metadata: Metadata = {
 const journey = [
   {
     action: { href: "/cadastrar", label: "Registar agora" },
-    body: "Crie gratuitamente a sua conta e tenha acesso ao primeiro cartão digital quando aderir a um negócio.",
-    title: "Crie a sua conta em poucos minutos"
+    body: "Faça o registo no navegador. Introduza o seu contacto e crie de imediato o seu primeiro cartão digital gratuito.",
+    title: "Crie a sua conta em 2 minutos"
   },
   {
     action: { href: "/estabelecimentos", label: "Ver parceiros" },
-    body: "Descubra restaurantes, lojas, farmácias, serviços e outros estabelecimentos publicados na VUYELA.",
+    body: "Visite os estabelecimentos parceiros, incluindo restaurantes, spas, clínicas e lojas em Maputo e noutras províncias aderentes.",
     title: "Faça compras no comércio local"
   },
   {
-    action: { href: "/clientes", label: "Ver o cartão" },
-    body: "Apresente o QR, o número do cartão ou o telefone associado para o negócio identificar a sua conta.",
-    title: "Identifique o cartão no pagamento"
+    action: { href: "/clientes", label: "Ver demo QR" },
+    body: "No momento de efetuar o pagamento, mostre o seu cartão no ecrã. O lojista lê o código QR para creditar os pontos automaticamente.",
+    title: "Apresente o QR Code no pagamento"
   },
   {
     action: { href: "/ofertas", label: "Conhecer recompensas" },
-    body: "Use os pontos numa compra futura no mesmo negócio, respeitando as regras do programa emissor.",
-    title: "Troque pontos por benefícios"
+    body: "Converta os pontos acumulados em descontos nas próximas compras ou em benefícios definidos pelo negócio emissor.",
+    title: "Troque por benefícios diretos"
   }
 ];
 
@@ -41,8 +41,8 @@ export default function HowItWorksPage() {
           <span>Guia do utilizador</span>
           <h1 id="how-title">Como funciona a VUYELA?</h1>
           <p>
-            Descubra o ciclo completo, desde o primeiro registo até ao momento em que utiliza os
-            pontos acumulados.
+            Descubra o ciclo completo da fidelização inteligente. Desde o primeiro registo gratuito
+            no seu telemóvel até ao momento em que poupa dinheiro real.
           </p>
         </div>
       </section>
@@ -129,10 +129,12 @@ export default function HowItWorksPage() {
         <div className="marketing-container">
           <span aria-hidden="true">“</span>
           <blockquote>
-            Cada movimento de pontos permanece ligado ao cliente, ao negócio emissor e à transação
-            que lhe deu origem.
+            “Com o programa da VUYELA, conseguimos crescer a taxa de retorno dos clientes em mais de
+            35% nos primeiros três meses. O facto de ser digital e no telemóvel facilitou a adesão
+            imediata.”
           </blockquote>
-          <p>Clareza para o cliente. Controlo para o negócio.</p>
+          <strong>Délio Manjate</strong>
+          <p>Proprietário, Restaurante Marés</p>
         </div>
       </section>
     </PublicSiteShell>

@@ -27,7 +27,8 @@ describe("approved VUYELA design contract", () => {
   });
 
   it("uses the official mark and cultural pattern instead of text-only branding", () => {
-    expect(marketingStyles).toContain("/brand/pattern.svg");
+    expect(marketingStyles).toContain("/brand/textures/capulana-primary.jpg");
+    expect(marketingStyles).toContain('font-family: "Outfit"');
     expect(homepage).toContain("VuyelaLogo");
     expect(publicShell).toContain("VuyelaLogo");
     expect(homepage).toContain("Cada compra");

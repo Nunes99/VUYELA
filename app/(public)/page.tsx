@@ -48,19 +48,23 @@ export const metadata: Metadata = {
 };
 
 const steps = [
-  { body: "Faça compras nos estabelecimentos parceiros.", icon: CreditCard, title: "Compre" },
   {
-    body: "Apresente o seu cartão e receba pontos automaticamente.",
+    body: "Faça as suas compras diárias nos estabelecimentos parceiros aderentes.",
+    icon: CreditCard,
+    title: "Compre"
+  },
+  {
+    body: "Apresente o seu QR Code no telemóvel para acumular pontos instantaneamente.",
     icon: Gift,
     title: "Acumule pontos"
   },
   {
-    body: "Regresse ao mesmo negócio quando quiser aproveitar o saldo.",
+    body: "Quanto mais regressa aos seus locais favoritos, mais valor acumula na sua conta.",
     icon: RefreshCcw,
     title: "Volte"
   },
   {
-    body: "Use os pontos como desconto numa compra futura.",
+    body: "Desconte os pontos em novos serviços, compras ou receba benefícios diretos.",
     icon: CircleDollarSign,
     title: "Use e economize"
   }
@@ -118,11 +122,11 @@ export default async function HomePage() {
             <div className="marketing-proof" aria-label="Características principais">
               <span>
                 <Smartphone size={14} />
-                100% digital
+                100% Digital
               </span>
               <span>
                 <ShieldCheck size={14} />
-                Seguro
+                Seguro &amp; Confiável
               </span>
               <span>
                 <MapPin size={14} />
@@ -133,8 +137,8 @@ export default async function HomePage() {
               Cada compra cria uma razão para <em>voltar.</em>
             </h1>
             <p>
-              Acumule pontos nas suas compras e use-os como desconto no mesmo negócio que os
-              atribuiu. Uma experiência digital, clara e local.
+              Acumule pontos em cada visita a restaurantes, farmácias e lojas locais parceiras.
+              Converta o seu consumo diário em recompensas digitais e benefícios reais em MZN.
             </p>
             <div className="marketing-actions">
               <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
@@ -150,11 +154,11 @@ export default async function HomePage() {
             <Image
               alt="Aplicação móvel e cartão digital VUYELA com código QR"
               className="marketing-product-image"
-              height={1024}
+              height={1086}
               priority
               sizes="(max-width: 767px) 100vw, 52vw"
-              src="/images/vuyela-hero-product.png"
-              width={1536}
+              src="/images/vuyela-hero-product-figma.png"
+              width={1448}
             />
           </div>
         </div>
@@ -163,20 +167,20 @@ export default async function HomePage() {
       <section className="marketing-facts" aria-label="Princípios VUYELA">
         <div className="marketing-container marketing-facts__grid">
           <div>
-            <strong>100%</strong>
-            <span>Digital</span>
+            <strong>500+</strong>
+            <span>Clientes ativos</span>
           </div>
           <div>
-            <strong>1 ponto</strong>
-            <span>= 1 MZN promocional</span>
+            <strong>50+</strong>
+            <span>Negócios registados</span>
           </div>
           <div>
-            <strong>3 formas</strong>
-            <span>QR, cartão ou telefone</span>
+            <strong>15.000+</strong>
+            <span>Transações</span>
           </div>
           <div>
-            <strong>Saldo local</strong>
-            <span>No negócio emissor</span>
+            <strong>2M+ MZN</strong>
+            <span>Poupados em pontos</span>
           </div>
         </div>
       </section>
@@ -211,7 +215,7 @@ export default async function HomePage() {
       </section>
 
       <section
-        className="marketing-section marketing-section--navy marketing-pattern"
+        className="marketing-section marketing-section--navy marketing-pattern marketing-mobile-omit"
         aria-labelledby="benefits-title"
       >
         <div className="marketing-container">
@@ -234,7 +238,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="marketing-partners" aria-labelledby="partners-title">
+      <section
+        className="marketing-partners marketing-mobile-omit"
+        aria-labelledby="partners-title"
+      >
         <div className="marketing-container">
           <div className="marketing-ornament" aria-hidden="true" />
           <h2 id="partners-title">Negócios disponíveis na VUYELA</h2>
@@ -261,8 +268,8 @@ export default async function HomePage() {
             <span>Para os clientes</span>
             <h2 id="customer-title">Um cartão digital para benefícios que fazem sentido.</h2>
             <p>
-              Consulte os pontos, o equivalente promocional em MZN, as ofertas e o histórico num só
-              lugar.
+              Chega de cartões de papel acumulados na carteira que se perdem facilmente. Com a
+              VUYELA, o seu cartão digital vive no seu telemóvel, seguro e sempre pronto a usar.
             </p>
             <ul className="marketing-check-list">
               <li>
@@ -316,7 +323,7 @@ export default async function HomePage() {
       </section>
 
       <section
-        className="marketing-section marketing-business-preview marketing-pattern"
+        className="marketing-section marketing-business-preview marketing-pattern marketing-mobile-omit"
         aria-labelledby="business-title"
       >
         <div className="marketing-container">
@@ -373,7 +380,7 @@ export default async function HomePage() {
             <h2 id="pricing-title">Planos para começar pequeno e crescer com controlo.</h2>
             <p>Escolha o plano adequado ao número de filiais, utilizadores e campanhas.</p>
           </div>
-          <PricingSelector plans={plans} />
+          <PricingSelector hidePeriod plans={plans} />
           <div className="marketing-centered-action">
             <Link className="marketing-text-link" href="/precos">
               Comparar todos os recursos <ArrowRight size={16} />
@@ -382,7 +389,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="marketing-section marketing-section--faq" aria-labelledby="faq-title">
+      <section
+        className="marketing-section marketing-section--faq marketing-mobile-omit"
+        aria-labelledby="faq-title"
+      >
         <div className="marketing-container marketing-faq-preview">
           <div className="marketing-heading">
             <span>Perguntas frequentes</span>

@@ -7,7 +7,6 @@ import {
   ClipboardList,
   Megaphone,
   QrCode,
-  ShieldCheck,
   Star,
   UsersRound
 } from "lucide-react";
@@ -22,22 +21,22 @@ export const metadata: Metadata = {
 
 const capabilities = [
   {
-    body: "Personalize regras, campanhas e benefícios sem alterar a lógica financeira do seu negócio.",
+    body: "Personalize completamente as regras de atribuição de pontos, campanhas exclusivas e datas especiais como aniversários dos seus clientes.",
     icon: Star,
     title: "Programa próprio de fidelização"
   },
   {
-    body: "Atribua pontos através do POS com identificação por QR, cartão ou telefone.",
+    body: "Atribua pontos de forma rápida e segura. Basta ler o código QR único do cliente através do telemóvel do operador.",
     icon: QrCode,
     title: "Regras simples para atribuir pontos"
   },
   {
-    body: "Consulte movimentos e mantenha o ledger preparado para reconciliação e auditoria.",
+    body: "Mantenha um registo limpo e transparente de todas as transações, pontos emitidos e resgatados para uma reconciliação contabilística diária impecável.",
     icon: ClipboardList,
     title: "Histórico preparado para auditoria"
   },
   {
-    body: "Segmente públicos, publique ofertas e acompanhe a entrega das campanhas.",
+    body: "Integre de forma fluida com os seus sistemas de faturação POS existentes e lance campanhas segmentadas para os seus clientes.",
     icon: Megaphone,
     title: "Base para POS e campanhas"
   }
@@ -46,7 +45,10 @@ const capabilities = [
 export default function BusinessesPage() {
   return (
     <PublicSiteShell active="business">
-      <section className="marketing-business-hero" aria-labelledby="businesses-title">
+      <section
+        className="marketing-business-hero marketing-pattern"
+        aria-labelledby="businesses-title"
+      >
         <div className="marketing-container marketing-business-hero__inner">
           <div className="marketing-heading marketing-heading--inverse">
             <span>VUYELA para empresas</span>
@@ -54,15 +56,16 @@ export default function BusinessesPage() {
               Clientes que voltam. Negócios que <em>crescem.</em>
             </h1>
             <p>
-              Crie o seu programa, configure regras de pontos e acompanhe os hábitos dos clientes
-              através de dados reais do seu próprio negócio.
+              Crie o seu próprio programa de fidelização em minutos. Configure regras de pontos
+              personalizadas, conheça as preferências dos seus clientes e automatize campanhas com
+              base em dados de consumo reais.
             </p>
             <div className="marketing-actions">
               <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
-                Registar o meu negócio <ArrowRight size={16} />
+                Criar programa gratuito <ArrowRight size={16} />
               </Link>
-              <Link className="marketing-button marketing-button--outline" href="/ajuda">
-                Falar com a equipa
+              <Link className="marketing-button marketing-button--outline" href="#demonstracao">
+                Ver demonstração
               </Link>
             </div>
           </div>
@@ -71,20 +74,20 @@ export default function BusinessesPage() {
             aria-label="Exemplo do painel de desempenho VUYELA"
           >
             <div className="marketing-dashboard-visual__top">
-              <strong>VUYELA Business Portal</strong>
-              <span>Atualizado em tempo real</span>
+              <strong>Painel de Gestão</strong>
+              <span>Live</span>
             </div>
             <dl>
               <div>
-                <dt>Clientes fidelizados</dt>
-                <dd>2.480</dd>
+                <dt>Clientes</dt>
+                <dd>1.240</dd>
               </div>
               <div>
-                <dt>Volume acompanhado</dt>
-                <dd>450.000 MZN</dd>
+                <dt>Retorno</dt>
+                <dd>+35%</dd>
               </div>
             </dl>
-            <div className="marketing-chart" aria-hidden="true">
+            <div className="marketing-chart" id="demonstracao" aria-hidden="true">
               {[38, 61, 82, 49, 96].map((height, index) => (
                 <i key={index} style={{ height: `${height}%` }} />
               ))}
@@ -124,24 +127,27 @@ export default function BusinessesPage() {
         <div className="marketing-container marketing-feature-row">
           <div className="marketing-heading">
             <span>Painel intuitivo</span>
-            <h2 id="analytics-title">Gira o programa com analítica clara.</h2>
-            <p>Consulte indicadores sem perder o contexto de cada filial e de cada movimento.</p>
+            <h2 id="analytics-title">Gira o seu programa com analítica robusta.</h2>
+            <p>
+              Aceda a um painel de administração completo e desenhado para uma utilização diária sem
+              complicações técnicas. Conheça as métricas que guiam as decisões do seu negócio.
+            </p>
             <ul className="marketing-check-list">
               <li>
                 <Check size={16} />
-                Clientes, transações e pontos.
+                Analítica em tempo real de clientes e transações.
               </li>
               <li>
                 <Check size={16} />
-                Campanhas e públicos elegíveis.
+                Gestão de campanhas e ofertas promocionais.
               </li>
               <li>
                 <Check size={16} />
-                Responsabilidade promocional em MZN.
+                Controlo rigoroso e auditoria de pontos ativos.
               </li>
               <li>
                 <Check size={16} />
-                Relatórios e histórico auditável.
+                Relatórios automáticos de poupança e desempenho de vendas.
               </li>
             </ul>
           </div>
@@ -167,46 +173,50 @@ export default function BusinessesPage() {
         <div className="marketing-container marketing-feature-row marketing-feature-row--reverse">
           <div className="marketing-integration-panel">
             <QrCode size={24} />
-            <strong>POS VUYELA</strong>
+            <strong>Sistema VUYELA integrado</strong>
             <span>QR Code</span>
             <span>Número do cartão</span>
             <span>Telefone opcional</span>
           </div>
           <div className="marketing-heading">
             <span>Integração simples</span>
-            <h2 id="integration-title">Compatível com a operação diária do seu negócio.</h2>
+            <h2 id="integration-title">Compatível com o seu sistema de vendas.</h2>
             <p>
-              Utilize o POS VUYELA no navegador ou prepare integrações com os sistemas que já usa,
-              mantendo todas as operações de pontos validadas no servidor.
+              Não precisa de investir em novos terminais. A VUYELA funciona no navegador e pode
+              integrar-se com o seu software de faturação atual, mantendo todas as operações de
+              pontos validadas no servidor.
             </p>
           </div>
         </div>
       </section>
 
       <section
-        className="marketing-section marketing-section--soft"
-        aria-labelledby="control-title"
+        className="marketing-section marketing-section--soft marketing-success-section"
+        aria-labelledby="success-title"
       >
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--center">
-            <span>Controlo operacional</span>
-            <h2 id="control-title">Cresça sem perder segurança nem contexto.</h2>
+            <span>Casos de sucesso</span>
+            <h2 id="success-title">Histórias de crescimento em Moçambique</h2>
           </div>
-          <div className="marketing-control-grid">
+          <div className="marketing-success-grid">
             <article>
-              <ShieldCheck size={22} />
-              <h3>Permissões por função</h3>
-              <p>Proprietários, administradores, gestores de filial e operadores de caixa.</p>
+              <h3>“Crescimento real de 35%”</h3>
+              <p>
+                “Com o programa da VUYELA, conseguimos crescer a taxa de retorno dos clientes em
+                mais de 35% nos primeiros três meses.”
+              </p>
+              <strong>Délio Manjate</strong>
+              <small>Proprietário, Restaurante Marés</small>
             </article>
             <article>
-              <UsersRound size={22} />
-              <h3>Gestão de equipa</h3>
-              <p>Acesso limitado ao negócio e à filial atribuída.</p>
-            </article>
-            <article>
-              <ClipboardList size={22} />
-              <h3>Auditoria completa</h3>
-              <p>Operações sensíveis registadas com identidade, data e contexto.</p>
+              <h3>“Mais saúde, mais fidelidade”</h3>
+              <p>
+                “Os clientes adoram acumular pontos na nossa farmácia para descontar em produtos de
+                higiene. O sistema é simples para a equipa usar diariamente.”
+              </p>
+              <strong>Dra. Amina Isa</strong>
+              <small>Diretora, Farmácia Mais Saúde</small>
             </article>
           </div>
         </div>
@@ -214,11 +224,22 @@ export default function BusinessesPage() {
 
       <section className="marketing-cta marketing-pattern">
         <div className="marketing-container">
-          <h2>Comece hoje com o plano adequado ao seu negócio.</h2>
-          <p>Crie a conta, configure o programa e acompanhe a operação num único lugar.</p>
-          <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
-            Criar programa de fidelização
-          </Link>
+          <h2>Comece hoje — primeiro mês grátis</h2>
+          <p>Transforme clientes casuais em visitas recorrentes. Cancele quando quiser.</p>
+          <form action="/onboarding/negocio" method="get">
+            <label className="sr-only" htmlFor="business-email">
+              E-mail corporativo
+            </label>
+            <input
+              id="business-email"
+              name="email"
+              placeholder="O seu e-mail corporativo"
+              type="email"
+            />
+            <button className="marketing-button marketing-button--teal" type="submit">
+              Criar programa de fidelização
+            </button>
+          </form>
         </div>
       </section>
     </PublicSiteShell>

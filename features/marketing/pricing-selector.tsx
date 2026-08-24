@@ -11,6 +11,7 @@ import {
 } from "@/features/subscriptions/model";
 
 interface PricingSelectorProps {
+  hidePeriod?: boolean;
   plans: SubscriptionPlan[];
 }
 
@@ -20,7 +21,7 @@ function formatMonthlyPrice(valueMznMinor: number): string {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-export function PricingSelector({ plans }: PricingSelectorProps) {
+export function PricingSelector({ hidePeriod = false, plans }: PricingSelectorProps) {
   const [annual, setAnnual] = useState(false);
 
   if (plans.length === 0) {
@@ -37,14 +38,16 @@ export function PricingSelector({ plans }: PricingSelectorProps) {
 
   return (
     <>
-      <div className="pricing-period" aria-label="Período de apresentação dos preços">
-        <button aria-pressed={!annual} onClick={() => setAnnual(false)} type="button">
-          Mensal
-        </button>
-        <button aria-pressed={annual} onClick={() => setAnnual(true)} type="button">
-          Anual <span>Poupe 15%</span>
-        </button>
-      </div>
+      {hidePeriod ? null : (
+        <div className="pricing-period" aria-label="Período de apresentação dos preços">
+          <button aria-pressed={!annual} onClick={() => setAnnual(false)} type="button">
+            Mensal
+          </button>
+          <button aria-pressed={annual} onClick={() => setAnnual(true)} type="button">
+            Anual <span>Poupe 15%</span>
+          </button>
+        </div>
+      )}
 
       <div className="pricing-grid">
         {plans.map((plan) => {
@@ -59,6 +62,7 @@ export function PricingSelector({ plans }: PricingSelectorProps) {
           return (
             <article
               className={recommended ? "pricing-card pricing-card--featured" : "pricing-card"}
+              data-plan-slug={plan.slug}
               key={plan.id}
             >
               {recommended ? <span className="pricing-card__badge">Recomendado</span> : null}
