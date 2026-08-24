@@ -33,6 +33,12 @@ audit record in the same transaction.
 
 Browser-authenticated roles cannot directly write point wallets, point ledger, or transactions. FASE 06 adds server-side transactional RPC functions for those writes.
 
+FASE 26 applies the same boundary to terminal registration, devices, payment channels, payment
+attempts, invitations, offer claims and platform settings. Browser roles may read only records
+allowed by RLS. Provider credentials are not represented in browser-readable columns; common
+secret key names are rejected from public JSON configuration. Invitation reads exclude
+`token_hash`, and platform settings intentionally have no authenticated policy.
+
 ## Auth and Authorization
 
 Phase 05 centralizes RBAC in `lib/auth/rbac.ts` and protected route evaluation in `lib/auth/session.ts`.
@@ -84,6 +90,11 @@ The customer dashboard follows the same boundary: private customer cards, wallet
 The POS route uses centralized protected-route helpers and is limited to active cashier, branch manager, business admin, and business owner memberships.
 
 FASE 09 adds `lookup_pos_customer_card` for identifying active cards through a server-side RPC guarded by `can_access_transaction`. Transaction completion still uses the FASE 06 loyalty RPCs, so wallet balances and ledger rows are never written directly from browser code.
+
+`get_pos_terminal_configuration` uses `SECURITY DEFINER` with an empty `search_path`, checks
+`can_access_pos_terminal`, and returns sanitized JSON. A web session is not considered an active
+terminal unless a persisted terminal record says so. Unconfigured provider methods are rejected
+by the current POS action before any loyalty RPC is called.
 
 ## PWA Security
 

@@ -23,6 +23,8 @@ supabase/migrations/harden_referral_programs.sql
 supabase/migrations/implement_platform_administration.sql
 supabase/migrations/harden_platform_administration.sql
 supabase/migrations/implement_subscription_entitlements.sql
+supabase/migrations/create_operational_flow_foundation.sql
+supabase/migrations/secure_operational_flow_foundation.sql
 ```
 
 FASE 03 defines tables, constraints, indexes, and append-only ledger protection. FASE 04 implements Row Level Security policies and static tenant-isolation tests. FASE 06 implements transactional loyalty RPCs. FASE 09 adds the POS card lookup RPC used before transactional writes. FASE 10 adds the read-only business dashboard RPC.
@@ -42,6 +44,13 @@ writes from exceeding configured capacity. `null` limits mean unlimited capacity
 
 The post-connection auth hardening migration synchronizes `auth.users` with `public.profiles` and
 adds the atomic `submit_business_onboarding` RPC so onboarding cannot leave partial business data.
+
+FASE 26 establishes the durable NEW PHAS operational model. It adds the business catalogue, POS
+terminals/settings/devices, non-secret payment-channel configuration, payment attempts, team
+invitations, customer preferences, offer claims, support messages, non-secret platform settings,
+profile account state, and optional date of birth. Composite foreign keys preserve tenant scope.
+The accompanying security migration enables RLS, keeps sensitive writes server-side, and exposes
+only a sanitized, tenant-checked POS configuration RPC.
 
 ## Core Tables
 
@@ -72,6 +81,20 @@ Transactions:
 
 - `transactions`
 - `transaction_payments`
+- `payment_attempts`
+
+Operational management:
+
+- `business_catalog_items`
+- `pos_terminals`
+- `pos_terminal_settings`
+- `pos_terminal_devices`
+- `business_payment_channels`
+- `business_member_invitations`
+- `customer_business_preferences`
+- `offer_claims`
+- `support_ticket_messages`
+- `platform_settings`
 
 Growth and communication:
 

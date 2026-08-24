@@ -582,12 +582,12 @@ function PosOverview({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
   return (
     <>
       <div className="business-metric-grid business-metric-grid--four">
-        <Metric label="Estado do terminal" value="Online e ativo" tone="success" />
+        <Metric label="Estado do terminal" value="Por registar" />
         <Metric
           label="Última transação"
           value={latest ? formatDateTime(latest.occurredAt) : "Sem transações"}
         />
-        <Metric label="Taxa de erro" value="0%" tone="success" />
+        <Metric label="Taxa de erro" value="Sem medição" />
         <Metric
           label="Filiais disponíveis"
           value={dashboard.branches.length.toLocaleString("pt-MZ")}
@@ -595,7 +595,7 @@ function PosOverview({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
         />
       </div>
       <div className="business-two-column">
-        <Panel title="Identificação e terminal" meta="Métodos ativos">
+        <Panel title="Identificação e terminal" meta="Métodos disponíveis">
           <dl className="business-definition-list">
             <Fact label="Negócio associado" value={dashboard.business.name} />
             <Fact label="Escopo atual" value={dashboard.scopeLabel} />

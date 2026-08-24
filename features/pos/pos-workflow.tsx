@@ -435,12 +435,43 @@ function AuthorizationStep({
     label: string;
     detail: string;
     icon: typeof Smartphone;
+    enabled: boolean;
   }> = [
-    { id: "mpesa", label: "M-Pesa", detail: "Pagamento móvel", icon: Smartphone },
-    { id: "emola", label: "e-Mola", detail: "Carteira móvel", icon: Smartphone },
-    { id: "mkesh", label: "mKesh", detail: "Carteira móvel", icon: Smartphone },
-    { id: "cash", label: "Dinheiro", detail: "Pagamento no balcão", icon: Banknote },
-    { id: "card", label: "Cartão", detail: "Terminal bancário", icon: WalletCards }
+    {
+      id: "mpesa",
+      label: "M-Pesa",
+      detail: "Por configurar",
+      icon: Smartphone,
+      enabled: false
+    },
+    {
+      id: "emola",
+      label: "e-Mola",
+      detail: "Por configurar",
+      icon: Smartphone,
+      enabled: false
+    },
+    {
+      id: "mkesh",
+      label: "mKesh",
+      detail: "Por configurar",
+      icon: Smartphone,
+      enabled: false
+    },
+    {
+      id: "cash",
+      label: "Dinheiro",
+      detail: "Confirmação manual",
+      icon: Banknote,
+      enabled: true
+    },
+    {
+      id: "card",
+      label: "Cartão",
+      detail: "Confirmação externa",
+      icon: WalletCards,
+      enabled: true
+    }
   ];
 
   return (
@@ -460,7 +491,12 @@ function AuthorizationStep({
         {methods.map((method) => {
           const Icon = method.icon;
           return (
-            <button key={method.id} onClick={() => onSelect(method.id)} type="button">
+            <button
+              disabled={!method.enabled}
+              key={method.id}
+              onClick={() => onSelect(method.id)}
+              type="button"
+            >
               <span>
                 <Icon aria-hidden="true" size={20} />
               </span>
@@ -471,8 +507,8 @@ function AuthorizationStep({
         })}
       </div>
       <p className="pos-form-hint">
-        O POS regista o método escolhido; a confirmação financeira permanece no provedor de
-        pagamento correspondente.
+        Nesta fase, o POS regista apenas o método escolhido. Nenhuma cobrança é iniciada num
+        provedor e a confirmação financeira é sempre manual.
       </p>
     </section>
   );

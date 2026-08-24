@@ -29,5 +29,7 @@ Apply them in this exact order:
 23. `seed_business_categories.sql`
 24. `fix_business_configuration_email_assignment.sql`
 25. `manage_business_categories.sql`
+26. `create_operational_flow_foundation.sql`
+27. `secure_operational_flow_foundation.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

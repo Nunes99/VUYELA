@@ -202,6 +202,23 @@ Phase 18 includes tests that verify:
 - exclusion of balances, MZN values, customer profile fields, and authorizations;
 - real browser access to a previously stored identification after network loss.
 
+## Current Operational Foundation Coverage
+
+Phase 26 includes tests that verify:
+
+- every NEW PHAS operational table and state enum exists in a descriptive migration;
+- cross-tenant terminal, channel, payment, transaction, offer and customer-card relationships use
+  composite foreign keys;
+- payment attempts use business-scoped idempotency and remain separate from loyalty operations;
+- the foundation migration never updates wallets or inserts ledger entries;
+- RLS is enabled on every new private table;
+- POS configuration reads validate business and branch access and return sanitized fields;
+- browser roles cannot write terminals, channels, payment attempts, invitations, claims or global
+  settings;
+- invitation token hashes and common provider secret keys are excluded from browser-readable data;
+- unconfigured provider methods are disabled in the POS and rejected again by the server action;
+- the protected POS and settings routes pass Playwright on an isolated local test port.
+
 ## Priority E2E
 
 Customer:

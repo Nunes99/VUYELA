@@ -38,6 +38,22 @@ A feature is complete only when:
 - production build passes;
 - relevant documentation is updated.
 
+## Phase 26 Operational Foundation Acceptance
+
+- NEW PHAS control rules are documented before feature CRUD is added;
+- catalogue, terminal, device, payment, invitation, preference, offer-claim, support-message and
+  non-secret platform-setting records have descriptive migrations;
+- all cross-tenant relationships use business-scoped foreign keys;
+- RLS is enabled on every new operational table;
+- payment, terminal, invitation, offer-claim and platform-setting writes remain server-side;
+- POS configuration reads validate both business and branch access and return no credentials;
+- invitation token hashes are excluded from browser grants;
+- payment attempts are idempotent and remain separate from loyalty balance operations;
+- the migrations never update wallets or insert ledger entries;
+- M-Pesa, e-Mola and mKesh are visibly unavailable until configured;
+- cash and external card payments are identified as manual confirmation paths;
+- lint, typecheck, unit and integration tests, relevant Playwright tests, and production build pass.
+
 ## Phase 00 Acceptance
 
 - project starts;

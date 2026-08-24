@@ -180,21 +180,21 @@ export function PosPaymentSettingsView({
           </SettingsCard>
 
           <SettingsCard title="Credenciais e segurança" icon={<LockKeyhole size={20} />}>
-            {method === "dinheiro" ? (
+            {config.mode === "manual" ? (
               <div className="pos-settings-callout">
-                <Banknote aria-hidden="true" size={22} />
+                <Icon aria-hidden="true" size={22} />
                 <div>
                   <strong>Sem credenciais externas</strong>
-                  <p>O operador confirma o valor recebido antes de concluir a transação.</p>
+                  <p>{config.manualConfirmation}</p>
                 </div>
               </div>
             ) : (
               <div className="pos-secure-fields">
                 <SecureField label={config.identifierLabel} value={config.identifierValue} />
-                <SecureField label="Chave privada" value="••••••••••••••••" />
+                <SecureField label="Credenciais do provedor" value="Não configuradas" />
                 <p>
-                  As credenciais são cifradas e geridas exclusivamente no servidor. Nunca são
-                  enviadas para este navegador.
+                  Quando forem disponibilizadas, as credenciais serão guardadas exclusivamente no
+                  servidor e nunca serão enviadas para este navegador.
                 </p>
               </div>
             )}
@@ -205,20 +205,28 @@ export function PosPaymentSettingsView({
           <div className="pos-setting-row">
             <div>
               <strong>Apresentar {config.label}</strong>
-              <p>Este método aparece na etapa de autorização da transação.</p>
+              <p>
+                {config.enabled
+                  ? "Disponível com confirmação manual na etapa de autorização."
+                  : "Oculto até existir uma configuração válida para este negócio."}
+              </p>
             </div>
-            <span className="pos-readonly-toggle" aria-label={`${config.label} disponível`}>
+            <span
+              aria-checked={config.enabled}
+              aria-label={`${config.label} disponível`}
+              className={`pos-readonly-toggle${config.enabled ? " is-active" : ""}`}
+              role="switch"
+            >
               <span />
             </span>
           </div>
-          <div className="pos-settings-actions">
-            <Link className="pos-settings-button pos-settings-button--secondary" href="/pos">
-              Testar no POS
-            </Link>
-            <Link className="pos-settings-button" href="/negocio/definicoes">
-              Gerir integração segura
-            </Link>
-          </div>
+          {config.enabled ? (
+            <div className="pos-settings-actions">
+              <Link className="pos-settings-button pos-settings-button--secondary" href="/pos">
+                Testar confirmação manual
+              </Link>
+            </div>
+          ) : null}
         </SettingsCard>
       </section>
     </div>
@@ -276,8 +284,8 @@ function GeneralSettings({
         <dl className="pos-settings-facts">
           <Fact label="Negócio" value={businessName} />
           <Fact label="Filial" value={branchName} />
-          <Fact label="Terminal" value="VUYELA POS · Principal" />
-          <Fact label="Estado" value="Online e operacional" tone="success" />
+          <Fact label="Terminal" value="Sessão web atual" />
+          <Fact label="Estado" value="Terminal ainda não registado" />
         </dl>
       </SettingsCard>
       <SettingsCard title="Localização e formato" icon={<Languages size={20} />}>
@@ -317,7 +325,8 @@ function DeviceSettings() {
         icon={<MonitorSmartphone size={22} />}
         name="Este dispositivo"
         detail="Navegador seguro · Sessão atual"
-        status="Ligado"
+        status="Não registado"
+        muted
       />
       <DeviceCard
         icon={<Printer size={22} />}
@@ -330,13 +339,15 @@ function DeviceSettings() {
         icon={<CreditCard size={22} />}
         name="Terminal bancário"
         detail="Operação externa ao VUYELA"
-        status="Disponível"
+        status="Confirmação externa"
+        muted
       />
       <DeviceCard
         icon={<Smartphone size={22} />}
         name="Câmara / QR Code"
         detail="Permissão solicitada apenas na leitura"
-        status="Pronta"
+        status="Sob autorização"
+        muted
       />
       <SettingsCard
         className="pos-settings-span"
@@ -390,17 +401,17 @@ function NetworkSettings() {
   return (
     <div className="pos-settings-grid">
       <SettingsCard title="Estado da ligação" icon={<Wifi size={20} />}>
-        <div className="pos-network-status">
+        <div className="pos-network-status pos-network-status--muted">
           <span />
           <div>
-            <strong>Ligação ativa</strong>
-            <p>O terminal consegue validar operações no servidor.</p>
+            <strong>Estado não monitorizado</strong>
+            <p>Esta sessão ainda não está associada a um terminal registado.</p>
           </div>
         </div>
         <dl className="pos-settings-facts">
           <Fact label="Canal" value="HTTPS cifrado" />
           <Fact label="Região" value="Automática" />
-          <Fact label="Sincronização" value="Em tempo real" />
+          <Fact label="Sincronização" value="Por verificar" />
         </dl>
       </SettingsCard>
       <SettingsCard title="Requisitos de rede" icon={<Router size={20} />}>
@@ -617,6 +628,9 @@ const paymentConfig: Record<
     confirmation: string;
     identifierLabel: string;
     identifierValue: string;
+    manualConfirmation: string;
+    mode: "manual" | "provider";
+    enabled: boolean;
     statusLabel: string;
     statusTone: "success" | "muted";
     icon: typeof Smartphone;
@@ -624,35 +638,44 @@ const paymentConfig: Record<
 > = {
   mpesa: {
     label: "M-Pesa",
-    description: "Pagamentos móveis Vodacom para o mercado moçambicano.",
-    processing: "Confirmação no canal M-Pesa",
-    confirmation: "Referência do provedor",
+    description: "Canal M-Pesa previsto para configuração segura por negócio.",
+    processing: "Integração não configurada",
+    confirmation: "Indisponível",
     identifierLabel: "Código do comerciante",
-    identifierValue: "•••• 2048",
-    statusLabel: "Disponível",
-    statusTone: "success",
+    identifierValue: "Não configurado",
+    manualConfirmation: "",
+    mode: "provider",
+    enabled: false,
+    statusLabel: "Por configurar",
+    statusTone: "muted",
     icon: Smartphone
   },
   emola: {
     label: "e-Mola",
-    description: "Carteira móvel Movitel integrada no fluxo do POS.",
-    processing: "Confirmação no canal e-Mola",
-    confirmation: "Referência do provedor",
+    description: "Canal e-Mola previsto para configuração segura por negócio.",
+    processing: "Integração não configurada",
+    confirmation: "Indisponível",
     identifierLabel: "Conta comercial",
-    identifierValue: "•••• 8170",
-    statusLabel: "Disponível",
-    statusTone: "success",
+    identifierValue: "Não configurada",
+    manualConfirmation: "",
+    mode: "provider",
+    enabled: false,
+    statusLabel: "Por configurar",
+    statusTone: "muted",
     icon: Smartphone
   },
   mkesh: {
     label: "mKesh",
-    description: "Canal de pagamento móvel para clientes mKesh.",
-    processing: "Confirmação no canal mKesh",
-    confirmation: "Referência do provedor",
+    description: "Canal mKesh previsto para configuração segura por negócio.",
+    processing: "Integração não configurada",
+    confirmation: "Indisponível",
     identifierLabel: "Identificador comercial",
-    identifierValue: "•••• 4632",
-    statusLabel: "Disponível",
-    statusTone: "success",
+    identifierValue: "Não configurado",
+    manualConfirmation: "",
+    mode: "provider",
+    enabled: false,
+    statusLabel: "Por configurar",
+    statusTone: "muted",
     icon: Smartphone
   },
   dinheiro: {
@@ -661,8 +684,11 @@ const paymentConfig: Record<
     processing: "Confirmação pelo operador",
     confirmation: "Imediata no POS",
     identifierLabel: "Caixa",
-    identifierValue: "Terminal principal",
-    statusLabel: "Ativo",
+    identifierValue: "Confirmação do operador",
+    manualConfirmation: "O operador confirma o valor recebido antes de concluir a transação.",
+    mode: "manual",
+    enabled: true,
+    statusLabel: "Confirmação manual",
     statusTone: "success",
     icon: Banknote
   },
@@ -672,8 +698,12 @@ const paymentConfig: Record<
     processing: "Terminal bancário do negócio",
     confirmation: "Confirmação pelo operador",
     identifierLabel: "Terminal",
-    identifierValue: "•••• 9021",
-    statusLabel: "Disponível",
+    identifierValue: "Não associado",
+    manualConfirmation:
+      "O operador confirma no VUYELA apenas depois da aprovação no terminal bancário externo.",
+    mode: "manual",
+    enabled: true,
+    statusLabel: "Confirmação manual",
     statusTone: "success",
     icon: CreditCard
   }

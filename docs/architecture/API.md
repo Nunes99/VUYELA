@@ -34,6 +34,15 @@ FASE 09 adds the POS application boundary:
 
 The quote step uses pure loyalty helpers and never writes wallet state. The confirm step requires customer authorization, sends an idempotency key as `external_reference`, and calls either `record_purchase_points` or `redeem_purchase_points` server-side.
 
+FASE 26 adds `get_pos_terminal_configuration`, a sanitized read boundary for registered terminal,
+settings, device and payment-channel state. It validates the authenticated operator against both
+the business and branch before returning data and never returns provider credentials.
+
+Payment-provider methods remain unavailable until a later server-side adapter can persist and
+reconcile `payment_attempts`. Cash and external card terminal flows are explicitly manual. A
+payment attempt and a loyalty transaction are separate contracts; neither one proves completion
+of the other.
+
 ## Customer Card Reads
 
 FASE 07 reads customer cards server-side from the authenticated Supabase session. The `/cliente` route loads customer-owned `customer_cards`, then resolves business identity, loyalty program configuration, wallet balances, and tiers through RLS-protected queries.

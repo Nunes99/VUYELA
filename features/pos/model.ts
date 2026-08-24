@@ -59,6 +59,12 @@ export function isPosPaymentMethod(value: string): value is PosPaymentMethod {
   );
 }
 
+export function isAvailablePosPaymentMethod(
+  value: PosPaymentMethod
+): value is Extract<PosPaymentMethod, "cash" | "card"> {
+  return value === "cash" || value === "card";
+}
+
 const MONEY_PATTERN = /^\d+(?:[,.]\d{1,2})?$/;
 const IDEMPOTENCY_PATTERN = /^[A-Za-z0-9_-]{12,80}$/;
 const CARD_NUMBER_PATTERN = /^VY-[0-9A-Z-]{6,32}$/;

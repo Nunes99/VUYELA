@@ -92,6 +92,25 @@ describe("POS server actions", () => {
     expect(state.message).toBe("Selecione um método de pagamento válido.");
   });
 
+  it("rejects provider methods that are not configured", async () => {
+    const quotedState = await quotePosTransactionAction(
+      identifiedState,
+      formWith({
+        grossAmountMzn: "200",
+        idempotencyKey: "pos_1234567890ab"
+      })
+    );
+    const state = await confirmPosTransactionAction(
+      quotedState,
+      formWith({ customerAuthorized: "on", paymentMethod: "mpesa" })
+    );
+
+    expect(state.status).toBe("error");
+    expect(state.message).toBe(
+      "Este método de pagamento ainda não está configurado para utilização."
+    );
+  });
+
   it("routes the unified POS action by intent", async () => {
     const state = await submitPosAction(identifiedState, formWith({ intent: "reset" }));
 

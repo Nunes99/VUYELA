@@ -7,6 +7,7 @@ import {
   buildFallbackIdempotencyKey,
   buildPosQuote,
   isPosPaymentMethod,
+  isAvailablePosPaymentMethod,
   isValidIdempotencyKey,
   normalizePosCustomerLookup,
   parseMznToMinorUnits
@@ -245,6 +246,13 @@ export async function confirmPosTransactionAction(
 
   if (!isPosPaymentMethod(paymentMethodValue)) {
     return createErrorState("Selecione um método de pagamento válido.", previousState);
+  }
+
+  if (!isAvailablePosPaymentMethod(paymentMethodValue)) {
+    return createErrorState(
+      "Este método de pagamento ainda não está configurado para utilização.",
+      previousState
+    );
   }
   const idempotencyKey = getIdempotencyKey(formData, previousState);
 
