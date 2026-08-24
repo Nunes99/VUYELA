@@ -4,40 +4,42 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowRight,
-  CheckCircle2,
-  Coins,
+  BarChart3,
+  Check,
+  CircleDollarSign,
   CreditCard,
   Gift,
   MapPin,
-  Menu,
-  Percent,
-  Search,
+  Megaphone,
+  QrCode,
+  RefreshCcw,
   ShieldCheck,
-  Sparkles,
   Smartphone,
+  Sparkles,
   Store,
-  WalletCards
+  UsersRound
 } from "lucide-react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { PublicSiteShell } from "@/components/marketing/public-site-shell";
+import { PricingSelector } from "@/features/marketing/pricing-selector";
+import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
-import { formatEntitlementLimit, getAnalyticsLabel } from "@/features/subscriptions/model";
 import { getSiteUrl } from "@/lib/env";
 import { serializeJsonLd } from "@/lib/seo/json-ld";
+
+export const revalidate = 3600;
 
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "Fidelização digital em Moçambique",
   description:
-    "VUYELA by LEMOTE ajuda negócios em Moçambique a criarem programas de fidelização claros, digitais e simples para clientes voltarem.",
-  alternates: {
-    canonical: "/"
-  },
+    "Cada compra cria uma razão para voltar com cartões digitais, pontos e benefícios VUYELA.",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "VUYELA by LEMOTE - Fidelização digital em Moçambique",
-    description:
-      "Cada compra cria uma razão para voltar. Clientes acumulam pontos e usam benefícios no mesmo estabelecimento emissor.",
+    title: "VUYELA - Cada compra cria uma razão para voltar",
+    description: "Fidelização digital simples para clientes e negócios em Moçambique.",
     url: siteUrl,
     siteName: "VUYELA",
     locale: "pt_MZ",
@@ -45,132 +47,45 @@ export const metadata: Metadata = {
   }
 };
 
-const navLinks = [
-  { href: "#top", label: "Início" },
-  { href: "#como-funciona", label: "Como funciona" },
-  { href: "#clientes", label: "Para clientes" },
-  { href: "#negocios", label: "Para negócios" },
-  { href: "#precos", label: "Preços" },
-  { href: "#recursos", label: "Recursos" },
-  { href: "#blog", label: "Blog" }
-];
-
-const discoveryLinks = [
-  { href: "/estabelecimentos", label: "Estabelecimentos", icon: <Store size={20} /> },
-  { href: "/categorias", label: "Categorias", icon: <WalletCards size={20} /> },
-  { href: "/locais", label: "Locais", icon: <MapPin size={20} /> },
-  { href: "/ofertas", label: "Ofertas ativas", icon: <Sparkles size={20} /> },
-  { href: "/pesquisar", label: "Pesquisar", icon: <Search size={20} /> }
-];
-
-const trustIndicators = [
-  {
-    label: "100% Digital",
-    body: "Tudo no seu telemóvel",
-    icon: <Smartphone size={22} />
-  },
-  {
-    label: "Seguro & Confiável",
-    body: "Os seus dados sempre protegidos",
-    icon: <ShieldCheck size={22} />
-  },
-  {
-    label: "Feito em Moçambique",
-    body: "Tecnologia que valoriza o que é nosso",
-    icon: <MapPin size={22} />
-  }
-];
-
-const productBenefits = [
-  {
-    title: "Descontos exclusivos",
-    body: "Benefícios criados pelos estabelecimentos onde já compra.",
-    icon: <Percent size={22} />
-  },
-  {
-    title: "Pontos que valem",
-    body: "1 ponto equivale a 1 MZN promocional no negócio emissor.",
-    icon: <Coins size={22} />
-  },
-  {
-    title: "Válido em vários lugares",
-    body: "Descubra estabelecimentos parceiros perto de si.",
-    icon: <MapPin size={22} />
-  },
-  {
-    title: "Ofertas personalizadas",
-    body: "Acompanhe campanhas relevantes dos seus negócios preferidos.",
-    icon: <Sparkles size={22} />
-  }
-];
-
 const steps = [
+  { body: "Faça compras nos estabelecimentos parceiros.", icon: CreditCard, title: "Compre" },
   {
-    title: "Compre",
-    body: "Faça as suas compras nos estabelecimentos parceiros.",
-    icon: <CreditCard size={22} />
+    body: "Apresente o seu cartão e receba pontos automaticamente.",
+    icon: Gift,
+    title: "Acumule pontos"
   },
   {
-    title: "Acumule pontos",
-    body: "Ganhe pontos a cada compra realizada.",
-    icon: <Gift size={22} />
+    body: "Regresse ao mesmo negócio quando quiser aproveitar o saldo.",
+    icon: RefreshCcw,
+    title: "Volte"
   },
   {
-    title: "Volte",
-    body: "Regresse sempre que quiser aproveitar mais.",
-    icon: <Store size={22} />
-  },
-  {
-    title: "Use e economize",
-    body: "Use os seus pontos como desconto e economize dinheiro.",
-    icon: <WalletCards size={22} />
+    body: "Use os pontos como desconto numa compra futura.",
+    icon: CircleDollarSign,
+    title: "Use e economize"
   }
 ];
 
-const trustedBusinesses = [
-  { name: "MARÉS", detail: "RESTAURANTE" },
-  { name: "ENERGIA GINÁSIO", detail: "BEM-ESTAR" },
-  { name: "MAIS SAÚDE", detail: "FARMÁCIA" },
-  { name: "BELEZA & CIA", detail: "SALÃO" },
-  { name: "Hotel VIP", detail: "MAPUTO" },
-  { name: "techpoint", detail: "INFORMÁTICA" }
-];
-
-const customerBenefits = [
-  "Cartões digitais sempre a mão.",
-  "Pontos com valor claro em MZN promocional.",
-  "Ofertas e benefícios do negócio que emitiu os pontos.",
-  "Código QR para consultar ou usar saldo sem complicação."
-];
-
-const businessBenefits = [
-  "Programa próprio de fidelização.",
-  "Regras simples para atribuir e usar pontos.",
-  "Histórico preparado para ledger e auditoria.",
-  "Base pronta para POS, campanhas e relatórios nas próximas fases."
-];
-
-const pricingNotes = [
-  "Teste a experiência antes de escalar.",
-  "Escolha um plano de acordo com o tamanho do negócio.",
-  "Cresca para POS, campanhas e analítica quando estiver pronto."
-];
-
-const faqItems = [
+const benefits = [
   {
-    question: "Os pontos podem ser levantados?",
-    answer:
-      "Não. Os pontos são valor promocional do estabelecimento que os emitiu e não representam saldo bancário."
+    body: "Aceda a promoções criadas pelos negócios onde já compra.",
+    icon: Sparkles,
+    title: "Descontos exclusivos"
   },
   {
-    question: "Posso usar pontos noutro negócio?",
-    answer:
-      "Não. Cada saldo pertence ao estabelecimento emissor e só pode ser usado nesse mesmo negócio."
+    body: "1 ponto equivale, por defeito, a 1 MZN promocional.",
+    icon: CircleDollarSign,
+    title: "Pontos que valem"
   },
   {
-    question: "A VUYELA assume o valor dos pontos?",
-    answer:
-      "Não. A VUYELA calcula, guarda e valida os pontos, mas a responsabilidade promocional pertence ao estabelecimento emissor."
+    body: "Descubra parceiros e vantagens em diferentes categorias.",
+    icon: MapPin,
+    title: "Válido em vários lugares"
+  },
+  {
+    body: "Receba campanhas relevantes dos negócios que acompanha.",
+    icon: Megaphone,
+    title: "Ofertas personalizadas"
   }
 ];
 
@@ -179,361 +94,319 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "VUYELA by LEMOTE",
   url: siteUrl,
-  slogan: "Volte. Ganhe. Cresca.",
-  description:
-    "Plataforma de fidelização digital para negócios em Moçambique criarem razões reais para clientes voltarem."
+  slogan: "Volte. Ganhe. Cresça.",
+  description: "Plataforma de fidelização digital para Moçambique."
 };
 
 export default async function HomePage() {
-  const subscriptionPlans = await getPublicSubscriptionPlans();
+  const [plans, marketplace] = await Promise.all([
+    getPublicSubscriptionPlans(),
+    getPublicMarketplaceSnapshot()
+  ]);
+  const businesses = marketplace.snapshot.businesses.slice(0, 6);
 
   return (
-    <>
+    <PublicSiteShell active="home">
       <script
-        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationJsonLd) }}
+        type="application/ld+json"
       />
-      <main className="home-page" id="top">
-        <header className="home-header" aria-label="Navegação principal">
-          <div className="vy-container home-header__inner">
-            <VuyelaLogo className="home-logo" href="#top" inverse />
-            <nav className="home-nav" aria-label="Secções da página inicial">
-              {navLinks.map((link) => (
-                <a href={link.href} key={link.href}>
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <div className="home-header__actions">
-              <a className="home-link-button home-link-button--ghost" href="/entrar">
-                Entrar
-              </a>
-              <a className="home-link-button home-link-button--reward" href="/cadastrar">
-                Registar
-              </a>
-            </div>
-            <details className="home-mobile-menu">
-              <summary aria-label="Abrir menu">
-                <Menu size={18} />
-              </summary>
-              <nav aria-label="Menu mobile">
-                {navLinks.map((link) => (
-                  <a href={link.href} key={link.href}>
-                    {link.label}
-                  </a>
-                ))}
-              </nav>
-            </details>
-          </div>
-        </header>
 
-        <section className="home-hero" aria-labelledby="home-title">
-          <div className="vy-container home-hero__inner">
-            <div className="home-hero__copy">
-              <span className="home-hero__eyebrow">Plataforma de fidelização digital</span>
-              <h1 id="home-title">
-                <span>Cada compra</span>
-                <span>
-                  cria uma <em>razão</em>
-                </span>
-                <span>
-                  para <strong>voltar.</strong>
-                </span>
-              </h1>
-              <p>
-                Acumule pontos, desbloqueie benefícios e aproveite vantagens exclusivas nos seus
-                estabelecimentos preferidos.
-              </p>
-              <div className="home-hero__actions">
-                <a className="home-link-button home-link-button--reward" href="/cadastrar">
-                  Quero um cartão
-                  <ArrowRight size={18} />
-                </a>
-                <a
-                  className="home-link-button home-link-button--outline"
-                  href="/onboarding/negocio"
-                >
-                  Sou um negócio
-                </a>
-              </div>
-              <ul className="home-trust-list" aria-label="Indicadores de confiança">
-                {trustIndicators.map((item) => (
-                  <li key={item.label}>
-                    <span className="home-trust-list__icon">{item.icon}</span>
-                    <span>
-                      <strong>{item.label}</strong>
-                      <small>{item.body}</small>
-                    </span>
-                  </li>
-                ))}
-              </ul>
+      <section className="marketing-home-hero marketing-pattern" aria-labelledby="home-title">
+        <div className="marketing-container marketing-home-hero__inner">
+          <div className="marketing-home-hero__copy">
+            <div className="marketing-proof" aria-label="Características principais">
+              <span>
+                <Smartphone size={14} />
+                100% digital
+              </span>
+              <span>
+                <ShieldCheck size={14} />
+                Seguro
+              </span>
+              <span>
+                <MapPin size={14} />
+                Feito em Moçambique
+              </span>
             </div>
-
-            <div className="home-product-visual" aria-label="Pré-visualização do produto VUYELA">
-              <Image
-                alt="Aplicação VUYELA num smartphone com cartão QR de fidelização e confirmação de pontos"
-                className="home-product-visual__image"
-                height={1024}
-                priority
-                sizes="(max-width: 639px) 135vw, (max-width: 1023px) 72vw, 55vw"
-                src="/images/vuyela-hero-product.png"
-                width={1536}
-              />
+            <h1 id="home-title">
+              Cada compra cria uma razão para <em>voltar.</em>
+            </h1>
+            <p>
+              Acumule pontos nas suas compras e use-os como desconto no mesmo negócio que os
+              atribuiu. Uma experiência digital, clara e local.
+            </p>
+            <div className="marketing-actions">
+              <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
+                Sou um negócio <ArrowRight size={17} />
+              </Link>
+              <Link className="marketing-button marketing-button--outline" href="/cadastrar">
+                Quero um cartão
+              </Link>
             </div>
           </div>
-        </section>
 
-        <nav className="home-discovery" aria-label="Descobrir benefícios VUYELA">
-          <div className="vy-container home-discovery__inner">
-            <span>Descubra VUYELA</span>
-            <div>
-              {discoveryLinks.map((link) => (
-                <Link href={link.href} key={link.href}>
-                  {link.icon}
-                  <strong>{link.label}</strong>
-                  <ArrowRight aria-hidden="true" size={16} />
-                </Link>
-              ))}
-            </div>
+          <div className="marketing-home-hero__visual">
+            <Image
+              alt="Aplicação móvel e cartão digital VUYELA com código QR"
+              className="marketing-product-image"
+              height={1024}
+              priority
+              sizes="(max-width: 767px) 100vw, 52vw"
+              src="/images/vuyela-hero-product.png"
+              width={1536}
+            />
           </div>
-        </nav>
+        </div>
+      </section>
 
-        <section className="home-section home-section--steps" id="como-funciona">
-          <div className="vy-container">
-            <div className="home-section__header home-section__header--centered">
-              <h2>Como funciona?</h2>
-            </div>
-            <ol className="home-step-grid">
-              {steps.map((step, index) => (
+      <section className="marketing-facts" aria-label="Princípios VUYELA">
+        <div className="marketing-container marketing-facts__grid">
+          <div>
+            <strong>100%</strong>
+            <span>Digital</span>
+          </div>
+          <div>
+            <strong>1 ponto</strong>
+            <span>= 1 MZN promocional</span>
+          </div>
+          <div>
+            <strong>3 formas</strong>
+            <span>QR, cartão ou telefone</span>
+          </div>
+          <div>
+            <strong>Saldo local</strong>
+            <span>No negócio emissor</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="marketing-section marketing-section--light" aria-labelledby="steps-title">
+        <div className="marketing-container">
+          <div className="marketing-heading marketing-heading--center">
+            <span>Como funciona a VUYELA</span>
+            <h2 id="steps-title">Simples para clientes, rentável para negócios.</h2>
+          </div>
+          <ol className="marketing-step-grid">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              return (
                 <li key={step.title}>
-                  <span className="home-step-grid__icon" data-step={index + 1}>
-                    {step.icon}
+                  <span className="marketing-step-grid__number">0{index + 1}</span>
+                  <span className="marketing-icon">
+                    <Icon size={19} />
                   </span>
                   <h3>{step.title}</h3>
                   <p>{step.body}</p>
                 </li>
-              ))}
-            </ol>
-            <a className="home-section-link" href="#clientes">
-              Ver como funciona
-              <ArrowRight size={16} />
-            </a>
+              );
+            })}
+          </ol>
+          <div className="marketing-centered-action">
+            <Link className="marketing-text-link" href="/como-funciona">
+              Ver o funcionamento completo <ArrowRight size={16} />
+            </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="home-section home-section--benefits" id="recursos">
-          <div className="vy-container">
-            <div className="home-section__header home-section__header--centered">
-              <h2>Vantagens para si</h2>
-              <p>Muito mais que pontos, uma experiência completa.</p>
-            </div>
-            <div className="home-benefit-grid">
-              {productBenefits.map((benefit) => (
+      <section
+        className="marketing-section marketing-section--navy marketing-pattern"
+        aria-labelledby="benefits-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-heading marketing-heading--inverse">
+            <span>Vantagens exclusivas</span>
+            <h2 id="benefits-title">Muito mais do que pontos, uma experiência completa.</h2>
+          </div>
+          <div className="marketing-benefit-grid">
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon;
+              return (
                 <article key={benefit.title}>
-                  <span>{benefit.icon}</span>
+                  <Icon aria-hidden="true" size={21} />
                   <h3>{benefit.title}</h3>
                   <p>{benefit.body}</p>
                 </article>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="home-partners" aria-labelledby="home-partners-title">
-          <div className="vy-container">
-            <h2 id="home-partners-title">Negócios que já confiam</h2>
-            <div className="home-partners__list">
-              {trustedBusinesses.map((business) => (
-                <span key={business.name}>
-                  <small>{business.detail}</small>
-                  <strong>{business.name}</strong>
-                </span>
+      <section className="marketing-partners" aria-labelledby="partners-title">
+        <div className="marketing-container">
+          <div className="marketing-ornament" aria-hidden="true" />
+          <h2 id="partners-title">Negócios disponíveis na VUYELA</h2>
+          {businesses.length > 0 ? (
+            <div className="marketing-partners__list">
+              {businesses.map((business) => (
+                <Link href={`/estabelecimentos/${business.slug}`} key={business.id}>
+                  {business.name}
+                </Link>
               ))}
             </div>
-            <Link href="/estabelecimentos">
-              Ver todos os parceiros
-              <ArrowRight size={16} />
+          ) : (
+            <p>O diretório de parceiros será apresentado quando existirem negócios publicados.</p>
+          )}
+        </div>
+      </section>
+
+      <section
+        className="marketing-section marketing-customer-preview"
+        aria-labelledby="customer-title"
+      >
+        <div className="marketing-container marketing-split">
+          <div className="marketing-heading">
+            <span>Para os clientes</span>
+            <h2 id="customer-title">Um cartão digital para benefícios que fazem sentido.</h2>
+            <p>
+              Consulte os pontos, o equivalente promocional em MZN, as ofertas e o histórico num só
+              lugar.
+            </p>
+            <ul className="marketing-check-list">
+              <li>
+                <Check size={17} />
+                Cartões digitais sempre disponíveis.
+              </li>
+              <li>
+                <Check size={17} />
+                Pontos associados ao negócio emissor.
+              </li>
+              <li>
+                <Check size={17} />
+                Campanhas e ofertas ativas.
+              </li>
+              <li>
+                <Check size={17} />
+                Identificação rápida através de QR.
+              </li>
+            </ul>
+            <Link className="marketing-text-link" href="/clientes">
+              Conhecer a experiência do cliente <ArrowRight size={16} />
             </Link>
           </div>
-        </section>
 
-        <section className="home-section" id="clientes">
-          <div className="vy-container home-audience">
-            <div className="home-audience__copy">
-              <span>Para clientes</span>
-              <h2>Um cartão digital para benefícios que fazem sentido.</h2>
-              <p>
-                O cliente sabe onde ganhou pontos, quanto valem em MZN promocional e onde pode
-                voltar para usar esse saldo.
-              </p>
-              <ul className="home-check-list">
-                {customerBenefits.map((benefit) => (
-                  <li key={benefit}>
-                    <CheckCircle2 size={18} />
-                    {benefit}
-                  </li>
-                ))}
-              </ul>
+          <article className="marketing-loyalty-card" aria-label="Exemplo de cartão VUYELA">
+            <div>
+              <VuyelaLogo inverse />
+              <span>Moçambique</span>
             </div>
-            <div className="home-audience__panel">
-              <article className="home-member-card" aria-label="Cartão VUYELA com QR">
-                <VuyelaLogo inverse />
-                <div className="home-member-card__qr">
-                  <QRCodeSVG
-                    aria-label="Exemplo de QR de identificação VUYELA"
-                    bgColor="#ffffff"
-                    fgColor="#032b38"
-                    level="M"
-                    marginSize={2}
-                    role="img"
-                    size={156}
-                    value="VY-DEMO-250"
-                  />
-                </div>
-              </article>
-              <div className="home-reward-note">
-                <Sparkles aria-hidden="true" size={24} />
-                <span>
-                  <strong>Parabéns!</strong>
-                  Ganhou 50 pontos na sua última compra.
-                </span>
-              </div>
+            <small>Saldo disponível</small>
+            <strong>3.750,00 MZN</strong>
+            <div className="marketing-loyalty-card__bottom">
+              <span>
+                Cliente fidelizado
+                <br />
+                <strong>Mário de Lemos</strong>
+              </span>
+              <QRCodeSVG
+                aria-label="Exemplo de QR de identificação VUYELA"
+                bgColor="#ffffff"
+                fgColor="#032b38"
+                level="M"
+                marginSize={1}
+                role="img"
+                size={64}
+                value="VY-DEMO-250"
+              />
             </div>
-          </div>
-        </section>
+          </article>
+        </div>
+      </section>
 
-        <section className="home-section home-section--dark" id="negocios">
-          <div className="vy-container home-business">
-            <div className="home-section__header">
+      <section
+        className="marketing-section marketing-business-preview marketing-pattern"
+        aria-labelledby="business-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-business-preview__top">
+            <div className="marketing-heading marketing-heading--inverse">
               <span>Para negócios</span>
-              <h2>Clientes que voltam. Negócios que crescem.</h2>
+              <h2 id="business-title">Clientes que voltam. Negócios que crescem.</h2>
               <p>
-                Configure benefícios claros, acompanhe movimentos e prepare a sua equipa para operar
-                com pontos de forma organizada.
+                Configure regras próprias, opere compras no POS e acompanhe o desempenho do seu
+                programa com clareza.
               </p>
             </div>
-            <div className="home-business-grid">
-              {businessBenefits.map((benefit) => (
-                <article key={benefit}>
-                  <CheckCircle2 size={20} />
-                  <p>{benefit}</p>
-                </article>
-              ))}
-            </div>
-            <div className="home-business__actions">
-              <a className="home-link-button home-link-button--reward" href="/onboarding/negocio">
-                Sou um negócio
-                <ArrowRight aria-hidden="true" size={18} />
-              </a>
-              <Link href="/estabelecimentos">
-                Ver negócios VUYELA
-                <ArrowRight aria-hidden="true" size={16} />
+            <div className="marketing-actions">
+              <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
+                Criar programa
+              </Link>
+              <Link className="marketing-button marketing-button--outline" href="/negocios">
+                Saber mais
               </Link>
             </div>
           </div>
-        </section>
-
-        <section className="home-section" id="precos">
-          <div className="vy-container home-pricing">
-            <div className="home-section__header">
-              <span>Preços</span>
-              <h2>Planos para começar pequeno e crescer com controlo.</h2>
-              <p>
-                A VUYELA foi pensada para negócios que querem validar fidelização digital antes de
-                escalar para POS, campanhas e relatórios.
-              </p>
-            </div>
-            {subscriptionPlans.length > 0 ? (
-              <div className="home-pricing__plans">
-                {subscriptionPlans.map((plan) => (
-                  <article key={plan.id}>
-                    <span>{plan.name}</span>
-                    <strong>
-                      {plan.monthlyPriceMznMinor === null
-                        ? "Sob consulta"
-                        : `${(plan.monthlyPriceMznMinor / 100).toLocaleString("pt-MZ")} MZN`}
-                    </strong>
-                    <p>{plan.description}</p>
-                    <dl>
-                      <div>
-                        <dt>Filiais</dt>
-                        <dd>{formatEntitlementLimit(plan.branchLimit)}</dd>
-                      </div>
-                      <div>
-                        <dt>Equipa</dt>
-                        <dd>{formatEntitlementLimit(plan.staffLimit)}</dd>
-                      </div>
-                      <div>
-                        <dt>Campanhas</dt>
-                        <dd>{formatEntitlementLimit(plan.campaignLimit)}</dd>
-                      </div>
-                      <div>
-                        <dt>Analítica</dt>
-                        <dd>{getAnalyticsLabel(plan.analyticsLevel)}</dd>
-                      </div>
-                    </dl>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="home-pricing__panel">
-                {pricingNotes.map((note) => (
-                  <p key={note}>
-                    <CheckCircle2 size={18} />
-                    {note}
-                  </p>
-                ))}
-                <a className="home-link-button home-link-button--primary" href="#faq">
-                  Ver perguntas frequentes
-                  <ArrowRight size={18} />
-                </a>
-              </div>
-            )}
+          <div className="marketing-business-grid">
+            <article>
+              <UsersRound size={20} />
+              <h3>Programa próprio</h3>
+              <p>Regras e identidade para cada negócio.</p>
+            </article>
+            <article>
+              <QrCode size={20} />
+              <h3>POS simples</h3>
+              <p>Identificação por QR, cartão ou telefone.</p>
+            </article>
+            <article>
+              <BarChart3 size={20} />
+              <h3>Painel de gestão</h3>
+              <p>Indicadores de clientes, pontos e transações.</p>
+            </article>
+            <article>
+              <Store size={20} />
+              <h3>Gestão operacional</h3>
+              <p>Filiais, equipa, campanhas e subscrição.</p>
+            </article>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="home-section home-section--faq" id="faq">
-          <div className="vy-container home-faq">
-            <div className="home-section__header">
-              <span>FAQ</span>
-              <h2>Pontos VUYELA são promocionais, claros e locais ao negócio.</h2>
-            </div>
-            <div className="home-faq__items">
-              {faqItems.map((item) => (
-                <details key={item.question}>
-                  <summary>{item.question}</summary>
-                  <p>{item.answer}</p>
-                </details>
-              ))}
-            </div>
+      <section
+        className="marketing-section marketing-section--light"
+        aria-labelledby="pricing-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-heading marketing-heading--center">
+            <span>Preços VUYELA</span>
+            <h2 id="pricing-title">Planos para começar pequeno e crescer com controlo.</h2>
+            <p>Escolha o plano adequado ao número de filiais, utilizadores e campanhas.</p>
           </div>
-        </section>
+          <PricingSelector plans={plans} />
+          <div className="marketing-centered-action">
+            <Link className="marketing-text-link" href="/precos">
+              Comparar todos os recursos <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        <section className="home-journal" id="blog" aria-labelledby="home-journal-title">
-          <div className="vy-container home-journal__inner">
-            <div>
-              <span>Recursos VUYELA</span>
-              <h2 id="home-journal-title">Fidelização explicada com clareza.</h2>
-              <p>
-                Consulte estabelecimentos, ofertas e respostas práticas para clientes e negócios.
-              </p>
-            </div>
-            <nav aria-label="Recursos VUYELA">
-              <Link href="/estabelecimentos">Estabelecimentos</Link>
-              <Link href="/ofertas">Ofertas ativas</Link>
-              <a href="#faq">Perguntas frequentes</a>
-            </nav>
+      <section className="marketing-section marketing-section--faq" aria-labelledby="faq-title">
+        <div className="marketing-container marketing-faq-preview">
+          <div className="marketing-heading">
+            <span>Perguntas frequentes</span>
+            <h2 id="faq-title">Esclareça as suas dúvidas mais comuns.</h2>
           </div>
-        </section>
-
-        <footer className="home-footer">
-          <div className="vy-container home-footer__inner">
-            <VuyelaLogo inverse />
-            <p>Volte. Ganhe. Cresca.</p>
-            <small>VUYELA by LEMOTE. Tecnologia de fidelização para Moçambique.</small>
+          <div>
+            <details open>
+              <summary>Os pontos VUYELA expiram?</summary>
+              <p>Cada negócio pode configurar a validade dos pontos do seu programa.</p>
+            </details>
+            <details>
+              <summary>Posso usar pontos noutro estabelecimento?</summary>
+              <p>Não. Os pontos são utilizados apenas no negócio que os atribuiu.</p>
+            </details>
+            <details>
+              <summary>A VUYELA assume o valor dos pontos?</summary>
+              <p>Não. O valor promocional é responsabilidade do negócio emissor.</p>
+            </details>
           </div>
-        </footer>
-      </main>
-    </>
+          <Link className="marketing-text-link" href="/ajuda">
+            Consultar toda a ajuda <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+    </PublicSiteShell>
   );
 }

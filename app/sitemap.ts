@@ -22,7 +22,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1
-    }
+    },
+    ...[
+      { path: "/como-funciona", priority: 0.85 },
+      { path: "/clientes", priority: 0.85 },
+      { path: "/negocios", priority: 0.85 },
+      { path: "/precos", priority: 0.8 },
+      { path: "/ajuda", priority: 0.7 }
+    ].map(({ path, priority }) => ({
+      url: `${siteUrl}${path}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority
+    }))
   ];
 
   if (snapshot.businesses.length > 0) {

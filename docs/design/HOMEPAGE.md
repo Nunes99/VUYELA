@@ -1,5 +1,22 @@
 # Public Homepage
 
+## NEW PHAS public flow
+
+The public VUYELA experience implements the approved Figma family as one shared system rather than
+six independent page copies:
+
+- `/` presents the product, customer value, business value, public partners, database plans and
+  core FAQs;
+- `/como-funciona` explains the complete earn-and-return journey;
+- `/clientes` presents the customer value and reads active offers from the public marketplace;
+- `/negocios` presents the operational dashboard, POS and management capabilities;
+- `/precos` reads the public plan catalogue and compares database-owned entitlements;
+- `/ajuda` provides searchable, category-filtered FAQs and working support destinations.
+
+All six pages reuse `PublicSiteShell`, the official `VuyelaLogo`, `/brand/pattern.svg`, Sora and
+Inter. Navigation links resolve to real routes, while unavailable payment-provider integrations
+are not advertised as active capabilities.
+
 ## Experience direction
 
 The public homepage is product-led and keeps the VUYELA message, services, and Mozambican identity

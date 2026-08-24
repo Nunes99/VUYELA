@@ -32,9 +32,9 @@ describe("public marketplace SEO contract", () => {
     expect(sitemap).toContain("isIndexableCity");
     expect(sitemap).toContain("isIndexableCityCategory");
     expect(sitemap).toContain("isIndexableOffer");
-    expect(sitemap).not.toContain("/cliente");
-    expect(sitemap).not.toContain("/negocio");
-    expect(sitemap).not.toContain("/pos");
+    expect(sitemap).not.toContain('path: "/cliente"');
+    expect(sitemap).not.toContain('path: "/negocio"');
+    expect(sitemap).not.toContain('path: "/pos"');
   });
 
   it("returns 404 for non-indexable category, city, city-category, and offer detail pages", () => {

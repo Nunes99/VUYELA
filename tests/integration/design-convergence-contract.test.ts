@@ -6,7 +6,9 @@ import { describe, expect, it } from "vitest";
 const root = process.cwd();
 const baseStyles = readFileSync(join(root, "vuyela-design-system/src/styles/base.css"), "utf8");
 const pageStyles = readFileSync(join(root, "app/globals.css"), "utf8");
+const marketingStyles = readFileSync(join(root, "app/marketing.css"), "utf8");
 const homepage = readFileSync(join(root, "app/(public)/page.tsx"), "utf8");
+const publicShell = readFileSync(join(root, "components/marketing/public-site-shell.tsx"), "utf8");
 const customerDashboard = readFileSync(
   join(root, "features/customer-dashboard/dashboard.tsx"),
   "utf8"
@@ -25,11 +27,12 @@ describe("approved VUYELA design contract", () => {
   });
 
   it("uses the official mark and cultural pattern instead of text-only branding", () => {
-    expect(pageStyles).toContain("/brand/pattern.svg");
+    expect(marketingStyles).toContain("/brand/pattern.svg");
     expect(homepage).toContain("VuyelaLogo");
+    expect(publicShell).toContain("VuyelaLogo");
     expect(homepage).toContain("Cada compra");
     expect(homepage).toContain("cria uma razão");
-    expect(homepage).toContain("para voltar.");
+    expect(homepage).toContain("<em>voltar.</em>");
   });
 
   it("includes the four documented benefit categories", () => {
@@ -57,7 +60,7 @@ describe("approved VUYELA design contract", () => {
   });
 
   it("implements the approved member-card and NEW PHAS customer composition", () => {
-    expect(homepage).toContain("home-member-card");
+    expect(homepage).toContain("marketing-loyalty-card");
     expect(homepage).toContain("QRCodeSVG");
     expect(customerDashboard).toContain("CustomerSummaryCard");
     expect(customerDashboard).toContain("Seus Cartões Digitais");

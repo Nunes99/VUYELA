@@ -6,6 +6,7 @@ import "../vuyela-design-system/src/styles/base.css";
 import "../vuyela-design-system/src/styles/components.css";
 import "../vuyela-design-system/src/styles/utilities.css";
 import "./globals.css";
+import "./marketing.css";
 import { PwaRegistration } from "@/features/pwa/pwa-registration";
 import { getSiteUrl } from "@/lib/env";
 

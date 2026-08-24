@@ -1,6 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 test("shows the public homepage", async ({ page }) => {
+  const browserErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      browserErrors.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => browserErrors.push(error.message));
+
   await page.goto("/");
 
   await expect(
@@ -8,16 +16,38 @@ test("shows the public homepage", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Quero um cartão" })).toBeVisible();
   await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toBeVisible();
-  await expect(page.getByText("Seguro & Confiável")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Como funciona?" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Vantagens para si" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Negócios que já confiam" })).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Descobrir benefícios VUYELA" })).toBeVisible();
+  await expect(page.getByText("Feito em Moçambique")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Simples para clientes, rentável para negócios." })
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", {
-      name: "Pontos VUYELA são promocionais, claros e locais ao negócio."
+      name: "Muito mais do que pontos, uma experiência completa."
     })
   ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Negócios disponíveis na VUYELA" })).toBeVisible();
+  expect(browserErrors).toEqual([]);
+});
+
+test("opens every NEW PHAS public page through real routes", async ({ page }) => {
+  test.setTimeout(180_000);
+
+  const pages = [
+    ["/como-funciona", "Como funciona a VUYELA?"],
+    ["/clientes", "O seu cartão digital de fidelização."],
+    ["/negocios", "Clientes que voltam. Negócios que crescem."],
+    ["/precos", "Planos para começar pequeno e crescer com controlo."],
+    ["/ajuda", "Perguntas frequentes e suporte."]
+  ] as const;
+
+  for (const [path, heading] of pages) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
+    await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toHaveAttribute(
+      "href",
+      "/"
+    );
+  }
 });
 
 test("keeps the approved hierarchy across core responsive widths", async ({ page }) => {
@@ -28,33 +58,28 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
 
     const layout = await page.evaluate(() => {
       const title = document.querySelector("h1");
-      const productVisual = document.querySelector(".home-product-visual img");
+      const productVisual = document.querySelector(".marketing-product-image");
       const productRect = productVisual?.getBoundingClientRect();
       const body = document.body;
 
       return {
         bodyFont: getComputedStyle(body).fontFamily,
         headingFont: title ? getComputedStyle(title).fontFamily : "",
-        heroLines: title?.querySelectorAll(":scope > span").length ?? 0,
         overflow: document.documentElement.scrollWidth - window.innerWidth,
         productVisible:
           Boolean(productRect) &&
           productRect!.width > 0 &&
           productRect!.right > 0 &&
           productRect!.left < window.innerWidth,
-        discoveryLabelsFit: Array.from(
-          document.querySelectorAll<HTMLElement>(".home-discovery a strong")
-        ).every(
-          (label) =>
-            label.scrollWidth <= label.clientWidth && label.scrollHeight <= label.clientHeight
-        )
+        pageLinksWork: Array.from(
+          document.querySelectorAll<HTMLAnchorElement>(".marketing-header a")
+        ).every((link) => Boolean(link.getAttribute("href")))
       };
     });
 
     expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
     expect(layout.productVisible, `product visual outside viewport at ${width}px`).toBe(true);
-    expect(layout.discoveryLabelsFit, `clipped discovery label at ${width}px`).toBe(true);
-    expect(layout.heroLines).toBe(3);
+    expect(layout.pageLinksWork, `missing navigation target at ${width}px`).toBe(true);
     expect(layout.headingFont).toContain("Sora");
     expect(layout.bodyFont).toContain("Inter");
   }

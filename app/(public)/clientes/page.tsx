@@ -1,0 +1,105 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Bell, Heart, MapPin, Scissors, Utensils } from "lucide-react";
+
+import { PublicSiteShell } from "@/components/marketing/public-site-shell";
+import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
+
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "Para clientes",
+  description: "Todos os cartões, pontos, ofertas e movimentos VUYELA numa área digital simples.",
+  alternates: { canonical: "/clientes" }
+};
+
+const offerIcons = [Utensils, Heart, Scissors];
+
+export default async function CustomersPage() {
+  const marketplace = await getPublicMarketplaceSnapshot();
+  const offers = marketplace.snapshot.offers.slice(0, 3);
+
+  return (
+    <PublicSiteShell active="customers">
+      <section className="marketing-page-hero marketing-pattern" aria-labelledby="customers-title">
+        <div className="marketing-container marketing-heading marketing-heading--center marketing-heading--inverse">
+          <span>Aplicação de fidelização</span>
+          <h1 id="customers-title">O seu cartão digital de fidelização.</h1>
+          <p>
+            Os seus negócios favoritos, cartões, pontos e ofertas reunidos numa experiência móvel
+            leve e simples.
+          </p>
+        </div>
+      </section>
+
+      <section
+        className="marketing-section marketing-section--light"
+        aria-labelledby="rewards-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-heading marketing-heading--center">
+            <span>Vantagens no seu bolso</span>
+            <h2 id="rewards-title">Consiga recompensas em cada compra.</h2>
+          </div>
+          <article className="marketing-alert-banner">
+            <div>
+              <h3>Alertas de ofertas</h3>
+              <p>Saiba quando os negócios que acompanha publicam novas campanhas.</p>
+              <Link className="marketing-button marketing-button--teal" href="/cadastrar">
+                <Bell size={17} /> Ativar alertas
+              </Link>
+            </div>
+            <div className="marketing-alert-banner__signal" aria-hidden="true">
+              <Bell size={26} />
+              <span>Nova oferta</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section
+        className="marketing-section marketing-section--navy marketing-pattern"
+        aria-labelledby="offers-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-heading marketing-heading--inverse">
+            <span>Campanhas ativas</span>
+            <h2 id="offers-title">Poupe nos parceiros publicados.</h2>
+          </div>
+          {offers.length > 0 ? (
+            <div className="marketing-offer-grid">
+              {offers.map((offer, index) => {
+                const Icon = offerIcons[index % offerIcons.length];
+                const href = offer.uniquePublicSlug
+                  ? `/ofertas/${offer.slug}`
+                  : `/estabelecimentos/${offer.businessSlug}`;
+                return (
+                  <Link href={href} key={offer.id}>
+                    <div>
+                      <span>{offer.businessName}</span>
+                      <Icon size={19} />
+                    </div>
+                    <h3>{offer.title}</h3>
+                    <p>{offer.description}</p>
+                    <small>
+                      <MapPin size={14} />
+                      {offer.city ?? "Moçambique"}
+                    </small>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="marketing-empty-state marketing-empty-state--dark">
+              <strong>Ainda não existem ofertas públicas ativas.</strong>
+              <p>Consulte o diretório para conhecer os negócios disponíveis.</p>
+              <Link className="marketing-button marketing-button--teal" href="/estabelecimentos">
+                Ver estabelecimentos
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+    </PublicSiteShell>
+  );
+}
