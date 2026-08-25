@@ -23,6 +23,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 interface ProfileRow {
   id: string;
   role: string | null;
+  account_status: string | null;
 }
 
 interface BusinessMembershipRow {
@@ -90,7 +91,7 @@ export async function getAuthContext(): Promise<AuthContext> {
   }
 
   const [{ data: profileData }, { data: membershipData }, assurance] = await Promise.all([
-    supabase.from("profiles").select("id, role").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("id, role, account_status").eq("id", user.id).maybeSingle(),
     supabase
       .from("business_members")
       .select("business_id, branch_id, role, status")
@@ -100,6 +101,14 @@ export async function getAuthContext(): Promise<AuthContext> {
   ]);
 
   const profile = profileData as ProfileRow | null;
+
+  if (!profile || profile.account_status !== "active") {
+    return {
+      isConfigured: true,
+      user,
+      principal: null
+    };
+  }
   const membershipRows = (membershipData ?? []) as BusinessMembershipRow[];
   const businessMemberships = membershipRows
     .map((row) => toBusinessMembership(row))

@@ -62,30 +62,54 @@ const dashboard = buildCustomerDashboardViewModel({
   offers: [
     {
       id: "offer-1",
+      businessId: "business-barbershop",
       businessName: "Barbershop 21",
       title: "20% no corte premium",
       description: "Válido até ao final do mês.",
       categorySlug: "beleza",
       categoryName: "Beleza",
-      href: "/estabelecimentos/barbershop-21"
+      href: "/estabelecimentos/barbershop-21",
+      customerCardId: "card-barbershop",
+      isFavorite: true,
+      offerNotificationsEnabled: true,
+      claimId: null,
+      claimCode: null,
+      claimStatus: null,
+      claimExpiresAt: null
     },
     {
       id: "offer-2",
+      businessId: "business-cafe",
       businessName: "Café Maputo",
       title: "Compre 1 e ganhe outro café",
       description: "Disponível em todas as lojas.",
       categorySlug: "restaurantes",
       categoryName: "Restaurantes",
-      href: "/estabelecimentos/cafe-maputo"
+      href: "/estabelecimentos/cafe-maputo",
+      customerCardId: "card-cafe",
+      isFavorite: false,
+      offerNotificationsEnabled: true,
+      claimId: null,
+      claimCode: null,
+      claimStatus: null,
+      claimExpiresAt: null
     },
     {
       id: "offer-3",
+      businessId: "business-pharmacy",
       businessName: "Farmácia Central",
       title: "10% em vitaminas",
       description: "Benefício para clientes VUYELA.",
       categorySlug: "saude",
       categoryName: "Saúde",
-      href: "/estabelecimentos/farmacia-central"
+      href: "/estabelecimentos/farmacia-central",
+      customerCardId: "card-pharmacy",
+      isFavorite: false,
+      offerNotificationsEnabled: false,
+      claimId: null,
+      claimCode: null,
+      claimStatus: null,
+      claimExpiresAt: null
     }
   ],
   notifications: [

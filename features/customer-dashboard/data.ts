@@ -62,6 +62,29 @@ interface OfferRow {
   description: string;
 }
 
+interface CustomerPreferenceRow {
+  businessId: string;
+  preferredBranchId: string | null;
+  isFavorite: boolean;
+  offerNotificationsEnabled: boolean;
+}
+
+interface OfferClaimRow {
+  id: string;
+  businessId: string;
+  offerId: string;
+  customerCardId: string;
+  claimCode: string;
+  status: "activated" | "redeemed" | "expired" | "cancelled";
+  activatedAt: string;
+  expiresAt: string | null;
+}
+
+interface CustomerEngagementRow {
+  preferences: unknown;
+  offer_claims: unknown;
+}
+
 interface NotificationRow {
   id: string;
   business_id: string | null;
@@ -92,7 +115,8 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
     { data: profileData, error: profileError },
     { data: transactionData, error: transactionError },
     { data: offerData, error: offerError },
-    { data: notificationData, error: notificationError }
+    { data: notificationData, error: notificationError },
+    { data: engagementData, error: engagementError }
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -120,10 +144,11 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
       .eq("channel", "in_app")
       .in("status", ["sent", "delivered"])
       .order("created_at", { ascending: false })
-      .limit(12)
+      .limit(12),
+    supabase.rpc("get_customer_engagement")
   ]);
 
-  if (profileError || transactionError || offerError || notificationError) {
+  if (profileError || transactionError || offerError || notificationError || engagementError) {
     return { status: "error", message: "Não foi possível carregar o painel do cliente." };
   }
 
@@ -168,10 +193,18 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
   const businessById = toMap(businessRows, (business) => business.id);
   const categoryById = toMap(rowsFrom<CategoryRow>(categoryData), (category) => category.id);
   const cardById = toMap(cards, (card) => card.id);
+  const engagement = parseEngagement(engagementData);
   const dashboard = buildCustomerDashboardViewModel({
     cards,
     activity: buildActivity(rowsFrom<TransactionRow>(transactionData), businessById, cardById),
-    offers: buildOffers(offerRows, businessById, categoryById),
+    offers: buildOffers(
+      offerRows,
+      businessById,
+      categoryById,
+      cards,
+      engagement.preferences,
+      engagement.claims
+    ),
     notifications: buildNotifications(notificationRows, businessById),
     profile: buildProfile(rowFrom<ProfileRow>(profileData))
   });
@@ -234,22 +267,54 @@ function buildActivity(
 function buildOffers(
   rows: OfferRow[],
   businessById: Map<string, BusinessNameRow>,
-  categoryById: Map<string, CategoryRow>
+  categoryById: Map<string, CategoryRow>,
+  cards: CustomerDashboardViewModel["cards"],
+  preferences: CustomerPreferenceRow[],
+  claims: OfferClaimRow[]
 ): CustomerExploreOffer[] {
+  const cardByBusinessId = toMap(cards, (card) => card.businessId);
+  const preferenceByBusinessId = toMap(preferences, (preference) => preference.businessId);
+  const claimByOfferId = toMap(claims, (claim) => claim.offerId);
+
   return rows.map((row) => {
     const business = businessById.get(row.business_id);
     const category = business?.category_id ? categoryById.get(business.category_id) : null;
 
+    const preference = preferenceByBusinessId.get(row.business_id);
+    const claim = claimByOfferId.get(row.id);
+
     return {
       id: row.id,
+      businessId: row.business_id,
       businessName: business?.name ?? "Negócio VUYELA",
       title: row.title,
       description: row.description,
       categorySlug: category?.slug ?? null,
       categoryName: category?.name ?? null,
-      href: business?.slug ? `/estabelecimentos/${business.slug}` : "/ofertas"
+      href: business?.slug ? `/estabelecimentos/${business.slug}` : "/ofertas",
+      customerCardId: cardByBusinessId.get(row.business_id)?.id ?? null,
+      isFavorite: preference?.isFavorite ?? false,
+      offerNotificationsEnabled: preference?.offerNotificationsEnabled ?? true,
+      claimId: claim?.id ?? null,
+      claimCode: claim?.claimCode ?? null,
+      claimStatus: claim?.status ?? null,
+      claimExpiresAt: claim?.expiresAt ?? null
     };
   });
+}
+
+function parseEngagement(data: unknown): {
+  preferences: CustomerPreferenceRow[];
+  claims: OfferClaimRow[];
+} {
+  const row = Array.isArray(data) ? (data[0] as CustomerEngagementRow | undefined) : undefined;
+
+  return {
+    preferences: Array.isArray(row?.preferences)
+      ? (row.preferences as CustomerPreferenceRow[])
+      : [],
+    claims: Array.isArray(row?.offer_claims) ? (row.offer_claims as OfferClaimRow[]) : []
+  };
 }
 
 function buildProfile(profile: ProfileRow | null): CustomerProfileSummary {

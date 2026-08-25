@@ -3,7 +3,13 @@ import type { Metadata } from "next";
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
 import { AdminDashboard } from "@/features/admin/admin-dashboard";
 import { getAdminDashboardState } from "@/features/admin/data";
-import { normalizeAdminId, normalizeAdminQuery, parseAdminView } from "@/features/admin/model";
+import {
+  normalizeAdminFilter,
+  normalizeAdminId,
+  normalizeAdminPage,
+  normalizeAdminQuery,
+  parseAdminView
+} from "@/features/admin/model";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
@@ -29,7 +35,9 @@ export default async function AdminPage({
           state.principal,
           parseAdminView(params.view),
           normalizeAdminQuery(params.q),
-          normalizeAdminId(params.id)
+          normalizeAdminId(params.id),
+          normalizeAdminFilter(params.filter),
+          normalizeAdminPage(params.page)
         )
       : null;
 

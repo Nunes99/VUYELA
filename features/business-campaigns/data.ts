@@ -6,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { parseBusinessSubscriptionOverview } from "@/features/subscriptions/model";
 
 import { buildCampaignAnalytics } from "./model";
-import type { BusinessCampaign, CampaignAnalytics } from "./model";
+import type { BusinessCampaign, BusinessOffer, CampaignAnalytics } from "./model";
 
 interface BusinessRow {
   id: string;
@@ -18,6 +18,22 @@ interface BusinessRow {
 interface BusinessCampaignsRpcRow {
   campaigns: unknown;
   analytics: unknown;
+}
+
+interface OfferRow {
+  id: string;
+  campaign_id: string | null;
+  slug: string;
+  title: string;
+  description: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_public: boolean;
+  is_active: boolean;
+}
+
+interface OfferClaimRow {
+  offer_id: string;
 }
 
 export interface BusinessCampaignBusinessOption {
@@ -35,6 +51,7 @@ export type BusinessCampaignsState =
       businesses: BusinessCampaignBusinessOption[];
       selectedBusinessId: string;
       campaigns: BusinessCampaign[];
+      offers: BusinessOffer[];
       analytics: CampaignAnalytics;
       emailDeliveryConfigured: boolean;
       campaignLimit: number | null;
@@ -82,16 +99,27 @@ export async function getBusinessCampaigns(
 
   const selectedBusiness =
     businesses.find((business) => business.id === params.businessId) ?? businesses[0];
-  const [campaignResult, subscriptionResult] = await Promise.all([
+  const [campaignResult, subscriptionResult, offersResult, claimsResult] = await Promise.all([
     supabase.rpc("get_business_campaigns", {
       p_business_id: selectedBusiness.id
     }),
     supabase.rpc("get_business_subscription_overview", {
       p_business_id: selectedBusiness.id
-    })
+    }),
+    supabase
+      .from("offers")
+      .select("id, campaign_id, slug, title, description, starts_at, ends_at, is_public, is_active")
+      .eq("business_id", selectedBusiness.id)
+      .order("created_at", { ascending: false }),
+    supabase.from("offer_claims").select("offer_id").eq("business_id", selectedBusiness.id)
   ]);
 
-  if (campaignResult.error || subscriptionResult.error) {
+  if (
+    campaignResult.error ||
+    subscriptionResult.error ||
+    offersResult.error ||
+    claimsResult.error
+  ) {
     return { status: "error", message: "Não foi possível carregar as campanhas." };
   }
 
@@ -99,6 +127,19 @@ export async function getBusinessCampaigns(
     ? (campaignResult.data[0] as BusinessCampaignsRpcRow | undefined)
     : undefined;
   const campaigns = arrayFrom<BusinessCampaign>(row?.campaigns).filter(isBusinessCampaign);
+  const claimCounts = countClaims(rowsFrom<OfferClaimRow>(claimsResult.data));
+  const offers = rowsFrom<OfferRow>(offersResult.data).map((offer) => ({
+    id: offer.id,
+    campaignId: offer.campaign_id,
+    slug: offer.slug,
+    title: offer.title,
+    description: offer.description,
+    startsAt: offer.starts_at,
+    endsAt: offer.ends_at,
+    isPublic: offer.is_public,
+    isActive: offer.is_active,
+    claimCount: claimCounts.get(offer.id) ?? 0
+  }));
   const analytics =
     objectFrom<CampaignAnalytics>(row?.analytics) ?? buildCampaignAnalytics(campaigns);
   const subscription = parseBusinessSubscriptionOverview(subscriptionResult.data);
@@ -115,12 +156,19 @@ export async function getBusinessCampaigns(
     businesses,
     selectedBusinessId: selectedBusiness.id,
     campaigns,
+    offers,
     analytics,
     emailDeliveryConfigured: isNotificationEmailConfigured(),
     campaignLimit,
     campaignUsage,
     canCreateCampaign: campaignLimit === null || campaignUsage < campaignLimit
   };
+}
+
+function countClaims(rows: OfferClaimRow[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const row of rows) counts.set(row.offer_id, (counts.get(row.offer_id) ?? 0) + 1);
+  return counts;
 }
 
 function buildBusinessOptions(

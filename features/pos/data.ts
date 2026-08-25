@@ -23,6 +23,67 @@ export interface PosBranchContext {
   city: string;
 }
 
+export type PosTerminalStatus = "provisioning" | "active" | "suspended" | "revoked";
+export type PosDeviceStatus = "pending" | "active" | "revoked";
+export type PosPaymentChannelStatus = "unconfigured" | "testing" | "active" | "suspended";
+
+export interface PosTerminalSettingsContext {
+  locale: string;
+  currency: string;
+  timezone: string;
+  requireCustomerAuthorization: boolean;
+  printReceiptAutomatically: boolean;
+  showPointsBalance: boolean;
+  showMznEquivalent: boolean;
+  inactivityTimeoutMinutes: number;
+  allowedLookupMethods: Array<"qr" | "card" | "phone">;
+}
+
+export interface PosDeviceContext {
+  id: string;
+  type: "browser" | "camera" | "printer" | "card_terminal" | "other";
+  label: string;
+  deviceReference: string;
+  status: PosDeviceStatus;
+  lastSeenAt: string | null;
+}
+
+export interface PosTerminalContext {
+  id: string;
+  businessId: string;
+  branchId: string;
+  code: string;
+  name: string;
+  status: PosTerminalStatus;
+  lastSeenAt: string | null;
+  settings: PosTerminalSettingsContext;
+  devices: PosDeviceContext[];
+}
+
+export interface PosPaymentChannelContext {
+  id: string;
+  businessId: string;
+  branchId: string | null;
+  method: "cash" | "card" | "mpesa" | "emola" | "mkesh";
+  mode: "manual" | "provider";
+  status: PosPaymentChannelStatus;
+  providerKey: string | null;
+  maskedIdentifier: string | null;
+  credentialsConfigured: boolean;
+  publicSettings: Record<string, unknown>;
+}
+
+export interface PosCatalogItemContext {
+  id: string;
+  branchId: string | null;
+  kind: "service" | "product";
+  sku: string | null;
+  name: string;
+  description: string | null;
+  priceMznMinor: number;
+  sortOrder: number;
+}
+
 export interface PosBusinessContext {
   id: string;
   name: string;
@@ -30,6 +91,10 @@ export interface PosBusinessContext {
   defaultBranchId: string;
   requiresBranch: boolean;
   roleLabels: string[];
+  canManage: boolean;
+  terminals: PosTerminalContext[];
+  paymentChannels: PosPaymentChannelContext[];
+  catalogItems: PosCatalogItemContext[];
 }
 
 export type PosContextState =
@@ -85,7 +150,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
 
   const branchesByBusinessId = groupBranches(rowsFrom<BranchRow>(branchData));
   const membershipsByBusinessId = groupMemberships(memberships);
-  const businesses = rowsFrom<BusinessRow>(businessData)
+  const businessShells = rowsFrom<BusinessRow>(businessData)
     .map((business): PosBusinessContext | null => {
       const businessMemberships = membershipsByBusinessId.get(business.id) ?? [];
       const hasBusinessWideAccess = businessMemberships.some((membership) =>
@@ -116,6 +181,10 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
         branches,
         defaultBranchId,
         requiresBranch: !hasBusinessWideAccess,
+        canManage: businessMemberships.some((membership) => businessWideRoles.has(membership.role)),
+        terminals: [],
+        paymentChannels: [],
+        catalogItems: [],
         roleLabels: uniqueValues(
           businessMemberships.map((membership) => roleLabels[membership.role])
         )
@@ -123,14 +192,191 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
     })
     .filter((business): business is PosBusinessContext => business !== null);
 
-  if (businesses.length === 0) {
+  if (businessShells.length === 0) {
     return {
       status: "empty",
       message: "Não há filiais ativas disponíveis para esta conta de POS."
     };
   }
 
+  const operationResults = await Promise.all(
+    businessShells.map(async (business) => {
+      const { data, error } = await supabase.rpc("get_pos_operations", {
+        p_business_id: business.id
+      });
+
+      return { business, row: firstRow<PosOperationsRow>(data), error };
+    })
+  );
+
+  if (operationResults.some((result) => result.error || !result.row)) {
+    return {
+      status: "error",
+      message: "Não foi possível carregar os terminais e os canais de pagamento do POS."
+    };
+  }
+
+  const businesses = operationResults.map(({ business, row }) => ({
+    ...business,
+    terminals: parseTerminals(row?.terminals),
+    paymentChannels: parsePaymentChannels(row?.payment_channels),
+    catalogItems: parseCatalogItems(row?.catalog_items)
+  }));
+
   return { status: "ready", businesses };
+}
+
+interface PosOperationsRow {
+  terminals: unknown;
+  payment_channels: unknown;
+  catalog_items: unknown;
+}
+
+const defaultTerminalSettings: PosTerminalSettingsContext = {
+  locale: "pt-MZ",
+  currency: "MZN",
+  timezone: "Africa/Maputo",
+  requireCustomerAuthorization: true,
+  printReceiptAutomatically: false,
+  showPointsBalance: true,
+  showMznEquivalent: true,
+  inactivityTimeoutMinutes: 30,
+  allowedLookupMethods: ["qr", "card", "phone"]
+};
+
+function firstRow<T>(data: unknown): T | null {
+  return Array.isArray(data) && data.length > 0 ? (data[0] as T) : null;
+}
+
+function parseTerminals(value: unknown): PosTerminalContext[] {
+  return objectRows(value).map((item) => {
+    const settings = isRecord(item.settings) ? item.settings : {};
+    const lookupMethods = Array.isArray(settings.allowedLookupMethods)
+      ? settings.allowedLookupMethods.filter(isLookupMethod)
+      : defaultTerminalSettings.allowedLookupMethods;
+
+    return {
+      id: stringValue(item.id),
+      businessId: stringValue(item.businessId),
+      branchId: stringValue(item.branchId),
+      code: stringValue(item.code),
+      name: stringValue(item.name),
+      status: terminalStatus(item.status),
+      lastSeenAt: nullableString(item.lastSeenAt),
+      settings: {
+        locale: stringValue(settings.locale) || defaultTerminalSettings.locale,
+        currency: stringValue(settings.currency) || defaultTerminalSettings.currency,
+        timezone: stringValue(settings.timezone) || defaultTerminalSettings.timezone,
+        requireCustomerAuthorization: booleanValue(settings.requireCustomerAuthorization, true),
+        printReceiptAutomatically: booleanValue(settings.printReceiptAutomatically, false),
+        showPointsBalance: booleanValue(settings.showPointsBalance, true),
+        showMznEquivalent: booleanValue(settings.showMznEquivalent, true),
+        inactivityTimeoutMinutes: numberValue(settings.inactivityTimeoutMinutes, 30),
+        allowedLookupMethods: lookupMethods.length
+          ? lookupMethods
+          : defaultTerminalSettings.allowedLookupMethods
+      },
+      devices: parseDevices(item.devices)
+    };
+  });
+}
+
+function parseDevices(value: unknown): PosDeviceContext[] {
+  return objectRows(value).map((item) => ({
+    id: stringValue(item.id),
+    type: deviceType(item.type),
+    label: stringValue(item.label),
+    deviceReference: stringValue(item.deviceReference),
+    status: deviceStatus(item.status),
+    lastSeenAt: nullableString(item.lastSeenAt)
+  }));
+}
+
+function parsePaymentChannels(value: unknown): PosPaymentChannelContext[] {
+  return objectRows(value).map((item) => ({
+    id: stringValue(item.id),
+    businessId: stringValue(item.businessId),
+    branchId: nullableString(item.branchId),
+    method: paymentMethod(item.method),
+    mode: item.mode === "provider" ? "provider" : "manual",
+    status: paymentChannelStatus(item.status),
+    providerKey: nullableString(item.providerKey),
+    maskedIdentifier: nullableString(item.maskedIdentifier),
+    credentialsConfigured: booleanValue(item.credentialsConfigured, false),
+    publicSettings: isRecord(item.publicSettings) ? item.publicSettings : {}
+  }));
+}
+
+function parseCatalogItems(value: unknown): PosCatalogItemContext[] {
+  return objectRows(value).map((item) => ({
+    id: stringValue(item.id),
+    branchId: nullableString(item.branchId),
+    kind: item.kind === "product" ? "product" : "service",
+    sku: nullableString(item.sku),
+    name: stringValue(item.name),
+    description: nullableString(item.description),
+    priceMznMinor: numberValue(item.priceMznMinor, 0),
+    sortOrder: numberValue(item.sortOrder, 100)
+  }));
+}
+
+function objectRows(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? value.filter(isRecord) : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function stringValue(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function nullableString(value: unknown): string | null {
+  return typeof value === "string" && value ? value : null;
+}
+
+function numberValue(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function booleanValue(value: unknown, fallback: boolean): boolean {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function isLookupMethod(value: unknown): value is "qr" | "card" | "phone" {
+  return value === "qr" || value === "card" || value === "phone";
+}
+
+function terminalStatus(value: unknown): PosTerminalStatus {
+  return value === "active" || value === "suspended" || value === "revoked"
+    ? value
+    : "provisioning";
+}
+
+function deviceType(value: unknown): PosDeviceContext["type"] {
+  return value === "browser" ||
+    value === "camera" ||
+    value === "printer" ||
+    value === "card_terminal"
+    ? value
+    : "other";
+}
+
+function deviceStatus(value: unknown): PosDeviceStatus {
+  return value === "active" || value === "revoked" ? value : "pending";
+}
+
+function paymentMethod(value: unknown): PosPaymentChannelContext["method"] {
+  return value === "card" || value === "mpesa" || value === "emola" || value === "mkesh"
+    ? value
+    : "cash";
+}
+
+function paymentChannelStatus(value: unknown): PosPaymentChannelStatus {
+  return value === "testing" || value === "active" || value === "suspended"
+    ? value
+    : "unconfigured";
 }
 
 function rowsFrom<T>(rows: unknown): T[] {

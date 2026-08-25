@@ -19,15 +19,21 @@ export default async function PosPaymentSettingsPage({
 }) {
   const state = await getProtectedRouteState("/pos", "/pos/definicoes/pagamentos");
   const context = state.status === "authorized" ? await getPosContext(state.principal) : null;
-  const method = parsePosPaymentView((await searchParams)?.metodo);
+  const params = await searchParams;
+  const method = parsePosPaymentView(params?.metodo);
+  const result = singleParam(params?.resultado);
 
   return (
     <ProtectedRouteStateView state={state} title="Pagamentos do POS" variant="pos">
       {state.status === "authorized" && context ? (
         <PosPortalShell context={context} principal={state.principal} section="settings">
-          <PosPaymentSettingsView context={context} method={method} />
+          <PosPaymentSettingsView context={context} method={method} result={result} />
         </PosPortalShell>
       ) : null}
     </ProtectedRouteStateView>
   );
+}
+
+function singleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
 }

@@ -8,21 +8,37 @@ import type { CustomerExploreOffer } from "@/features/customer-dashboard/model";
 const offers: CustomerExploreOffer[] = [
   {
     id: "offer-restaurant",
+    businessId: "business-restaurant",
     businessName: "Restaurante Marés",
     title: "Sobremesa incluída",
     description: "Benefício para membros VUYELA.",
     categorySlug: "restaurantes",
     categoryName: "Restaurantes",
-    href: "/estabelecimentos/restaurante-mares"
+    href: "/estabelecimentos/restaurante-mares",
+    customerCardId: null,
+    isFavorite: false,
+    offerNotificationsEnabled: true,
+    claimId: null,
+    claimCode: null,
+    claimStatus: null,
+    claimExpiresAt: null
   },
   {
     id: "offer-health",
+    businessId: "business-health",
     businessName: "Farmácia Central",
     title: "Pontos em dobro",
     description: "Campanha de saúde e bem-estar.",
     categorySlug: "saude",
     categoryName: "Saúde",
-    href: "/estabelecimentos/farmacia-central"
+    href: "/estabelecimentos/farmacia-central",
+    customerCardId: null,
+    isFavorite: false,
+    offerNotificationsEnabled: true,
+    claimId: null,
+    claimCode: null,
+    claimStatus: null,
+    claimExpiresAt: null
   }
 ];
 

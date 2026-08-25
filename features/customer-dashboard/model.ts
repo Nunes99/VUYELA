@@ -14,12 +14,20 @@ export interface CustomerActivityItem {
 
 export interface CustomerExploreOffer {
   id: string;
+  businessId: string;
   businessName: string;
   title: string;
   description: string;
   categorySlug?: string | null;
   categoryName?: string | null;
   href?: string;
+  customerCardId: string | null;
+  isFavorite: boolean;
+  offerNotificationsEnabled: boolean;
+  claimId: string | null;
+  claimCode: string | null;
+  claimStatus: "activated" | "redeemed" | "expired" | "cancelled" | null;
+  claimExpiresAt: string | null;
 }
 
 export interface CustomerProfileSummary {

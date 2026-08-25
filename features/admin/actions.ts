@@ -139,6 +139,50 @@ export async function updateProfileRoleAction(
   return adminSuccess("Função do utilizador atualizada e auditada.");
 }
 
+export async function updateProfileAccountStatusAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const targetProfileId = getFormString(formData, "targetProfileId");
+  const status = getFormString(formData, "status");
+  const reason = getFormString(formData, "reason");
+
+  if (
+    !isUuid(targetProfileId) ||
+    !["active", "suspended"].includes(status) ||
+    (status === "suspended" && reason.length < 4)
+  ) {
+    return adminError("Selecione um estado e registe o respetivo motivo.");
+  }
+
+  const principal = await getActionPrincipal("users_manage");
+  if (!principal) {
+    return adminError("A sua função não permite alterar o estado de contas.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc(
+    "admin_set_profile_account_status",
+    {
+      p_actor_profile_id: principal.profileId,
+      p_target_profile_id: targetProfileId,
+      p_status: status,
+      p_reason: reason || "Reativação aprovada pelo administrador",
+      p_ip_address: auditContext.ipAddress,
+      p_user_agent: auditContext.userAgent
+    }
+  );
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateAdmin();
+  return adminSuccess(
+    status === "suspended" ? "Conta suspensa e acesso bloqueado." : "Conta reativada com sucesso."
+  );
+}
+
 export async function updateSupportTicketAction(
   _previousState: AdminActionState,
   formData: FormData
@@ -190,6 +234,46 @@ export async function updateSupportTicketAction(
   return adminSuccess("Pedido de suporte atualizado e auditado.");
 }
 
+export async function addSupportTicketMessageAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const ticketId = getFormString(formData, "ticketId");
+  const body = getFormString(formData, "body");
+  const isInternal = formData.get("isInternal") === "on";
+
+  if (!isUuid(ticketId) || body.length < 2) {
+    return adminError("Escreva uma resposta antes de enviar.");
+  }
+
+  const principal = await getActionPrincipal("support_manage");
+  if (!principal) {
+    return adminError("A sua função não permite responder a pedidos de suporte.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc(
+    "admin_add_support_ticket_message",
+    {
+      p_actor_profile_id: principal.profileId,
+      p_ticket_id: ticketId,
+      p_body: body,
+      p_is_internal: isInternal,
+      p_ip_address: auditContext.ipAddress,
+      p_user_agent: auditContext.userAgent
+    }
+  );
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateAdmin();
+  return adminSuccess(
+    isInternal ? "Nota interna registada." : "Resposta colocada na fila de envio."
+  );
+}
+
 export async function reviewFraudEventAction(
   _previousState: AdminActionState,
   formData: FormData
@@ -224,6 +308,100 @@ export async function reviewFraudEventAction(
 
   revalidateAdmin();
   return adminSuccess("Alerta de fraude atualizado e auditado.");
+}
+
+export async function triageFraudEventAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const fraudEventId = getFormString(formData, "fraudEventId");
+  const decision = getFormString(formData, "decision");
+  const assignedToProfileId = getFormString(formData, "assignedToProfileId");
+  const note = getFormString(formData, "note");
+
+  if (
+    !isUuid(fraudEventId) ||
+    !["review", "escalate", "resolve", "dismiss", "reopen"].includes(decision) ||
+    (assignedToProfileId && !isUuid(assignedToProfileId)) ||
+    (["escalate", "resolve", "dismiss"].includes(decision) && note.length < 4)
+  ) {
+    return adminError("Selecione uma decisão válida e registe a nota necessária.");
+  }
+
+  const principal = await getActionPrincipal("fraud_review");
+  if (!principal) {
+    return adminError("A sua função não permite fazer a triagem de fraude.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc("admin_triage_fraud_event", {
+    p_actor_profile_id: principal.profileId,
+    p_fraud_event_id: fraudEventId,
+    p_decision: decision,
+    p_assigned_to_profile_id: assignedToProfileId || null,
+    p_note: note || null,
+    p_ip_address: auditContext.ipAddress,
+    p_user_agent: auditContext.userAgent
+  });
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateAdmin();
+  return adminSuccess("Triagem de fraude atualizada e auditada.");
+}
+
+export async function updatePlatformSettingsAction(
+  _previousState: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  const platformName = getFormString(formData, "platformName");
+  const locale = getFormString(formData, "locale");
+  const currency = getFormString(formData, "currency").toUpperCase();
+  const timeZone = getFormString(formData, "timeZone");
+  const securityEmail = getFormString(formData, "securityEmail").toLowerCase();
+  const note = getFormString(formData, "note");
+
+  if (
+    platformName.length < 2 ||
+    !/^[a-z]{2}-[A-Z]{2}$/.test(locale) ||
+    !/^[A-Z]{3}$/.test(currency) ||
+    timeZone.length < 3 ||
+    !/^\S+@\S+\.\S+$/.test(securityEmail) ||
+    note.length < 4
+  ) {
+    return adminError("Revise as definições e registe o motivo da alteração.");
+  }
+
+  const principal = await getActionPrincipal("users_manage");
+  if (!principal) {
+    return adminError("A sua função não permite alterar definições globais.");
+  }
+
+  const auditContext = await getRequestAuditContext();
+  const { error } = await createSupabaseServiceRoleClient().rpc("admin_update_platform_settings", {
+    p_actor_profile_id: principal.profileId,
+    p_platform_name: platformName,
+    p_locale: locale,
+    p_currency: currency,
+    p_timezone: timeZone,
+    p_security_email: securityEmail,
+    p_privileged_mfa_required: formData.get("privilegedMfaRequired") === "on",
+    p_fraud_alerts: formData.get("fraudAlerts") === "on",
+    p_support_alerts: formData.get("supportAlerts") === "on",
+    p_note: note,
+    p_ip_address: auditContext.ipAddress,
+    p_user_agent: auditContext.userAgent
+  });
+
+  if (error) {
+    return adminError(getDatabaseActionMessage(error.message));
+  }
+
+  revalidateAdmin();
+  revalidatePath("/");
+  return adminSuccess("Definições globais atualizadas e auditadas.");
 }
 
 export async function assignSubscriptionPlanAction(

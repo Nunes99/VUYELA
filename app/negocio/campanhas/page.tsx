@@ -42,7 +42,10 @@ export default async function BusinessCampaignsPage({
           principal={state.principal}
           title="Campanhas"
         >
-          <BusinessCampaignsView state={campaignsState} />
+          <BusinessCampaignsView
+            operationResult={getSearchParam(params.resultado)}
+            state={campaignsState}
+          />
         </BusinessPortalShell>
       ) : null}
     </ProtectedRouteStateView>

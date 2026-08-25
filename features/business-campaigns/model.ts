@@ -81,6 +81,19 @@ export interface BusinessCampaign {
   createdAt: string;
 }
 
+export interface BusinessOffer {
+  id: string;
+  campaignId: string | null;
+  slug: string;
+  title: string;
+  description: string;
+  startsAt: string | null;
+  endsAt: string | null;
+  isPublic: boolean;
+  isActive: boolean;
+  claimCount: number;
+}
+
 export interface CampaignEligibilityCustomer {
   id: string;
   customerName: string;

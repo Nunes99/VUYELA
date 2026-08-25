@@ -8,15 +8,18 @@ import { profileRoles } from "@/lib/auth/rbac";
 import type { ProfileRole } from "@/lib/auth/rbac";
 
 import {
+  addSupportTicketMessageAction,
   assignSubscriptionPlanAction,
   reviewBusinessAction,
-  reviewFraudEventAction,
+  triageFraudEventAction,
+  updatePlatformSettingsAction,
   updatePlanEntitlementsAction,
+  updateProfileAccountStatusAction,
   updateProfileRoleAction,
   updateSupportTicketAction,
   saveBusinessCategoryAction
 } from "./actions";
-import type { AdminCategory, AdminOperator, AdminPlan } from "./model";
+import type { AdminCategory, AdminOperator, AdminPlan, AdminSystemSettings } from "./model";
 import { initialAdminActionState } from "./state";
 
 interface BusinessReviewFormProps {
@@ -162,6 +165,42 @@ export function UserRoleForm({
         <input maxLength={1000} name="note" placeholder="Obrigatório" required />
       </label>
       <SubmitButton label="Guardar" pending={pending} />
+      <ActionMessage state={state} />
+    </form>
+  );
+}
+
+export function UserAccountStatusForm({
+  actorProfileId,
+  userId,
+  accountStatus
+}: {
+  actorProfileId: string;
+  userId: string;
+  accountStatus: string;
+}) {
+  const [state, action, pending] = useActionState(
+    updateProfileAccountStatusAction,
+    initialAdminActionState
+  );
+
+  if (actorProfileId === userId || accountStatus === "closed") {
+    return null;
+  }
+
+  const nextStatus = accountStatus === "suspended" ? "active" : "suspended";
+  return (
+    <form action={action} className="admin-inline-form admin-inline-form--danger">
+      <input name="targetProfileId" type="hidden" value={userId} />
+      <input name="status" type="hidden" value={nextStatus} />
+      <label className="admin-inline-form__wide">
+        <span>{nextStatus === "suspended" ? "Motivo da suspensão" : "Nota de reativação"}</span>
+        <input maxLength={1000} name="reason" placeholder="Obrigatório para auditoria" required />
+      </label>
+      <SubmitButton
+        label={nextStatus === "suspended" ? "Suspender conta" : "Reativar conta"}
+        pending={pending}
+      />
       <ActionMessage state={state} />
     </form>
   );
@@ -363,24 +402,126 @@ export function SupportTicketForm({
   );
 }
 
-export function FraudReviewForm({
+export function SupportReplyForm({ ticketId }: { ticketId: string }) {
+  const [state, action, pending] = useActionState(
+    addSupportTicketMessageAction,
+    initialAdminActionState
+  );
+
+  return (
+    <form action={action} className="admin-support-reply-form">
+      <input name="ticketId" type="hidden" value={ticketId} />
+      <label>
+        <span>Nova resposta</span>
+        <textarea maxLength={2000} name="body" required rows={4} />
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input name="isInternal" type="checkbox" />
+        <span>Guardar apenas como nota interna</span>
+      </label>
+      <SubmitButton label="Enviar resposta" pending={pending} />
+      <ActionMessage state={state} />
+    </form>
+  );
+}
+
+export function FraudTriageForm({
   fraudEventId,
-  resolved
+  triageStatus,
+  assignedToProfileId,
+  operators
 }: {
   fraudEventId: string;
-  resolved: boolean;
+  triageStatus: string;
+  assignedToProfileId: string | null;
+  operators: AdminOperator[];
 }) {
-  const [state, action, pending] = useActionState(reviewFraudEventAction, initialAdminActionState);
+  const [state, action, pending] = useActionState(triageFraudEventAction, initialAdminActionState);
+  const resolved = ["resolved", "dismissed"].includes(triageStatus);
 
   return (
     <form action={action} className="admin-inline-form">
       <input name="fraudEventId" type="hidden" value={fraudEventId} />
-      <input name="resolution" type="hidden" value={resolved ? "reopen" : "resolve"} />
+      <label>
+        <span>Decisão</span>
+        <select defaultValue={resolved ? "reopen" : "review"} name="decision">
+          {resolved ? <option value="reopen">Reabrir alerta</option> : null}
+          {!resolved ? <option value="review">Em análise</option> : null}
+          {!resolved ? <option value="escalate">Escalar</option> : null}
+          {!resolved ? <option value="resolve">Resolver</option> : null}
+          {!resolved ? <option value="dismiss">Descartar</option> : null}
+        </select>
+      </label>
+      <label>
+        <span>Responsável</span>
+        <select defaultValue={assignedToProfileId ?? ""} name="assignedToProfileId">
+          <option value="">Atribuir a mim</option>
+          {operators.map((operator) => (
+            <option key={operator.id} value={operator.id}>
+              {operator.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <label className="admin-inline-form__wide">
         <span>Nota da revisão</span>
-        <input maxLength={2000} name="note" placeholder="Obrigatório" required />
+        <input maxLength={2000} name="note" placeholder="Obrigatória ao escalar ou concluir" />
       </label>
-      <SubmitButton label={resolved ? "Reabrir" : "Resolver"} pending={pending} />
+      <SubmitButton label="Guardar triagem" pending={pending} />
+      <ActionMessage state={state} />
+    </form>
+  );
+}
+
+export function PlatformSettingsForm({ settings }: { settings: AdminSystemSettings }) {
+  const [state, action, pending] = useActionState(
+    updatePlatformSettingsAction,
+    initialAdminActionState
+  );
+
+  return (
+    <form action={action} className="admin-platform-settings-form">
+      <label>
+        <span>Nome da plataforma</span>
+        <input defaultValue={settings.platformName} maxLength={100} name="platformName" required />
+      </label>
+      <label>
+        <span>Idioma (código)</span>
+        <input defaultValue={settings.locale} maxLength={5} name="locale" required />
+      </label>
+      <label>
+        <span>Moeda</span>
+        <input defaultValue={settings.currency} maxLength={3} name="currency" required />
+      </label>
+      <label>
+        <span>Fuso horário</span>
+        <input defaultValue={settings.timeZone} maxLength={100} name="timeZone" required />
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Correio eletrónico de segurança</span>
+        <input defaultValue={settings.securityEmail} name="securityEmail" required type="email" />
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input
+          defaultChecked={settings.privilegedMfaRequired}
+          name="privilegedMfaRequired"
+          type="checkbox"
+        />
+        <span>MFA obrigatório para funções privilegiadas</span>
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input defaultChecked={settings.fraudAlerts} name="fraudAlerts" type="checkbox" />
+        <span>Alertas internos de fraude</span>
+      </label>
+      <label className="admin-plan-form__toggle">
+        <input defaultChecked={settings.supportAlerts} name="supportAlerts" type="checkbox" />
+        <span>Alertas internos de suporte</span>
+      </label>
+      <label className="admin-inline-form__wide">
+        <span>Motivo da alteração</span>
+        <input maxLength={1000} name="note" required />
+      </label>
+      <SubmitButton label="Guardar definições" pending={pending} />
       <ActionMessage state={state} />
     </form>
   );

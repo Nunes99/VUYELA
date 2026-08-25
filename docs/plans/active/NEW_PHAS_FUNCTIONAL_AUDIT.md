@@ -83,15 +83,15 @@ administrativos de identidade, suporte, fraude e configurações globais.
 - notificações in-app e e-mail para campanhas configuradas;
 - configuração e histórico do programa de indicações;
 - consulta de subscrição, utilização e catálogo de planos.
+- criação, edição, suspensão, reativação e remoção condicionada de filiais;
+- convites privados, funções, filiais e estado da equipa;
+- catálogo persistente de serviços e produtos para utilização no POS;
+- detalhe operacional e suspensão, reativação ou arquivo de cartões;
+- ciclo de campanhas com edição de calendário, duplicação, pausa, retoma e cancelamento;
+- criação, edição, publicação, suspensão e remoção condicionada de ofertas.
 
 **Parcial ou em falta**
 
-- Filiais é apenas consulta: falta criar, editar, suspender e definir sede;
-- Cartões é apenas consulta: falta suspender, reativar e consultar detalhe operacional;
-- Clientes é apenas consulta: falta detalhe, segmentação e ações permitidas;
-- a equipa existe nos dados, mas não há ecrã completo para convite, função, filial e suspensão;
-- campanhas podem ser criadas, mas não editadas, duplicadas, pausadas, retomadas ou canceladas;
-- não existe gestão dedicada das ofertas resultantes das campanhas;
 - a mudança de plano não pode ser solicitada ou contratada pelo negócio;
 - os relatórios não têm intervalos, filtros e exportação PDF reais;
 - alguns estados de terminal são inferidos na interface e não provêm de um terminal registado.
@@ -199,6 +199,11 @@ Supabase e as fases seguintes devem usar estes contratos em vez de criar estrutu
 
 ### Fase 27 — Gestão operacional do negócio
 
+**Estado no repositório e no Supabase: concluída em 25/08/2026.** O portal usa uma única camada
+operacional para filiais, equipa, catálogo, cartões, clientes, campanhas e ofertas. As operações
+privilegiadas validam a pertença ao negócio, usam tokens de convite com hash e criam registos de
+auditoria. A aceitação de convites está disponível através de uma ligação privada com prazo.
+
 - CRUD de filiais;
 - convites, funções e suspensão da equipa;
 - catálogo de serviços/produtos;
@@ -206,6 +211,11 @@ Supabase e as fases seguintes devem usar estes contratos em vez de criar estrutu
 - ciclo completo de campanhas e ofertas.
 
 ### Fase 28 — POS transacional completo
+
+**Estado no repositório e no Supabase: concluída em 25/08/2026.** Terminais, definições,
+dispositivos e canais de pagamento são persistentes. A confirmação transacional é idempotente,
+regista a tentativa e o pagamento, executa o movimento de fidelização no servidor e produz o
+recibo reconciliado. Provedores externos permanecem indisponíveis enquanto não houver credenciais.
 
 - terminais e definições persistentes;
 - seleção de itens do catálogo;
@@ -215,6 +225,10 @@ Supabase e as fases seguintes devem usar estes contratos em vez de criar estrutu
 
 ### Fase 29 — Fluxo completo do cliente
 
+**Estado no repositório e no Supabase: concluída em 25/08/2026.** Favoritos, avisos por negócio e
+ativações de ofertas são persistentes, validados por cartão ativo e ligados ao catálogo público
+vigente. Os códigos de utilização são gerados no servidor e todas as alterações são auditadas.
+
 - favoritos e filtros reais;
 - filtros e leitura em massa de notificações;
 - perfil alargado e preferências;
@@ -222,6 +236,11 @@ Supabase e as fases seguintes devem usar estes contratos em vez de criar estrutu
 - recompensa seguinte baseada em regras reais.
 
 ### Fase 30 — Operações administrativas completas
+
+**Estado no repositório e no Supabase: concluída em 25/08/2026.** O painel permite suspender e
+reativar contas com efeito imediato no acesso, responder e adicionar notas a pedidos de suporte,
+atribuir e decidir triagens de fraude, editar definições globais não secretas e exportar dados com
+registo de auditoria. Filtros e paginação deixam de ser apenas visuais.
 
 - suspensão/recuperação de conta;
 - notificações administrativas;

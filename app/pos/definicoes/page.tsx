@@ -19,15 +19,22 @@ export default async function PosSettingsPage({
 }) {
   const state = await getProtectedRouteState("/pos", "/pos/definicoes");
   const context = state.status === "authorized" ? await getPosContext(state.principal) : null;
-  const view = parsePosSettingsView((await searchParams)?.vista);
+  const params = await searchParams;
+  const view = parsePosSettingsView(params?.vista);
+  const terminalId = singleParam(params?.terminal);
+  const result = singleParam(params?.resultado);
 
   return (
     <ProtectedRouteStateView state={state} title="Definições do POS" variant="pos">
       {state.status === "authorized" && context ? (
         <PosPortalShell context={context} principal={state.principal} section="settings">
-          <PosSettingsView context={context} view={view} />
+          <PosSettingsView context={context} result={result} terminalId={terminalId} view={view} />
         </PosPortalShell>
       ) : null}
     </ProtectedRouteStateView>
   );
+}
+
+function singleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
 }

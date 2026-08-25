@@ -39,9 +39,23 @@ interface ProfileRow {
   email: string | null;
   phone: string | null;
   role: string;
+  account_status?: string;
+  suspended_at?: string | null;
+  suspension_reason?: string | null;
   locale?: string;
   marketing_consent_at?: string | null;
   terms_accepted_at?: string | null;
+  created_at: string;
+}
+
+interface SupportMessageRow {
+  id: string;
+  ticket_id: string;
+  author_profile_id: string | null;
+  author_type: string;
+  body: string;
+  is_internal: boolean;
+  delivery_status: string;
   created_at: string;
 }
 
@@ -153,6 +167,9 @@ interface FraudEventRow {
   resolved_by_profile_id: string | null;
   resolution_note: string | null;
   resolved_at: string | null;
+  triage_status: string;
+  assigned_to_profile_id: string | null;
+  reviewed_at: string | null;
   created_at: string;
 }
 
@@ -189,7 +206,10 @@ export async function getAdminDashboardState(
   principal: AuthPrincipal,
   view: AdminView,
   query: string,
-  selectedId = ""
+  selectedId = "",
+  filter = "",
+  page = 1,
+  paginateResults = true
 ): Promise<AdminDashboardState> {
   const capabilities = getAdminCapabilities(principal.profileRole);
 
@@ -210,6 +230,8 @@ export async function getAdminDashboardState(
       status: "ready",
       view,
       query,
+      filter,
+      pagination: null,
       capabilities,
       viewer,
       metrics: null,
@@ -258,13 +280,18 @@ export async function getAdminDashboardState(
       baseState.tickets = tickets;
       baseState.operators = operators;
     } else if (view === "fraud") {
-      baseState.fraudEvents = await loadFraudEvents(supabase, query);
+      const [fraudEvents, operators] = await Promise.all([
+        loadFraudEvents(supabase, query),
+        loadOperators(supabase)
+      ]);
+      baseState.fraudEvents = fraudEvents;
+      baseState.operators = operators;
     } else if (view === "audit") {
       baseState.auditEntries = await loadAuditEntries(supabase, query);
     } else if (view === "analytics") {
       const [metrics, analytics] = await Promise.all([
         loadMetrics(supabase, principal.profileId),
-        loadAnalytics(supabase)
+        loadAnalytics(supabase, analyticsWindowDays(filter))
       ]);
       baseState.metrics = metrics;
       baseState.analytics = analytics;
@@ -273,7 +300,12 @@ export async function getAdminDashboardState(
     } else if (view === "user-detail") {
       baseState.userDetail = selectedId ? await loadUserDetail(supabase, selectedId) : null;
     } else {
-      baseState.settings = loadSystemSettings();
+      baseState.settings = await loadSystemSettings(supabase);
+    }
+
+    applyCollectionFilter(baseState, view, filter);
+    if (paginateResults) {
+      applyCollectionPagination(baseState, view, page);
     }
 
     return baseState;
@@ -311,27 +343,60 @@ async function loadViewer(supabase: SupabaseClient, profileId: string): Promise<
   };
 }
 
-function loadSystemSettings(): AdminDashboardReadyState["settings"] {
+async function loadSystemSettings(
+  supabase: SupabaseClient
+): Promise<AdminDashboardReadyState["settings"]> {
+  const { data, error } = await supabase
+    .from("platform_settings")
+    .select("key, value")
+    .in("key", [
+      "platform.name",
+      "platform.locale",
+      "platform.currency",
+      "platform.timezone",
+      "security.contact_email",
+      "security.privileged_mfa_required",
+      "notifications.fraud_alerts",
+      "notifications.support_alerts"
+    ]);
+
+  if (error) {
+    throw error;
+  }
+
+  const values = new Map(
+    ((data ?? []) as Array<{ key: string; value: unknown }>).map((row) => [row.key, row.value])
+  );
+
   return {
-    platformName: "VUYELA",
+    platformName: settingText(values, "platform.name", "VUYELA"),
     publicUrl: getSiteUrl(),
-    locale: "Português (Moçambique)",
-    currency: "MZN (Metical)",
-    timeZone: "Africa/Maputo (GMT+2)",
-    privilegedMfaRequired: true,
+    locale: settingText(values, "platform.locale", "pt-MZ"),
+    currency: settingText(values, "platform.currency", "MZN"),
+    timeZone: settingText(values, "platform.timezone", "Africa/Maputo"),
+    privilegedMfaRequired: settingBoolean(values, "security.privileged_mfa_required", true),
     leakedPasswordProtection: process.env.SUPABASE_LEAKED_PASSWORD_PROTECTION_ENABLED === "true",
     supabaseConnected: isSupabaseConfigured(),
     emailConfigured: isNotificationEmailConfigured(),
     vercelDeployment: Boolean(process.env.VERCEL),
-    securityEmail: process.env.SECURITY_EMAIL?.trim() || "Não configurado"
+    securityEmail: settingText(
+      values,
+      "security.contact_email",
+      process.env.SECURITY_EMAIL?.trim() || "seguranca@vuyela.co.mz"
+    ),
+    fraudAlerts: settingBoolean(values, "notifications.fraud_alerts", true),
+    supportAlerts: settingBoolean(values, "notifications.support_alerts", true)
   };
 }
 
-async function loadAnalytics(supabase: SupabaseClient): Promise<AdminAnalyticsData> {
+async function loadAnalytics(
+  supabase: SupabaseClient,
+  windowDays = 7
+): Promise<AdminAnalyticsData> {
   const now = new Date();
   const firstMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1));
   const firstDay = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 6)
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (windowDays - 1))
   );
   const [transactionResult, paymentResult, businessResult, categoryResult] = await Promise.all([
     supabase
@@ -373,7 +438,7 @@ async function loadAnalytics(supabase: SupabaseClient): Promise<AdminAnalyticsDa
   );
   const businessMap = new Map(businesses.map((row) => [row.id, row]));
   const monthly = createAnalyticsBuckets(firstMonth, 6, "month");
-  const daily = createAnalyticsBuckets(firstDay, 7, "day");
+  const daily = createAnalyticsBuckets(firstDay, windowDays, "day");
 
   for (const transaction of transactions) {
     addToAnalyticsBucket(monthly, transaction, "month");
@@ -653,7 +718,7 @@ async function loadUserDetail(
   const { data: profileData, error: profileError } = await supabase
     .from("profiles")
     .select(
-      "id, display_name, email, phone, role, locale, marketing_consent_at, terms_accepted_at, created_at"
+      "id, display_name, email, phone, role, account_status, suspended_at, suspension_reason, locale, marketing_consent_at, terms_accepted_at, created_at"
     )
     .eq("id", profileId)
     .maybeSingle();
@@ -713,6 +778,9 @@ async function loadUserDetail(
     email: profile.email ?? "Sem e-mail",
     phone: profile.phone ?? "Sem telefone",
     role: profile.role,
+    accountStatus: profile.account_status ?? "active",
+    suspendedAt: profile.suspended_at ?? null,
+    suspensionReason: profile.suspension_reason ?? "",
     createdAt: profile.created_at,
     locale: profile.locale ?? "pt-MZ",
     marketingConsentAt: profile.marketing_consent_at ?? null,
@@ -821,7 +889,7 @@ async function loadBusinesses(supabase: SupabaseClient, query: string): Promise<
     .from("businesses")
     .select("id, name, slug, status, owner_profile_id, created_at, reviewed_at, review_note")
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(1000);
 
   if (error) {
     throw error;
@@ -852,9 +920,11 @@ async function loadBusinesses(supabase: SupabaseClient, query: string): Promise<
 async function loadUsers(supabase: SupabaseClient, query: string): Promise<AdminUser[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, email, phone, role, created_at")
+    .select(
+      "id, display_name, email, phone, role, account_status, suspended_at, suspension_reason, created_at"
+    )
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(1000);
 
   if (error) {
     throw error;
@@ -874,6 +944,9 @@ async function loadUsers(supabase: SupabaseClient, query: string): Promise<Admin
           email: row.email ?? "Sem e-mail",
           phone: row.phone ?? "Sem telefone",
           role: row.role,
+          accountStatus: row.account_status ?? "active",
+          suspendedAt: row.suspended_at ?? null,
+          suspensionReason: row.suspension_reason ?? "",
           createdAt: row.created_at
         }
       ];
@@ -888,7 +961,7 @@ async function loadSubscriptions(
     .from("subscriptions")
     .select("id, business_id, plan_id, status, current_period_end, trial_ends_at")
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(1000);
 
   if (error) {
     throw error;
@@ -991,19 +1064,39 @@ async function loadSupportTickets(
       "id, business_id, profile_id, subject, description, status, priority, assigned_to_profile_id, resolution_note, resolved_at, created_at"
     )
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(1000);
 
   if (error) {
     throw error;
   }
 
   const rows = (data ?? []) as SupportTicketRow[];
+  const { data: messageData, error: messageError } =
+    rows.length > 0
+      ? await supabase
+          .from("support_ticket_messages")
+          .select(
+            "id, ticket_id, author_profile_id, author_type, body, is_internal, delivery_status, created_at"
+          )
+          .in(
+            "ticket_id",
+            rows.map((row) => row.id)
+          )
+          .order("created_at", { ascending: true })
+      : { data: [], error: null };
+
+  if (messageError) {
+    throw messageError;
+  }
+
+  const messages = (messageData ?? []) as SupportMessageRow[];
   const [profiles, businesses] = await Promise.all([
     loadProfileMap(
       supabase,
-      rows.flatMap((row) =>
-        [row.profile_id, row.assigned_to_profile_id].filter((id): id is string => Boolean(id))
-      )
+      [
+        ...rows.flatMap((row) => [row.profile_id, row.assigned_to_profile_id]),
+        ...messages.map((message) => message.author_profile_id)
+      ].filter((id): id is string => Boolean(id))
     ),
     loadBusinessMap(
       supabase,
@@ -1028,7 +1121,23 @@ async function loadSupportTickets(
         : "Não atribuído",
       resolutionNote: row.resolution_note ?? "",
       resolvedAt: row.resolved_at,
-      createdAt: row.created_at
+      createdAt: row.created_at,
+      messages: messages
+        .filter((message) => message.ticket_id === row.id)
+        .map((message) => ({
+          id: message.id,
+          authorName:
+            message.author_type === "system"
+              ? "Sistema VUYELA"
+              : getProfileLabel(
+                  message.author_profile_id ? profiles.get(message.author_profile_id) : undefined
+                ),
+          authorType: message.author_type,
+          body: message.body,
+          isInternal: message.is_internal,
+          deliveryStatus: message.delivery_status,
+          createdAt: message.created_at
+        }))
     }))
     .filter((row) =>
       matchesQuery(
@@ -1046,8 +1155,9 @@ async function loadSupportTickets(
 async function loadOperators(supabase: SupabaseClient): Promise<AdminOperator[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, email, phone, role, created_at")
+    .select("id, display_name, email, phone, role, account_status, created_at")
     .in("role", ["support_agent", "platform_admin", "super_admin"])
+    .eq("account_status", "active")
     .order("display_name", { ascending: true });
 
   if (error) {
@@ -1070,10 +1180,10 @@ async function loadFraudEvents(
   const { data, error } = await supabase
     .from("fraud_events")
     .select(
-      "id, business_id, profile_id, event_type, severity, details, resolved_by_profile_id, resolution_note, resolved_at, created_at"
+      "id, business_id, profile_id, event_type, severity, details, triage_status, assigned_to_profile_id, reviewed_at, resolved_by_profile_id, resolution_note, resolved_at, created_at"
     )
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(1000);
 
   if (error) {
     throw error;
@@ -1084,7 +1194,9 @@ async function loadFraudEvents(
     loadProfileMap(
       supabase,
       rows.flatMap((row) =>
-        [row.profile_id, row.resolved_by_profile_id].filter((id): id is string => Boolean(id))
+        [row.profile_id, row.assigned_to_profile_id, row.resolved_by_profile_id].filter(
+          (id): id is string => Boolean(id)
+        )
       )
     ),
     loadBusinessMap(
@@ -1106,6 +1218,12 @@ async function loadFraudEvents(
       resolvedByName: row.resolved_by_profile_id
         ? getProfileLabel(profiles.get(row.resolved_by_profile_id))
         : "Por rever",
+      triageStatus: row.triage_status,
+      assignedToProfileId: row.assigned_to_profile_id,
+      assignedToName: row.assigned_to_profile_id
+        ? getProfileLabel(profiles.get(row.assigned_to_profile_id))
+        : "Não atribuído",
+      reviewedAt: row.reviewed_at,
       resolutionNote: row.resolution_note ?? "",
       resolvedAt: row.resolved_at,
       createdAt: row.created_at
@@ -1115,6 +1233,7 @@ async function loadFraudEvents(
         query,
         row.eventType,
         row.severity,
+        row.triageStatus,
         row.businessName,
         row.profileName,
         row.detailsSummary
@@ -1132,7 +1251,7 @@ async function loadAuditEntries(
       "id, business_id, actor_profile_id, action, entity_table, entity_id, before_data, after_data, ip_address, context, created_at"
     )
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(1000);
 
   if (error) {
     throw error;
@@ -1180,6 +1299,97 @@ async function loadAuditEntries(
         row.operation
       )
     );
+}
+
+function settingText(values: Map<string, unknown>, key: string, fallback: string): string {
+  const value = values.get(key);
+  if (!isRecord(value) || typeof value.value !== "string") {
+    return fallback;
+  }
+
+  return value.value;
+}
+
+function settingBoolean(values: Map<string, unknown>, key: string, fallback: boolean): boolean {
+  const value = values.get(key);
+  if (!isRecord(value) || typeof value.enabled !== "boolean") {
+    return fallback;
+  }
+
+  return value.enabled;
+}
+
+function analyticsWindowDays(filter: string): number {
+  if (filter === "30d") {
+    return 30;
+  }
+  if (filter === "90d") {
+    return 90;
+  }
+  return 7;
+}
+
+function applyCollectionFilter(state: AdminDashboardReadyState, view: AdminView, filter: string) {
+  if (!filter) {
+    return;
+  }
+
+  if (view === "businesses") {
+    state.businesses = state.businesses.filter((item) => item.status === filter);
+  } else if (view === "categories") {
+    state.categories = state.categories.filter((item) =>
+      filter === "active" ? item.isActive : filter === "archived" ? !item.isActive : true
+    );
+  } else if (view === "users") {
+    state.users = state.users.filter(
+      (item) => item.role === filter || item.accountStatus === filter
+    );
+  } else if (view === "subscriptions") {
+    state.subscriptions = state.subscriptions.filter((item) => item.status === filter);
+  } else if (view === "support") {
+    state.tickets = state.tickets.filter(
+      (item) => item.status === filter || item.priority === filter
+    );
+  } else if (view === "fraud") {
+    state.fraudEvents = state.fraudEvents.filter(
+      (item) => item.severity === filter || item.triageStatus === filter
+    );
+  } else if (view === "audit") {
+    state.auditEntries = state.auditEntries.filter(
+      (item) => item.action === filter || item.operation === filter
+    );
+  }
+}
+
+function applyCollectionPagination(
+  state: AdminDashboardReadyState,
+  view: AdminView,
+  requestedPage: number
+) {
+  const pageSize = 20;
+  const paginate = <T>(items: T[]): T[] => {
+    const totalItems = items.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const page = Math.min(Math.max(1, requestedPage), totalPages);
+    state.pagination = { page, pageSize, totalItems, totalPages };
+    return items.slice((page - 1) * pageSize, page * pageSize);
+  };
+
+  if (view === "businesses") {
+    state.businesses = paginate(state.businesses);
+  } else if (view === "categories") {
+    state.categories = paginate(state.categories);
+  } else if (view === "users") {
+    state.users = paginate(state.users);
+  } else if (view === "subscriptions") {
+    state.subscriptions = paginate(state.subscriptions);
+  } else if (view === "support") {
+    state.tickets = paginate(state.tickets);
+  } else if (view === "fraud") {
+    state.fraudEvents = paginate(state.fraudEvents);
+  } else if (view === "audit") {
+    state.auditEntries = paginate(state.auditEntries);
+  }
 }
 
 async function loadProfileMap(

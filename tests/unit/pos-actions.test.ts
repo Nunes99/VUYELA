@@ -13,6 +13,7 @@ const identifiedState: PosActionState = {
   status: "success",
   businessId: "business-1",
   branchId: "branch-1",
+  terminalId: "terminal-1",
   card: {
     customerCardId: "card-1",
     customerName: "Ana Mucavele",
@@ -123,6 +124,7 @@ describe("POS server actions", () => {
       formWith({
         intent: "identify",
         businessId: "business-1",
+        terminalId: "terminal-1",
         lookupMethod: "email",
         lookupValue: "cliente@example.com"
       })

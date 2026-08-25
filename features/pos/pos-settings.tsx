@@ -5,12 +5,12 @@ import {
   CreditCard,
   EthernetPort,
   Fingerprint,
-  Gauge,
   KeyRound,
   Languages,
   LockKeyhole,
   MonitorSmartphone,
   Network,
+  Plus,
   Printer,
   ReceiptText,
   Router,
@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   Smartphone,
   Store,
+  Trash2,
   UserCog,
   UsersRound,
   WalletCards,
@@ -25,7 +26,19 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 
-import type { PosContextState } from "./data";
+import type {
+  PosBusinessContext,
+  PosContextState,
+  PosDeviceContext,
+  PosPaymentChannelContext,
+  PosTerminalContext
+} from "./data";
+import {
+  managePosPaymentChannelAction,
+  managePosTerminalAction,
+  managePosTerminalDeviceAction,
+  updatePosTerminalSettingsAction
+} from "./settings-actions";
 
 export const posSettingsViews = [
   "geral",
@@ -83,36 +96,42 @@ const paymentNavigation: Array<{
 
 export function PosSettingsView({
   context,
-  view
+  view,
+  terminalId,
+  result
 }: {
   context: PosContextState;
   view: PosSettingsViewId;
+  terminalId?: string;
+  result?: string;
 }) {
   if (context.status !== "ready") {
     return <PosSettingsNotice message={context.message} />;
   }
 
   const business = context.businesses[0];
-  const branch = business?.branches.find((item) => item.id === business.defaultBranchId);
+  const terminal =
+    business?.terminals.find((item) => item.id === terminalId) ??
+    business?.terminals.find((item) => item.status === "active") ??
+    business?.terminals[0];
+  const branch = business?.branches.find((item) => item.id === terminal?.branchId);
 
   return (
     <div className="pos-settings-layout">
-      <PosSettingsNavigation active={view} />
+      <PosSettingsNavigation active={view} terminalId={terminal?.id} />
       <section className="pos-settings-main">
+        <PosSettingsResult result={result} />
         <SettingsHeader
           eyebrow="Definições do terminal"
           title={settingsNavigation.find((item) => item.id === view)?.label ?? "Geral"}
           body={`${business?.name ?? "Negócio VUYELA"} · ${branch?.name ?? "Sede principal"}`}
         />
-        {view === "geral" ? (
-          <GeneralSettings
-            businessName={business?.name ?? "VUYELA"}
-            branchName={branch?.name ?? "Sede"}
-          />
+        {view === "geral" ? <GeneralSettings business={business} terminal={terminal} /> : null}
+        {view === "dispositivos" ? (
+          <DeviceSettings business={business} terminal={terminal} />
         ) : null}
-        {view === "dispositivos" ? <DeviceSettings /> : null}
-        {view === "impressora" ? <PrinterSettings /> : null}
-        {view === "rede" ? <NetworkSettings /> : null}
+        {view === "impressora" ? <PrinterSettings terminal={terminal} /> : null}
+        {view === "rede" ? <NetworkSettings terminal={terminal} /> : null}
         {view === "utilizadores" ? <UserSettings roles={business?.roleLabels ?? []} /> : null}
         {view === "seguranca" ? <SecuritySettings /> : null}
       </section>
@@ -122,10 +141,12 @@ export function PosSettingsView({
 
 export function PosPaymentSettingsView({
   context,
-  method
+  method,
+  result
 }: {
   context: PosContextState;
   method: PosPaymentViewId;
+  result?: string;
 }) {
   if (context.status !== "ready") {
     return <PosSettingsNotice message={context.message} />;
@@ -133,11 +154,21 @@ export function PosPaymentSettingsView({
 
   const config = paymentConfig[method];
   const Icon = config.icon;
+  const business = context.businesses[0];
+  const branchId = business?.defaultBranchId;
+  const databaseMethod = paymentViewToMethod(method);
+  const channel = business?.paymentChannels.find(
+    (item) =>
+      item.method === databaseMethod && (item.branchId === branchId || item.branchId === null)
+  );
+  const enabled = channel?.status === "active";
+  const statusLabel = paymentChannelStatusLabel(channel);
 
   return (
     <div className="pos-settings-layout">
       <PosSettingsNavigation active="pagamentos" />
       <section className="pos-settings-main">
+        <PosSettingsResult result={result} />
         <SettingsHeader
           eyebrow="Métodos de pagamento"
           title="Configuração de pagamentos"
@@ -167,13 +198,20 @@ export function PosPaymentSettingsView({
             icon={<Icon size={22} />}
           >
             <div className="pos-payment-provider__status">
-              <span className={`pos-config-status pos-config-status--${config.statusTone}`}>
-                {config.statusLabel}
+              <span
+                className={`pos-config-status pos-config-status--${enabled ? "success" : "muted"}`}
+              >
+                {statusLabel}
               </span>
               <p>{config.description}</p>
             </div>
             <dl className="pos-settings-facts">
-              <Fact label="Processamento" value={config.processing} />
+              <Fact
+                label="Processamento"
+                value={
+                  channel?.mode === "manual" ? "Confirmação manual auditada" : config.processing
+                }
+              />
               <Fact label="Moeda" value="Metical moçambicano (MZN)" />
               <Fact label="Confirmação" value={config.confirmation} />
             </dl>
@@ -190,8 +228,16 @@ export function PosPaymentSettingsView({
               </div>
             ) : (
               <div className="pos-secure-fields">
-                <SecureField label={config.identifierLabel} value={config.identifierValue} />
-                <SecureField label="Credenciais do provedor" value="Não configuradas" />
+                <SecureField
+                  label={config.identifierLabel}
+                  value={channel?.maskedIdentifier ?? config.identifierValue}
+                />
+                <SecureField
+                  label="Credenciais do provedor"
+                  value={
+                    channel?.credentialsConfigured ? "Configuradas no servidor" : "Não configuradas"
+                  }
+                />
                 <p>
                   Quando forem disponibilizadas, as credenciais serão guardadas exclusivamente no
                   servidor e nunca serão enviadas para este navegador.
@@ -206,25 +252,42 @@ export function PosPaymentSettingsView({
             <div>
               <strong>Apresentar {config.label}</strong>
               <p>
-                {config.enabled
+                {enabled
                   ? "Disponível com confirmação manual na etapa de autorização."
                   : "Oculto até existir uma configuração válida para este negócio."}
               </p>
             </div>
             <span
-              aria-checked={config.enabled}
+              aria-checked={enabled}
               aria-label={`${config.label} disponível`}
-              className={`pos-readonly-toggle${config.enabled ? " is-active" : ""}`}
+              className={`pos-readonly-toggle${enabled ? " is-active" : ""}`}
               role="switch"
             >
               <span />
             </span>
           </div>
-          {config.enabled ? (
+          {enabled ? (
             <div className="pos-settings-actions">
               <Link className="pos-settings-button pos-settings-button--secondary" href="/pos">
                 Testar confirmação manual
               </Link>
+              {business?.canManage && channel ? (
+                <PaymentChannelForm
+                  businessId={business.id}
+                  channel={channel}
+                  label="Suspender no POS"
+                  operation="suspend"
+                />
+              ) : null}
+            </div>
+          ) : business?.canManage && channel?.mode === "manual" ? (
+            <div className="pos-settings-actions">
+              <PaymentChannelForm
+                businessId={business.id}
+                channel={channel}
+                label="Ativar no POS"
+                operation="activate"
+              />
             </div>
           ) : null}
         </SettingsCard>
@@ -233,7 +296,13 @@ export function PosPaymentSettingsView({
   );
 }
 
-function PosSettingsNavigation({ active }: { active: PosSettingsViewId | "pagamentos" }) {
+function PosSettingsNavigation({
+  active,
+  terminalId
+}: {
+  active: PosSettingsViewId | "pagamentos";
+  terminalId?: string;
+}) {
   return (
     <aside className="pos-settings-nav">
       <div>
@@ -247,7 +316,7 @@ function PosSettingsNavigation({ active }: { active: PosSettingsViewId | "pagame
             <Link
               aria-current={active === item.id ? "page" : undefined}
               className={active === item.id ? "is-active" : undefined}
-              href={`/pos/definicoes?vista=${item.id}`}
+              href={`/pos/definicoes?vista=${item.id}${terminalId ? `&terminal=${terminalId}` : ""}`}
               key={item.id}
             >
               <Icon aria-hidden="true" size={18} />
@@ -272,83 +341,179 @@ function PosSettingsNavigation({ active }: { active: PosSettingsViewId | "pagame
 }
 
 function GeneralSettings({
-  businessName,
-  branchName
+  business,
+  terminal
 }: {
-  businessName: string;
-  branchName: string;
+  business?: PosBusinessContext;
+  terminal?: PosTerminalContext;
 }) {
+  if (!business) return <PosSettingsNotice message="Não existe um negócio disponível." />;
+  const branch = business.branches.find((item) => item.id === terminal?.branchId);
+
   return (
     <div className="pos-settings-grid">
       <SettingsCard title="Identificação do terminal" icon={<Store size={20} />}>
         <dl className="pos-settings-facts">
-          <Fact label="Negócio" value={businessName} />
-          <Fact label="Filial" value={branchName} />
-          <Fact label="Terminal" value="Sessão web atual" />
-          <Fact label="Estado" value="Terminal ainda não registado" />
+          <Fact label="Negócio" value={business.name} />
+          <Fact label="Filial" value={branch?.name ?? "Não selecionada"} />
+          <Fact label="Terminal" value={terminal?.name ?? "Não registado"} />
+          <Fact label="Código" value={terminal?.code ?? "-"} />
+          <Fact label="Estado" value={terminalStatusLabel(terminal?.status)} />
         </dl>
       </SettingsCard>
       <SettingsCard title="Localização e formato" icon={<Languages size={20} />}>
         <dl className="pos-settings-facts">
-          <Fact label="Idioma" value="Português (Moçambique)" />
-          <Fact label="Moeda" value="MZN · Metical" />
-          <Fact label="Fuso horário" value="África/Maputo" />
+          <Fact label="Idioma" value={terminal?.settings.locale ?? "pt-MZ"} />
+          <Fact label="Moeda" value={`${terminal?.settings.currency ?? "MZN"} · Metical`} />
+          <Fact label="Fuso horário" value={terminal?.settings.timezone ?? "Africa/Maputo"} />
           <Fact label="Formato de data" value="DD/MM/AAAA" />
         </dl>
       </SettingsCard>
-      <SettingsCard title="Comportamento da caixa" icon={<ReceiptText size={20} />}>
-        <SettingsRows
-          rows={[
-            ["Pedir confirmação do cliente", "Obrigatório em todas as transações"],
-            ["Imprimir comprovativo", "Apenas quando existe impressora ligada"],
-            ["Iniciar nova transação", "Depois da confirmação do operador"]
-          ]}
-        />
+      <SettingsCard
+        className="pos-settings-span"
+        title="Terminais do negócio"
+        icon={<MonitorSmartphone size={20} />}
+      >
+        <div className="pos-terminal-list">
+          {business.terminals.map((item) => (
+            <div className={item.id === terminal?.id ? "is-active" : undefined} key={item.id}>
+              <Link href={`/pos/definicoes?vista=geral&terminal=${item.id}`}>
+                <strong>{item.name}</strong>
+                <small>
+                  {item.code} · {terminalStatusLabel(item.status)}
+                </small>
+              </Link>
+              {business.canManage ? (
+                <TerminalStateActions businessId={business.id} terminal={item} />
+              ) : null}
+            </div>
+          ))}
+        </div>
+        {business.canManage ? <TerminalCreateForm business={business} /> : null}
       </SettingsCard>
-      <SettingsCard title="Pontos e saldo" icon={<Gauge size={20} />}>
-        <SettingsRows
-          rows={[
-            ["Mostrar pontos disponíveis", "Depois da identificação do cliente"],
-            ["Mostrar equivalente em MZN", "Sempre que houver saldo"],
-            ["Cálculo de pontos", "Executado e validado no servidor"]
-          ]}
-        />
-      </SettingsCard>
+      {terminal ? (
+        <SettingsCard
+          className="pos-settings-span"
+          title="Comportamento da caixa"
+          icon={<ReceiptText size={20} />}
+        >
+          {business.canManage ? (
+            <form action={updatePosTerminalSettingsAction} className="pos-persistent-form">
+              <input name="businessId" type="hidden" value={business.id} />
+              <input name="terminalId" type="hidden" value={terminal.id} />
+              <div className="pos-settings-checkboxes">
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.requireCustomerAuthorization}
+                  label="Pedir confirmação do cliente"
+                  name="requireCustomerAuthorization"
+                />
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.printReceiptAutomatically}
+                  label="Imprimir comprovativo automaticamente"
+                  name="printReceiptAutomatically"
+                />
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.showPointsBalance}
+                  label="Mostrar pontos disponíveis"
+                  name="showPointsBalance"
+                />
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.showMznEquivalent}
+                  label="Mostrar equivalente em MZN"
+                  name="showMznEquivalent"
+                />
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.allowedLookupMethods.includes("qr")}
+                  label="Identificação por QR Code"
+                  name="lookupQr"
+                />
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.allowedLookupMethods.includes("card")}
+                  label="Identificação pelo número do cartão"
+                  name="lookupCard"
+                />
+                <SettingCheckbox
+                  defaultChecked={terminal.settings.allowedLookupMethods.includes("phone")}
+                  label="Identificação por telefone"
+                  name="lookupPhone"
+                />
+              </div>
+              <label>
+                <span>Bloqueio por inatividade (minutos)</span>
+                <input
+                  defaultValue={terminal.settings.inactivityTimeoutMinutes}
+                  max={480}
+                  min={5}
+                  name="inactivity_timeout_minutes"
+                  required
+                  type="number"
+                />
+              </label>
+              <button className="pos-settings-button" type="submit">
+                Guardar definições
+              </button>
+            </form>
+          ) : (
+            <SettingsRows
+              rows={[
+                [
+                  "Confirmação do cliente",
+                  terminal.settings.requireCustomerAuthorization ? "Obrigatória" : "Opcional"
+                ],
+                [
+                  "Métodos de identificação",
+                  terminal.settings.allowedLookupMethods.join(", ").toUpperCase()
+                ],
+                ["Tempo limite", `${terminal.settings.inactivityTimeoutMinutes} minutos`]
+              ]}
+            />
+          )}
+        </SettingsCard>
+      ) : null}
     </div>
   );
 }
 
-function DeviceSettings() {
+function DeviceSettings({
+  business,
+  terminal
+}: {
+  business?: PosBusinessContext;
+  terminal?: PosTerminalContext;
+}) {
+  if (!business || !terminal) {
+    return <PosSettingsNotice message="Selecione um terminal para gerir os dispositivos." />;
+  }
+
   return (
     <div className="pos-settings-grid">
-      <DeviceCard
-        icon={<MonitorSmartphone size={22} />}
-        name="Este dispositivo"
-        detail="Navegador seguro · Sessão atual"
-        status="Não registado"
-        muted
-      />
-      <DeviceCard
-        icon={<Printer size={22} />}
-        name="Impressora térmica"
-        detail="Nenhuma impressora selecionada"
-        status="Por configurar"
-        muted
-      />
-      <DeviceCard
-        icon={<CreditCard size={22} />}
-        name="Terminal bancário"
-        detail="Operação externa ao VUYELA"
-        status="Confirmação externa"
-        muted
-      />
-      <DeviceCard
-        icon={<Smartphone size={22} />}
-        name="Câmara / QR Code"
-        detail="Permissão solicitada apenas na leitura"
-        status="Sob autorização"
-        muted
-      />
+      {terminal.devices.map((device) => (
+        <SettingsCard title={device.label} icon={<MonitorSmartphone size={22} />} key={device.id}>
+          <p className="pos-settings-copy">
+            {deviceTypeLabel(device.type)} · {device.deviceReference}
+          </p>
+          <span
+            className={`pos-config-status pos-config-status--${device.status === "active" ? "success" : "muted"}`}
+          >
+            {deviceStatusLabel(device.status)}
+          </span>
+          {business.canManage ? (
+            <DeviceStateActions businessId={business.id} device={device} terminalId={terminal.id} />
+          ) : null}
+        </SettingsCard>
+      ))}
+      {terminal.devices.length === 0 ? (
+        <DeviceCard
+          icon={<MonitorSmartphone size={22} />}
+          name="Sem dispositivos"
+          detail="Registe um dispositivo para este terminal."
+          status="Por configurar"
+          muted
+        />
+      ) : null}
+      {business.canManage ? (
+        <DeviceCreateForm businessId={business.id} terminalId={terminal.id} />
+      ) : null}
       <SettingsCard
         className="pos-settings-span"
         title="Política dos dispositivos"
@@ -366,15 +531,22 @@ function DeviceSettings() {
   );
 }
 
-function PrinterSettings() {
+function PrinterSettings({ terminal }: { terminal?: PosTerminalContext }) {
+  const printer = terminal?.devices.find(
+    (device) => device.type === "printer" && device.status === "active"
+  );
   return (
     <div className="pos-settings-grid">
       <SettingsCard title="Impressora de recibos" icon={<Printer size={20} />}>
         <div className="pos-settings-callout pos-settings-callout--muted">
           <Printer size={24} />
           <div>
-            <strong>Impressora não ligada</strong>
-            <p>O comprovativo digital continua sempre disponível.</p>
+            <strong>{printer ? printer.label : "Impressora não ligada"}</strong>
+            <p>
+              {printer
+                ? "Dispositivo ativo neste terminal."
+                : "O comprovativo digital continua sempre disponível."}
+            </p>
           </div>
         </div>
         <dl className="pos-settings-facts">
@@ -397,15 +569,21 @@ function PrinterSettings() {
   );
 }
 
-function NetworkSettings() {
+function NetworkSettings({ terminal }: { terminal?: PosTerminalContext }) {
   return (
     <div className="pos-settings-grid">
       <SettingsCard title="Estado da ligação" icon={<Wifi size={20} />}>
         <div className="pos-network-status pos-network-status--muted">
           <span />
           <div>
-            <strong>Estado não monitorizado</strong>
-            <p>Esta sessão ainda não está associada a um terminal registado.</p>
+            <strong>
+              {terminal?.status === "active" ? "Terminal ativo" : "Terminal indisponível"}
+            </strong>
+            <p>
+              {terminal?.lastSeenAt
+                ? `Última atividade: ${formatDateTime(terminal.lastSeenAt)}`
+                : "A atividade será registada na primeira transação."}
+            </p>
           </div>
         </div>
         <dl className="pos-settings-facts">
@@ -509,6 +687,247 @@ function SecuritySettings() {
         </div>
       </SettingsCard>
     </div>
+  );
+}
+
+function TerminalCreateForm({ business }: { business: PosBusinessContext }) {
+  return (
+    <details className="pos-settings-editor">
+      <summary>
+        <Plus aria-hidden="true" size={16} /> Registar terminal
+      </summary>
+      <form action={managePosTerminalAction} className="pos-persistent-form">
+        <input name="businessId" type="hidden" value={business.id} />
+        <input name="operation" type="hidden" value="create" />
+        <label>
+          <span>Nome</span>
+          <input maxLength={100} minLength={2} name="name" placeholder="POS Balcão 2" required />
+        </label>
+        <label>
+          <span>Filial</span>
+          <select name="branchId" required>
+            {business.branches.map((branch) => (
+              <option key={branch.id} value={branch.id}>
+                {branch.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Código personalizado (opcional)</span>
+          <input name="code" pattern="POS-[0-9A-Z-]{4,32}" placeholder="POS-MAPUTO-02" />
+        </label>
+        <button className="pos-settings-button" type="submit">
+          Criar terminal
+        </button>
+      </form>
+    </details>
+  );
+}
+
+function TerminalStateActions({
+  businessId,
+  terminal
+}: {
+  businessId: string;
+  terminal: PosTerminalContext;
+}) {
+  if (terminal.status === "revoked") return null;
+  const operation = terminal.status === "active" ? "suspend" : "activate";
+
+  return (
+    <div className="pos-settings-inline-actions">
+      <form action={managePosTerminalAction}>
+        <input name="businessId" type="hidden" value={businessId} />
+        <input name="terminalId" type="hidden" value={terminal.id} />
+        <input name="operation" type="hidden" value={operation} />
+        <button type="submit">{operation === "activate" ? "Ativar" : "Suspender"}</button>
+      </form>
+      {terminal.status !== "active" ? (
+        <form action={managePosTerminalAction}>
+          <input name="businessId" type="hidden" value={businessId} />
+          <input name="terminalId" type="hidden" value={terminal.id} />
+          <input name="operation" type="hidden" value="revoke" />
+          <button className="is-danger" title="Revogar terminal" type="submit">
+            <Trash2 aria-hidden="true" size={14} />
+          </button>
+        </form>
+      ) : null}
+    </div>
+  );
+}
+
+function DeviceCreateForm({ businessId, terminalId }: { businessId: string; terminalId: string }) {
+  return (
+    <SettingsCard
+      className="pos-settings-span"
+      title="Registar dispositivo"
+      icon={<Plus size={20} />}
+    >
+      <form action={managePosTerminalDeviceAction} className="pos-persistent-form">
+        <input name="businessId" type="hidden" value={businessId} />
+        <input name="terminalId" type="hidden" value={terminalId} />
+        <input name="operation" type="hidden" value="create" />
+        <label>
+          <span>Tipo</span>
+          <select name="deviceType">
+            <option value="browser">Navegador</option>
+            <option value="camera">Câmara</option>
+            <option value="printer">Impressora</option>
+            <option value="card_terminal">Terminal bancário</option>
+            <option value="other">Outro</option>
+          </select>
+        </label>
+        <label>
+          <span>Nome</span>
+          <input
+            maxLength={100}
+            minLength={2}
+            name="label"
+            placeholder="Impressora do balcão"
+            required
+          />
+        </label>
+        <label>
+          <span>Referência do dispositivo</span>
+          <input
+            maxLength={200}
+            minLength={8}
+            name="deviceReference"
+            placeholder="USB-PRINTER-001"
+            required
+          />
+        </label>
+        <button className="pos-settings-button" type="submit">
+          Registar dispositivo
+        </button>
+      </form>
+    </SettingsCard>
+  );
+}
+
+function DeviceStateActions({
+  businessId,
+  device,
+  terminalId
+}: {
+  businessId: string;
+  device: PosDeviceContext;
+  terminalId: string;
+}) {
+  if (device.status === "revoked") return null;
+  const operation = device.status === "pending" ? "activate" : "revoke";
+
+  return (
+    <form action={managePosTerminalDeviceAction} className="pos-settings-actions">
+      <input name="businessId" type="hidden" value={businessId} />
+      <input name="terminalId" type="hidden" value={terminalId} />
+      <input name="deviceId" type="hidden" value={device.id} />
+      <input name="deviceType" type="hidden" value={device.type} />
+      <input name="operation" type="hidden" value={operation} />
+      <button className="pos-settings-button pos-settings-button--secondary" type="submit">
+        {operation === "activate" ? "Ativar dispositivo" : "Revogar dispositivo"}
+      </button>
+    </form>
+  );
+}
+
+function SettingCheckbox({
+  defaultChecked,
+  label,
+  name
+}: {
+  defaultChecked: boolean;
+  label: string;
+  name: string;
+}) {
+  return (
+    <label>
+      <input defaultChecked={defaultChecked} name={name} type="checkbox" />
+      <span>{label}</span>
+    </label>
+  );
+}
+
+function PaymentChannelForm({
+  businessId,
+  channel,
+  label,
+  operation
+}: {
+  businessId: string;
+  channel: PosPaymentChannelContext;
+  label: string;
+  operation: "activate" | "suspend";
+}) {
+  return (
+    <form action={managePosPaymentChannelAction}>
+      <input name="businessId" type="hidden" value={businessId} />
+      <input name="channelId" type="hidden" value={channel.id} />
+      <input name="method" type="hidden" value={channel.method} />
+      <input name="operation" type="hidden" value={operation} />
+      <button className="pos-settings-button" type="submit">
+        {label}
+      </button>
+    </form>
+  );
+}
+
+function PosSettingsResult({ result }: { result?: string }) {
+  if (!result) return null;
+  const messages: Record<string, string> = {
+    guardado: "Alteração guardada e registada na auditoria.",
+    "dados-invalidos": "Existem dados inválidos ou incompletos.",
+    "nao-configurado": "Este canal ainda não tem a configuração necessária.",
+    erro: "Não foi possível concluir a alteração. Confirme as permissões."
+  };
+  const success = result === "guardado";
+
+  return (
+    <p className={`pos-message pos-message--${success ? "success" : "error"}`} role="status">
+      {messages[result] ?? messages.erro}
+    </p>
+  );
+}
+
+function terminalStatusLabel(status: PosTerminalContext["status"] | undefined) {
+  if (status === "active") return "Ativo";
+  if (status === "suspended") return "Suspenso";
+  if (status === "revoked") return "Revogado";
+  return "Em preparação";
+}
+
+function deviceTypeLabel(type: PosDeviceContext["type"]) {
+  const labels: Record<PosDeviceContext["type"], string> = {
+    browser: "Navegador",
+    camera: "Câmara",
+    printer: "Impressora",
+    card_terminal: "Terminal bancário",
+    other: "Outro dispositivo"
+  };
+  return labels[type];
+}
+
+function deviceStatusLabel(status: PosDeviceContext["status"]) {
+  return status === "active" ? "Ativo" : status === "revoked" ? "Revogado" : "Pendente";
+}
+
+function paymentViewToMethod(view: PosPaymentViewId): PosPaymentChannelContext["method"] {
+  if (view === "dinheiro") return "cash";
+  if (view === "cartao") return "card";
+  return view;
+}
+
+function paymentChannelStatusLabel(channel?: PosPaymentChannelContext) {
+  if (!channel || channel.status === "unconfigured") return "Por configurar";
+  if (channel.status === "testing") return "Em testes";
+  if (channel.status === "suspended") return "Suspenso";
+  return channel.mode === "manual" ? "Confirmação manual ativa" : "Ligado ao provedor";
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("pt-MZ", { dateStyle: "medium", timeStyle: "short" }).format(
+    new Date(value)
   );
 }
 

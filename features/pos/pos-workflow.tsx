@@ -27,11 +27,18 @@ import type { PosPaymentMethod } from "./model";
 import { PosQrScanner } from "./pos-qr-scanner";
 import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
-import type { PosBusinessContext, PosContextState } from "./data";
+import type {
+  PosBusinessContext,
+  PosCatalogItemContext,
+  PosContextState,
+  PosPaymentChannelContext
+} from "./data";
 
 interface PosWorkflowProps {
   context: PosContextState;
 }
+
+const defaultLookupMethods: Array<"qr" | "card" | "phone"> = ["qr", "card", "phone"];
 
 export function PosWorkflow({ context }: PosWorkflowProps) {
   const [state, formAction, pending] = useActionState(submitPosAction, initialPosActionState);
@@ -58,6 +65,12 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
           ? "services"
           : "identify";
   const [quoteIdempotencyKey, setQuoteIdempotencyKey] = useState("");
+  const selectedCatalogItems = selectedBusiness?.catalogItems.filter(
+    (item) => item.branchId === null || item.branchId === state.branchId
+  );
+  const selectedPaymentChannels = selectedBusiness?.paymentChannels.filter(
+    (channel) => channel.branchId === null || channel.branchId === state.branchId
+  );
 
   useEffect(() => {
     setQuoteIdempotencyKey(createBrowserIdempotencyKey());
@@ -102,6 +115,8 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
               idempotencyKey={state.idempotencyKey || quoteIdempotencyKey}
               pending={pending}
               maximumPoints={state.card.availablePoints}
+              terminalId={state.terminalId}
+              catalogItems={selectedCatalogItems ?? []}
             />
           ) : null}
 
@@ -113,6 +128,7 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
                 customerAuthorized={customerAuthorized}
                 formAction={formAction}
                 idempotencyKey={state.idempotencyKey}
+                terminalId={state.terminalId}
                 onAuthorizationChange={setCustomerAuthorized}
                 onBack={() => setPaymentMethod(null)}
                 paymentMethod={paymentMethod}
@@ -120,7 +136,11 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
                 state={state}
               />
             ) : (
-              <AuthorizationStep onSelect={setPaymentMethod} quote={state.quote} />
+              <AuthorizationStep
+                channels={selectedPaymentChannels ?? []}
+                onSelect={setPaymentMethod}
+                quote={state.quote}
+              />
             )
           ) : null}
 
@@ -195,15 +215,37 @@ function IdentifyForm({
     branches: [],
     defaultBranchId: "",
     requiresBranch: true,
-    roleLabels: []
+    roleLabels: [],
+    canManage: false,
+    terminals: [],
+    paymentChannels: [],
+    catalogItems: []
   };
   const [selectedBusinessId, setSelectedBusinessId] = useState(firstBusiness.id);
   const selectedBusiness =
     businesses.find((business) => business.id === selectedBusinessId) ?? firstBusiness;
   const [selectedBranchId, setSelectedBranchId] = useState(selectedBusiness.defaultBranchId);
+  const terminalsForBranch = selectedBusiness.terminals.filter(
+    (terminal) => terminal.branchId === selectedBranchId && terminal.status === "active"
+  );
+  const [selectedTerminalId, setSelectedTerminalId] = useState(terminalsForBranch[0]?.id ?? "");
   const [lookupMethod, setLookupMethod] = useState<"qr" | "card" | "phone">("qr");
   const [lookupValue, setLookupValue] = useState("");
   const lookupInputRef = useRef<HTMLInputElement>(null);
+  const selectedTerminal = terminalsForBranch.find(
+    (terminal) => terminal.id === selectedTerminalId
+  );
+  const allowedLookupMethods = useMemo(
+    () => selectedTerminal?.settings.allowedLookupMethods ?? defaultLookupMethods,
+    [selectedTerminal]
+  );
+
+  useEffect(() => {
+    if (!allowedLookupMethods.includes(lookupMethod)) {
+      setLookupMethod(allowedLookupMethods[0] ?? "qr");
+      setLookupValue("");
+    }
+  }, [allowedLookupMethods, lookupMethod]);
 
   const methodConfig = {
     qr: {
@@ -240,6 +282,12 @@ function IdentifyForm({
 
             setSelectedBusinessId(nextBusiness.id);
             setSelectedBranchId(nextBusiness.defaultBranchId);
+            setSelectedTerminalId(
+              nextBusiness.terminals.find(
+                (terminal) =>
+                  terminal.branchId === nextBusiness.defaultBranchId && terminal.status === "active"
+              )?.id ?? ""
+            );
           }}
           requiredMark
           required
@@ -256,7 +304,13 @@ function IdentifyForm({
           name="branchId"
           value={selectedBranchId}
           onChange={(event) => {
-            setSelectedBranchId(event.currentTarget.value);
+            const nextBranchId = event.currentTarget.value;
+            setSelectedBranchId(nextBranchId);
+            setSelectedTerminalId(
+              selectedBusiness.terminals.find(
+                (terminal) => terminal.branchId === nextBranchId && terminal.status === "active"
+              )?.id ?? ""
+            );
           }}
           required={selectedBusiness.requiresBranch}
           requiredMark={selectedBusiness.requiresBranch}
@@ -265,6 +319,22 @@ function IdentifyForm({
           {selectedBusiness.branches.map((branch) => (
             <option value={branch.id} key={branch.id}>
               {branch.name} - {branch.city}
+            </option>
+          ))}
+        </Select>
+
+        <Select
+          label="Terminal"
+          name="terminalId"
+          value={selectedTerminalId}
+          onChange={(event) => setSelectedTerminalId(event.currentTarget.value)}
+          requiredMark
+          required
+        >
+          {terminalsForBranch.length === 0 ? <option value="">Nenhum terminal ativo</option> : null}
+          {terminalsForBranch.map((terminal) => (
+            <option value={terminal.id} key={terminal.id}>
+              {terminal.name} · {terminal.code}
             </option>
           ))}
         </Select>
@@ -279,27 +349,29 @@ function IdentifyForm({
               { id: "card", label: "Cartão", icon: Hash },
               { id: "phone", label: "Telefone", icon: Phone }
             ] as const
-          ).map((method) => {
-            const Icon = method.icon;
-            const selected = lookupMethod === method.id;
+          )
+            .filter((method) => allowedLookupMethods.includes(method.id))
+            .map((method) => {
+              const Icon = method.icon;
+              const selected = lookupMethod === method.id;
 
-            return (
-              <button
-                aria-checked={selected}
-                className={selected ? "is-active" : undefined}
-                key={method.id}
-                onClick={() => {
-                  setLookupMethod(method.id);
-                  setLookupValue("");
-                }}
-                role="radio"
-                type="button"
-              >
-                <Icon aria-hidden="true" size={18} />
-                <span>{method.label}</span>
-              </button>
-            );
-          })}
+              return (
+                <button
+                  aria-checked={selected}
+                  className={selected ? "is-active" : undefined}
+                  key={method.id}
+                  onClick={() => {
+                    setLookupMethod(method.id);
+                    setLookupValue("");
+                  }}
+                  role="radio"
+                  type="button"
+                >
+                  <Icon aria-hidden="true" size={18} />
+                  <span>{method.label}</span>
+                </button>
+              );
+            })}
         </div>
       </fieldset>
 
@@ -339,6 +411,7 @@ function IdentifyForm({
         size="lg"
         fullWidth
         loading={pending}
+        disabled={!selectedTerminalId}
         leadingIcon={<ScanLine aria-hidden="true" size={20} />}
       >
         Validar cliente
@@ -353,7 +426,9 @@ function QuoteForm({
   formAction,
   pending,
   idempotencyKey,
-  maximumPoints
+  maximumPoints,
+  terminalId,
+  catalogItems
 }: {
   businessId: string;
   branchId: string;
@@ -361,12 +436,15 @@ function QuoteForm({
   idempotencyKey: string;
   pending: boolean;
   maximumPoints: number;
+  terminalId: string;
+  catalogItems: PosCatalogItemContext[];
 }) {
   return (
     <form action={formAction} className="pos-form">
       <input type="hidden" name="intent" value="quote" />
       <input type="hidden" name="businessId" value={businessId} />
       <input type="hidden" name="branchId" value={branchId} />
+      <input type="hidden" name="terminalId" value={terminalId} />
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
 
       <div className="pos-form__intro">
@@ -377,8 +455,17 @@ function QuoteForm({
         </div>
       </div>
 
+      <Select label="Serviço ou produto" name="catalogItemId">
+        <option value="">Venda livre</option>
+        {catalogItems.map((item) => (
+          <option value={item.id} key={item.id}>
+            {item.name} · {formatMznMinor(item.priceMznMinor)}
+          </option>
+        ))}
+      </Select>
+
       <Input
-        label="Descrição do serviço ou produto"
+        label="Descrição no comprovativo"
         name="serviceDescription"
         maxLength={160}
         placeholder="Ex.: Corte masculino + barba"
@@ -425,9 +512,11 @@ function QuoteForm({
 
 function AuthorizationStep({
   quote,
+  channels,
   onSelect
 }: {
   quote: NonNullable<PosActionState["quote"]>;
+  channels: PosPaymentChannelContext[];
   onSelect: (method: PosPaymentMethod) => void;
 }) {
   const methods: Array<{
@@ -436,43 +525,54 @@ function AuthorizationStep({
     detail: string;
     icon: typeof Smartphone;
     enabled: boolean;
-  }> = [
-    {
-      id: "mpesa",
-      label: "M-Pesa",
-      detail: "Por configurar",
-      icon: Smartphone,
-      enabled: false
-    },
-    {
-      id: "emola",
-      label: "e-Mola",
-      detail: "Por configurar",
-      icon: Smartphone,
-      enabled: false
-    },
-    {
-      id: "mkesh",
-      label: "mKesh",
-      detail: "Por configurar",
-      icon: Smartphone,
-      enabled: false
-    },
-    {
-      id: "cash",
-      label: "Dinheiro",
-      detail: "Confirmação manual",
-      icon: Banknote,
-      enabled: true
-    },
-    {
-      id: "card",
-      label: "Cartão",
-      detail: "Confirmação externa",
-      icon: WalletCards,
-      enabled: true
-    }
-  ];
+  }> =
+    quote.netAmountMznMinor === 0
+      ? [
+          {
+            id: "points",
+            label: "Pontos VUYELA",
+            detail: "Compra totalmente liquidada",
+            icon: BadgeCheck,
+            enabled: true
+          }
+        ]
+      : [
+          {
+            id: "mpesa",
+            label: "M-Pesa",
+            detail: channelDetail(channels, "mpesa"),
+            icon: Smartphone,
+            enabled: false
+          },
+          {
+            id: "emola",
+            label: "e-Mola",
+            detail: channelDetail(channels, "emola"),
+            icon: Smartphone,
+            enabled: false
+          },
+          {
+            id: "mkesh",
+            label: "mKesh",
+            detail: channelDetail(channels, "mkesh"),
+            icon: Smartphone,
+            enabled: false
+          },
+          {
+            id: "cash",
+            label: "Dinheiro",
+            detail: channelDetail(channels, "cash"),
+            icon: Banknote,
+            enabled: channelIsActive(channels, "cash")
+          },
+          {
+            id: "card",
+            label: "Cartão",
+            detail: channelDetail(channels, "card"),
+            icon: WalletCards,
+            enabled: channelIsActive(channels, "card")
+          }
+        ];
 
   return (
     <section className="pos-authorization" aria-labelledby="pos-payment-title">
@@ -507,8 +607,8 @@ function AuthorizationStep({
         })}
       </div>
       <p className="pos-form-hint">
-        Nesta fase, o POS regista apenas o método escolhido. Nenhuma cobrança é iniciada num
-        provedor e a confirmação financeira é sempre manual.
+        Dinheiro e cartão são reconciliados no servidor. Os canais móveis só ficam disponíveis
+        depois da configuração segura das credenciais do respetivo provedor.
       </p>
     </section>
   );
@@ -519,6 +619,7 @@ function ConfirmForm({
   branchId,
   formAction,
   idempotencyKey,
+  terminalId,
   customerAuthorized,
   onAuthorizationChange,
   onBack,
@@ -530,6 +631,7 @@ function ConfirmForm({
   branchId: string;
   formAction: (formData: FormData) => void;
   idempotencyKey: string;
+  terminalId: string;
   customerAuthorized: boolean;
   onAuthorizationChange: (value: boolean) => void;
   onBack: () => void;
@@ -542,6 +644,7 @@ function ConfirmForm({
       <input type="hidden" name="intent" value="confirm" />
       <input type="hidden" name="businessId" value={businessId} />
       <input type="hidden" name="branchId" value={branchId} />
+      <input type="hidden" name="terminalId" value={terminalId} />
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
       <input type="hidden" name="paymentMethod" value={paymentMethod} />
 
@@ -571,6 +674,17 @@ function ConfirmForm({
           <dd>{state.quote ? formatMznMinor(state.quote.netAmountMznMinor) : "-"}</dd>
         </div>
       </dl>
+
+      {paymentMethod === "card" ? (
+        <Input
+          label="Referência do terminal bancário"
+          name="paymentReference"
+          maxLength={100}
+          placeholder="Ex.: TPA-984251"
+          requiredMark
+          required
+        />
+      ) : null}
 
       <label className="pos-check">
         <input
@@ -629,7 +743,7 @@ function SuccessState({
       <dl className="pos-success__receipt">
         <div>
           <dt>Referência</dt>
-          <dd>{state.transactionId ?? "-"}</dd>
+          <dd>{state.receiptNumber ?? state.transactionId ?? "-"}</dd>
         </div>
         <div>
           <dt>Total pago</dt>
@@ -642,6 +756,10 @@ function SuccessState({
         <div>
           <dt>Método</dt>
           <dd>{state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}</dd>
+        </div>
+        <div>
+          <dt>Pagamento</dt>
+          <dd>{state.paymentStatus === "reconciled" ? "Reconciliado" : "Não necessário"}</dd>
         </div>
       </dl>
       <small className="pos-success__key">Anti-duplicação: {idempotencyKey}</small>
@@ -778,10 +896,30 @@ function paymentMethodLabel(method: PosPaymentMethod): string {
     emola: "e-Mola",
     mkesh: "mKesh",
     cash: "Dinheiro",
-    card: "Cartão bancário"
+    card: "Cartão bancário",
+    points: "Pontos VUYELA"
   };
 
   return labels[method];
+}
+
+function channelIsActive(
+  channels: PosPaymentChannelContext[],
+  method: PosPaymentChannelContext["method"]
+) {
+  return channels.some((channel) => channel.method === method && channel.status === "active");
+}
+
+function channelDetail(
+  channels: PosPaymentChannelContext[],
+  method: PosPaymentChannelContext["method"]
+) {
+  const channel = channels.find((candidate) => candidate.method === method);
+
+  if (!channel || channel.status === "unconfigured") return "Por configurar";
+  if (channel.status === "testing") return "Em testes";
+  if (channel.status === "suspended") return "Suspenso";
+  return channel.mode === "manual" ? "Confirmação manual" : "Ligado ao provedor";
 }
 
 function createBrowserIdempotencyKey() {

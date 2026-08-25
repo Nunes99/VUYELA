@@ -2,8 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Bell, BellOff, CheckCircle2, Heart, X } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
+import {
+  activateCustomerOfferAction,
+  cancelCustomerOfferClaimAction,
+  updateCustomerBusinessPreferenceAction
+} from "./actions";
 import type { CustomerExploreOffer } from "./model";
 
 interface CustomerOfferGridProps {
@@ -75,14 +81,102 @@ export function CustomerOfferGrid({ offers, limit, showFilters = false }: Custom
               <span>{offer.categoryName ?? "Oferta"}</span>
             </div>
             <div>
-              <small>{offer.businessName}</small>
+              <div className="customer-offer-card__heading">
+                <small>{offer.businessName}</small>
+                {offer.customerCardId ? (
+                  <div className="customer-offer-card__preferences">
+                    <PreferenceForm
+                      icon={Heart}
+                      label={offer.isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                      offer={offer}
+                      nextFavorite={!offer.isFavorite}
+                      nextNotifications={offer.offerNotificationsEnabled}
+                      pressed={offer.isFavorite}
+                    />
+                    <PreferenceForm
+                      icon={offer.offerNotificationsEnabled ? Bell : BellOff}
+                      label={
+                        offer.offerNotificationsEnabled
+                          ? "Desativar avisos deste negócio"
+                          : "Ativar avisos deste negócio"
+                      }
+                      offer={offer}
+                      nextFavorite={offer.isFavorite}
+                      nextNotifications={!offer.offerNotificationsEnabled}
+                      pressed={offer.offerNotificationsEnabled}
+                    />
+                  </div>
+                ) : null}
+              </div>
               <h3>{offer.title}</h3>
               <p>{offer.description}</p>
-              <Link href={offer.href ?? "/ofertas"}>Ver oferta</Link>
+              {offer.claimStatus === "activated" && offer.claimId ? (
+                <div className="customer-offer-claim">
+                  <span>
+                    <CheckCircle2 aria-hidden="true" size={16} /> Oferta ativa
+                  </span>
+                  <strong>{offer.claimCode}</strong>
+                  <small>
+                    {offer.claimExpiresAt
+                      ? `Válida até ${formatDate(offer.claimExpiresAt)}`
+                      : "Sem data limite"}
+                  </small>
+                  <form action={cancelCustomerOfferClaimAction}>
+                    <input name="claimId" type="hidden" value={offer.claimId} />
+                    <input name="offerId" type="hidden" value={offer.id} />
+                    <button type="submit">
+                      <X aria-hidden="true" size={14} /> Cancelar
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <div className="customer-offer-card__actions">
+                  <Link href={offer.href ?? "/ofertas"}>Ver oferta</Link>
+                  {offer.customerCardId && offer.claimStatus !== "redeemed" ? (
+                    <form action={activateCustomerOfferAction}>
+                      <input name="offerId" type="hidden" value={offer.id} />
+                      <input name="customerCardId" type="hidden" value={offer.customerCardId} />
+                      <button type="submit">Ativar benefício</button>
+                    </form>
+                  ) : null}
+                </div>
+              )}
             </div>
           </article>
         ))}
       </div>
     </>
   );
+}
+
+function PreferenceForm({
+  icon: Icon,
+  label,
+  nextFavorite,
+  nextNotifications,
+  offer,
+  pressed
+}: {
+  icon: typeof Heart;
+  label: string;
+  nextFavorite: boolean;
+  nextNotifications: boolean;
+  offer: CustomerExploreOffer;
+  pressed: boolean;
+}) {
+  return (
+    <form action={updateCustomerBusinessPreferenceAction}>
+      <input name="businessId" type="hidden" value={offer.businessId} />
+      <input name="offerId" type="hidden" value={offer.id} />
+      <input name="isFavorite" type="hidden" value={String(nextFavorite)} />
+      <input name="offerNotificationsEnabled" type="hidden" value={String(nextNotifications)} />
+      <button aria-label={label} aria-pressed={pressed} title={label} type="submit">
+        <Icon aria-hidden="true" size={16} />
+      </button>
+    </form>
+  );
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("pt-MZ", { dateStyle: "medium" }).format(new Date(value));
 }

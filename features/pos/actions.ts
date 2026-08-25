@@ -28,6 +28,9 @@ interface PosLookupRow {
 interface PosTransactionRow {
   transaction_id: string;
   available_balance: number;
+  payment_attempt_id: string | null;
+  payment_status: string;
+  receipt_number: string;
 }
 
 export async function submitPosAction(
@@ -102,6 +105,10 @@ export async function identifyPosCustomerAction(
     return businessId.state;
   }
   const branchId = getFormString(formData, "branchId");
+  const terminalId = getRequiredFormString(formData, "terminalId", "Terminal");
+  if (!terminalId.ok) {
+    return terminalId.state;
+  }
 
   const lookupMethod = getFormString(formData, "lookupMethod");
   if (!isLookupMethod(lookupMethod)) {
@@ -151,6 +158,7 @@ export async function identifyPosCustomerAction(
     message: "Cliente identificado. Introduza o valor da compra.",
     businessId: businessId.value,
     branchId,
+    terminalId: terminalId.value,
     card: {
       customerCardId: row.customer_card_id,
       customerName: row.customer_name,
@@ -210,6 +218,7 @@ export async function quotePosTransactionAction(
     card: previousState.card
   });
   const serviceDescription = getFormString(formData, "serviceDescription").slice(0, 160);
+  const catalogItemId = getFormString(formData, "catalogItemId");
 
   return {
     ...previousState,
@@ -217,6 +226,7 @@ export async function quotePosTransactionAction(
     message: "Valor calculado. Confirme com o cliente.",
     quote,
     serviceDescription,
+    catalogItemId,
     transactionId: null,
     idempotencyKey: getIdempotencyKey(formData, { ...previousState, quote })
   };
@@ -240,8 +250,11 @@ export async function confirmPosTransactionAction(
     return createErrorState("Confirme a autorização do cliente antes de concluir.", previousState);
   }
 
-  const branchId = getFormString(formData, "branchId") || previousState.branchId || null;
-  const cashierMemberId = getFormString(formData, "cashierMemberId") || null;
+  const branchId = getFormString(formData, "branchId") || previousState.branchId;
+  const terminalId = getFormString(formData, "terminalId") || previousState.terminalId;
+  if (!branchId || !terminalId) {
+    return createErrorState("Selecione uma filial e um terminal ativos.", previousState);
+  }
   const paymentMethodValue = getFormString(formData, "paymentMethod");
 
   if (!isPosPaymentMethod(paymentMethodValue)) {
@@ -254,6 +267,16 @@ export async function confirmPosTransactionAction(
       previousState
     );
   }
+  if (previousState.quote.netAmountMznMinor === 0 && paymentMethodValue !== "points") {
+    return createErrorState("Esta compra está totalmente liquidada com pontos.", previousState);
+  }
+  if (previousState.quote.netAmountMznMinor > 0 && paymentMethodValue === "points") {
+    return createErrorState("Selecione um método para pagar o valor restante.", previousState);
+  }
+  const paymentReference = getFormString(formData, "paymentReference");
+  if (paymentMethodValue === "card" && paymentReference.length < 4) {
+    return createErrorState("Indique a referência emitida pelo terminal bancário.", previousState);
+  }
   const idempotencyKey = getIdempotencyKey(formData, previousState);
 
   if (!isValidIdempotencyKey(idempotencyKey)) {
@@ -265,24 +288,23 @@ export async function confirmPosTransactionAction(
   }
 
   const supabase = await createSupabaseServerClient();
-  const rpcName =
-    previousState.quote.pointsToRedeem > 0 ? "redeem_purchase_points" : "record_purchase_points";
-  const { data, error } = await supabase.rpc(rpcName, {
+  const { data, error } = await supabase.rpc("confirm_pos_transaction", {
     p_business_id: businessId,
     p_branch_id: branchId,
+    p_terminal_id: terminalId,
     p_customer_card_id: previousState.card.customerCardId,
     p_gross_amount_mzn_minor: previousState.quote.grossAmountMznMinor,
     p_discount_amount_mzn_minor: previousState.quote.discountAmountMznMinor,
-    ...(previousState.quote.pointsToRedeem > 0
-      ? { p_points_to_redeem: previousState.quote.pointsToRedeem }
-      : {}),
-    p_cashier_member_id: cashierMemberId,
-    p_external_reference: idempotencyKey,
+    p_points_to_redeem: previousState.quote.pointsToRedeem,
+    p_expected_net_amount_mzn_minor: previousState.quote.netAmountMznMinor,
+    p_payment_method: paymentMethodValue,
+    p_payment_reference: paymentReference || null,
+    p_idempotency_key: idempotencyKey,
     p_metadata: {
       source: "pos",
       customer_authorized: getFormString(formData, "customerAuthorized") === "on",
       service_description: previousState.serviceDescription || null,
-      payment_method: paymentMethodValue
+      catalog_item_id: previousState.catalogItemId || null
     }
   });
 
@@ -308,7 +330,10 @@ export async function confirmPosTransactionAction(
     message: "Transação confirmada com sucesso.",
     transactionId: row?.transaction_id ?? null,
     idempotencyKey,
-    paymentMethod: paymentMethodValue
+    paymentMethod: paymentMethodValue,
+    paymentAttemptId: row?.payment_attempt_id ?? null,
+    paymentStatus: row?.payment_status ?? null,
+    receiptNumber: row?.receipt_number ?? null
   };
 }
 

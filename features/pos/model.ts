@@ -32,7 +32,7 @@ export interface PosQuote {
 }
 
 export type PosLookupMethod = "qr" | "card" | "phone";
-export type PosPaymentMethod = "mpesa" | "emola" | "mkesh" | "cash" | "card";
+export type PosPaymentMethod = "mpesa" | "emola" | "mkesh" | "cash" | "card" | "points";
 
 export interface NormalizedPosLookup {
   method: PosLookupMethod;
@@ -55,14 +55,15 @@ export function isPosPaymentMethod(value: string): value is PosPaymentMethod {
     value === "emola" ||
     value === "mkesh" ||
     value === "cash" ||
-    value === "card"
+    value === "card" ||
+    value === "points"
   );
 }
 
 export function isAvailablePosPaymentMethod(
   value: PosPaymentMethod
-): value is Extract<PosPaymentMethod, "cash" | "card"> {
-  return value === "cash" || value === "card";
+): value is Extract<PosPaymentMethod, "cash" | "card" | "points"> {
+  return value === "cash" || value === "card" || value === "points";
 }
 
 const MONEY_PATTERN = /^\d+(?:[,.]\d{1,2})?$/;

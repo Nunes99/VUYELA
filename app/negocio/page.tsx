@@ -6,6 +6,7 @@ import {
   parseBusinessDashboardView
 } from "@/features/business-dashboard/dashboard";
 import { getBusinessDashboard } from "@/features/business-dashboard/data";
+import { getBusinessOperations } from "@/features/business-operations/data";
 import {
   BusinessPortalShell,
   type BusinessPortalSection
@@ -41,10 +42,20 @@ export default async function BusinessAreaPage({
           branchId: getSearchParam(params.branchId)
         })
       : null;
+  const operationViews = new Set(["filiais", "equipa", "catalogo", "cartoes", "clientes"]);
+  const operationsState =
+    dashboardState?.status === "ready" && operationViews.has(view)
+      ? await getBusinessOperations(
+          dashboardState.selectedBusinessId,
+          dashboardState.dashboard.hasManagerScope
+        )
+      : null;
 
   const sectionByView: Record<typeof view, BusinessPortalSection> = {
     dashboard: "dashboard",
     filiais: "branches",
+    equipa: "team",
+    catalogo: "catalog",
     cartoes: "cards",
     clientes: "customers",
     fidelizacao: "loyalty",
@@ -61,7 +72,12 @@ export default async function BusinessAreaPage({
           principal={state.principal}
           title={view === "dashboard" ? "Painel do Negócio" : undefined}
         >
-          <BusinessDashboardView state={dashboardState} view={view} />
+          <BusinessDashboardView
+            operationResult={getSearchParam(params.resultado)}
+            operationsState={operationsState}
+            state={dashboardState}
+            view={view}
+          />
         </BusinessPortalShell>
       ) : null}
     </ProtectedRouteStateView>

@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   CreditCard,
   Database,
+  Download,
   FileClock,
   Globe2,
   KeyRound,
@@ -27,10 +28,13 @@ import type { AuthPrincipal } from "@/lib/auth/rbac";
 import {
   BusinessCategoryForm,
   BusinessReviewForm,
-  FraudReviewForm,
+  FraudTriageForm,
+  PlatformSettingsForm,
   PlanEntitlementsForm,
   SubscriptionPlanForm,
+  SupportReplyForm,
   SupportTicketForm,
+  UserAccountStatusForm,
   UserRoleForm
 } from "./action-forms";
 import { AdminDonut, AdminLineChart, AdminShareBars } from "./admin-charts";
@@ -64,6 +68,7 @@ export function AdminViewContent({
   return (
     <section className="admin-view">
       <AdminBreadcrumb view={state.view} />
+      <AdminCollectionControls state={state} />
       {state.view === "overview" && state.metrics && state.analytics ? (
         <Overview
           analytics={state.analytics}
@@ -98,12 +103,14 @@ export function AdminViewContent({
       {state.view === "support" ? (
         <SupportList operators={state.operators} query={state.query} tickets={state.tickets} />
       ) : null}
-      {state.view === "fraud" ? <FraudList events={state.fraudEvents} query={state.query} /> : null}
+      {state.view === "fraud" ? (
+        <FraudList events={state.fraudEvents} operators={state.operators} query={state.query} />
+      ) : null}
       {state.view === "audit" ? (
         <AuditList entries={state.auditEntries} query={state.query} />
       ) : null}
       {state.view === "analytics" && state.metrics && state.analytics ? (
-        <Analytics analytics={state.analytics} metrics={state.metrics} />
+        <Analytics analytics={state.analytics} metrics={state.metrics} range={state.filter} />
       ) : null}
       {state.view === "settings" && state.settings ? (
         <SettingsView settings={state.settings} />
@@ -121,6 +128,7 @@ export function AdminViewContent({
           user={state.userDetail}
         />
       ) : null}
+      <AdminPagination state={state} />
     </section>
   );
 }
@@ -433,6 +441,7 @@ function UserList({
               <span>Telefone</span>
               <span>Registo</span>
               <span>Função</span>
+              <span>Estado</span>
             </div>
             {users.map((user, index) => (
               <details key={user.id} open={index === 0}>
@@ -442,14 +451,22 @@ function UserList({
                   <span>{user.phone}</span>
                   <span>{formatDateOnly(user.createdAt)}</span>
                   <StatusBadge value={user.role} />
+                  <StatusBadge value={user.accountStatus} />
                 </summary>
                 {canManage ? (
-                  <UserRoleForm
-                    actorProfileId={actor.profileId}
-                    actorRole={actor.profileRole}
-                    currentRole={user.role}
-                    userId={user.id}
-                  />
+                  <div className="admin-user-actions">
+                    <UserRoleForm
+                      actorProfileId={actor.profileId}
+                      actorRole={actor.profileRole}
+                      currentRole={user.role}
+                      userId={user.id}
+                    />
+                    <UserAccountStatusForm
+                      accountStatus={user.accountStatus}
+                      actorProfileId={actor.profileId}
+                      userId={user.id}
+                    />
+                  </div>
                 ) : null}
               </details>
             ))}
@@ -596,6 +613,28 @@ function SupportList({
                   <MessageSquare aria-hidden="true" size={17} />
                   <p>{ticket.description}</p>
                 </div>
+                {ticket.messages.length > 0 ? (
+                  <div className="admin-support-thread">
+                    {ticket.messages.map((message) => (
+                      <article
+                        className={message.isInternal ? "is-internal" : undefined}
+                        key={message.id}
+                      >
+                        <header>
+                          <strong>{message.authorName}</strong>
+                          <span>
+                            {message.isInternal
+                              ? "Nota interna"
+                              : humanizeStatus(message.deliveryStatus)}
+                            {" · "}
+                            {formatAdminDate(message.createdAt)}
+                          </span>
+                        </header>
+                        <p>{message.body}</p>
+                      </article>
+                    ))}
+                  </div>
+                ) : null}
                 <SupportTicketForm
                   assignedToProfileId={ticket.assignedToProfileId}
                   operators={operators}
@@ -604,6 +643,7 @@ function SupportList({
                   status={ticket.status}
                   ticketId={ticket.id}
                 />
+                {ticket.status !== "closed" ? <SupportReplyForm ticketId={ticket.id} /> : null}
               </details>
             ))}
           </div>
@@ -613,7 +653,15 @@ function SupportList({
   );
 }
 
-function FraudList({ events, query }: { events: AdminFraudEvent[]; query: string }) {
+function FraudList({
+  events,
+  operators,
+  query
+}: {
+  events: AdminFraudEvent[];
+  operators: AdminDashboardReadyState["operators"];
+  query: string;
+}) {
   return (
     <div className="admin-list-view">
       <div className="admin-list-toolbar">
@@ -641,7 +689,10 @@ function FraudList({ events, query }: { events: AdminFraudEvent[]; query: string
                   <h2>{humanize(event.eventType)}</h2>
                   <p>{event.detailsSummary}</p>
                 </div>
-                <StatusBadge value={event.resolvedAt ? "resolved" : event.severity} />
+                <span className="admin-risk-card__badges">
+                  <StatusBadge value={event.severity} />
+                  <StatusBadge value={event.triageStatus} />
+                </span>
               </div>
               <dl className="admin-record__facts admin-record__facts--three">
                 <Fact
@@ -650,6 +701,7 @@ function FraudList({ events, query }: { events: AdminFraudEvent[]; query: string
                 />
                 <Fact label="Data do evento" value={formatAdminDate(event.createdAt)} />
                 <Fact label="Revisto por" value={event.resolvedByName} />
+                <Fact label="Responsável" value={event.assignedToName} />
               </dl>
               {event.resolutionNote ? (
                 <p className="admin-record__note">{event.resolutionNote}</p>
@@ -658,7 +710,12 @@ function FraudList({ events, query }: { events: AdminFraudEvent[]; query: string
                 <summary>
                   Ação de segurança imediata <ArrowRight aria-hidden="true" size={17} />
                 </summary>
-                <FraudReviewForm fraudEventId={event.id} resolved={Boolean(event.resolvedAt)} />
+                <FraudTriageForm
+                  assignedToProfileId={event.assignedToProfileId}
+                  fraudEventId={event.id}
+                  operators={operators}
+                  triageStatus={event.triageStatus}
+                />
               </details>
             </article>
           ))}
@@ -722,11 +779,16 @@ function AuditList({ entries, query }: { entries: AdminAuditEntry[]; query: stri
 
 function Analytics({
   metrics,
-  analytics
+  analytics,
+  range
 }: {
   metrics: PlatformMetrics;
   analytics: AdminAnalyticsData;
+  range: string;
 }) {
+  const activeRange = ["30d", "90d"].includes(range) ? range : "7d";
+  const rangeDays = Number.parseInt(activeRange, 10);
+  const rangeLabel = `Últimos ${rangeDays} dias`;
   const recent = analytics.daily.reduce(
     (totals, point) => ({
       transactions: totals.transactions + point.transactions,
@@ -740,9 +802,15 @@ function Analytics({
     <div className="admin-analytics">
       <div className="admin-list-toolbar">
         <div className="admin-filter-pills">
-          <span className="is-active">7D</span>
-          <span>30D</span>
-          <span>90D</span>
+          {["7d", "30d", "90d"].map((value) => (
+            <Link
+              className={activeRange === value ? "is-active" : undefined}
+              href={`/admin?view=analytics&filter=${value}`}
+              key={value}
+            >
+              {value.toUpperCase()}
+            </Link>
+          ))}
         </div>
         <AdminDownloadButton
           data={analytics.topBusinesses.map((business) => ({
@@ -759,19 +827,19 @@ function Analytics({
         <MetricCard
           icon={Activity}
           label="Total de transações"
-          meta="Últimos sete dias"
+          meta={rangeLabel}
           value={recent.transactions.toLocaleString("pt-MZ")}
         />
         <MetricCard
           icon={Landmark}
           label="Volume total"
-          meta="Últimos sete dias"
+          meta={rangeLabel}
           value={formatMznMinor(recent.volumeMznMinor)}
         />
         <MetricCard
           icon={WalletCards}
           label="Pontos emitidos"
-          meta="Últimos sete dias"
+          meta={rangeLabel}
           value={`${recent.pointsIssued.toLocaleString("pt-MZ")} Pts`}
         />
         <MetricCard
@@ -784,8 +852,8 @@ function Analytics({
       <div className="admin-data-grid admin-data-grid--charts">
         <section className="admin-panel admin-panel--wide">
           <PanelHeading
-            meta={`${(recent.transactions / 7).toLocaleString("pt-MZ", { maximumFractionDigits: 1 })} transações/dia`}
-            title="Transações diárias (7 dias)"
+            meta={`${(recent.transactions / rangeDays).toLocaleString("pt-MZ", { maximumFractionDigits: 1 })} transações/dia`}
+            title={`Transações diárias (${rangeDays} dias)`}
           />
           <AdminLineChart data={analytics.daily} value="transactions" />
         </section>
@@ -836,6 +904,10 @@ function SettingsView({ settings }: { settings: AdminSystemSettings }) {
           <h2>Configurações globais</h2>
         </div>
       </div>
+      <section className="admin-panel admin-form-panel">
+        <PanelHeading meta="Persistência segura e auditada" title="Editar definições globais" />
+        <PlatformSettingsForm settings={settings} />
+      </section>
       <div className="admin-settings-grid">
         <section className="admin-panel">
           <PanelHeading meta="Identidade e localização" title="Definições gerais" />
@@ -871,8 +943,8 @@ function SettingsView({ settings }: { settings: AdminSystemSettings }) {
               checked={settings.emailConfigured}
               label="Notificações por correio eletrónico"
             />
-            <StatusToggle checked label="Alertas de fraude preventiva" />
-            <StatusToggle checked label="Alertas da fila de suporte" />
+            <StatusToggle checked={settings.fraudAlerts} label="Alertas de fraude preventiva" />
+            <StatusToggle checked={settings.supportAlerts} label="Alertas da fila de suporte" />
           </div>
           <dl className="admin-settings-list">
             <Fact label="Correio eletrónico de segurança" value={settings.securityEmail} />
@@ -1058,7 +1130,10 @@ function UserDetail({
               {user.email} · {user.phone} · Criado em {formatDateOnly(user.createdAt)}
             </p>
           </div>
-          <StatusBadge value={user.role} />
+          <span className="admin-profile-card__badges">
+            <StatusBadge value={user.role} />
+            <StatusBadge value={user.accountStatus} />
+          </span>
         </div>
         <div className="admin-profile-tabs">
           <span className="is-active">Perfil</span>
@@ -1071,6 +1146,8 @@ function UserDetail({
           <Fact label="Correio eletrónico" value={user.email} />
           <Fact label="Contacto telefónico" value={user.phone} />
           <Fact label="Idioma" value={user.locale} />
+          <Fact label="Estado da conta" value={humanizeStatus(user.accountStatus)} />
+          <Fact label="Suspensa em" value={formatAdminDate(user.suspendedAt)} />
           <Fact label="Termos aceites" value={formatAdminDate(user.termsAcceptedAt)} />
           <Fact
             label="Consentimento de marketing"
@@ -1123,12 +1200,17 @@ function UserDetail({
         )}
       </section>
       {canManage ? (
-        <section className="admin-panel admin-decision-panel">
-          <PanelHeading meta="Controlo de papéis & acessos" title="Mudar função do utilizador" />
+        <section className="admin-panel admin-decision-panel admin-user-actions">
+          <PanelHeading meta="Controlo de papéis & acessos" title="Gerir acesso do utilizador" />
           <UserRoleForm
             actorProfileId={actor.profileId}
             actorRole={actor.profileRole}
             currentRole={user.role}
+            userId={user.id}
+          />
+          <UserAccountStatusForm
+            accountStatus={user.accountStatus}
+            actorProfileId={actor.profileId}
             userId={user.id}
           />
         </section>
@@ -1162,6 +1244,119 @@ function AdminBreadcrumb({ view }: { view: AdminView }) {
       ))}
     </nav>
   );
+}
+
+const adminFilterOptions: Partial<Record<AdminView, Array<{ value: string; label: string }>>> = {
+  businesses: [
+    { value: "pending_review", label: "Em aprovação" },
+    { value: "active", label: "Ativos" },
+    { value: "suspended", label: "Suspensos" }
+  ],
+  categories: [
+    { value: "active", label: "Ativas" },
+    { value: "archived", label: "Arquivadas" }
+  ],
+  users: [
+    { value: "active", label: "Contas ativas" },
+    { value: "suspended", label: "Contas suspensas" },
+    { value: "customer", label: "Clientes" },
+    { value: "support_agent", label: "Suporte" }
+  ],
+  subscriptions: [
+    { value: "trialing", label: "Em teste" },
+    { value: "active", label: "Ativas" },
+    { value: "paused", label: "Pausadas" }
+  ],
+  support: [
+    { value: "open", label: "Abertos" },
+    { value: "in_progress", label: "Em curso" },
+    { value: "urgent", label: "Urgentes" },
+    { value: "resolved", label: "Resolvidos" }
+  ],
+  fraud: [
+    { value: "pending", label: "Pendentes" },
+    { value: "reviewing", label: "Em análise" },
+    { value: "escalated", label: "Escalados" },
+    { value: "critical", label: "Críticos" },
+    { value: "resolved", label: "Resolvidos" }
+  ],
+  audit: [
+    { value: "create", label: "Criação" },
+    { value: "update", label: "Atualização" },
+    { value: "suspension", label: "Suspensão" }
+  ]
+};
+
+function AdminCollectionControls({ state }: { state: AdminDashboardReadyState }) {
+  const options = adminFilterOptions[state.view];
+  if (!options || !state.pagination) {
+    return null;
+  }
+
+  return (
+    <div className="admin-collection-controls">
+      <div className="admin-filter-pills" aria-label="Filtrar resultados">
+        <Link className={!state.filter ? "is-active" : undefined} href={adminHref(state, 1, "")}>
+          Todos
+        </Link>
+        {options.map((option) => (
+          <Link
+            className={state.filter === option.value ? "is-active" : undefined}
+            href={adminHref(state, 1, option.value)}
+            key={option.value}
+          >
+            {option.label}
+          </Link>
+        ))}
+      </div>
+      <Link
+        className="admin-secondary-button"
+        href={`/admin/export?view=${state.view}&q=${encodeURIComponent(state.query)}&filter=${encodeURIComponent(state.filter)}`}
+      >
+        <Download aria-hidden="true" size={17} />
+        Exportar CSV
+      </Link>
+    </div>
+  );
+}
+
+function AdminPagination({ state }: { state: AdminDashboardReadyState }) {
+  const pagination = state.pagination;
+  if (!pagination || pagination.totalPages <= 1) {
+    return null;
+  }
+
+  return (
+    <nav aria-label="Paginação" className="admin-pagination">
+      <Link
+        aria-disabled={pagination.page === 1}
+        href={adminHref(state, Math.max(1, pagination.page - 1), state.filter)}
+      >
+        Anterior
+      </Link>
+      <span>
+        Página {pagination.page} de {pagination.totalPages} · {pagination.totalItems} resultados
+      </span>
+      <Link
+        aria-disabled={pagination.page === pagination.totalPages}
+        href={adminHref(state, Math.min(pagination.totalPages, pagination.page + 1), state.filter)}
+      >
+        Seguinte
+      </Link>
+    </nav>
+  );
+}
+
+function adminHref(state: AdminDashboardReadyState, page: number, filter: string): string {
+  const params = new URLSearchParams({ view: state.view, page: String(page) });
+  if (state.query) {
+    params.set("q", state.query);
+  }
+  if (filter) {
+    params.set("filter", filter);
+  }
+
+  return `/admin?${params.toString()}`;
 }
 
 function AdminSearch({
@@ -1375,6 +1570,9 @@ function humanizeStatus(value: string): string {
     open: "Aberto",
     in_progress: "Em curso",
     resolved: "Resolvido",
+    reviewing: "Em análise",
+    escalated: "Escalado",
+    dismissed: "Descartado",
     closed: "Fechado",
     low: "Baixa",
     normal: "Normal",
@@ -1391,9 +1589,22 @@ function humanizeStatus(value: string): string {
 
 function statusTone(value: string): string {
   if (["active", "resolved", "closed", "low", "create"].includes(value)) return "active";
-  if (["pending_review", "trialing", "open", "in_progress", "normal", "medium"].includes(value))
+  if (
+    [
+      "pending_review",
+      "pending",
+      "reviewing",
+      "trialing",
+      "open",
+      "in_progress",
+      "normal",
+      "medium"
+    ].includes(value)
+  )
     return "pending";
-  if (["high", "urgent", "critical", "past_due", "suspended", "delete"].includes(value))
+  if (
+    ["high", "urgent", "critical", "escalated", "past_due", "suspended", "delete"].includes(value)
+  )
     return "danger";
   return "neutral";
 }

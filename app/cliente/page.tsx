@@ -74,6 +74,7 @@ export default async function CustomerAreaPage({
           cardId={param(params.cartao)}
           editProfile={param(params.editar) === "1"}
           profileStatus={param(params.perfil)}
+          offerStatus={param(params.oferta)}
           state={dashboardState}
           workspaceAccess={{
             business: state.status === "authorized" && canAccessRoute(state.principal, "/negocio"),

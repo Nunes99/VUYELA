@@ -7,11 +7,13 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  PackageSearch,
   ScanLine,
   Settings,
   ShieldCheck,
   Store,
   UserPlus,
+  UsersRound,
   WalletCards
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -24,6 +26,8 @@ import type { AuthPrincipal } from "@/lib/auth/rbac";
 export type BusinessPortalSection =
   | "dashboard"
   | "branches"
+  | "team"
+  | "catalog"
   | "campaigns"
   | "cards"
   | "customers"
@@ -42,6 +46,8 @@ const navigation: Array<{
 }> = [
   { id: "dashboard", href: "/negocio", label: "Visão geral", icon: LayoutDashboard },
   { id: "branches", href: "/negocio?vista=filiais", label: "Filiais", icon: BriefcaseBusiness },
+  { id: "team", href: "/negocio?vista=equipa", label: "Equipa", icon: UsersRound },
+  { id: "catalog", href: "/negocio?vista=catalogo", label: "Catálogo", icon: PackageSearch },
   { id: "campaigns", href: "/negocio/campanhas", label: "Campanhas", icon: Grid2X2 },
   { id: "cards", href: "/negocio?vista=cartoes", label: "Cartões", icon: WalletCards },
   { id: "customers", href: "/negocio?vista=clientes", label: "Clientes", icon: CreditCard },

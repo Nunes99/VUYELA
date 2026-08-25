@@ -48,6 +48,7 @@ interface CustomerDashboardViewProps {
   cardId?: string | undefined;
   editProfile?: boolean;
   profileStatus?: string;
+  offerStatus?: string;
   workspaceAccess?: CustomerWorkspaceAccess;
 }
 
@@ -88,6 +89,7 @@ export function CustomerDashboardView({
   cardId,
   editProfile = false,
   profileStatus,
+  offerStatus,
   workspaceAccess = { business: false, pos: false }
 }: CustomerDashboardViewProps) {
   if (state.status === "error") {
@@ -118,7 +120,9 @@ export function CustomerDashboardView({
             <CustomerCardsHub dashboard={state.dashboard} />
           )
         ) : null}
-        {activeView === "ofertas" ? <CustomerOffers dashboard={state.dashboard} /> : null}
+        {activeView === "ofertas" ? (
+          <CustomerOffers dashboard={state.dashboard} offerStatus={offerStatus} />
+        ) : null}
         {activeView === "atividade" ? <CustomerActivity dashboard={state.dashboard} /> : null}
         {activeView === "notificacoes" ? (
           <CustomerNotifications dashboard={state.dashboard} />
@@ -453,7 +457,21 @@ function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel
   );
 }
 
-function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
+function CustomerOffers({
+  dashboard,
+  offerStatus
+}: {
+  dashboard: CustomerDashboardViewModel;
+  offerStatus?: string;
+}) {
+  const offerMessages: Record<string, string> = {
+    "oferta-ativada": "Oferta ativada. Apresente o código no estabelecimento.",
+    "oferta-cancelada": "A ativação da oferta foi cancelada.",
+    "preferencia-guardada": "Preferência atualizada.",
+    "cartao-necessario": "Adira primeiro ao cartão deste negócio para ativar a oferta.",
+    erro: "Não foi possível concluir a operação. Confirme a validade da oferta."
+  };
+
   return (
     <section aria-labelledby="customer-offers-title">
       <CustomerMobileHeader action="notifications" title="Explorar Ofertas" />
@@ -462,6 +480,14 @@ function CustomerOffers({ dashboard }: { dashboard: CustomerDashboardViewModel }
         description="Descubra benefícios exclusivos dos estabelecimentos VUYELA."
         titleId="customer-offers-title"
       />
+      {offerStatus ? (
+        <p
+          className={`customer-profile-message customer-profile-message--${offerStatus === "erro" || offerStatus === "cartao-necessario" ? "error" : "success"}`}
+          role="status"
+        >
+          {offerMessages[offerStatus] ?? offerMessages.erro}
+        </p>
+      ) : null}
       <div className="customer-offers-hero">
         <Image
           alt="Refeição num estabelecimento parceiro VUYELA"

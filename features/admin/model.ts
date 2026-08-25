@@ -113,6 +113,9 @@ export interface AdminUser {
   email: string;
   phone: string;
   role: ProfileRole;
+  accountStatus: string;
+  suspendedAt: string | null;
+  suspensionReason: string;
   createdAt: string;
 }
 
@@ -152,6 +155,18 @@ export interface AdminSystemSettings {
   emailConfigured: boolean;
   vercelDeployment: boolean;
   securityEmail: string;
+  fraudAlerts: boolean;
+  supportAlerts: boolean;
+}
+
+export interface AdminSupportMessage {
+  id: string;
+  authorName: string;
+  authorType: string;
+  body: string;
+  isInternal: boolean;
+  deliveryStatus: string;
+  createdAt: string;
 }
 
 export interface AdminSubscription {
@@ -201,6 +216,7 @@ export interface AdminSupportTicket {
   resolutionNote: string;
   resolvedAt: string | null;
   createdAt: string;
+  messages: AdminSupportMessage[];
 }
 
 export interface AdminFraudEvent {
@@ -211,9 +227,20 @@ export interface AdminFraudEvent {
   profileName: string;
   detailsSummary: string;
   resolvedByName: string;
+  triageStatus: string;
+  assignedToProfileId: string | null;
+  assignedToName: string;
+  reviewedAt: string | null;
   resolutionNote: string;
   resolvedAt: string | null;
   createdAt: string;
+}
+
+export interface AdminPagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
 }
 
 export interface AdminAuditEntry {
@@ -233,6 +260,8 @@ export interface AdminDashboardReadyState {
   status: "ready";
   view: AdminView;
   query: string;
+  filter: string;
+  pagination: AdminPagination | null;
   capabilities: AdminCapability[];
   viewer: AdminViewer;
   metrics: PlatformMetrics | null;
@@ -275,6 +304,19 @@ export function normalizeAdminId(value: string | string[] | undefined): string {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
     ? candidate
     : "";
+}
+
+export function normalizeAdminFilter(value: string | string[] | undefined): string {
+  const candidate = Array.isArray(value) ? value[0] : value;
+
+  return (candidate ?? "").trim().toLowerCase().slice(0, 40);
+}
+
+export function normalizeAdminPage(value: string | string[] | undefined): number {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  const page = Number.parseInt(candidate ?? "1", 10);
+
+  return Number.isFinite(page) && page > 0 ? Math.min(page, 10_000) : 1;
 }
 
 export function formatMznMinor(value: number): string {

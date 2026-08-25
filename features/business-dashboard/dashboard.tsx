@@ -19,10 +19,20 @@ import type {
   BusinessDashboardTransaction,
   BusinessDashboardViewModel
 } from "./model";
+import type { BusinessOperationsState } from "@/features/business-operations/data";
+import {
+  BusinessBranchesManagementView,
+  BusinessCardsCustomersManagementView,
+  BusinessCatalogManagementView,
+  BusinessOperationResult,
+  BusinessTeamManagementView
+} from "@/features/business-operations/views";
 
 export const businessDashboardViews = [
   "dashboard",
   "filiais",
+  "equipa",
+  "catalogo",
   "cartoes",
   "clientes",
   "fidelizacao",
@@ -44,10 +54,14 @@ export function parseBusinessDashboardView(
 
 export function BusinessDashboardView({
   state,
-  view = "dashboard"
+  view = "dashboard",
+  operationsState,
+  operationResult
 }: {
   state: BusinessDashboardState;
   view?: BusinessDashboardPageView;
+  operationsState?: BusinessOperationsState | null | undefined;
+  operationResult?: string | undefined;
 }) {
   if (state.status === "error" || state.status === "empty") {
     return (
@@ -73,10 +87,49 @@ export function BusinessDashboardView({
         business={state.dashboard.business}
         scopeLabel={state.dashboard.scopeLabel}
       />
+      <BusinessOperationResult result={operationResult} />
       {view === "dashboard" ? <DashboardOverview dashboard={state.dashboard} /> : null}
-      {view === "filiais" ? <BranchesView dashboard={state.dashboard} /> : null}
-      {view === "cartoes" ? <CardsView dashboard={state.dashboard} /> : null}
-      {view === "clientes" ? <CustomersView dashboard={state.dashboard} /> : null}
+      {view === "filiais" ? (
+        operationsState ? (
+          <BusinessBranchesManagementView
+            businessId={state.selectedBusinessId}
+            state={operationsState}
+          />
+        ) : (
+          <BranchesView dashboard={state.dashboard} />
+        )
+      ) : null}
+      {view === "equipa" && operationsState ? (
+        <BusinessTeamManagementView businessId={state.selectedBusinessId} state={operationsState} />
+      ) : null}
+      {view === "catalogo" && operationsState ? (
+        <BusinessCatalogManagementView
+          businessId={state.selectedBusinessId}
+          state={operationsState}
+        />
+      ) : null}
+      {view === "cartoes" ? (
+        operationsState ? (
+          <BusinessCardsCustomersManagementView
+            businessId={state.selectedBusinessId}
+            mode="cards"
+            state={operationsState}
+          />
+        ) : (
+          <CardsView dashboard={state.dashboard} />
+        )
+      ) : null}
+      {view === "clientes" ? (
+        operationsState ? (
+          <BusinessCardsCustomersManagementView
+            businessId={state.selectedBusinessId}
+            mode="customers"
+            state={operationsState}
+          />
+        ) : (
+          <CustomersView dashboard={state.dashboard} />
+        )
+      ) : null}
       {view === "fidelizacao" ? <LoyaltyView dashboard={state.dashboard} /> : null}
       {view === "analitica" ? <AnalyticsView dashboard={state.dashboard} /> : null}
       {view === "pos" ? <PosOverview dashboard={state.dashboard} /> : null}
@@ -97,6 +150,8 @@ export function BusinessProfileHeader({
   const tabs = [
     { id: "perfil", label: "Perfil", href: "/negocio" },
     { id: "filiais", label: "Filiais", href: "/negocio?vista=filiais" },
+    { id: "equipa", label: "Equipa", href: "/negocio?vista=equipa" },
+    { id: "catalogo", label: "Catálogo", href: "/negocio?vista=catalogo" },
     { id: "campanhas", label: "Campanhas", href: "/negocio/campanhas" },
     { id: "transacoes", label: "Transações", href: "/negocio?vista=transacoes" },
     { id: "cartoes", label: "Cartões Emitidos", href: "/negocio?vista=cartoes" },
@@ -143,6 +198,8 @@ function BusinessViewToolbar({
   const labels: Record<BusinessDashboardPageView, string> = {
     dashboard: "Visão geral",
     filiais: "Filiais",
+    equipa: "Equipa",
+    catalogo: "Catálogo",
     cartoes: "Cartões Emitidos",
     clientes: "Clientes",
     fidelizacao: "Programa de Fidelização",
