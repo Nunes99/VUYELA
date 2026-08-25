@@ -42,6 +42,29 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     expect(layout.overflow).toBeLessThanOrEqual(0);
     expect(layout.mobileTotalVisible).toBe(viewport.mobile);
     expect(layout.desktopSummaryVisible).toBe(!viewport.mobile);
+
+    if (!viewport.mobile) {
+      const activityRows = await page
+        .locator(".customer-home-activity .customer-activity-preview article")
+        .evaluateAll((rows) =>
+          rows.map((row) => {
+            const copy = row.querySelector<HTMLElement>(":scope > div")!;
+            const amount = row.querySelector<HTMLElement>(".customer-activity-preview__amount")!;
+            const copyBounds = copy.getBoundingClientRect();
+            const amountBounds = amount.getBoundingClientRect();
+
+            return {
+              amountFits:
+                amount.scrollWidth <= amount.clientWidth &&
+                amount.scrollHeight <= amount.clientHeight,
+              separated: amountBounds.left >= copyBounds.right
+            };
+          })
+        );
+
+      expect(activityRows.length).toBeGreaterThan(0);
+      expect(activityRows.every((row) => row.amountFits && row.separated)).toBe(true);
+    }
   }
 });
 

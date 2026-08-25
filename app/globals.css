@@ -12166,7 +12166,7 @@
 
 .customer-activity-preview article {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: 2.25rem minmax(0, 1fr) minmax(7.5rem, max-content);
   align-items: center;
   gap: 0.75rem;
   border-bottom: 1px solid #eef2f5;
@@ -12195,6 +12195,39 @@
 .customer-activity-preview article > div {
   display: grid;
   min-width: 0;
+}
+
+.customer-activity-preview article > .customer-activity-preview__amount {
+  display: grid;
+  width: auto;
+  min-width: 7.5rem;
+  height: auto;
+  justify-items: end;
+  align-content: center;
+  gap: 0.15rem;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.customer-activity-preview__amount b,
+.customer-activity-preview__amount time {
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.customer-activity-preview__amount b {
+  color: #00a6a6;
+  font-size: var(--vy-text-sm);
+}
+
+.customer-activity-preview__amount b.is-redeem {
+  color: #d95d4f;
+}
+
+.customer-activity-preview__amount time {
+  color: #64748b;
+  font-size: var(--vy-text-xs);
 }
 
 .customer-activity-preview article strong {
@@ -13749,6 +13782,7 @@
   }
 
   .customer-activity-preview article {
+    grid-template-columns: 2.5rem minmax(0, 1fr) max-content;
     min-height: 4rem;
     padding: 0.75rem;
   }
@@ -13756,6 +13790,7 @@
   .customer-activity-preview__amount {
     display: grid;
     width: auto !important;
+    min-width: 0;
     height: auto !important;
     justify-items: end;
     gap: 0.12rem;
