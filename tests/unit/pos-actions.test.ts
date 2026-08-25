@@ -50,6 +50,25 @@ describe("POS server actions", () => {
     expect(state.idempotencyKey).toBe("pos_1234567890ab");
   });
 
+  it("limits the points used and calculates credit from the remaining payment", async () => {
+    const state = await quotePosTransactionAction(
+      identifiedState,
+      formWith({
+        grossAmountMzn: "200",
+        pointsToRedeem: "999",
+        idempotencyKey: "pos_1234567890ab"
+      })
+    );
+
+    expect(state.quote).toMatchObject({
+      maximumRedeemablePoints: 100,
+      pointsToRedeem: 100,
+      pointsRedeemedValueMznMinor: 10000,
+      netAmountMznMinor: 10000,
+      pointsEarned: 5
+    });
+  });
+
   it("preserves the service description for the confirmation receipt", async () => {
     const state = await quotePosTransactionAction(
       identifiedState,

@@ -124,11 +124,11 @@ const previewCard = {
 const previewQuote = {
   grossAmountMznMinor: 140000,
   discountAmountMznMinor: 0,
-  pointsToRedeem: 0,
-  pointsRedeemedValueMznMinor: 0,
+  pointsToRedeem: 300,
+  pointsRedeemedValueMznMinor: 30000,
   maximumRedeemablePoints: 700,
-  pointsEarned: 140,
-  netAmountMznMinor: 140000
+  pointsEarned: 110,
+  netAmountMznMinor: 110000
 };
 
 function previewState(step: PosStepId): PosActionState {
@@ -152,6 +152,10 @@ function previewState(step: PosStepId): PosActionState {
 
   return {
     ...withQuote,
+    card: {
+      ...previewCard,
+      availablePoints: 3260
+    },
     status: "success",
     message: "Transação concluída.",
     transactionId: "TXN-20260825-001",

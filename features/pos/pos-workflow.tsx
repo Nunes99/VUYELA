@@ -29,8 +29,14 @@ import {
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select } from "../../vuyela-design-system/src/components/Field";
 import { submitPosAction } from "./actions";
-import { formatMznCompact, posSteps, splitVatInclusive } from "./model";
-import type { PosPaymentMethod, PosStepId } from "./model";
+import {
+  buildPosQuote,
+  formatMznCompact,
+  parseMznToMinorUnits,
+  posSteps,
+  splitVatInclusive
+} from "./model";
+import type { PosCustomerCard, PosPaymentMethod, PosStepId } from "./model";
 import { PosQrScanner } from "./pos-qr-scanner";
 import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
@@ -144,6 +150,7 @@ export function PosWorkflow({
             <QuoteForm
               branchId={state.branchId}
               businessId={state.businessId}
+              card={state.card}
               formAction={formAction}
               idempotencyKey={state.idempotencyKey || quoteIdempotencyKey}
               pending={pending}
@@ -471,6 +478,7 @@ function IdentifyForm({
 function QuoteForm({
   businessId,
   branchId,
+  card,
   formAction,
   pending,
   idempotencyKey,
@@ -481,6 +489,7 @@ function QuoteForm({
 }: {
   businessId: string;
   branchId: string;
+  card: PosCustomerCard;
   formAction: (formData: FormData) => void;
   idempotencyKey: string;
   pending: boolean;
@@ -491,9 +500,50 @@ function QuoteForm({
 }) {
   const [customDescription, setCustomDescription] = useState("");
   const [customAmount, setCustomAmount] = useState("");
+  const [usePoints, setUsePoints] = useState(false);
+  const [requestedPoints, setRequestedPoints] = useState(0);
   const selectedItem = catalogItems.find((item) => item.id === selectedItemId) ?? null;
   const hasCatalog = catalogItems.length > 0;
-  const canContinue = selectedItem ? selectedItem.priceMznMinor > 0 : Number(customAmount) > 0;
+  const grossAmountMznMinor = selectedItem?.priceMznMinor ?? parseOptionalMzn(customAmount);
+  const maximumQuote = useMemo(
+    () =>
+      grossAmountMznMinor > 0
+        ? buildPosQuote({
+            grossAmountMznMinor,
+            discountAmountMznMinor: 0,
+            requestedPointsToRedeem: Number.MAX_SAFE_INTEGER,
+            card
+          })
+        : null,
+    [card, grossAmountMznMinor]
+  );
+  const maximumRedeemablePoints = maximumQuote?.maximumRedeemablePoints ?? 0;
+  const quotePreview = useMemo(
+    () =>
+      grossAmountMznMinor > 0
+        ? buildPosQuote({
+            grossAmountMznMinor,
+            discountAmountMznMinor: 0,
+            requestedPointsToRedeem: usePoints ? requestedPoints : 0,
+            card
+          })
+        : null,
+    [card, grossAmountMznMinor, requestedPoints, usePoints]
+  );
+  const canContinue = grossAmountMznMinor > 0;
+
+  useEffect(() => {
+    setRequestedPoints((current) => Math.min(current, maximumRedeemablePoints));
+
+    if (maximumRedeemablePoints === 0) {
+      setUsePoints(false);
+    }
+  }, [maximumRedeemablePoints]);
+
+  const updateRequestedPoints = (value: number) => {
+    const nextValue = Number.isFinite(value) ? Math.trunc(value) : 0;
+    setRequestedPoints(Math.max(0, Math.min(nextValue, maximumRedeemablePoints)));
+  };
 
   return (
     <form action={formAction} className="pos-form">
@@ -503,7 +553,11 @@ function QuoteForm({
       <input type="hidden" name="terminalId" value={terminalId} />
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
       <input name="discountAmountMzn" type="hidden" value="0" />
-      <input name="pointsToRedeem" type="hidden" value="0" />
+      <input
+        name="pointsToRedeem"
+        type="hidden"
+        value={usePoints ? (quotePreview?.pointsToRedeem ?? 0) : 0}
+      />
 
       {hasCatalog ? (
         <>
@@ -574,6 +628,97 @@ function QuoteForm({
           />
         </div>
       )}
+
+      <section className="pos-loyalty-manager" aria-labelledby="pos-loyalty-title">
+        <div className="pos-loyalty-manager__heading">
+          <div>
+            <span className="pos-section-label">Fidelização VUYELA</span>
+            <h3 id="pos-loyalty-title">Gerir pontos desta compra</h3>
+          </div>
+          <div className="pos-loyalty-manager__balance">
+            <small>Saldo disponível</small>
+            <strong>{card.availablePoints.toLocaleString("pt-MZ")} pontos</strong>
+            <span>
+              Equivale a {formatMznCompact(card.availablePoints * card.pointValueMznMinor)}
+            </span>
+          </div>
+        </div>
+
+        <label className="pos-loyalty-toggle">
+          <span>
+            <strong>Usar pontos como parte do pagamento</strong>
+            <small>Até {maximumRedeemablePoints.toLocaleString("pt-MZ")} pontos nesta compra</small>
+          </span>
+          <input
+            checked={usePoints}
+            disabled={maximumRedeemablePoints === 0}
+            onChange={(event) => {
+              const enabled = event.currentTarget.checked;
+              setUsePoints(enabled);
+              if (enabled && requestedPoints === 0) {
+                setRequestedPoints(maximumRedeemablePoints);
+              }
+            }}
+            type="checkbox"
+          />
+          <i aria-hidden="true">
+            <span />
+          </i>
+        </label>
+
+        {usePoints ? (
+          <div className="pos-loyalty-manager__controls">
+            <div className="pos-loyalty-manager__field">
+              <label htmlFor="pos-points-to-redeem">Pontos a utilizar</label>
+              <div>
+                <input
+                  id="pos-points-to-redeem"
+                  inputMode="numeric"
+                  max={maximumRedeemablePoints}
+                  min="0"
+                  onChange={(event) => updateRequestedPoints(Number(event.currentTarget.value))}
+                  step="1"
+                  type="number"
+                  value={requestedPoints}
+                />
+                <button
+                  onClick={() => updateRequestedPoints(maximumRedeemablePoints)}
+                  type="button"
+                >
+                  Usar máximo
+                </button>
+              </div>
+              <input
+                aria-label="Ajustar pontos a utilizar"
+                max={maximumRedeemablePoints}
+                min="0"
+                onChange={(event) => updateRequestedPoints(Number(event.currentTarget.value))}
+                step="1"
+                type="range"
+                value={requestedPoints}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        <dl className="pos-loyalty-manager__preview">
+          <div>
+            <dt>Desconto em pontos</dt>
+            <dd>-{formatMznCompact(quotePreview?.pointsRedeemedValueMznMinor ?? 0)}</dd>
+          </div>
+          <div>
+            <dt>Restante a pagar</dt>
+            <dd>{quotePreview ? formatMznCompact(quotePreview.netAmountMznMinor) : "-"}</dd>
+          </div>
+          <div>
+            <dt>Pontos a creditar</dt>
+            <dd>+{quotePreview?.pointsEarned.toLocaleString("pt-MZ") ?? 0} pts</dd>
+          </div>
+        </dl>
+        <p className="pos-loyalty-manager__note">
+          O saldo e os novos pontos são confirmados no servidor quando o pagamento for concluído.
+        </p>
+      </section>
 
       <Button
         className="pos-primary-action"
@@ -808,6 +953,19 @@ function ConfirmForm({
             </button>
           </dd>
         </div>
+        {state.quote?.pointsToRedeem ? (
+          <div>
+            <dt>Pontos utilizados</dt>
+            <dd>
+              {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pts (-
+              {formatMznCompact(state.quote.pointsRedeemedValueMznMinor)})
+            </dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>Pontos a creditar</dt>
+          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} pts</dd>
+        </div>
         <div className="pos-confirmation-list__total">
           <dt>Total a Liquidar</dt>
           <dd>{state.quote ? formatMznCompact(state.quote.netAmountMznMinor) : "-"}</dd>
@@ -877,7 +1035,10 @@ function SuccessState({
       [
         `Recibo: ${receiptNumber}`,
         `Data e hora: ${completedAt}`,
-        `Total: ${state.quote ? formatMznCompact(state.quote.netAmountMznMinor) : "-"}`,
+        `Valor da compra: ${state.quote ? formatMznCompact(state.quote.grossAmountMznMinor) : "-"}`,
+        `Pontos utilizados: ${state.quote?.pointsToRedeem ?? 0}`,
+        `Total pago: ${state.quote ? formatMznCompact(state.quote.netAmountMznMinor) : "-"}`,
+        `Pontos creditados: ${state.quote?.pointsEarned ?? 0}`,
         `Método: ${state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}`
       ].join("\n")
     );
@@ -906,6 +1067,18 @@ function SuccessState({
         <div>
           <dt>Método utilizado</dt>
           <dd>{state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}</dd>
+        </div>
+        <div>
+          <dt>Pontos utilizados</dt>
+          <dd>{state.quote?.pointsToRedeem.toLocaleString("pt-MZ") ?? 0} pts</dd>
+        </div>
+        <div>
+          <dt>Pontos creditados</dt>
+          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} pts</dd>
+        </div>
+        <div>
+          <dt>Saldo atualizado</dt>
+          <dd>{state.card?.availablePoints.toLocaleString("pt-MZ") ?? 0} pts</dd>
         </div>
       </dl>
       <div className="pos-success__actions">
@@ -1022,16 +1195,39 @@ function PosTransactionSummary({
         <h3>Resumo dos Valores</h3>
         <dl>
           <div>
-            <dt>Subtotal</dt>
+            <dt>Valor da compra</dt>
+            <dd>{formatMznCompact(state.quote.grossAmountMznMinor)}</dd>
+          </div>
+          {state.quote.discountAmountMznMinor > 0 ? (
+            <div>
+              <dt>Desconto comercial</dt>
+              <dd>-{formatMznCompact(state.quote.discountAmountMznMinor)}</dd>
+            </div>
+          ) : null}
+          {state.quote.pointsToRedeem > 0 ? (
+            <div>
+              <dt>Pontos utilizados</dt>
+              <dd>
+                {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pts (-
+                {formatMznCompact(state.quote.pointsRedeemedValueMznMinor)})
+              </dd>
+            </div>
+          ) : null}
+          <div>
+            <dt>Base do valor restante</dt>
             <dd>{formatMznCompact(taxes.subtotalMznMinor)}</dd>
           </div>
           <div>
             <dt>IVA (16%)</dt>
             <dd>{formatMznCompact(taxes.vatMznMinor)}</dd>
           </div>
-          <div>
-            <dt>Valor Total</dt>
+          <div className="pos-summary__payment-total">
+            <dt>Total a pagar</dt>
             <dd>{formatMznCompact(state.quote.netAmountMznMinor)}</dd>
+          </div>
+          <div className="pos-summary__points-credit">
+            <dt>Pontos a creditar</dt>
+            <dd>+{state.quote.pointsEarned.toLocaleString("pt-MZ")} pts</dd>
           </div>
         </dl>
       </aside>
@@ -1050,11 +1246,21 @@ function PosTransactionSummary({
           <small>Data: {formatPosDate(new Date())}</small>
           <div>
             <span>{state.serviceDescription || "Compra no estabelecimento"}</span>
-            <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
+            <strong>{formatMznCompact(state.quote.grossAmountMznMinor)}</strong>
           </div>
+          {state.quote.pointsToRedeem > 0 ? (
+            <div>
+              <span>Pontos utilizados ({state.quote.pointsToRedeem.toLocaleString("pt-MZ")})</span>
+              <strong>-{formatMznCompact(state.quote.pointsRedeemedValueMznMinor)}</strong>
+            </div>
+          ) : null}
           <div>
             <b>Total Pago</b>
             <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
+          </div>
+          <div className="pos-summary__receipt-points">
+            <span>Pontos a creditar</span>
+            <strong>+{state.quote.pointsEarned.toLocaleString("pt-MZ")} pts</strong>
           </div>
           <small>{paymentMethod ? paymentMethodLabel(paymentMethod) : ""}</small>
         </div>
@@ -1069,6 +1275,15 @@ function PosTransactionSummary({
       <div>
         <BadgeCheck aria-hidden="true" size={22} />
         <strong>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} Pontos Acumulados</strong>
+      </div>
+      {state.quote?.pointsToRedeem ? (
+        <p>{state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pontos foram utilizados.</p>
+      ) : null}
+      <div className="pos-summary__updated-balance">
+        <WalletCards aria-hidden="true" size={22} />
+        <strong>
+          {state.card?.availablePoints.toLocaleString("pt-MZ") ?? 0} pontos disponíveis
+        </strong>
       </div>
     </aside>
   );
@@ -1112,6 +1327,18 @@ function paymentMethodLabel(method: PosPaymentMethod): string {
   };
 
   return labels[method];
+}
+
+function parseOptionalMzn(value: string): number {
+  if (!value.trim()) {
+    return 0;
+  }
+
+  try {
+    return parseMznToMinorUnits(value);
+  } catch {
+    return 0;
+  }
 }
 
 function channelIsActive(
