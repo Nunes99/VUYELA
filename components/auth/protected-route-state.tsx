@@ -7,6 +7,7 @@ import {
   LayoutGrid,
   LogOut,
   ScanLine,
+  Settings,
   ShieldCheck,
   UserRound
 } from "lucide-react";
@@ -169,11 +170,13 @@ export function ProtectedRouteStateView({
 export function DashboardAreaMenu({
   principal,
   variant,
-  customerName
+  customerName,
+  includePosSettings = false
 }: {
   principal: AuthPrincipal;
   variant: "default" | "customer";
   customerName?: string | undefined;
+  includePosSettings?: boolean;
 }) {
   const areas = [
     { href: "/cliente", label: "Cliente", icon: UserRound, visible: true },
@@ -188,6 +191,12 @@ export function DashboardAreaMenu({
       label: "POS",
       icon: ScanLine,
       visible: canAccessRoute(principal, "/pos")
+    },
+    {
+      href: "/pos/definicoes",
+      label: "Definições do POS",
+      icon: Settings,
+      visible: includePosSettings && canAccessRoute(principal, "/pos")
     },
     {
       href: "/admin",

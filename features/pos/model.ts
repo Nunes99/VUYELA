@@ -46,7 +46,7 @@ export const posSteps: ReadonlyArray<{ id: PosStepId; label: string }> = [
   { id: "services", label: "Serviços" },
   { id: "authorize", label: "Autorizar" },
   { id: "confirm", label: "Confirmar" },
-  { id: "success", label: "Sucesso" }
+  { id: "success", label: "Concluído" }
 ];
 
 export function isPosPaymentMethod(value: string): value is PosPaymentMethod {
@@ -113,6 +113,34 @@ export function formatMznMinor(value: number): string {
     2,
     "0"
   )} MZN`;
+}
+
+export function formatMznCompact(value: number): string {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new RangeError("MZN minor value must be a non-negative integer");
+  }
+
+  const major = String(Math.floor(value / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const minor = value % 100;
+
+  return `${major}${minor === 0 ? "" : `,${String(minor).padStart(2, "0")}`} MT`;
+}
+
+export function splitVatInclusive(value: number, vatPercent = 16) {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new RangeError("MZN minor value must be a non-negative integer");
+  }
+
+  if (!Number.isFinite(vatPercent) || vatPercent < 0) {
+    throw new RangeError("VAT percentage must be non-negative");
+  }
+
+  const subtotalMznMinor = Math.round((value * 100) / (100 + vatPercent));
+
+  return {
+    subtotalMznMinor,
+    vatMznMinor: value - subtotalMznMinor
+  };
 }
 
 export function buildPosQuote({

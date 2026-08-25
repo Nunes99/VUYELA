@@ -2,28 +2,35 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ArrowRight,
   BadgeCheck,
   Banknote,
-  Calculator,
-  Camera,
-  CheckCircle2,
-  ChevronLeft,
+  Check,
   CreditCard,
-  Hash,
+  Droplets,
+  Heart,
+  Info,
+  LockKeyhole,
+  Mail,
   Phone,
-  Receipt,
-  RotateCcw,
+  Plus,
+  Printer,
+  QrCode,
   ScanLine,
-  ShieldCheck,
+  Scissors,
+  ShoppingBag,
+  Smile,
+  Sparkles,
   Smartphone,
+  UserRound,
   WalletCards
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select } from "../../vuyela-design-system/src/components/Field";
 import { submitPosAction } from "./actions";
-import { formatMznMinor, posSteps } from "./model";
-import type { PosPaymentMethod } from "./model";
+import { formatMznCompact, posSteps, splitVatInclusive } from "./model";
+import type { PosPaymentMethod, PosStepId } from "./model";
 import { PosQrScanner } from "./pos-qr-scanner";
 import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
@@ -36,14 +43,21 @@ import type {
 
 interface PosWorkflowProps {
   context: PosContextState;
+  initialPaymentMethod?: PosPaymentMethod | null;
+  initialState?: PosActionState;
 }
 
 const defaultLookupMethods: Array<"qr" | "card" | "phone"> = ["qr", "card", "phone"];
 
-export function PosWorkflow({ context }: PosWorkflowProps) {
-  const [state, formAction, pending] = useActionState(submitPosAction, initialPosActionState);
+export function PosWorkflow({
+  context,
+  initialPaymentMethod = null,
+  initialState = initialPosActionState
+}: PosWorkflowProps) {
+  const [state, formAction, pending] = useActionState(submitPosAction, initialState);
   const [customerAuthorized, setCustomerAuthorized] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<PosPaymentMethod | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PosPaymentMethod | null>(initialPaymentMethod);
+  const [catalogItemId, setCatalogItemId] = useState(initialState.catalogItemId);
   const selectedBusiness = useMemo(() => {
     if (context.status !== "ready") {
       return null;
@@ -55,7 +69,7 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
       null
     );
   }, [context, state.businessId]);
-  const activeStep = state.transactionId
+  const activeStep: PosStepId = state.transactionId
     ? "success"
     : state.quote && paymentMethod
       ? "confirm"
@@ -65,16 +79,38 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
           ? "services"
           : "identify";
   const [quoteIdempotencyKey, setQuoteIdempotencyKey] = useState("");
-  const selectedCatalogItems = selectedBusiness?.catalogItems.filter(
-    (item) => item.branchId === null || item.branchId === state.branchId
+  const selectedCatalogItems = useMemo(
+    () =>
+      selectedBusiness?.catalogItems.filter(
+        (item) => item.branchId === null || item.branchId === state.branchId
+      ) ?? [],
+    [selectedBusiness, state.branchId]
   );
-  const selectedPaymentChannels = selectedBusiness?.paymentChannels.filter(
-    (channel) => channel.branchId === null || channel.branchId === state.branchId
+  const selectedPaymentChannels = useMemo(
+    () =>
+      selectedBusiness?.paymentChannels.filter(
+        (channel) => channel.branchId === null || channel.branchId === state.branchId
+      ) ?? [],
+    [selectedBusiness, state.branchId]
   );
+  const selectedCatalogItem =
+    selectedCatalogItems.find((item) => item.id === (catalogItemId || state.catalogItemId)) ?? null;
 
   useEffect(() => {
     setQuoteIdempotencyKey(createBrowserIdempotencyKey());
   }, []);
+
+  useEffect(() => {
+    if (!state.card || state.quote || selectedCatalogItems.length === 0) {
+      return;
+    }
+
+    setCatalogItemId((current) =>
+      selectedCatalogItems.some((item) => item.id === current)
+        ? current
+        : (selectedCatalogItems[0]?.id ?? "")
+    );
+  }, [selectedCatalogItems, state.card, state.quote]);
 
   if (context.status !== "ready") {
     return (
@@ -93,11 +129,8 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
       <PosSteps activeStep={activeStep} />
 
       <div className="pos-layout">
-        <section className="pos-panel" aria-labelledby="pos-flow-title">
-          <div className="pos-panel__header">
-            <span className="pos-eyebrow">Caixa</span>
-            <h2 id="pos-flow-title">Nova transação</h2>
-          </div>
+        <section className={`pos-panel pos-panel--${activeStep}`} aria-labelledby="pos-flow-title">
+          {activeStep !== "success" ? <PosPanelHeading activeStep={activeStep} /> : null}
 
           {!state.card ? (
             <IdentifyForm
@@ -114,9 +147,10 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
               formAction={formAction}
               idempotencyKey={state.idempotencyKey || quoteIdempotencyKey}
               pending={pending}
-              maximumPoints={state.card.availablePoints}
               terminalId={state.terminalId}
-              catalogItems={selectedCatalogItems ?? []}
+              catalogItems={selectedCatalogItems}
+              selectedItemId={catalogItemId}
+              onSelectItem={setCatalogItemId}
             />
           ) : null}
 
@@ -137,7 +171,7 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
               />
             ) : (
               <AuthorizationStep
-                channels={selectedPaymentChannels ?? []}
+                channels={selectedPaymentChannels}
                 onSelect={setPaymentMethod}
                 quote={state.quote}
               />
@@ -147,11 +181,11 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
           {state.card && state.quote && state.transactionId ? (
             <SuccessState
               formAction={formAction}
-              idempotencyKey={state.idempotencyKey}
               onReset={() => {
                 setQuoteIdempotencyKey(createBrowserIdempotencyKey());
                 setCustomerAuthorized(false);
                 setPaymentMethod(null);
+                setCatalogItemId("");
               }}
               state={state}
             />
@@ -160,38 +194,49 @@ export function PosWorkflow({ context }: PosWorkflowProps) {
           <ActionMessage status={state.status} message={state.message} />
         </section>
 
-        <aside className="pos-summary" aria-label="Resumo da transação">
-          <div className="pos-summary__business">
-            <span>Negócio</span>
-            <strong>{selectedBusiness?.name ?? "VUYELA"}</strong>
-            <small>{getBranchLabel(selectedBusiness, state.branchId)}</small>
-          </div>
-
-          <CustomerSummary state={state} />
-          <QuoteSummary state={state} />
-          {paymentMethod ? <PaymentSummary method={paymentMethod} /> : null}
-        </aside>
+        <PosTransactionSummary
+          activeStep={activeStep}
+          business={selectedBusiness}
+          paymentMethod={paymentMethod}
+          selectedCatalogItem={selectedCatalogItem}
+          state={state}
+        />
       </div>
     </div>
   );
 }
 
-function PosSteps({ activeStep }: { activeStep: string }) {
+function PosPanelHeading({ activeStep }: { activeStep: Exclude<PosStepId, "success"> }) {
+  const content = {
+    identify: { eyebrow: "Caixa", title: "Nova transação" },
+    services: { eyebrow: "Serviços disponíveis", title: "Selecione os Serviços" },
+    authorize: { eyebrow: "Pagamento", title: "Autorizar Pagamento" },
+    confirm: { eyebrow: "Revisão", title: "Confirmar Transação" }
+  }[activeStep];
+
+  return (
+    <div className="pos-panel__header">
+      <span className="pos-eyebrow">{content.eyebrow}</span>
+      <h2 id="pos-flow-title">{content.title}</h2>
+    </div>
+  );
+}
+
+function PosSteps({ activeStep }: { activeStep: PosStepId }) {
   const activeIndex = posSteps.findIndex((step) => step.id === activeStep);
 
   return (
     <ol className="pos-steps" aria-label="Progresso do POS">
       {posSteps.map((step, index) => {
-        const isDone = index < activeIndex;
         const isActive = step.id === activeStep;
 
         return (
           <li
             aria-current={isActive ? "step" : undefined}
-            className={isDone ? "is-done" : isActive ? "is-active" : ""}
+            className={isActive ? "is-active" : index < activeIndex ? "is-done" : ""}
             key={step.id}
           >
-            {isDone ? <CheckCircle2 size={18} aria-hidden="true" /> : <span>{index + 1}</span>}
+            <span>{index + 1}</span>
             <strong>{step.label}</strong>
           </li>
         );
@@ -323,21 +368,24 @@ function IdentifyForm({
           ))}
         </Select>
 
-        <Select
-          label="Terminal"
-          name="terminalId"
-          value={selectedTerminalId}
-          onChange={(event) => setSelectedTerminalId(event.currentTarget.value)}
-          requiredMark
-          required
-        >
-          {terminalsForBranch.length === 0 ? <option value="">Nenhum terminal ativo</option> : null}
-          {terminalsForBranch.map((terminal) => (
-            <option value={terminal.id} key={terminal.id}>
-              {terminal.name} · {terminal.code}
-            </option>
-          ))}
-        </Select>
+        {terminalsForBranch.length > 1 ? (
+          <Select
+            label="Terminal"
+            name="terminalId"
+            value={selectedTerminalId}
+            onChange={(event) => setSelectedTerminalId(event.currentTarget.value)}
+            requiredMark
+            required
+          >
+            {terminalsForBranch.map((terminal) => (
+              <option value={terminal.id} key={terminal.id}>
+                {terminal.name} · {terminal.code}
+              </option>
+            ))}
+          </Select>
+        ) : (
+          <input name="terminalId" type="hidden" value={selectedTerminalId} />
+        )}
       </div>
 
       <fieldset className="pos-lookup-methods">
@@ -345,8 +393,8 @@ function IdentifyForm({
         <div role="radiogroup" aria-label="Método de identificação">
           {(
             [
-              { id: "qr", label: "Ler QR", icon: Camera },
-              { id: "card", label: "Cartão", icon: Hash },
+              { id: "qr", label: "Ler QR", icon: QrCode },
+              { id: "card", label: "Nº Cartão", icon: CreditCard },
               { id: "phone", label: "Telefone", icon: Phone }
             ] as const
           )
@@ -426,19 +474,27 @@ function QuoteForm({
   formAction,
   pending,
   idempotencyKey,
-  maximumPoints,
   terminalId,
-  catalogItems
+  catalogItems,
+  selectedItemId,
+  onSelectItem
 }: {
   businessId: string;
   branchId: string;
   formAction: (formData: FormData) => void;
   idempotencyKey: string;
   pending: boolean;
-  maximumPoints: number;
   terminalId: string;
   catalogItems: PosCatalogItemContext[];
+  selectedItemId: string;
+  onSelectItem: (itemId: string) => void;
 }) {
+  const [customDescription, setCustomDescription] = useState("");
+  const [customAmount, setCustomAmount] = useState("");
+  const selectedItem = catalogItems.find((item) => item.id === selectedItemId) ?? null;
+  const hasCatalog = catalogItems.length > 0;
+  const canContinue = selectedItem ? selectedItem.priceMznMinor > 0 : Number(customAmount) > 0;
+
   return (
     <form action={formAction} className="pos-form">
       <input type="hidden" name="intent" value="quote" />
@@ -446,65 +502,90 @@ function QuoteForm({
       <input type="hidden" name="branchId" value={branchId} />
       <input type="hidden" name="terminalId" value={terminalId} />
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
+      <input name="discountAmountMzn" type="hidden" value="0" />
+      <input name="pointsToRedeem" type="hidden" value="0" />
 
-      <div className="pos-form__intro">
-        <span className="pos-form__step-number">02</span>
-        <div>
-          <h3>Serviços e valor da compra</h3>
-          <p>Registe o serviço ou produto prestado antes de calcular os pontos.</p>
+      {hasCatalog ? (
+        <>
+          <input name="catalogItemId" type="hidden" value={selectedItem?.id ?? ""} />
+          <input name="serviceDescription" type="hidden" value={selectedItem?.name ?? ""} />
+          <input
+            name="grossAmountMzn"
+            type="hidden"
+            value={selectedItem ? minorUnitsToInput(selectedItem.priceMznMinor) : ""}
+          />
+          <div className="pos-catalog-grid" role="radiogroup" aria-label="Serviços disponíveis">
+            {catalogItems.map((item, index) => {
+              const Icon = catalogItemIcon(index, item.kind);
+              const selected = item.id === selectedItemId;
+
+              return (
+                <button
+                  aria-checked={selected}
+                  className={selected ? "is-selected" : undefined}
+                  key={item.id}
+                  onClick={() => onSelectItem(item.id)}
+                  role="radio"
+                  type="button"
+                >
+                  <span className="pos-catalog-card__topline">
+                    <i aria-hidden="true">
+                      <Icon size={19} />
+                    </i>
+                    <strong>{formatMznCompact(item.priceMznMinor)}</strong>
+                  </span>
+                  <span className="pos-catalog-card__copy">
+                    <b>{item.name}</b>
+                    <small>
+                      {item.description || (item.kind === "product" ? "Produto" : "Serviço")}
+                    </small>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <div className="pos-catalog-empty">
+          <ShoppingBag aria-hidden="true" size={24} />
+          <div>
+            <strong>Venda sem catálogo</strong>
+            <p>Indique a descrição e o valor para continuar.</p>
+          </div>
+          <Input
+            label="Descrição no comprovativo"
+            name="serviceDescription"
+            maxLength={160}
+            onChange={(event) => setCustomDescription(event.currentTarget.value)}
+            placeholder="Ex.: Corte masculino + barba"
+            required
+            requiredMark
+            value={customDescription}
+          />
+          <Input
+            label="Valor da compra em MZN"
+            name="grossAmountMzn"
+            inputMode="decimal"
+            onChange={(event) => setCustomAmount(event.currentTarget.value)}
+            placeholder="0,00"
+            required
+            requiredMark
+            value={customAmount}
+          />
         </div>
-      </div>
-
-      <Select label="Serviço ou produto" name="catalogItemId">
-        <option value="">Venda livre</option>
-        {catalogItems.map((item) => (
-          <option value={item.id} key={item.id}>
-            {item.name} · {formatMznMinor(item.priceMznMinor)}
-          </option>
-        ))}
-      </Select>
-
-      <Input
-        label="Descrição no comprovativo"
-        name="serviceDescription"
-        maxLength={160}
-        placeholder="Ex.: Corte masculino + barba"
-      />
-
-      <div className="pos-amount-field">
-        <Input
-          label="Valor da compra"
-          name="grossAmountMzn"
-          inputMode="decimal"
-          placeholder="0,00"
-          requiredMark
-          required
-        />
-        <span>MZN</span>
-      </div>
-
-      <div className="pos-form-grid">
-        <Input label="Desconto" name="discountAmountMzn" inputMode="decimal" placeholder="0,00" />
-        <Input
-          label="Pontos a usar"
-          name="pointsToRedeem"
-          inputMode="numeric"
-          min={0}
-          max={maximumPoints}
-          placeholder="0"
-          type="number"
-        />
-      </div>
+      )}
 
       <Button
+        className="pos-primary-action"
+        disabled={!canContinue}
         type="submit"
-        variant="secondary"
+        variant="primary"
         size="lg"
         fullWidth
         loading={pending}
-        leadingIcon={<Calculator size={20} />}
+        trailingIcon={<ArrowRight aria-hidden="true" size={20} />}
       >
-        Rever pagamento
+        Confirmar Serviços selecionados
       </Button>
     </form>
   );
@@ -519,97 +600,156 @@ function AuthorizationStep({
   channels: PosPaymentChannelContext[];
   onSelect: (method: PosPaymentMethod) => void;
 }) {
-  const methods: Array<{
-    id: PosPaymentMethod;
-    label: string;
-    detail: string;
-    icon: typeof Smartphone;
-    enabled: boolean;
-  }> =
-    quote.netAmountMznMinor === 0
-      ? [
-          {
-            id: "points",
-            label: "Pontos VUYELA",
-            detail: "Compra totalmente liquidada",
-            icon: BadgeCheck,
-            enabled: true
-          }
-        ]
-      : [
-          {
-            id: "mpesa",
-            label: "M-Pesa",
-            detail: channelDetail(channels, "mpesa"),
-            icon: Smartphone,
-            enabled: false
-          },
-          {
-            id: "emola",
-            label: "e-Mola",
-            detail: channelDetail(channels, "emola"),
-            icon: Smartphone,
-            enabled: false
-          },
-          {
-            id: "mkesh",
-            label: "mKesh",
-            detail: channelDetail(channels, "mkesh"),
-            icon: Smartphone,
-            enabled: false
-          },
-          {
-            id: "cash",
-            label: "Dinheiro",
-            detail: channelDetail(channels, "cash"),
-            icon: Banknote,
-            enabled: channelIsActive(channels, "cash")
-          },
-          {
-            id: "card",
-            label: "Cartão",
-            detail: channelDetail(channels, "card"),
-            icon: WalletCards,
-            enabled: channelIsActive(channels, "card")
-          }
-        ];
+  const [selectedMethod, setSelectedMethod] = useState<PosPaymentMethod | null>(null);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherMessage, setVoucherMessage] = useState("");
+  const methods = useMemo<
+    Array<{
+      id: PosPaymentMethod;
+      label: string;
+      detail: string;
+      icon: typeof Smartphone;
+      enabled: boolean;
+    }>
+  >(
+    () =>
+      quote.netAmountMznMinor === 0
+        ? [
+            {
+              id: "points",
+              label: "Pontos VUYELA",
+              detail: "Compra totalmente liquidada",
+              icon: BadgeCheck,
+              enabled: true
+            }
+          ]
+        : [
+            {
+              id: "mpesa",
+              label: "M-Pesa",
+              detail: "Pagamento móvel Vodacom",
+              icon: Smartphone,
+              enabled: channelIsReady(channels, "mpesa")
+            },
+            {
+              id: "emola",
+              label: "e-Mola",
+              detail: "Pagamento móvel Movitel",
+              icon: Smartphone,
+              enabled: channelIsReady(channels, "emola")
+            },
+            {
+              id: "mkesh",
+              label: "Mkesh",
+              detail: "Pagamento móvel",
+              icon: Smartphone,
+              enabled: channelIsReady(channels, "mkesh")
+            },
+            {
+              id: "cash",
+              label: "Dinheiro",
+              detail: channelDetail(channels, "cash"),
+              icon: Banknote,
+              enabled: channelIsActive(channels, "cash")
+            },
+            {
+              id: "card",
+              label: "Cartão",
+              detail: channelDetail(channels, "card"),
+              icon: WalletCards,
+              enabled: channelIsActive(channels, "card")
+            }
+          ],
+    [channels, quote.netAmountMznMinor]
+  );
+
+  useEffect(() => {
+    const availableMethod = methods.find((method) => method.enabled)?.id ?? null;
+
+    setSelectedMethod((current) =>
+      current && methods.some((method) => method.id === current && method.enabled)
+        ? current
+        : availableMethod
+    );
+  }, [methods]);
 
   return (
     <section className="pos-authorization" aria-labelledby="pos-payment-title">
-      <div className="pos-form__intro">
-        <span className="pos-form__step-number">03</span>
-        <div>
-          <h3 id="pos-payment-title">Autorizar pagamento</h3>
-          <p>Selecione como o cliente vai pagar o valor final.</p>
-        </div>
-      </div>
-      <div className="pos-payment-total">
-        <span>Total a pagar</span>
-        <strong>{formatMznMinor(quote.netAmountMznMinor)}</strong>
-      </div>
-      <div className="pos-payment-methods">
+      <h3 className="sr-only" id="pos-payment-title">
+        Método de pagamento
+      </h3>
+      <strong className="pos-section-label">
+        Método de pagamento <span aria-hidden="true">*</span>
+      </strong>
+      <div className="pos-payment-methods" role="radiogroup" aria-label="Método de pagamento">
         {methods.map((method) => {
           const Icon = method.icon;
+          const selected = selectedMethod === method.id;
           return (
             <button
+              aria-checked={selected}
+              className={`${selected ? "is-selected " : ""}pos-payment-method--${method.id}`}
               disabled={!method.enabled}
               key={method.id}
-              onClick={() => onSelect(method.id)}
+              onClick={() => setSelectedMethod(method.id)}
+              role="radio"
               type="button"
             >
+              {selected ? (
+                <i className="pos-payment-method__check" aria-hidden="true">
+                  <Check size={15} />
+                </i>
+              ) : null}
               <span>
                 <Icon aria-hidden="true" size={20} />
               </span>
               <strong>{method.label}</strong>
-              <small>{method.detail}</small>
+              <small>{method.enabled ? method.detail : channelDetail(channels, method.id)}</small>
             </button>
           );
         })}
       </div>
-      <p className="pos-form-hint">
-        Dinheiro e cartão são reconciliados no servidor. Os canais móveis só ficam disponíveis
-        depois da configuração segura das credenciais do respetivo provedor.
-      </p>
+
+      <div className="pos-voucher-field">
+        <label htmlFor="pos-voucher-code">Código de Desconto / Vale</label>
+        <div>
+          <input
+            id="pos-voucher-code"
+            onChange={(event) => {
+              setVoucherCode(event.currentTarget.value.toUpperCase());
+              setVoucherMessage("");
+            }}
+            placeholder="Introduza código..."
+            value={voucherCode}
+          />
+          <button
+            onClick={() =>
+              setVoucherMessage(
+                voucherCode.trim()
+                  ? "Este vale não está disponível para esta transação."
+                  : "Introduza um código para validar."
+              )
+            }
+            type="button"
+          >
+            Aplicar
+          </button>
+        </div>
+        {voucherMessage ? <small role="status">{voucherMessage}</small> : null}
+      </div>
+
+      <Button
+        className="pos-primary-action"
+        disabled={!selectedMethod}
+        fullWidth
+        onClick={() => selectedMethod && onSelect(selectedMethod)}
+        size="lg"
+        trailingIcon={<ArrowRight aria-hidden="true" size={20} />}
+        type="button"
+        variant="primary"
+      >
+        Prosseguir para Resumo
+      </Button>
     </section>
   );
 }
@@ -648,30 +788,29 @@ function ConfirmForm({
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
       <input type="hidden" name="paymentMethod" value={paymentMethod} />
 
-      <div className="pos-form__intro">
-        <span className="pos-form__step-number">04</span>
-        <div>
-          <h3>Confirmar transação</h3>
-          <p>Revise os dados antes de emitir ou resgatar os pontos.</p>
-        </div>
-      </div>
-
-      <dl className="pos-confirmation-list">
+      <dl className="pos-confirmation-list pos-confirmation-list--review">
         <div>
           <dt>Cliente</dt>
-          <dd>{state.card?.customerName}</dd>
+          <dd>
+            {state.card?.customerName} ({state.card?.cardNumber})
+          </dd>
         </div>
         <div>
-          <dt>Serviço</dt>
+          <dt>Serviço Adicionado</dt>
           <dd>{state.serviceDescription || "Compra no estabelecimento"}</dd>
         </div>
         <div>
-          <dt>Pagamento</dt>
-          <dd>{paymentMethodLabel(paymentMethod)}</dd>
+          <dt>Método de Pagamento</dt>
+          <dd>
+            {paymentMethodLabel(paymentMethod)}
+            <button className="pos-inline-edit" onClick={onBack} type="button">
+              Alterar
+            </button>
+          </dd>
         </div>
-        <div>
-          <dt>Total</dt>
-          <dd>{state.quote ? formatMznMinor(state.quote.netAmountMznMinor) : "-"}</dd>
+        <div className="pos-confirmation-list__total">
+          <dt>Total a Liquidar</dt>
+          <dd>{state.quote ? formatMznCompact(state.quote.netAmountMznMinor) : "-"}</dd>
         </div>
       </dl>
 
@@ -696,79 +835,107 @@ function ConfirmForm({
           }}
           required
         />
-        <span>
-          <strong>Cliente autorizou</strong>
-          <small>Pontos, desconto e valor final confirmados no balcão.</small>
-        </span>
+        <span>Aceito os termos de faturação e transação eletrónica.</span>
       </label>
 
       <Button
+        className="pos-primary-action"
+        disabled={!customerAuthorized}
         type="submit"
-        variant="reward"
+        variant="primary"
         size="lg"
         fullWidth
         loading={pending}
-        leadingIcon={<ShieldCheck size={20} />}
+        leadingIcon={<LockKeyhole aria-hidden="true" size={20} />}
       >
-        Confirmar transação
+        Confirmar Pagamento
       </Button>
-      <button className="pos-back-button" onClick={onBack} type="button">
-        <ChevronLeft aria-hidden="true" size={17} />
-        Alterar método de pagamento
-      </button>
     </form>
   );
 }
 
 function SuccessState({
   formAction,
-  idempotencyKey,
   onReset,
   state
 }: {
   formAction: (formData: FormData) => void;
-  idempotencyKey: string;
   onReset: () => void;
   state: PosActionState;
 }) {
+  const receiptNumber = state.receiptNumber ?? state.transactionId ?? "-";
+  const completedAt = state.completedAt
+    ? new Intl.DateTimeFormat("pt-MZ", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(new Date(state.completedAt))
+    : "-";
+
+  const emailReceipt = () => {
+    const subject = encodeURIComponent(`Recibo VUYELA ${receiptNumber}`);
+    const body = encodeURIComponent(
+      [
+        `Recibo: ${receiptNumber}`,
+        `Data e hora: ${completedAt}`,
+        `Total: ${state.quote ? formatMznCompact(state.quote.netAmountMznMinor) : "-"}`,
+        `Método: ${state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}`
+      ].join("\n")
+    );
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
   return (
     <div className="pos-success" role="status">
       <span className="pos-success__icon">
-        <BadgeCheck size={48} aria-hidden="true" />
+        <Check size={46} aria-hidden="true" />
       </span>
       <div>
-        <h3>Transação concluída</h3>
-        <p>Os pontos e o saldo do cliente foram atualizados.</p>
+        <h3>Transação concluída com sucesso!</h3>
+        <p>A transação foi concluída com sucesso no sistema POS VUYELA.</p>
       </div>
       <dl className="pos-success__receipt">
         <div>
-          <dt>Referência</dt>
-          <dd>{state.receiptNumber ?? state.transactionId ?? "-"}</dd>
+          <dt>ID Transação</dt>
+          <dd>#{receiptNumber}</dd>
         </div>
         <div>
-          <dt>Total pago</dt>
-          <dd>{state.quote ? formatMznMinor(state.quote.netAmountMznMinor) : "-"}</dd>
+          <dt>Data e Hora</dt>
+          <dd>{completedAt}</dd>
         </div>
         <div>
-          <dt>Pontos ganhos</dt>
-          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} Pts</dd>
-        </div>
-        <div>
-          <dt>Método</dt>
+          <dt>Método utilizado</dt>
           <dd>{state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}</dd>
         </div>
-        <div>
-          <dt>Pagamento</dt>
-          <dd>{state.paymentStatus === "reconciled" ? "Reconciliado" : "Não necessário"}</dd>
-        </div>
       </dl>
-      <small className="pos-success__key">Anti-duplicação: {idempotencyKey}</small>
+      <div className="pos-success__actions">
+        <Button
+          className="pos-success__secondary-action"
+          leadingIcon={<Printer aria-hidden="true" size={18} />}
+          onClick={() => window.print()}
+          type="button"
+          variant="outline"
+        >
+          Imprimir Recibo
+        </Button>
+        <Button
+          className="pos-success__secondary-action"
+          leadingIcon={<Mail aria-hidden="true" size={18} />}
+          onClick={emailReceipt}
+          type="button"
+          variant="outline"
+        >
+          Enviar por Email
+        </Button>
+      </div>
       <form action={formAction}>
         <input type="hidden" name="intent" value="reset" />
         <Button
+          className="pos-primary-action"
+          fullWidth
           type="submit"
-          variant="outline"
-          leadingIcon={<RotateCcw size={18} />}
+          variant="primary"
+          leadingIcon={<Plus aria-hidden="true" size={18} />}
           onClick={onReset}
         >
           Nova transação
@@ -778,94 +945,137 @@ function SuccessState({
   );
 }
 
-function CustomerSummary({ state }: { state: PosActionState }) {
-  if (!state.card) {
+function PosTransactionSummary({
+  activeStep,
+  business,
+  paymentMethod,
+  selectedCatalogItem,
+  state
+}: {
+  activeStep: PosStepId;
+  business: PosBusinessContext | null;
+  paymentMethod: PosPaymentMethod | null;
+  selectedCatalogItem: PosCatalogItemContext | null;
+  state: PosActionState;
+}) {
+  const branch = getSelectedBranch(business, state.branchId);
+
+  if (activeStep === "identify") {
     return (
-      <div className="pos-summary__empty">
-        <CreditCard size={22} aria-hidden="true" />
-        <p>Identifique o cliente para ver pontos e equivalente em MZN.</p>
-      </div>
+      <aside className="pos-summary pos-summary--identify" aria-label="Resumo do negócio">
+        <div className="pos-summary__heading">
+          <span className="pos-eyebrow">Negócio</span>
+          <h3>{business?.name ?? "Negócio VUYELA"}</h3>
+          <small>{branch ? `${branch.name}, ${branch.city}` : "Sede / sem filial"}</small>
+        </div>
+        <div className="pos-summary__guide">
+          <p>
+            <Info aria-hidden="true" size={18} />
+            <span>Identifique o cliente para ver os pontos e o equivalente em MZN.</span>
+          </p>
+          <p>
+            <ShoppingBag aria-hidden="true" size={18} />
+            <span>O resumo aparece depois de selecionar o serviço.</span>
+          </p>
+        </div>
+        <div className="pos-summary__qr-note">
+          <QrCode aria-hidden="true" size={28} />
+          <strong>Aceita QR do cartão</strong>
+          <small>ou da aplicação do cliente</small>
+        </div>
+      </aside>
     );
   }
 
-  const valueMznMinor = state.card.availablePoints * state.card.pointValueMznMinor;
-
-  return (
-    <div className="pos-summary__section">
-      <span className="pos-eyebrow">Cliente</span>
-      <h3>{state.card.customerName}</h3>
-      <dl className="pos-summary-list">
-        <div>
-          <dt>Cartão</dt>
-          <dd>{state.card.cardNumber}</dd>
-        </div>
-        <div>
-          <dt>Pontos</dt>
-          <dd>{state.card.availablePoints.toLocaleString("pt-MZ")}</dd>
-        </div>
-        <div>
-          <dt>Equivalente</dt>
-          <dd>{formatMznMinor(valueMznMinor)}</dd>
-        </div>
-      </dl>
-    </div>
-  );
-}
-
-function QuoteSummary({ state }: { state: PosActionState }) {
-  if (!state.quote) {
+  if (activeStep === "services") {
     return (
-      <div className="pos-summary__empty">
-        <Receipt size={22} aria-hidden="true" />
-        <p>O resumo aparece depois de calcular a compra.</p>
-      </div>
+      <aside className="pos-summary pos-summary--services" aria-label="Serviço selecionado">
+        <div className="pos-summary__customer">
+          <span aria-hidden="true">
+            <UserRound size={25} />
+          </span>
+          <div>
+            <h3>{state.card?.customerName ?? "Cliente VUYELA"}</h3>
+            <small>ID: {state.card?.cardNumber ?? "-"}</small>
+          </div>
+        </div>
+        <div className="pos-summary__selected-service">
+          <span className="pos-summary__label">Serviço selecionado</span>
+          <div>
+            <strong>{selectedCatalogItem?.name ?? "Selecione um serviço"}</strong>
+            <b>{selectedCatalogItem ? formatMznCompact(selectedCatalogItem.priceMznMinor) : "-"}</b>
+          </div>
+        </div>
+        <div className="pos-summary__total">
+          <strong>Total provisório</strong>
+          <b>{selectedCatalogItem ? formatMznCompact(selectedCatalogItem.priceMznMinor) : "-"}</b>
+        </div>
+      </aside>
+    );
+  }
+
+  if (activeStep === "authorize" && state.quote) {
+    const taxes = splitVatInclusive(state.quote.netAmountMznMinor);
+
+    return (
+      <aside className="pos-summary pos-summary--values" aria-label="Resumo dos valores">
+        <h3>Resumo dos Valores</h3>
+        <dl>
+          <div>
+            <dt>Subtotal</dt>
+            <dd>{formatMznCompact(taxes.subtotalMznMinor)}</dd>
+          </div>
+          <div>
+            <dt>IVA (16%)</dt>
+            <dd>{formatMznCompact(taxes.vatMznMinor)}</dd>
+          </div>
+          <div>
+            <dt>Valor Total</dt>
+            <dd>{formatMznCompact(state.quote.netAmountMznMinor)}</dd>
+          </div>
+        </dl>
+      </aside>
+    );
+  }
+
+  if (activeStep === "confirm" && state.quote) {
+    return (
+      <aside className="pos-summary pos-summary--receipt" aria-label="Recibo provisório">
+        <h3>Recibo Provisório</h3>
+        <div className="pos-summary__receipt-sheet">
+          <strong>POS VUYELA</strong>
+          <p>
+            {business?.name ?? "Negócio VUYELA"} - {branch?.name ?? "Principal"}
+          </p>
+          <small>Data: {formatPosDate(new Date())}</small>
+          <div>
+            <span>{state.serviceDescription || "Compra no estabelecimento"}</span>
+            <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
+          </div>
+          <div>
+            <b>Total Pago</b>
+            <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
+          </div>
+          <small>{paymentMethod ? paymentMethodLabel(paymentMethod) : ""}</small>
+        </div>
+      </aside>
     );
   }
 
   return (
-    <div className="pos-summary__section">
-      <span className="pos-eyebrow">Resumo</span>
-      <dl className="pos-summary-list pos-summary-list--large">
-        <div>
-          <dt>Compra</dt>
-          <dd>{formatMznMinor(state.quote.grossAmountMznMinor)}</dd>
-        </div>
-        <div>
-          <dt>Desconto</dt>
-          <dd>{formatMznMinor(state.quote.discountAmountMznMinor)}</dd>
-        </div>
-        <div>
-          <dt>Usar</dt>
-          <dd>
-            {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pts /{" "}
-            {formatMznMinor(state.quote.pointsRedeemedValueMznMinor)}
-          </dd>
-        </div>
-        <div>
-          <dt>Ganhar</dt>
-          <dd>{state.quote.pointsEarned.toLocaleString("pt-MZ")} pts</dd>
-        </div>
-        <div className="pos-summary-list__total">
-          <dt>Total</dt>
-          <dd>{formatMznMinor(state.quote.netAmountMznMinor)}</dd>
-        </div>
-      </dl>
-    </div>
-  );
-}
-
-function PaymentSummary({ method }: { method: PosPaymentMethod }) {
-  return (
-    <div className="pos-summary__section pos-summary__payment">
-      <span className="pos-eyebrow">Pagamento</span>
-      <strong>{paymentMethodLabel(method)}</strong>
-      <small>Selecionado para esta transação</small>
-    </div>
+    <aside className="pos-summary pos-summary--success" aria-label="Pontos acumulados">
+      <h3>Cliente Fiel</h3>
+      <p>O saldo de pontos do cliente foi atualizado com sucesso.</p>
+      <div>
+        <BadgeCheck aria-hidden="true" size={22} />
+        <strong>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} Pontos Acumulados</strong>
+      </div>
+    </aside>
   );
 }
 
 function ActionMessage({ status, message }: { status: string; message: string }) {
-  if (!message) {
+  if (!message || status !== "error") {
     return null;
   }
 
@@ -879,22 +1089,23 @@ function ActionMessage({ status, message }: { status: string; message: string })
   );
 }
 
-function getBranchLabel(
-  business: { branches: Array<{ id: string; name: string }> } | null,
-  id: string
-) {
-  if (!id) {
-    return "Sede / sem filial";
+function getSelectedBranch(business: PosBusinessContext | null, id: string) {
+  if (!business) {
+    return null;
   }
 
-  return business?.branches.find((branch) => branch.id === id)?.name ?? "Filial selecionada";
+  return (
+    business.branches.find((branch) => branch.id === (id || business.defaultBranchId)) ??
+    business.branches[0] ??
+    null
+  );
 }
 
 function paymentMethodLabel(method: PosPaymentMethod): string {
   const labels: Record<PosPaymentMethod, string> = {
     mpesa: "M-Pesa",
     emola: "e-Mola",
-    mkesh: "mKesh",
+    mkesh: "Mkesh",
     cash: "Dinheiro",
     card: "Cartão bancário",
     points: "Pontos VUYELA"
@@ -910,16 +1121,51 @@ function channelIsActive(
   return channels.some((channel) => channel.method === method && channel.status === "active");
 }
 
-function channelDetail(
+function channelIsReady(
   channels: PosPaymentChannelContext[],
   method: PosPaymentChannelContext["method"]
 ) {
+  // Provider payments remain disabled until a server-side provider adapter confirms them.
+  if (method === "mpesa" || method === "emola" || method === "mkesh") {
+    return false;
+  }
+
+  return channelIsActive(channels, method);
+}
+
+function channelDetail(channels: PosPaymentChannelContext[], method: PosPaymentMethod) {
+  if (method === "points") return "Saldo de pontos VUYELA";
+
   const channel = channels.find((candidate) => candidate.method === method);
 
   if (!channel || channel.status === "unconfigured") return "Por configurar";
   if (channel.status === "testing") return "Em testes";
   if (channel.status === "suspended") return "Suspenso";
+  if (method === "mpesa" || method === "emola" || method === "mkesh") {
+    return channel.credentialsConfigured ? "Integração pendente" : "Credenciais por configurar";
+  }
   return channel.mode === "manual" ? "Confirmação manual" : "Ligado ao provedor";
+}
+
+function catalogItemIcon(index: number, kind: PosCatalogItemContext["kind"]) {
+  if (kind === "product") {
+    return ShoppingBag;
+  }
+
+  return [Scissors, UserRound, Sparkles, Droplets, Heart, Smile][index % 6] ?? Sparkles;
+}
+
+function minorUnitsToInput(value: number) {
+  return `${Math.floor(value / 100)}.${String(value % 100).padStart(2, "0")}`;
+}
+
+function formatPosDate(date: Date) {
+  return new Intl.DateTimeFormat("pt-MZ", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Africa/Maputo"
+  }).format(date);
 }
 
 function createBrowserIdempotencyKey() {

@@ -16,6 +16,7 @@ export interface PosActionState {
   paymentAttemptId: string | null;
   paymentStatus: string | null;
   receiptNumber: string | null;
+  completedAt: string | null;
 }
 
 export const initialPosActionState: PosActionState = {
@@ -33,5 +34,6 @@ export const initialPosActionState: PosActionState = {
   paymentMethod: null,
   paymentAttemptId: null,
   paymentStatus: null,
-  receiptNumber: null
+  receiptNumber: null,
+  completedAt: null
 };

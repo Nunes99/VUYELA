@@ -333,7 +333,8 @@ export async function confirmPosTransactionAction(
     paymentMethod: paymentMethodValue,
     paymentAttemptId: row?.payment_attempt_id ?? null,
     paymentStatus: row?.payment_status ?? null,
-    receiptNumber: row?.receipt_number ?? null
+    receiptNumber: row?.receipt_number ?? null,
+    completedAt: new Date().toISOString()
   };
 }
 

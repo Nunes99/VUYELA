@@ -16,7 +16,7 @@ export function PosQrScanner({ onDetected }: PosQrScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
   const [status, setStatus] = useState<ScannerStatus>("idle");
-  const [message, setMessage] = useState("Ative a câmara e enquadre o QR do cartão.");
+  const [message, setMessage] = useState("Aguardando QR Code...");
 
   const stopScanner = useCallback(() => {
     controlsRef.current?.stop();
@@ -91,10 +91,14 @@ export function PosQrScanner({ onDetected }: PosQrScannerProps) {
           ref={videoRef}
         />
         <span aria-hidden="true" className="pos-qr-scanner__frame" />
+        <span aria-hidden="true" className="pos-qr-scanner__scanline" />
         {status === "detected" ? <CheckCircle2 aria-hidden="true" size={34} /> : null}
       </div>
+      <p className="pos-qr-scanner__status" role={status === "error" ? "alert" : "status"}>
+        <span aria-hidden="true" />
+        {message}
+      </p>
       <div className="pos-qr-scanner__controls">
-        <p role={status === "error" ? "alert" : "status"}>{message}</p>
         {isActive ? (
           <Button
             leadingIcon={<CameraOff aria-hidden="true" size={18} />}
@@ -114,6 +118,7 @@ export function PosQrScanner({ onDetected }: PosQrScannerProps) {
             Ativar câmara
           </Button>
         )}
+        <small>Posicione o QR code do cartão ou telemóvel do cliente na área de leitura.</small>
       </div>
     </div>
   );
