@@ -145,6 +145,28 @@ test("renders the customer activity, notifications and card identification views
   ).toBe(true);
 });
 
+test("lets customers discover businesses and distinguish existing cards", async ({
+  page
+}, testInfo) => {
+  await page.goto("/dev/customer?vista=negocios");
+
+  await expect(
+    page.getByRole("heading", {
+      name: testInfo.project.name === "mobile-chrome" ? "Descobrir Negócios" : "Negócios VUYELA"
+    })
+  ).toBeVisible();
+  await expect(page.getByText("3 negócios disponíveis")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ver meu cartão" })).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Aderir ao cartão" })).toHaveCount(1);
+  await expect(page.getByText("Farmácia Central", { exact: true })).toBeVisible();
+
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+});
+
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chrome", "Mobile-only design contract");
   test.setTimeout(180_000);
@@ -152,6 +174,10 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await page.goto("/dev/customer?vista=cartoes");
   await expect(page.getByRole("heading", { name: "Gerir Cartões" })).toBeVisible();
   await expect(page.getByText("Adicionar novo cartão digital")).toBeVisible();
+  await expect(page.getByLabel("Adicionar cartão")).toHaveAttribute(
+    "href",
+    "/cliente?vista=negocios"
+  );
   await expect(page.locator(".customer-mobile-header__logo")).toHaveAttribute("href", "/cliente");
   const thumbnailGeometry = await page
     .locator(".customer-card-hub-item")

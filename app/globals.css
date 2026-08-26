@@ -14796,6 +14796,237 @@
   min-height: 0;
 }
 
+.customer-add-card,
+.customer-discovery-link {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px dashed #00a6a6;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #008f8f;
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.customer-add-card {
+  grid-column: 1 / -1;
+}
+
+.customer-cards-empty-with-action {
+  display: grid;
+  gap: 1rem;
+}
+
+.customer-discovery-link {
+  width: fit-content;
+  justify-self: center;
+  border-style: solid;
+  background: #00a6a6;
+  color: #ffffff;
+}
+
+.customer-discovery-link svg:last-child {
+  margin-left: 0.25rem;
+}
+
+.customer-business-discovery__summary {
+  display: flex;
+  min-height: 5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #cde7e5;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: #f2faf9;
+}
+
+.customer-business-discovery__summary > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.75rem;
+  color: #008f8f;
+}
+
+.customer-business-discovery__summary > div > span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.customer-business-discovery__summary strong {
+  color: #0f2832;
+}
+
+.customer-business-discovery__summary small {
+  color: #64748b;
+}
+
+.customer-business-discovery__summary > a {
+  flex: 0 0 auto;
+  color: #008f8f;
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.customer-business-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.customer-business-discovery-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d7e0e5;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  box-shadow: 0 0.5rem 1.5rem rgba(15, 40, 50, 0.05);
+}
+
+.customer-business-discovery-card__media {
+  position: relative;
+  display: grid;
+  aspect-ratio: 16 / 8;
+  place-items: center;
+  overflow: hidden;
+  background: #073540;
+  color: #ffffff;
+}
+
+.customer-business-discovery-card__media > img {
+  object-fit: cover;
+}
+
+.customer-business-discovery-card__media > span {
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.customer-business-discovery-card__media > b {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1;
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  background: #e8f7f5;
+  color: #087b74;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+.customer-business-discovery-card__media > b.is-available {
+  background: #fff5d9;
+  color: #8a6200;
+}
+
+.customer-business-discovery-card__body {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+}
+
+.customer-business-discovery-card__body > span {
+  color: #008f8f;
+  font-size: 0.65rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.customer-business-discovery-card h3,
+.customer-business-discovery-card p {
+  margin: 0;
+}
+
+.customer-business-discovery-card h3 {
+  color: #0f2832;
+  font-size: 1.05rem;
+}
+
+.customer-business-discovery-card p {
+  display: -webkit-box;
+  min-height: 2.7rem;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.customer-business-discovery-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #edf1f3;
+}
+
+.customer-business-discovery-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #526979;
+  font-size: 0.68rem;
+}
+
+.customer-business-discovery-card__meta svg {
+  color: #00a6a6;
+}
+
+.customer-business-discovery-card__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.customer-business-discovery-card__actions form {
+  min-width: 0;
+}
+
+.customer-business-discovery-card__actions button,
+.customer-business-discovery-card__actions a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid #00a6a6;
+  border-radius: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  background: #ffffff;
+  color: #008f8f;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.customer-business-discovery-card__actions form button,
+.customer-business-discovery-card__actions a.is-primary {
+  width: 100%;
+  background: #00a6a6;
+  color: #ffffff;
+}
+
+@media (max-width: 67.5rem) {
+  .customer-business-discovery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .customer-offer-filters {
   display: flex;
   max-width: 100%;
@@ -14916,6 +15147,31 @@
     border: 0;
     background: transparent;
     box-shadow: none;
+  }
+
+  .customer-business-discovery__summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .customer-business-discovery__summary > a {
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #cde7e5;
+    padding-top: 0.75rem;
+  }
+
+  .customer-business-discovery-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customer-business-discovery-card__actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customer-business-discovery-card__actions a {
+    width: 100%;
   }
 
   .customer-home-activity .customer-activity-preview article {

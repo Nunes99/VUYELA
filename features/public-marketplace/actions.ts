@@ -15,12 +15,22 @@ function getFormString(formData: FormData, key: string): string {
 export async function joinBusinessLoyaltyProgramAction(formData: FormData): Promise<void> {
   const businessId = getFormString(formData, "businessId");
   const businessSlug = getFormString(formData, "businessSlug");
+  const requestedReturnTo = getFormString(formData, "returnTo");
+  const customerReturnTo =
+    requestedReturnTo === "/cliente?vista=negocios" ? requestedReturnTo : null;
   const businessPath = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(businessSlug)
     ? `/estabelecimentos/${businessSlug}`
     : "/estabelecimentos";
+  const failurePath = customerReturnTo
+    ? `${customerReturnTo}&adesao=erro`
+    : `${businessPath}?adesao=erro`;
 
   if (!isSupabaseConfigured()) {
-    redirect(`${businessPath}?adesao=indisponivel`);
+    redirect(
+      customerReturnTo
+        ? `${customerReturnTo}&adesao=indisponivel`
+        : `${businessPath}?adesao=indisponivel`
+    );
   }
 
   const supabase = await createSupabaseServerClient();
@@ -29,13 +39,15 @@ export async function joinBusinessLoyaltyProgramAction(formData: FormData): Prom
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/entrar?next=${encodeURIComponent(businessPath)}`);
+    redirect(`/entrar?next=${encodeURIComponent(customerReturnTo ?? businessPath)}`);
   }
 
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(businessId)
   ) {
-    redirect(`${businessPath}?adesao=invalida`);
+    redirect(
+      customerReturnTo ? `${customerReturnTo}&adesao=invalida` : `${businessPath}?adesao=invalida`
+    );
   }
 
   const { error } = await supabase.rpc("join_business_loyalty_program", {
@@ -43,9 +55,9 @@ export async function joinBusinessLoyaltyProgramAction(formData: FormData): Prom
   });
 
   if (error) {
-    redirect(`${businessPath}?adesao=erro`);
+    redirect(failurePath);
   }
 
   revalidatePath("/cliente");
-  redirect("/cliente#cartoes");
+  redirect(customerReturnTo ? `${customerReturnTo}&adesao=sucesso` : "/cliente#cartoes");
 }

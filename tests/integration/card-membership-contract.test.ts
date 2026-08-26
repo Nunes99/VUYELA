@@ -38,4 +38,12 @@ describe("loyalty program membership contract", () => {
     expect(action).toContain('supabase.rpc("join_business_loyalty_program"');
     expect(action).not.toContain("createSupabaseServiceRoleClient");
   });
+
+  it("accepts only the customer discovery return path", () => {
+    expect(action).toContain(
+      'requestedReturnTo === "/cliente?vista=negocios" ? requestedReturnTo : null'
+    );
+    expect(action).toContain("`${customerReturnTo}&adesao=sucesso`");
+    expect(action).not.toMatch(/redirect\(requestedReturnTo\)/);
+  });
 });

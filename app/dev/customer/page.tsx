@@ -5,6 +5,7 @@ import { CustomerDashboardView } from "@/features/customer-dashboard/dashboard";
 import type { CustomerDashboardViewName } from "@/features/customer-dashboard/dashboard";
 import { buildCustomerDashboardViewModel } from "@/features/customer-dashboard/model";
 import { buildDigitalCustomerCard } from "@/features/customer-cards/model";
+import type { MarketplaceBusiness } from "@/features/public-marketplace/model";
 
 const cards = [
   ["card-1", "business-1", "Barbershop 21", "VY-6885-4797", 3450, 6200],
@@ -29,6 +30,93 @@ const cards = [
     ]
   })
 );
+
+const previewBusinesses: MarketplaceBusiness[] = [
+  {
+    id: "business-1",
+    slug: "barbershop-21",
+    name: "Barbershop 21",
+    description: "Cortes, barba e cuidados pessoais com benefícios em cada visita.",
+    phone: "+258 84 000 0021",
+    email: "ola@barbershop21.co.mz",
+    websiteUrl: null,
+    logoUrl: null,
+    coverUrl: "/images/offer-prawns.jpg",
+    activatedAt: "2026-08-01T08:00:00.000Z",
+    category: {
+      id: "category-beauty",
+      slug: "beleza",
+      name: "Beleza",
+      description: "Beleza e cuidados pessoais"
+    },
+    program: {
+      name: "Pontos Barbershop 21",
+      earnRate: 0.1,
+      pointValueMznMinor: 100,
+      maximumRedemptionPercent: 50,
+      pointsExpireAfterDays: 365,
+      terms: null
+    },
+    branches: [previewBranch("business-1", "barbershop-21-maputo", "Maputo")],
+    offers: []
+  },
+  {
+    id: "business-2",
+    slug: "cafe-maputo",
+    name: "Café Maputo",
+    description: "Café moçambicano, pastelaria fresca e recompensas para clientes habituais.",
+    phone: "+258 84 000 0012",
+    email: "ola@cafemaputo.co.mz",
+    websiteUrl: null,
+    logoUrl: null,
+    coverUrl: "/images/offer-bakery.jpg",
+    activatedAt: "2026-08-02T08:00:00.000Z",
+    category: {
+      id: "category-restaurants",
+      slug: "restaurantes",
+      name: "Restaurantes",
+      description: "Restauração e cafés"
+    },
+    program: {
+      name: "Fidelidade Café Maputo",
+      earnRate: 0.05,
+      pointValueMznMinor: 100,
+      maximumRedemptionPercent: 50,
+      pointsExpireAfterDays: 180,
+      terms: null
+    },
+    branches: [previewBranch("business-2", "cafe-maputo-central", "Maputo")],
+    offers: []
+  },
+  {
+    id: "business-3",
+    slug: "farmacia-central",
+    name: "Farmácia Central",
+    description: "Saúde, bem-estar e um programa de pontos disponível para adesão imediata.",
+    phone: "+258 84 000 0033",
+    email: "apoio@farmaciacentral.co.mz",
+    websiteUrl: null,
+    logoUrl: null,
+    coverUrl: "/images/offer-prawns.jpg",
+    activatedAt: "2026-08-03T08:00:00.000Z",
+    category: {
+      id: "category-health",
+      slug: "saude",
+      name: "Saúde",
+      description: "Saúde e bem-estar"
+    },
+    program: {
+      name: "Mais Saúde",
+      earnRate: 0.08,
+      pointValueMznMinor: 100,
+      maximumRedemptionPercent: 40,
+      pointsExpireAfterDays: 365,
+      terms: null
+    },
+    branches: [previewBranch("business-3", "farmacia-central-maputo", "Maputo")],
+    offers: []
+  }
+];
 
 const dashboard = buildCustomerDashboardViewModel({
   cards,
@@ -135,6 +223,7 @@ const dashboard = buildCustomerDashboardViewModel({
 const titles: Record<CustomerDashboardViewName, string> = {
   inicio: "Painel do Cliente",
   cartoes: "Gerir Cartões",
+  negocios: "Descobrir Negócios",
   ofertas: "Explorar Ofertas",
   atividade: "Histórico de Atividade",
   notificacoes: "Avisos e Alertas",
@@ -173,11 +262,32 @@ export default async function CustomerPreviewPage({
     >
       <CustomerDashboardView
         activeView={activeView}
+        businesses={previewBusinesses}
         cardId={typeof params.cartao === "string" ? params.cartao : undefined}
         editProfile={params.editar === "1"}
+        membershipStatus={typeof params.adesao === "string" ? params.adesao : undefined}
         state={{ status: "populated", dashboard }}
         workspaceAccess={{ business: true, pos: true }}
       />
     </ProtectedRouteStateView>
   );
+}
+
+function previewBranch(businessId: string, id: string, city: string) {
+  return {
+    id,
+    businessId,
+    slug: id,
+    name: "Filial principal",
+    city,
+    province: "Maputo",
+    addressLine: null,
+    phone: null,
+    email: null,
+    latitude: null,
+    longitude: null,
+    isPrimary: true,
+    openingHours: null,
+    timezone: "Africa/Maputo"
+  };
 }

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   Activity,
+  ArrowRight,
   ArrowLeft,
   Bell,
   BriefcaseBusiness,
@@ -21,6 +22,7 @@ import {
   ScanLine,
   ShieldCheck,
   Star,
+  Store,
   User
 } from "lucide-react";
 
@@ -30,6 +32,8 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
+import { joinBusinessLoyaltyProgramAction } from "@/features/public-marketplace/actions";
+import type { MarketplaceBusiness } from "@/features/public-marketplace/model";
 import { signOutAction } from "@/features/auth/actions";
 
 import { updateCustomerProfileAction } from "./actions";
@@ -40,7 +44,7 @@ import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
 
 export type CustomerDashboardViewName =
-  "inicio" | "cartoes" | "ofertas" | "atividade" | "notificacoes" | "perfil";
+  "inicio" | "cartoes" | "negocios" | "ofertas" | "atividade" | "notificacoes" | "perfil";
 
 interface CustomerDashboardViewProps {
   state: CustomerDashboardState;
@@ -49,6 +53,8 @@ interface CustomerDashboardViewProps {
   editProfile?: boolean;
   profileStatus?: string;
   offerStatus?: string;
+  membershipStatus?: string;
+  businesses?: MarketplaceBusiness[];
   workspaceAccess?: CustomerWorkspaceAccess;
 }
 
@@ -90,6 +96,8 @@ export function CustomerDashboardView({
   editProfile = false,
   profileStatus,
   offerStatus,
+  membershipStatus,
+  businesses = [],
   workspaceAccess = { business: false, pos: false }
 }: CustomerDashboardViewProps) {
   if (state.status === "error") {
@@ -119,6 +127,13 @@ export function CustomerDashboardView({
           ) : (
             <CustomerCardsHub dashboard={state.dashboard} />
           )
+        ) : null}
+        {activeView === "negocios" ? (
+          <CustomerBusinesses
+            businesses={businesses}
+            dashboard={state.dashboard}
+            membershipStatus={membershipStatus}
+          />
         ) : null}
         {activeView === "ofertas" ? (
           <CustomerOffers dashboard={state.dashboard} offerStatus={offerStatus} />
@@ -295,10 +310,14 @@ function CustomerHome({
             <Gift aria-hidden="true" />
             <span>Ofertas</span>
           </Link>
+          <Link href="/cliente?vista=negocios">
+            <Store aria-hidden="true" />
+            <span>Aderir</span>
+          </Link>
           {workspaceAccess.business ? (
             <Link href="/negocio">
               <BriefcaseBusiness aria-hidden="true" />
-              <span>Negócios</span>
+              <span>Meus negócios</span>
             </Link>
           ) : null}
           {workspaceAccess.pos ? (
@@ -356,15 +375,142 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
               <ChevronRight aria-hidden="true" size={18} />
             </Link>
           ))}
-          <Link className="customer-add-card" href="/estabelecimentos">
+          <Link className="customer-add-card" href="/cliente?vista=negocios">
             <Plus aria-hidden="true" size={16} /> Adicionar novo cartão digital
           </Link>
         </div>
       ) : (
+        <div className="customer-cards-empty-with-action">
+          <SectionEmpty
+            icon={CreditCard}
+            title="Ainda não tem cartões"
+            body="Escolha um negócio VUYELA e adira gratuitamente ao respetivo cartão digital."
+          />
+          <Link className="customer-discovery-link" href="/cliente?vista=negocios">
+            <Store aria-hidden="true" size={18} /> Descobrir negócios
+            <ArrowRight aria-hidden="true" size={17} />
+          </Link>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CustomerBusinesses({
+  businesses,
+  dashboard,
+  membershipStatus
+}: {
+  businesses: MarketplaceBusiness[];
+  dashboard: CustomerDashboardViewModel;
+  membershipStatus?: string;
+}) {
+  const cardByBusinessId = new Map(dashboard.cards.map((card) => [card.businessId, card]));
+  const statusMessages: Record<string, string> = {
+    sucesso: "Adesão concluída. O novo cartão já está disponível na sua carteira.",
+    erro: "Não foi possível concluir a adesão. Tente novamente.",
+    indisponivel: "A adesão está temporariamente indisponível.",
+    invalida: "O negócio selecionado não está disponível para adesão."
+  };
+
+  return (
+    <section aria-labelledby="customer-businesses-title">
+      <CustomerMobileHeader action="notifications" title="Descobrir Negócios" />
+      <CustomerPageHeading
+        eyebrow="Cartões disponíveis"
+        title="Negócios VUYELA"
+        description="Escolha os estabelecimentos onde pretende acumular pontos e adira ao cartão digital."
+        titleId="customer-businesses-title"
+      />
+      {membershipStatus ? (
+        <p
+          className={`customer-profile-message customer-profile-message--${membershipStatus === "sucesso" ? "success" : "error"}`}
+          role="status"
+        >
+          {statusMessages[membershipStatus] ?? statusMessages.erro}
+        </p>
+      ) : null}
+      <div className="customer-business-discovery__summary">
+        <div>
+          <Store aria-hidden="true" size={22} />
+          <span>
+            <strong>{businesses.length.toLocaleString("pt-MZ")} negócios disponíveis</strong>
+            <small>A adesão ao cartão é gratuita e cria um saldo separado por negócio.</small>
+          </span>
+        </div>
+        <Link href="/estabelecimentos">Ver marketplace público</Link>
+      </div>
+      {businesses.length > 0 ? (
+        <div className="customer-business-discovery-grid">
+          {businesses.map((business) => {
+            const card = cardByBusinessId.get(business.id);
+            const primaryBranch =
+              business.branches.find((branch) => branch.isPrimary) ?? business.branches[0];
+
+            return (
+              <article className="customer-business-discovery-card" key={business.id}>
+                <div className="customer-business-discovery-card__media">
+                  {business.coverUrl ? (
+                    <Image
+                      alt=""
+                      fill
+                      sizes="(max-width: 760px) 100vw, (max-width: 1080px) 50vw, 33vw"
+                      src={business.coverUrl}
+                      unoptimized
+                    />
+                  ) : business.logoUrl ? (
+                    <Image alt="" height={72} src={business.logoUrl} unoptimized width={72} />
+                  ) : (
+                    <span>{business.name.slice(0, 2).toLocaleUpperCase("pt-MZ")}</span>
+                  )}
+                  {card ? <b>Cartão ativo</b> : <b className="is-available">Disponível</b>}
+                </div>
+                <div className="customer-business-discovery-card__body">
+                  <span>{business.category?.name ?? "Estabelecimento VUYELA"}</span>
+                  <h3>{business.name}</h3>
+                  <p>{business.description}</p>
+                  <div className="customer-business-discovery-card__meta">
+                    <span>
+                      <MapPin aria-hidden="true" size={15} />
+                      {primaryBranch?.city ?? "Moçambique"}
+                    </span>
+                    <span>
+                      <Star aria-hidden="true" size={15} />
+                      {business.program
+                        ? `${Math.round(business.program.earnRate * 100)}% em pontos`
+                        : "Programa de fidelização"}
+                    </span>
+                  </div>
+                  <div className="customer-business-discovery-card__actions">
+                    {card ? (
+                      <Link
+                        className="is-primary"
+                        href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
+                      >
+                        <CreditCard aria-hidden="true" size={17} /> Ver meu cartão
+                      </Link>
+                    ) : (
+                      <form action={joinBusinessLoyaltyProgramAction}>
+                        <input name="businessId" type="hidden" value={business.id} />
+                        <input name="businessSlug" type="hidden" value={business.slug} />
+                        <input name="returnTo" type="hidden" value="/cliente?vista=negocios" />
+                        <button type="submit">
+                          <Plus aria-hidden="true" size={17} /> Aderir ao cartão
+                        </button>
+                      </form>
+                    )}
+                    <Link href={`/estabelecimentos/${business.slug}`}>Ver detalhes</Link>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
         <SectionEmpty
-          icon={CreditCard}
-          title="Ainda não tem cartões"
-          body="Os cartões emitidos por negócios VUYELA aparecerão nesta área."
+          icon={Store}
+          title="Ainda sem negócios disponíveis"
+          body="Os negócios com programas ativos aparecerão aqui assim que forem publicados."
         />
       )}
     </section>
@@ -884,7 +1030,7 @@ function CustomerMobileHeader({
           {actionContent}
         </Link>
       ) : action === "add" ? (
-        <Link aria-label={actionLabel} href="/estabelecimentos">
+        <Link aria-label={actionLabel} href="/cliente?vista=negocios">
           {actionContent}
         </Link>
       ) : (
