@@ -95,7 +95,7 @@ function buildEmailHtml(request: NotificationDeliveryRequest): string {
   const subject = escapeHtml(request.subject);
   const body = escapeHtml(request.body).replace(/\n/g, "<br />");
 
-  return `<!doctype html><html lang="pt-MZ"><body style="margin:0;background:#f4f7f7;color:#16323a;font-family:Arial,sans-serif"><div style="max-width:600px;margin:0 auto;padding:32px 20px"><p style="margin:0 0 12px;color:#007f7f;font-size:12px;font-weight:700;text-transform:uppercase">${businessName} · VUYELA</p><h1 style="margin:0 0 16px;color:#073b4c;font-size:24px">${subject}</h1><p style="margin:0;line-height:1.6">${body}</p><p style="margin:28px 0 0;color:#65777c;font-size:12px">Os pontos VUYELA são benefícios promocionais do estabelecimento emissor.</p></div></body></html>`;
+  return `<!doctype html><html lang="pt-MZ"><body style="margin:0;background:#f4f7f7;color:#16323a;font-family:Arial,sans-serif"><div style="max-width:600px;margin:0 auto;padding:32px 20px"><p style="margin:0 0 12px;color:#007f7f;font-size:12px;font-weight:700;text-transform:uppercase">${businessName} · VUYELA</p><h1 style="margin:0 0 16px;color:#073b4c;font-size:24px">${subject}</h1><p style="margin:0;line-height:1.6">${body}</p><p style="margin:28px 0 0;color:#65777c;font-size:12px">As YELAS VUYELA são benefícios promocionais do estabelecimento emissor.</p></div></body></html>`;
 }
 
 function escapeHtml(value: string): string {

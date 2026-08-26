@@ -7,34 +7,34 @@ import { FaqExplorer, type MarketingFaqItem } from "@/features/marketing/faq-exp
 
 export const metadata: Metadata = {
   title: "Ajuda e perguntas frequentes",
-  description: "Respostas sobre cartões, pontos, POS, negócios e segurança na VUYELA.",
+  description: "Respostas sobre cartões, YELAS, POS, negócios e segurança na VUYELA.",
   alternates: { canonical: "/ajuda" }
 };
 
 const faqItems: MarketingFaqItem[] = [
   {
     category: "Clientes",
-    question: "Como posso acumular pontos?",
+    question: "Como posso acumular YELAS?",
     answer:
       "Ao pagar num estabelecimento parceiro, apresente o QR Code no seu telemóvel para o operador fazer a leitura rápida."
   },
   {
     category: "Clientes",
-    question: "Os pontos têm valor monetário fora da rede?",
+    question: "As YELAS têm valor monetário fora da rede?",
     answer:
-      "Não. Os pontos representam descontos promocionais exclusivos e benefícios em compras futuras nos parceiros."
+      "Não. As YELAS representam descontos promocionais exclusivos e benefícios em compras futuras nos parceiros."
   },
   {
     category: "Clientes",
-    question: "Posso transferir pontos para outro número?",
+    question: "Posso transferir YELAS para outro número?",
     answer:
-      "Não. Os pontos acumulados são de gestão direta e pessoal, associados ao número de telefone registado."
+      "Não. As YELAS acumuladas são de gestão direta e pessoal, associadas ao número de telefone registado."
   },
   {
     category: "Clientes",
     question: "Como funciona o resgate de recompensas?",
     answer:
-      "Basta indicar ao operador que deseja descontar os seus pontos disponíveis no momento do pagamento."
+      "Basta indicar ao operador que deseja descontar os seus YELAS disponíveis no momento do pagamento."
   },
   {
     category: "Negócios",

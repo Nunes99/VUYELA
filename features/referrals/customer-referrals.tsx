@@ -48,7 +48,7 @@ export function CustomerReferralsView({ state }: { state: CustomerReferralsState
             Premiados<strong>{state.summary.rewardedCount.toLocaleString("pt-MZ")}</strong>
           </span>
           <span>
-            Pontos<strong>{state.summary.totalRewardPoints.toLocaleString("pt-MZ")}</strong>
+            YELAS<strong>{state.summary.totalRewardPoints.toLocaleString("pt-MZ")}</strong>
           </span>
           <span>
             Equivalente<strong>{formatMznMinor(state.summary.totalRewardValueMznMinor)}</strong>
@@ -103,7 +103,7 @@ function CustomerProgramList({ programs }: { programs: CustomerReferralProgram[]
           <dl>
             <ReferralFact
               label="Indicador"
-              value={`${program.referrerRewardPoints.toLocaleString("pt-MZ")} pts`}
+              value={`${program.referrerRewardPoints.toLocaleString("pt-MZ")} YL`}
               detail={formatMznMinor(
                 calculatePointsValueMznMinor(
                   program.referrerRewardPoints,
@@ -113,7 +113,7 @@ function CustomerProgramList({ programs }: { programs: CustomerReferralProgram[]
             />
             <ReferralFact
               label="Convidado"
-              value={`${program.referredRewardPoints.toLocaleString("pt-MZ")} pts`}
+              value={`${program.referredRewardPoints.toLocaleString("pt-MZ")} YL`}
               detail={formatMznMinor(
                 calculatePointsValueMznMinor(
                   program.referredRewardPoints,
@@ -162,9 +162,7 @@ function ReferralHistory({ items }: { items: ReferralHistoryItem[] }) {
               <ReferralFact label="Expira" value={formatDate(item.expiresAt)} />
               <ReferralFact
                 label="Prémio"
-                value={
-                  rewardPoints > 0 ? `${rewardPoints.toLocaleString("pt-MZ")} pts` : "Pendente"
-                }
+                value={rewardPoints > 0 ? `${rewardPoints.toLocaleString("pt-MZ")} YL` : "Pendente"}
                 detail={
                   rewardPoints > 0
                     ? formatMznMinor(

@@ -47,7 +47,7 @@ export function CustomerCardVisual({
         <span className="customer-digital-card__balance">
           <span>Saldo disponível</span>
           <strong>
-            {card.availablePoints.toLocaleString("pt-MZ")} <small>Pts</small>
+            {card.availablePoints.toLocaleString("pt-MZ")} <small>YL</small>
           </strong>
           <b>Equivale a {card.valueMzn.toLocaleString("pt-MZ")} MZN</b>
         </span>

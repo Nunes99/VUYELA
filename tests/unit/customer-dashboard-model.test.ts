@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildCustomerDashboardViewModel,
-  getActivityDescription,
-  getActivityPoints,
+  getLedgerActivityDescription,
   getActivityTone
 } from "@/features/customer-dashboard/model";
 import type { DigitalCustomerCard } from "@/features/customer-cards/model";
@@ -68,18 +67,16 @@ describe("customer dashboard model", () => {
     expect(dashboard.unreadNotificationCount).toBe(1);
   });
 
-  it("builds activity copy and signed point movement", () => {
+  it("builds separate YELAS copy for ledger credit and debit movements", () => {
+    expect(getLedgerActivityDescription({ type: "redeem", reason: "purchase_redemption" })).toBe(
+      "YELAS utilizadas no pagamento"
+    );
     expect(
-      getActivityDescription({ pointsEarned: 5, pointsRedeemed: 0, netAmountMznMinor: 10000 })
-    ).toBe("Ganhou 5 pontos");
-    expect(
-      getActivityDescription({ pointsEarned: 0, pointsRedeemed: 20, netAmountMznMinor: 8000 })
-    ).toBe("Resgatou 20 pontos");
-    expect(
-      getActivityDescription({ pointsEarned: 2, pointsRedeemed: 10, netAmountMznMinor: 8000 })
-    ).toBe("Resgatou 10 pontos e ganhou 2 pontos");
-
-    expect(getActivityPoints({ pointsEarned: 2, pointsRedeemed: 10 })).toBe(-8);
+      getLedgerActivityDescription({
+        type: "earn",
+        reason: "purchase_earn_after_redemption"
+      })
+    ).toBe("YELAS ganhas sobre o valor pago");
     expect(getActivityTone(-8)).toBe("redeem");
     expect(getActivityTone(0)).toBe("neutral");
     expect(getActivityTone(5)).toBe("earn");

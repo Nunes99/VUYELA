@@ -53,7 +53,7 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
           />
           <ReferralStat
             icon={<Gift size={18} />}
-            label="Pontos emitidos"
+            label="YELAS emitidas"
             value={state.summary.totalIssuedPoints.toLocaleString("pt-MZ")}
           />
           <ReferralStat
@@ -83,7 +83,7 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
             />
             <Fact
               label="Indicador"
-              value={`${state.rules.referrerRewardPoints.toLocaleString("pt-MZ")} pts`}
+              value={`${state.rules.referrerRewardPoints.toLocaleString("pt-MZ")} YL`}
               detail={formatMznMinor(
                 calculatePointsValueMznMinor(
                   state.rules.referrerRewardPoints,
@@ -93,7 +93,7 @@ export function BusinessReferralsView({ state }: { state: BusinessReferralsState
             />
             <Fact
               label="Convidado"
-              value={`${state.rules.referredRewardPoints.toLocaleString("pt-MZ")} pts`}
+              value={`${state.rules.referredRewardPoints.toLocaleString("pt-MZ")} YL`}
               detail={formatMznMinor(
                 calculatePointsValueMznMinor(
                   state.rules.referredRewardPoints,
@@ -183,11 +183,11 @@ function BusinessReferralList({ state }: { state: BusinessReferralsReadyState })
             </div>
             <div>
               <dt>Indicador</dt>
-              <dd>{referral.referrerRewardPoints.toLocaleString("pt-MZ")} pts</dd>
+              <dd>{referral.referrerRewardPoints.toLocaleString("pt-MZ")} YL</dd>
             </div>
             <div>
               <dt>Convidado</dt>
-              <dd>{referral.referredRewardPoints.toLocaleString("pt-MZ")} pts</dd>
+              <dd>{referral.referredRewardPoints.toLocaleString("pt-MZ")} YL</dd>
             </div>
           </dl>
         </article>

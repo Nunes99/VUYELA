@@ -29,7 +29,7 @@ export function PricingSelector({ hidePeriod = false, plans }: PricingSelectorPr
       <div className="marketing-empty-state">
         <strong>Os planos serão apresentados assim que o catálogo estiver disponível.</strong>
         <p>Fale com a equipa VUYELA para preparar o programa adequado ao seu negócio.</p>
-        <Link className="marketing-button marketing-button--dark" href="/onboarding/negocio">
+        <Link className="marketing-button marketing-button--dark" href="/cadastrar/negocio">
           Registar o meu negócio
         </Link>
       </div>
@@ -96,7 +96,7 @@ export function PricingSelector({ hidePeriod = false, plans }: PricingSelectorPr
                     ? "marketing-button marketing-button--dark"
                     : "marketing-button marketing-button--soft"
                 }
-                href="/onboarding/negocio"
+                href="/cadastrar/negocio"
               >
                 {plan.monthlyPriceMznMinor === 0 ? "Começar grátis" : "Começar agora"}
               </Link>

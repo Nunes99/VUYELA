@@ -12,6 +12,7 @@ import type { AuthPrincipal } from "@/lib/auth/rbac";
 const customer: AuthPrincipal = {
   profileId: "customer-1",
   profileRole: "customer",
+  accountType: "customer",
   mfaVerified: false,
   businessMemberships: []
 };
@@ -19,6 +20,7 @@ const customer: AuthPrincipal = {
 const cashier: AuthPrincipal = {
   profileId: "cashier-1",
   profileRole: "customer",
+  accountType: "business",
   mfaVerified: false,
   businessMemberships: [
     {
@@ -33,6 +35,7 @@ const cashier: AuthPrincipal = {
 const businessAdmin: AuthPrincipal = {
   profileId: "admin-1",
   profileRole: "customer",
+  accountType: "business",
   mfaVerified: false,
   businessMemberships: [
     {
@@ -59,6 +62,7 @@ describe("RBAC", () => {
   });
 
   it("limits cashier POS access to the assigned branch", () => {
+    expect(canAccessRoute(cashier, "/cliente")).toBe(false);
     expect(
       canAccessRoute(cashier, "/pos", {
         businessId: "business-a",
@@ -79,6 +83,11 @@ describe("RBAC", () => {
     ).toBe(false);
   });
 
+  it("keeps business identities out of the customer portal", () => {
+    expect(canAccessRoute(businessAdmin, "/cliente")).toBe(false);
+    expect(canAccessRoute(businessAdmin, "/negocio")).toBe(true);
+  });
+
   it("prevents business admins from managing owners", () => {
     expect(canManageBusinessRole("business_owner", "business_owner")).toBe(true);
     expect(canManageBusinessRole("business_admin", "cashier")).toBe(true);
@@ -97,6 +106,7 @@ describe("RBAC", () => {
         {
           profileId: "platform-1",
           profileRole: "platform_admin",
+          accountType: "platform",
           mfaVerified: false,
           businessMemberships: []
         },
@@ -119,6 +129,7 @@ describe("RBAC", () => {
       getDefaultAuthenticatedPath({
         profileId: "platform-1",
         profileRole: "platform_admin",
+        accountType: "platform",
         mfaVerified: true,
         businessMemberships: []
       })

@@ -69,7 +69,7 @@ export function OfflineCardList() {
       <section className="offline-security" aria-label="Limite de segurança offline">
         <ShieldCheck aria-hidden="true" size={20} />
         <p>
-          Estes QR servem apenas para identificar o cartão. Consultar saldo ou usar pontos requer
+          Estes QR servem apenas para identificar o cartão. Consultar saldo ou usar YELAS requer
           ligação e validação no servidor.
         </p>
       </section>

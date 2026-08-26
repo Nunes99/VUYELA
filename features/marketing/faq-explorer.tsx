@@ -42,7 +42,7 @@ export function FaqExplorer({ items, pageLayout = false }: FaqExplorerProps) {
       <span className="sr-only">Pesquisar perguntas frequentes</span>
       <input
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="Pesquise por pontos, cartões ou negócios"
+        placeholder="Pesquise por YELAS, cartões ou negócios"
         type="search"
         value={query}
       />
@@ -87,7 +87,7 @@ export function FaqExplorer({ items, pageLayout = false }: FaqExplorerProps) {
           <div className="marketing-container marketing-heading marketing-heading--center marketing-heading--inverse">
             <span>Centro de ajuda</span>
             <h1 id="help-title">Perguntas Frequentes &amp; Suporte</h1>
-            <p>Encontre respostas rápidas sobre pontos, segurança e gestão do seu negócio.</p>
+            <p>Encontre respostas rápidas sobre YELAS, segurança e gestão do seu negócio.</p>
             {search}
           </div>
         </section>

@@ -1,5 +1,11 @@
 # Loyalty Rules
 
+## Product terminology
+
+The customer-facing loyalty unit is **YELA**, abbreviated **YL**. Use **YELAS** in plural UI copy.
+The existing `points_*` columns, RPC parameters, and `point_ledger` table remain internal technical
+names for backwards compatibility; they must not appear as the product unit in the interface.
+
 ## Point Value
 
 Default:
@@ -18,6 +24,16 @@ Default eligible amount:
 eligible_amount = gross_amount - discounts - points_redeemed_value
 points_earned = eligible_amount * earn_rate
 ```
+
+When a customer uses YELAS and earns new YELAS in the same purchase, the engine records two
+independent ledger movements linked to the same transaction:
+
+1. a negative `redeem` movement for the YELAS used;
+2. a positive `earn` movement calculated only from the amount still paid after discounts and the
+   promotional value redeemed.
+
+The customer history must show both movements separately. It must never collapse them into a net
+movement because that hides the debit and credit audit trail.
 
 Do not use floating point for money. Use integer minor units or PostgreSQL `numeric` with explicit rounding rules.
 

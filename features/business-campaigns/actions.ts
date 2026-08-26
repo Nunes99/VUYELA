@@ -244,7 +244,7 @@ function parseRules(
   }
 
   if (rewardType === "bonus_points") {
-    const bonusPoints = parseOptionalInteger(formData, "bonusPoints", "Pontos bonus");
+    const bonusPoints = parseOptionalInteger(formData, "bonusPoints", "YELAS bonus");
     if (!bonusPoints.ok) {
       return bonusPoints;
     }
@@ -252,7 +252,7 @@ function parseRules(
     rules.bonusPoints = bonusPoints.value ?? 0;
 
     if (rules.bonusPoints <= 0 || rules.bonusPoints > 100_000) {
-      return createParseError("Os pontos bonus devem estar entre 1 e 100000.");
+      return createParseError("As YELAS bonus devem estar entre 1 e 100000.");
     }
   }
 
@@ -297,7 +297,7 @@ function parseAudience(
     return inactiveDays;
   }
 
-  const minPointsBalance = parseOptionalInteger(formData, "minPointsBalance", "Pontos mínimos");
+  const minPointsBalance = parseOptionalInteger(formData, "minPointsBalance", "YELAS mínimos");
   if (!minPointsBalance.ok) {
     return minPointsBalance;
   }

@@ -414,7 +414,7 @@ function GeneralSettings({
                 />
                 <SettingCheckbox
                   defaultChecked={terminal.settings.showPointsBalance}
-                  label="Mostrar pontos disponíveis"
+                  label="Mostrar YELAS disponíveis"
                   name="showPointsBalance"
                 />
                 <SettingCheckbox
@@ -559,7 +559,7 @@ function PrinterSettings({ terminal }: { terminal?: PosTerminalContext }) {
         <SettingsRows
           rows={[
             ["Logótipo VUYELA", "Visível no cabeçalho"],
-            ["Pontos ganhos e usados", "Detalhados por transação"],
+            ["YELAS ganhas e usados", "Detalhados por transação"],
             ["Referência anti-duplicação", "Visível para auditoria"],
             ["Contacto do negócio", "Obtido do perfil da filial"]
           ]}
@@ -663,7 +663,7 @@ function SecuritySettings() {
       <SettingsCard title="Proteção das transações" icon={<KeyRound size={20} />}>
         <SettingsRows
           rows={[
-            ["Cálculo de pontos", "Servidor"],
+            ["Cálculo de YELAS", "Servidor"],
             ["Alteração de saldo", "RPC transacional"],
             ["Registo no ledger", "Obrigatório"],
             ["Proteção anti-duplicação", "Chave única por transação"]

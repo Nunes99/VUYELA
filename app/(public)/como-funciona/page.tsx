@@ -23,12 +23,12 @@ const journey = [
   },
   {
     action: { href: "/clientes", label: "Ver demo QR" },
-    body: "No momento de efetuar o pagamento, mostre o seu cartão no ecrã. O lojista lê o código QR para creditar os pontos automaticamente.",
+    body: "No momento de efetuar o pagamento, mostre o seu cartão no ecrã. O lojista lê o código QR para creditar as YELAS automaticamente.",
     title: "Apresente o QR Code no pagamento"
   },
   {
     action: { href: "/ofertas", label: "Conhecer recompensas" },
-    body: "Converta os pontos acumulados em descontos nas próximas compras ou em benefícios definidos pelo negócio emissor.",
+    body: "Converta as YELAS acumuladas em descontos nas próximas compras ou em benefícios definidos pelo negócio emissor.",
     title: "Troque por benefícios diretos"
   }
 ];
@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
                 </li>
                 <li>
                   <Check size={16} />
-                  Pontos e equivalente promocional em MZN.
+                  YELAS e equivalente promocional em MZN.
                 </li>
                 <li>
                   <Check size={16} />
@@ -109,7 +109,7 @@ export default function HowItWorksPage() {
                 </li>
                 <li>
                   <Check size={16} />
-                  Regras de pontos e utilização.
+                  Regras de YELAS e utilização.
                 </li>
                 <li>
                   <Check size={16} />

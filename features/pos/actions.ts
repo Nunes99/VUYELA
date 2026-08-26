@@ -67,7 +67,7 @@ export async function submitPosAction(
     return {
       ...previousState,
       status: "idle",
-      message: "Pode ajustar os serviços, o valor e os pontos antes de continuar.",
+      message: "Pode ajustar os serviços, o valor e as YELAS antes de continuar.",
       quote: null,
       transactionId: null,
       idempotencyKey: "",
@@ -293,7 +293,7 @@ export async function confirmPosTransactionAction(
     );
   }
   if (previousState.quote.netAmountMznMinor === 0 && paymentMethodValue !== "points") {
-    return createErrorState("Esta compra está totalmente liquidada com pontos.", previousState);
+    return createErrorState("Esta compra está totalmente liquidada com YELAS.", previousState);
   }
   if (previousState.quote.netAmountMznMinor > 0 && paymentMethodValue === "points") {
     return createErrorState("Selecione um método para pagar o valor restante.", previousState);
@@ -414,7 +414,7 @@ function parseOptionalInteger(formData: FormData, key: string, previousState: Po
   if (!Number.isSafeInteger(parsed) || parsed < 0) {
     return {
       ok: false as const,
-      state: createErrorState("Os pontos a usar devem ser válidos.", previousState)
+      state: createErrorState("As YELAS a usar devem ser válidos.", previousState)
     };
   }
 

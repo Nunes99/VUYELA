@@ -47,8 +47,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
       <section className="auth-shell" aria-labelledby="signin-title">
         <div className="auth-panel auth-panel--copy">
           <VuyelaLogo className="auth-brand" href="/" inverse />
-          <span className="auth-kicker">Acesso seguro</span>
-          <h1 id="signin-title">Entre para ver os seus pontos e negócios.</h1>
+          <span className="auth-kicker">Acesso de cliente</span>
+          <h1 id="signin-title">Entre para ver os seus cartões e YELAS.</h1>
           <p>
             Use o seu e-mail e palavra-passe. As regras de acesso continuam protegidas no servidor e
             no PostgreSQL.
@@ -78,7 +78,8 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
           ) : null}
           <p className="auth-footnote">
             Ainda não tem conta? <Link href="/cadastrar">Criar conta</Link>. Esqueceu a
-            palavra-passe? <Link href="/recuperar-acesso">Recuperar acesso</Link>.
+            palavra-passe? <Link href="/recuperar-acesso">Recuperar acesso</Link>. É um negócio?{" "}
+            <Link href="/entrar/negocio">Entrar no Portal de Negócio</Link>.
           </p>
         </div>
       </section>

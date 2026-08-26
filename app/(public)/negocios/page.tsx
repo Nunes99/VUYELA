@@ -21,17 +21,17 @@ export const metadata: Metadata = {
 
 const capabilities = [
   {
-    body: "Personalize completamente as regras de atribuição de pontos, campanhas exclusivas e datas especiais como aniversários dos seus clientes.",
+    body: "Personalize completamente as regras de atribuição de YELAS, campanhas exclusivas e datas especiais como aniversários dos seus clientes.",
     icon: Star,
     title: "Programa próprio de fidelização"
   },
   {
-    body: "Atribua pontos de forma rápida e segura. Basta ler o código QR único do cliente através do telemóvel do operador.",
+    body: "Atribua YELAS de forma rápida e segura. Basta ler o código QR único do cliente através do telemóvel do operador.",
     icon: QrCode,
-    title: "Regras simples para atribuir pontos"
+    title: "Regras simples para atribuir YELAS"
   },
   {
-    body: "Mantenha um registo limpo e transparente de todas as transações, pontos emitidos e resgatados para uma reconciliação contabilística diária impecável.",
+    body: "Mantenha um registo limpo e transparente de todas as transações, YELAS emitidas e resgatados para uma reconciliação contabilística diária impecável.",
     icon: ClipboardList,
     title: "Histórico preparado para auditoria"
   },
@@ -56,12 +56,12 @@ export default function BusinessesPage() {
               Clientes que voltam. Negócios que <em>crescem.</em>
             </h1>
             <p>
-              Crie o seu próprio programa de fidelização em minutos. Configure regras de pontos
+              Crie o seu próprio programa de fidelização em minutos. Configure regras de YELAS
               personalizadas, conheça as preferências dos seus clientes e automatize campanhas com
               base em dados de consumo reais.
             </p>
             <div className="marketing-actions">
-              <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
+              <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
                 Criar programa gratuito <ArrowRight size={16} />
               </Link>
               <Link className="marketing-button marketing-button--outline" href="#demonstracao">
@@ -143,7 +143,7 @@ export default function BusinessesPage() {
               </li>
               <li>
                 <Check size={16} />
-                Controlo rigoroso e auditoria de pontos ativos.
+                Controlo rigoroso e auditoria de YELAS ativos.
               </li>
               <li>
                 <Check size={16} />
@@ -154,7 +154,7 @@ export default function BusinessesPage() {
           <div className="marketing-metrics-panel">
             <div>
               <BarChart3 size={20} />
-              <span>Pontos emitidos</span>
+              <span>YELAS emitidas</span>
               <strong>158.300</strong>
             </div>
             <div>
@@ -184,7 +184,7 @@ export default function BusinessesPage() {
             <p>
               Não precisa de investir em novos terminais. A VUYELA funciona no navegador e pode
               integrar-se com o seu software de faturação atual, mantendo todas as operações de
-              pontos validadas no servidor.
+              YELAS validadas no servidor.
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function BusinessesPage() {
             <article>
               <h3>“Mais saúde, mais fidelidade”</h3>
               <p>
-                “Os clientes adoram acumular pontos na nossa farmácia para descontar em produtos de
+                “Os clientes adoram acumular YELAS na nossa farmácia para descontar em produtos de
                 higiene. O sistema é simples para a equipa usar diariamente.”
               </p>
               <strong>Dra. Amina Isa</strong>
@@ -226,7 +226,7 @@ export default function BusinessesPage() {
         <div className="marketing-container">
           <h2>Comece hoje — primeiro mês grátis</h2>
           <p>Transforme clientes casuais em visitas recorrentes. Cancele quando quiser.</p>
-          <form action="/onboarding/negocio" method="get">
+          <form action="/cadastrar/negocio" method="get">
             <label className="sr-only" htmlFor="business-email">
               E-mail corporativo
             </label>

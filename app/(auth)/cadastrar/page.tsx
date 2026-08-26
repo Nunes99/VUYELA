@@ -6,7 +6,7 @@ import { SignUpForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
   title: "Criar conta",
-  description: "Crie uma conta VUYELA para usar cartões digitais ou registar um negócio.",
+  description: "Crie uma conta pessoal VUYELA para usar cartões digitais e acumular YELAS.",
   alternates: {
     canonical: "/cadastrar"
   },
@@ -22,18 +22,16 @@ export default function SignUpPage() {
       <section className="auth-shell auth-shell--compact" aria-labelledby="signup-title">
         <div className="auth-panel auth-panel--copy">
           <VuyelaLogo className="auth-brand" href="/" inverse />
-          <span className="auth-kicker">Nova conta</span>
-          <h1 id="signup-title">Crie a base da sua conta VUYELA.</h1>
-          <p>
-            Depois da confirmação, pode completar o perfil de cliente ou registar um negócio para
-            validação.
-          </p>
+          <span className="auth-kicker">Conta de cliente</span>
+          <h1 id="signup-title">Crie a sua conta pessoal VUYELA.</h1>
+          <p>Adira aos cartões dos seus negócios favoritos e acompanhe todas as suas YELAS.</p>
         </div>
 
         <div className="auth-panel auth-panel--forms">
           <SignUpForm />
           <p className="auth-footnote">
-            Já tem conta? <Link href="/entrar">Entrar</Link>.
+            Já tem conta? <Link href="/entrar">Entrar</Link>. Pretende gerir uma empresa?{" "}
+            <Link href="/cadastrar/negocio">Registar negócio</Link>.
           </p>
         </div>
       </section>

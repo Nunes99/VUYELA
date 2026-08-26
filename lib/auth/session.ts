@@ -7,6 +7,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 import {
   canAccessRoute,
   getDefaultAuthenticatedPath,
+  isAccountType,
   isBusinessMemberRole,
   isMfaVerifiedAssuranceLevel,
   isProfileRole,
@@ -23,6 +24,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 interface ProfileRow {
   id: string;
   role: string | null;
+  account_type: string | null;
   account_status: string | null;
 }
 
@@ -91,7 +93,11 @@ export async function getAuthContext(): Promise<AuthContext> {
   }
 
   const [{ data: profileData }, { data: membershipData }, assurance] = await Promise.all([
-    supabase.from("profiles").select("id, role, account_status").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("id, role, account_type, account_status")
+      .eq("id", user.id)
+      .maybeSingle(),
     supabase
       .from("business_members")
       .select("business_id, branch_id, role, status")
@@ -115,6 +121,14 @@ export async function getAuthContext(): Promise<AuthContext> {
     .filter((membership): membership is BusinessMembership => membership !== null);
 
   const profileRole = profile?.role && isProfileRole(profile.role) ? profile.role : "customer";
+  const accountType =
+    profile?.account_type && isAccountType(profile.account_type)
+      ? profile.account_type
+      : businessMemberships.length > 0
+        ? "business"
+        : profileRole === "customer"
+          ? "customer"
+          : "platform";
 
   return {
     isConfigured: true,
@@ -122,6 +136,7 @@ export async function getAuthContext(): Promise<AuthContext> {
     principal: {
       profileId: user.id,
       profileRole,
+      accountType,
       mfaVerified: isMfaVerifiedAssuranceLevel(assurance.data?.currentLevel),
       businessMemberships
     }

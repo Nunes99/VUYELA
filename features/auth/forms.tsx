@@ -21,8 +21,9 @@ import {
   requestPasswordResetAction,
   requestPhoneOtpAction,
   signInWithEmailAction,
+  signUpBusinessMemberWithEmailAction,
+  signUpBusinessWithEmailAction,
   signUpWithEmailAction,
-  submitBusinessOnboardingAction,
   updatePasswordAction,
   updateCustomerProfileAction,
   verifyPhoneOtpAction
@@ -31,6 +32,7 @@ import { initialAuthActionState } from "@/features/auth/state";
 
 interface FormProps {
   nextPath?: string | undefined;
+  portal?: "customer" | "business" | undefined;
 }
 
 function ActionMessage({ status, message }: { status: string; message: string }) {
@@ -48,7 +50,7 @@ function ActionMessage({ status, message }: { status: string; message: string })
   );
 }
 
-export function EmailSignInForm({ nextPath = "/cliente" }: FormProps) {
+export function EmailSignInForm({ nextPath = "/cliente", portal = "customer" }: FormProps) {
   const [state, formAction, pending] = useActionState(
     signInWithEmailAction,
     initialAuthActionState
@@ -57,6 +59,7 @@ export function EmailSignInForm({ nextPath = "/cliente" }: FormProps) {
   return (
     <form action={formAction} className="auth-form">
       <input type="hidden" name="next" value={nextPath} />
+      <input type="hidden" name="portal" value={portal} />
       <Input label="E-mail" name="email" type="email" autoComplete="email" requiredMark required />
       <Input
         label="Palavra-passe"
@@ -252,25 +255,28 @@ export function CustomerOnboardingForm() {
   );
 }
 
-export function BusinessOnboardingForm() {
+export function BusinessSignUpForm() {
   const [state, formAction, pending] = useActionState(
-    submitBusinessOnboardingAction,
+    signUpBusinessWithEmailAction,
     initialAuthActionState
   );
   const [step, setStep] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [values, setValues] = useState({
+    representativeName: "",
+    email: "",
+    password: "",
+    passwordConfirmation: "",
     businessName: "",
     legalName: "",
     nuit: "",
     city: "",
     province: "",
     phone: "",
-    email: "",
     description: ""
   });
-  const steps = ["Identificação", "Local e contactos", "Revisão"];
+  const steps = ["Acesso", "Negócio", "Revisão"];
 
   const updateValue = (field: keyof typeof values, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
@@ -327,7 +333,52 @@ export function BusinessOnboardingForm() {
       </h2>
 
       <fieldset className="auth-wizard__panel" data-step="0" hidden={step !== 0}>
-        <legend className="sr-only">Identificação do negócio</legend>
+        <legend className="sr-only">Credenciais da conta de negócio</legend>
+        <Input
+          label="Nome do responsável"
+          name="representativeName"
+          autoComplete="name"
+          onChange={(event) => updateValue("representativeName", event.currentTarget.value)}
+          requiredMark
+          required
+          value={values.representativeName}
+        />
+        <Input
+          label="E-mail de acesso"
+          name="email"
+          type="email"
+          autoComplete="email"
+          onChange={(event) => updateValue("email", event.currentTarget.value)}
+          requiredMark
+          required
+          value={values.email}
+        />
+        <Input
+          label="Palavra-passe"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          onChange={(event) => updateValue("password", event.currentTarget.value)}
+          requiredMark
+          required
+          value={values.password}
+        />
+        <Input
+          label="Confirmar palavra-passe"
+          name="passwordConfirmation"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          onChange={(event) => updateValue("passwordConfirmation", event.currentTarget.value)}
+          requiredMark
+          required
+          value={values.passwordConfirmation}
+        />
+      </fieldset>
+
+      <fieldset className="auth-wizard__panel" data-step="1" hidden={step !== 1}>
+        <legend className="sr-only">Identificação e localização do negócio</legend>
         <Input
           label="Nome do negócio"
           name="businessName"
@@ -357,10 +408,6 @@ export function BusinessOnboardingForm() {
           title="Introduza entre 9 e 12 algarismos."
           value={values.nuit}
         />
-      </fieldset>
-
-      <fieldset className="auth-wizard__panel" data-step="1" hidden={step !== 1}>
-        <legend className="sr-only">Localização e contactos</legend>
         <div className="auth-wizard__grid">
           <Input
             label="Cidade"
@@ -386,20 +433,23 @@ export function BusinessOnboardingForm() {
             onChange={(event) => updateValue("phone", event.currentTarget.value)}
             value={values.phone}
           />
-          <Input
-            label="E-mail do negócio"
-            name="email"
-            type="email"
-            autoComplete="email"
-            onChange={(event) => updateValue("email", event.currentTarget.value)}
-            value={values.email}
-          />
         </div>
+        <Textarea
+          label="Descrição"
+          name="description"
+          onChange={(event) => updateValue("description", event.currentTarget.value)}
+          rows={4}
+          value={values.description}
+        />
       </fieldset>
 
       <fieldset className="auth-wizard__panel" data-step="2" hidden={step !== 2}>
         <legend className="sr-only">Revisão do registo</legend>
         <dl className="auth-wizard__review">
+          <div>
+            <dt>Responsável e acesso</dt>
+            <dd>{[values.representativeName, values.email].filter(Boolean).join(" · ")}</dd>
+          </div>
           <div>
             <dt>Negócio</dt>
             <dd>{values.businessName}</dd>
@@ -414,16 +464,9 @@ export function BusinessOnboardingForm() {
           </div>
           <div>
             <dt>Contactos</dt>
-            <dd>{[values.phone, values.email].filter(Boolean).join(" · ") || "Não indicados"}</dd>
+            <dd>{values.phone || "Não indicado"}</dd>
           </div>
         </dl>
-        <Textarea
-          label="Descrição"
-          name="description"
-          onChange={(event) => updateValue("description", event.currentTarget.value)}
-          rows={4}
-          value={values.description}
-        />
         <p className="auth-wizard__hint">
           Confirme os dados antes de enviar. Pode voltar às etapas anteriores sem perder o que já
           preencheu.
@@ -438,7 +481,7 @@ export function BusinessOnboardingForm() {
               <ArrowLeft aria-hidden="true" size={17} /> Voltar
             </button>
           ) : (
-            <Link href="/cliente">Cancelar</Link>
+            <Link href="/">Cancelar</Link>
           )}
         </span>
         {step < steps.length - 1 ? (
@@ -457,10 +500,67 @@ export function BusinessOnboardingForm() {
             loading={pending}
             leadingIcon={<Store size={18} />}
           >
-            Enviar para validação
+            Criar conta de negócio
           </Button>
         )}
       </div>
+    </form>
+  );
+}
+
+export function BusinessTeamSignUpForm({ token }: { token: string }) {
+  const [state, formAction, pending] = useActionState(
+    signUpBusinessMemberWithEmailAction,
+    initialAuthActionState
+  );
+
+  return (
+    <form action={formAction} className="auth-form">
+      <input name="token" type="hidden" value={token} />
+      <Input label="Nome" name="displayName" autoComplete="name" requiredMark required />
+      <Input
+        label="E-mail de acesso"
+        name="email"
+        type="email"
+        autoComplete="email"
+        requiredMark
+        required
+      />
+      <Input
+        label="Telefone"
+        name="phone"
+        type="tel"
+        autoComplete="tel"
+        hint="Preencha quando o convite tiver sido enviado para o telefone."
+      />
+      <Input
+        label="Palavra-passe"
+        name="password"
+        type="password"
+        autoComplete="new-password"
+        minLength={8}
+        requiredMark
+        required
+      />
+      <Input
+        label="Confirmar palavra-passe"
+        name="passwordConfirmation"
+        type="password"
+        autoComplete="new-password"
+        minLength={8}
+        requiredMark
+        required
+      />
+      <ActionMessage status={state.status} message={state.message} />
+      <Button
+        type="submit"
+        variant="primary"
+        fullWidth
+        loading={pending}
+        leadingIcon={<Store size={18} />}
+      >
+        Criar credenciais de equipa
+      </Button>
     </form>
   );
 }

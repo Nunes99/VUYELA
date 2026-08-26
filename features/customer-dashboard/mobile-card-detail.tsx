@@ -42,15 +42,15 @@ export function CustomerMobileCardDetail({
           <h3>Próxima Recompensa</h3>
           <strong>
             {card.availablePoints.toLocaleString("pt-MZ")} / {rewardTarget.toLocaleString("pt-MZ")}{" "}
-            Pts
+            YL
           </strong>
         </header>
         <span>
           <i style={{ width: `${progress}%` }} />
         </span>
         <p>
-          Faltam {(rewardTarget - card.availablePoints).toLocaleString("pt-MZ")} pontos para
-          resgatar a próxima recompensa.
+          Faltam {(rewardTarget - card.availablePoints).toLocaleString("pt-MZ")} YELAS para resgatar
+          a próxima recompensa.
         </p>
       </section>
 
@@ -76,7 +76,7 @@ export function CustomerMobileCardDetail({
             </div>
             <b className={`is-${item.tone}`}>
               {item.points > 0 ? "+" : ""}
-              {item.points.toLocaleString("pt-MZ")} Pts
+              {item.points.toLocaleString("pt-MZ")} YL
             </b>
           </article>
         ))}

@@ -60,21 +60,21 @@ test("keeps lookup, catalogue, payment and confirmation controls functional", as
   await page.getByRole("radio", { name: /Barba Completa/ }).click();
   await expect(page.locator(".pos-summary--services")).toContainText("Barba Completa");
   const usePoints = page.getByRole("checkbox", {
-    name: /Usar pontos como parte do pagamento/
+    name: /Usar YELAS como parte do pagamento/
   });
   await usePoints.check();
-  const pointsInput = page.getByRole("spinbutton", { name: "Pontos a utilizar" });
+  const pointsInput = page.getByRole("spinbutton", { name: "YELAS a utilizar" });
   await expect(pointsInput).toHaveValue("400");
   await pointsInput.fill("250");
   await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("250 MT");
   await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("550 MT");
-  await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("+55 pts");
+  await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("+55 YL");
   await expect(page.getByRole("button", { name: "Confirmar Serviços selecionados" })).toBeEnabled();
 
   await page.goto("/dev/pos?etapa=authorize");
-  await expect(page.locator(".pos-summary--values")).toContainText("300 pts");
+  await expect(page.locator(".pos-summary--values")).toContainText("300 YL");
   await expect(page.locator(".pos-summary--values")).toContainText("1.100 MT");
-  await expect(page.locator(".pos-summary--values")).toContainText("+110 pts");
+  await expect(page.locator(".pos-summary--values")).toContainText("+110 YL");
   await expect(page.getByRole("radio", { name: /Dinheiro/ })).toHaveAttribute(
     "aria-checked",
     "true"
@@ -82,8 +82,8 @@ test("keeps lookup, catalogue, payment and confirmation controls functional", as
   await page.getByRole("radio", { name: /^Cartão/ }).click();
   await page.getByRole("button", { name: "Prosseguir para Resumo" }).click();
   await expect(page.getByRole("heading", { name: "Confirmar Transação" })).toBeVisible();
-  await expect(page.locator(".pos-confirmation-list--review")).toContainText("300 pts");
-  await expect(page.locator(".pos-confirmation-list--review")).toContainText("+110 pts");
+  await expect(page.locator(".pos-confirmation-list--review")).toContainText("300 YL");
+  await expect(page.locator(".pos-confirmation-list--review")).toContainText("+110 YL");
 
   const authorization = page.getByRole("checkbox");
   const confirmButton = page.getByRole("button", { name: "Confirmar Pagamento" });

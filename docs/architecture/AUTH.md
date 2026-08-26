@@ -76,6 +76,12 @@ existing Auth users. Business onboarding calls the authenticated
 `submit_business_onboarding` RPC, which creates the business, primary branch, owner membership, and
 audit record atomically without exposing or requiring a service-role key in the application flow.
 
+Customer and business identities are separate persistent account types. `/cadastrar` creates only
+customer credentials; `/cadastrar/negocio` creates business-only credentials and provisions the
+pending business, primary branch, and owner membership in the Auth trigger transaction. An account
+type never grants tenant access by itself: business and POS authorization still requires an active
+`business_members` row. User-editable Auth metadata is not referenced by RLS policies.
+
 Password recovery returns through `/auth/callback` to `/definir-senha`, where the authenticated
 recovery session can set the new password. Invalid or expired callback codes return to the login
 screen with an explicit error state.

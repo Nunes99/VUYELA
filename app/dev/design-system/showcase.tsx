@@ -82,7 +82,7 @@ const transactionColumns = [
   },
   {
     key: "points",
-    header: "Pontos",
+    header: "YELAS",
     render: (row: (typeof transactions)[number]) => row.points,
     align: "right" as const
   }
@@ -168,7 +168,7 @@ export function DesignSystemShowcase() {
             <h3>Botoes</h3>
             <div className="ds-inline">
               <Button variant="primary">Guardar</Button>
-              <Button variant="reward">Emitir pontos</Button>
+              <Button variant="reward">Emitir YELAS</Button>
               <Button variant="outline">Cancelar</Button>
               <Button variant="danger">Suspender</Button>
               <IconButton label="Abrir menu" icon={<Menu />} variant="outline" />
@@ -189,7 +189,7 @@ export function DesignSystemShowcase() {
               </Select>
               <Textarea
                 label="Mensagem da campanha"
-                placeholder="Volte esta semana e ganhe pontos extra."
+                placeholder="Volte esta semana e ganhe YELAS extra."
               />
               <Input label="NUIT" error="Informe um NUIT válido." defaultValue="123" />
             </div>
@@ -199,7 +199,7 @@ export function DesignSystemShowcase() {
             <div className="ds-stack">
               <Checkbox
                 label="Enviar comprovativo por e-mail"
-                hint="Cliente recebe os pontos e o resumo."
+                hint="Cliente recebe as YELAS e o resumo."
                 defaultChecked
               />
               <Radio label="Plano mensal" name="billing" defaultChecked />
@@ -221,8 +221,8 @@ export function DesignSystemShowcase() {
           <article className="ds-example">
             <h3>Feedback</h3>
             <div className="ds-stack">
-              <Alert title="Pontos creditados" tone="success" icon={<Check size={18} />}>
-                O cliente recebeu 50 pontos neste estabelecimento.
+              <Alert title="YELAS creditadas" tone="success" icon={<Check size={18} />}>
+                O cliente recebeu 50 YELAS neste estabelecimento.
               </Alert>
               <Toast title="QR gerado" description="O código expira em 2 minutos." tone="info" />
               <EmptyState
@@ -287,8 +287,8 @@ export function DesignSystemShowcase() {
           <article className="ds-example">
             <h3>Menus</h3>
             <div className="ds-inline">
-              <Popover trigger={<span>Detalhes</span>} title="Regra de pontos">
-                <p>1 ponto equivale a 1 MZN promocional neste estabelecimento.</p>
+              <Popover trigger={<span>Detalhes</span>} title="Regra de YELAS">
+                <p>1 YELA equivale a 1 MZN promocional neste estabelecimento.</p>
               </Popover>
               <DropdownMenu
                 label="Mais"
@@ -324,11 +324,11 @@ export function DesignSystemShowcase() {
             <Accordion
               items={[
                 {
-                  title: "Os pontos podem ser levantados?",
+                  title: "As YELAS podem ser levantados?",
                   content: "Não. São valor promocional do negócio emissor."
                 },
                 {
-                  title: "Os pontos expiram?",
+                  title: "As YELAS expiram?",
                   content: "Podem expirar conforme regras do estabelecimento."
                 }
               ]}
@@ -344,7 +344,7 @@ export function DesignSystemShowcase() {
       >
         <div className="ds-section__header">
           <span>Fidelização</span>
-          <h2 id="loyalty-heading">Pontos, QR e ofertas</h2>
+          <h2 id="loyalty-heading">YELAS, QR e ofertas</h2>
         </div>
         <div className="ds-component-grid">
           <article className="ds-example">
@@ -357,7 +357,7 @@ export function DesignSystemShowcase() {
               timestamp="Hoje"
             />
             <TransactionItem
-              title="Uso de pontos"
+              title="Uso de YELAS"
               description="Desconto aplicado"
               points={-100}
               timestamp="Ontem"
@@ -367,11 +367,11 @@ export function DesignSystemShowcase() {
             name="Restaurante Mares"
             category="Restaurante"
             location="Maputo"
-            rewardRate="5% em pontos"
+            rewardRate="5% em YELAS"
             action={<Button size="sm">Aderir</Button>}
           />
           <OfferCard
-            title="Pontos em dobro ao almoco"
+            title="YELAS em dobro ao almoco"
             businessName="Restaurante Mares"
             description="Ganhe benefícios extra em compras válidas de segunda a sexta."
             badge={<Badge tone="reward">Campanha</Badge>}
@@ -420,7 +420,7 @@ export function DesignSystemShowcase() {
               icon={<Users size={18} />}
             />
             <StatCard
-              label="Pontos emitidos"
+              label="YELAS emitidas"
               value="85.000"
               helperText="Equivalente promocional por estabelecimento."
               icon={<Sparkles size={18} />}

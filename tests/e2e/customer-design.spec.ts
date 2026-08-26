@@ -15,8 +15,10 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     await expect(page.getByLabel("Navegação do cliente")).toBeVisible();
 
     if (viewport.mobile) {
-      await expect(page.getByRole("link", { name: "Negócios" })).toBeVisible();
-      await expect(page.getByRole("link", { name: "POS" })).toBeVisible();
+      const customerNavigation = page.getByLabel("Navegação do cliente");
+      await expect(customerNavigation.locator('a[href="/cliente?vista=ofertas"]')).toBeVisible();
+      await expect(customerNavigation.locator('a[href="/cliente?vista=perfil"]')).toBeVisible();
+      await expect(customerNavigation.getByRole("link", { name: "POS" })).toHaveCount(0);
 
       const cardAlignment = await page.evaluate(() => {
         const heading = document.querySelector<HTMLElement>("#home-cards-title")!;
@@ -73,7 +75,7 @@ test("renders the customer activity, notifications and card identification views
 }, testInfo) => {
   await page.goto("/dev/customer?vista=atividade");
   if (testInfo.project.name === "mobile-chrome") {
-    await expect(page.getByRole("heading", { name: "Histórico de Pontos" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Histórico de YELAS" })).toBeVisible();
     await expect(page.getByRole("searchbox", { name: "Pesquisar atividade" })).toBeVisible();
     await expect(page.getByText("Barbershop 21", { exact: true }).first()).toBeVisible();
   } else {
@@ -85,7 +87,7 @@ test("renders the customer activity, notifications and card identification views
 
   await page.goto("/dev/customer?vista=notificacoes");
   await expect(page.getByRole("heading", { name: "Avisos e Alertas" }).last()).toBeVisible();
-  await expect(page.getByText("Pontos acumulados", { exact: true })).toBeVisible();
+  await expect(page.getByText("YELAS acumuladas", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=cartoes&cartao=card-1");
   const cardDetailSelector =

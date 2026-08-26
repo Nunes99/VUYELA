@@ -50,7 +50,7 @@ const previewBusinesses: MarketplaceBusiness[] = [
       description: "Beleza e cuidados pessoais"
     },
     program: {
-      name: "Pontos Barbershop 21",
+      name: "YELAS Barbershop 21",
       earnRate: 0.1,
       pointValueMznMinor: 100,
       maximumRedemptionPercent: 50,
@@ -92,7 +92,7 @@ const previewBusinesses: MarketplaceBusiness[] = [
     id: "business-3",
     slug: "farmacia-central",
     name: "Farmácia Central",
-    description: "Saúde, bem-estar e um programa de pontos disponível para adesão imediata.",
+    description: "Saúde, bem-estar e um programa de YELAS disponível para adesão imediata.",
     phone: "+258 84 000 0033",
     email: "apoio@farmaciacentral.co.mz",
     websiteUrl: null,
@@ -204,8 +204,8 @@ const dashboard = buildCustomerDashboardViewModel({
     {
       id: "notification-1",
       businessName: "Barbershop 21",
-      subject: "Pontos acumulados",
-      body: "Ganhou 300 pontos na sua última visita.",
+      subject: "YELAS acumuladas",
+      body: "Ganhou 300 YELAS na sua última visita.",
       createdAt: new Date().toISOString(),
       readAt: null
     },
@@ -253,6 +253,7 @@ export default async function CustomerPreviewPage({
         principal: {
           profileId: "preview",
           profileRole: "customer",
+          accountType: "customer",
           mfaVerified: true,
           businessMemberships: []
         }
@@ -267,7 +268,7 @@ export default async function CustomerPreviewPage({
         editProfile={params.editar === "1"}
         membershipStatus={typeof params.adesao === "string" ? params.adesao : undefined}
         state={{ status: "populated", dashboard }}
-        workspaceAccess={{ business: true, pos: true }}
+        workspaceAccess={{ business: false, pos: false }}
       />
     </ProtectedRouteStateView>
   );

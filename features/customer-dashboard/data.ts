@@ -12,8 +12,7 @@ import type { CustomerNotification } from "@/features/notifications/model";
 
 import {
   buildCustomerDashboardViewModel,
-  getActivityDescription,
-  getActivityPoints,
+  getLedgerActivityDescription,
   getActivityTone
 } from "./model";
 import type {
@@ -32,14 +31,15 @@ interface ProfileRow {
   marketing_consent_at: string | null;
 }
 
-interface TransactionRow {
+interface LedgerRow {
   id: string;
   business_id: string;
   customer_card_id: string;
-  points_earned: number;
-  points_redeemed: number;
-  net_amount_mzn_minor: number;
-  occurred_at: string;
+  transaction_id: string | null;
+  type: string;
+  amount: number;
+  reason: string | null;
+  created_at: string;
 }
 
 interface BusinessNameRow {
@@ -113,7 +113,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
 
   const [
     { data: profileData, error: profileError },
-    { data: transactionData, error: transactionError },
+    { data: ledgerData, error: ledgerError },
     { data: offerData, error: offerError },
     { data: notificationData, error: notificationError },
     { data: engagementData, error: engagementError }
@@ -125,13 +125,13 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
       .maybeSingle(),
     cardIds.length > 0
       ? supabase
-          .from("transactions")
+          .from("point_ledger")
           .select(
-            "id, business_id, customer_card_id, points_earned, points_redeemed, net_amount_mzn_minor, occurred_at"
+            "id, business_id, customer_card_id, transaction_id, type, amount, reason, created_at"
           )
           .in("customer_card_id", cardIds)
-          .order("occurred_at", { ascending: false })
-          .limit(8)
+          .order("created_at", { ascending: false })
+          .limit(16)
       : Promise.resolve({ data: [], error: null }),
     supabase
       .from("offers")
@@ -148,7 +148,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
     supabase.rpc("get_customer_engagement")
   ]);
 
-  if (profileError || transactionError || offerError || notificationError || engagementError) {
+  if (profileError || ledgerError || offerError || notificationError || engagementError) {
     return { status: "error", message: "Não foi possível carregar o painel do cliente." };
   }
 
@@ -196,7 +196,7 @@ export async function getCustomerDashboard(profileId: string): Promise<CustomerD
   const engagement = parseEngagement(engagementData);
   const dashboard = buildCustomerDashboardViewModel({
     cards,
-    activity: buildActivity(rowsFrom<TransactionRow>(transactionData), businessById, cardById),
+    activity: buildActivity(rowsFrom<LedgerRow>(ledgerData), businessById, cardById),
     offers: buildOffers(
       offerRows,
       businessById,
@@ -238,28 +238,19 @@ function buildNotifications(
 }
 
 function buildActivity(
-  rows: TransactionRow[],
+  rows: LedgerRow[],
   businessById: Map<string, BusinessNameRow>,
   cardById: Map<string, CustomerDashboardViewModel["cards"][number]>
 ): CustomerActivityItem[] {
   return rows.map((row) => {
-    const points = getActivityPoints({
-      pointsEarned: row.points_earned,
-      pointsRedeemed: row.points_redeemed
-    });
-
     return {
       id: row.id,
       businessName: businessById.get(row.business_id)?.name ?? "Negócio VUYELA",
       cardName: cardById.get(row.customer_card_id)?.currentTierName ?? "Cartão VUYELA",
-      description: getActivityDescription({
-        pointsEarned: row.points_earned,
-        pointsRedeemed: row.points_redeemed,
-        netAmountMznMinor: row.net_amount_mzn_minor
-      }),
-      points,
-      occurredAt: row.occurred_at,
-      tone: getActivityTone(points)
+      description: getLedgerActivityDescription({ type: row.type, reason: row.reason }),
+      points: row.amount,
+      occurredAt: row.created_at,
+      tone: getActivityTone(row.amount)
     };
   });
 }

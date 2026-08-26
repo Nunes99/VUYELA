@@ -42,7 +42,7 @@ export function BusinessSettingsView({
         <div>
           <span className="business-dashboard-eyebrow">Gestão do conteúdo</span>
           <h2>Definições do negócio</h2>
-          <p>Atualize o perfil público, as regras de pontos e os dados da filial principal.</p>
+          <p>Atualize o perfil público, as regras de YELAS e os dados da filial principal.</p>
         </div>
         <Link href={`/negocio?businessId=${encodeURIComponent(settings.business.id)}`}>
           Voltar ao painel
@@ -177,7 +177,7 @@ export function BusinessSettingsView({
             />
             <Input
               defaultValue={settings.program.pointValueMzn}
-              label="Valor de 1 ponto (MZN)"
+              label="Valor de 1 YELA (MZN)"
               min={0.01}
               name="pointValueMzn"
               required
@@ -187,7 +187,7 @@ export function BusinessSettingsView({
             />
             <Input
               defaultValue={settings.program.maximumRedemptionPercent}
-              label="Máximo da compra em pontos (%)"
+              label="Máximo da compra em YELAS (%)"
               max={100}
               min={0}
               name="maximumRedemptionPercent"
@@ -199,7 +199,7 @@ export function BusinessSettingsView({
             <Input
               defaultValue={settings.program.pointsExpireAfterDays ?? ""}
               hint="Deixe vazio para não expirar."
-              label="Validade dos pontos (dias)"
+              label="Validade das YELAS (dias)"
               min={1}
               name="pointsExpireAfterDays"
               type="number"

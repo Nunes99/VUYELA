@@ -193,9 +193,9 @@ function viewSubtitle(view: AdminView): string {
     users: "Administração Geral VUYELA Moçambique",
     subscriptions: "Administração Geral VUYELA Moçambique",
     support: "Gestão de incidentes e apoio a estabelecimentos VUYELA",
-    fraud: "Auditoria preventiva e deteção de anomalias no sistema de pontos",
+    fraud: "Auditoria preventiva e deteção de anomalias no sistema de YELAS",
     audit: "Registos de segurança e alterações de estado do diretório VUYELA",
-    analytics: "Analítica agregada de atividade, volume de transações e emissão de pontos",
+    analytics: "Analítica agregada de atividade, volume de transações e emissão de YELAS",
     settings: "Configuração e calibração de políticas globais da plataforma",
     "business-detail": "Controlo e auditoria operacional de negócio parceiro",
     "user-detail": "Visualização detalhada de dados cadastrais e acessos do utilizador"

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireRouteAccess } from "@/lib/auth/session";
+import { requireAuthenticatedUser, requireRouteAccess } from "@/lib/auth/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
@@ -130,9 +130,14 @@ export async function revokeBusinessInvitationAction(formData: FormData): Promis
 }
 
 export async function acceptBusinessInvitationAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/cliente", "/negocio/convite");
   const token = field(formData, "token");
   if (!/^[0-9a-f]{48}$/.test(token)) redirect("/negocio/convite?estado=invalido");
+  const principal = await requireAuthenticatedUser(
+    `/negocio/convite?token=${encodeURIComponent(token)}`
+  );
+  if (principal.accountType !== "business") {
+    redirect(`/negocio/convite?token=${encodeURIComponent(token)}`);
+  }
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.rpc("accept_business_member_invitation", { p_token: token });

@@ -12,6 +12,7 @@ import type { AuthPrincipal } from "@/lib/auth/rbac";
 const previewPrincipal: AuthPrincipal = {
   profileId: "pos-preview",
   profileRole: "customer",
+  accountType: "business",
   mfaVerified: true,
   businessMemberships: [
     {

@@ -216,8 +216,8 @@ function Overview({
             />
             <Fact label="Volume bruto" value={formatMznMinor(metrics.grossVolumeMznMinor)} />
             <Fact
-              label="Pontos emitidos"
-              value={`${metrics.pointsIssued.toLocaleString("pt-MZ")} Pts`}
+              label="YELAS emitidas"
+              value={`${metrics.pointsIssued.toLocaleString("pt-MZ")} YL`}
             />
           </dl>
         </section>
@@ -817,7 +817,7 @@ function Analytics({
             estabelecimento: business.name,
             transacoes: business.transactions,
             volume_mzn: business.volumeMznMinor / 100,
-            pontos_emitidos: business.pointsIssued
+            YELAS_emitidos: business.pointsIssued
           }))}
           filename="vuyela-analitica.csv"
           label="Exportar PDF/CSV"
@@ -838,9 +838,9 @@ function Analytics({
         />
         <MetricCard
           icon={WalletCards}
-          label="Pontos emitidos"
+          label="YELAS emitidas"
           meta={rangeLabel}
-          value={`${recent.pointsIssued.toLocaleString("pt-MZ")} Pts`}
+          value={`${recent.pointsIssued.toLocaleString("pt-MZ")} YL`}
         />
         <MetricCard
           icon={ArrowDownRight}
@@ -873,7 +873,7 @@ function Analytics({
             <span>Estabelecimento / negócio</span>
             <span>Transações</span>
             <span>Volume financeiro</span>
-            <span>Pontos emitidos</span>
+            <span>YELAS emitidas</span>
           </div>
           {analytics.topBusinesses.map((business, index) => (
             <div
@@ -886,7 +886,7 @@ function Analytics({
               </Link>
               <span>{business.transactions.toLocaleString("pt-MZ")}</span>
               <span>{formatMznMinor(business.volumeMznMinor)}</span>
-              <strong>{business.pointsIssued.toLocaleString("pt-MZ")} Pts</strong>
+              <strong>{business.pointsIssued.toLocaleString("pt-MZ")} YL</strong>
             </div>
           ))}
         </div>
@@ -1164,7 +1164,7 @@ function UserDetail({
               <span className="admin-user-card-grid__logo">VUYELA</span>
               <StatusBadge value={card.status} />
               <strong>{card.businessName}</strong>
-              <span>{card.availablePoints.toLocaleString("pt-MZ")} Pts</span>
+              <span>{card.availablePoints.toLocaleString("pt-MZ")} YL</span>
               <code>{card.cardNumber}</code>
             </article>
           ))
@@ -1180,7 +1180,7 @@ function UserDetail({
               <span>Data</span>
               <span>Estabelecimento</span>
               <span>Tipo</span>
-              <span>Pontos</span>
+              <span>YELAS</span>
             </div>
             {user.transactions.map((transaction) => (
               <div
@@ -1192,7 +1192,7 @@ function UserDetail({
                 <span>{transaction.type === "earn" ? "Acumulação" : "Resgate"}</span>
                 <strong className={transaction.points >= 0 ? "is-positive" : "is-negative"}>
                   {transaction.points > 0 ? "+" : ""}
-                  {transaction.points.toLocaleString("pt-MZ")} Pts
+                  {transaction.points.toLocaleString("pt-MZ")} YL
                 </strong>
               </div>
             ))}

@@ -1,10 +1,11 @@
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { signOutAction } from "@/features/auth/actions";
 import { acceptBusinessInvitationAction } from "@/features/business-operations/actions";
-import { getProtectedRouteState } from "@/lib/auth/session";
+import { getAuthContext } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Aceitar convite",
@@ -24,39 +25,74 @@ export default async function AcceptBusinessInvitationPage({
   const currentPath = token
     ? `/negocio/convite?token=${encodeURIComponent(token)}`
     : "/negocio/convite";
-  const state = await getProtectedRouteState("/cliente", currentPath);
+  const authContext = await getAuthContext();
+  const principal = authContext.principal;
+  const businessSignInPath = `/entrar/negocio?next=${encodeURIComponent(currentPath)}`;
+  const teamSignUpPath = `/cadastrar/negocio/equipa?token=${encodeURIComponent(token)}`;
 
   return (
-    <ProtectedRouteStateView state={state} title="Convite para negócio" variant="business">
-      {state.status === "authorized" ? (
-        <main className="business-invitation-page">
-          <VuyelaLogo href="/" />
-          <section>
-            {invalid ? (
-              <>
-                <ShieldCheck aria-hidden="true" size={34} />
-                <h1>Convite inválido ou expirado</h1>
-                <p>Peça ao administrador do negócio para criar uma nova ligação privada.</p>
-              </>
-            ) : (
-              <>
-                <CheckCircle2 aria-hidden="true" size={34} />
-                <h1>Juntar-se à equipa</h1>
-                <p>
-                  Confirme para associar esta conta ao negócio com a função e a filial definidas no
-                  convite.
-                </p>
-                <form action={acceptBusinessInvitationAction}>
-                  <input name="token" type="hidden" value={token} />
-                  <button className="business-button business-button--primary" type="submit">
-                    Aceitar convite
-                  </button>
-                </form>
-              </>
-            )}
-          </section>
-        </main>
-      ) : null}
-    </ProtectedRouteStateView>
+    <main className="business-invitation-page">
+      <VuyelaLogo href="/" />
+      <section>
+        {invalid ? (
+          <>
+            <ShieldCheck aria-hidden="true" size={34} />
+            <h1>Convite inválido ou expirado</h1>
+            <p>Peça ao administrador do negócio para criar uma nova ligação privada.</p>
+          </>
+        ) : !principal ? (
+          <>
+            <CheckCircle2 aria-hidden="true" size={34} />
+            <h1>Juntar-se à equipa</h1>
+            <p>
+              Entre com as suas credenciais empresariais ou crie um acesso de equipa exclusivo para
+              este convite.
+            </p>
+            <div className="business-invitation-actions">
+              <Link className="business-button business-button--primary" href={businessSignInPath}>
+                Entrar no Portal de Negócio
+              </Link>
+              <Link className="business-button business-button--secondary" href={teamSignUpPath}>
+                Criar credenciais de equipa
+              </Link>
+            </div>
+          </>
+        ) : principal.accountType !== "business" ? (
+          <>
+            <ShieldCheck aria-hidden="true" size={34} />
+            <h1>Use uma conta de negócio</h1>
+            <p>
+              Está autenticado como cliente. Termine esta sessão e use credenciais empresariais para
+              manter os dois perfis separados.
+            </p>
+            <div className="business-invitation-actions">
+              <form action={signOutAction}>
+                <button className="business-button business-button--primary" type="submit">
+                  Terminar sessão
+                </button>
+              </form>
+              <Link className="business-button business-button--secondary" href={teamSignUpPath}>
+                Criar credenciais de equipa
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <CheckCircle2 aria-hidden="true" size={34} />
+            <h1>Juntar-se à equipa</h1>
+            <p>
+              Confirme para associar esta conta empresarial ao negócio com a função e a filial
+              definidas no convite.
+            </p>
+            <form action={acceptBusinessInvitationAction}>
+              <input name="token" type="hidden" value={token} />
+              <button className="business-button business-button--primary" type="submit">
+                Aceitar convite
+              </button>
+            </form>
+          </>
+        )}
+      </section>
+    </main>
   );
 }

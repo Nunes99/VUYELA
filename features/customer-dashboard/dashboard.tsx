@@ -212,7 +212,7 @@ function CustomerHome({
         </div>
         <div className="customer-mobile-total" aria-label="Total acumulado">
           <span>Total acumulado</span>
-          <strong>{dashboard.totalPoints.toLocaleString("pt-MZ")} Pts</strong>
+          <strong>{dashboard.totalPoints.toLocaleString("pt-MZ")} YL</strong>
           <small>Equivale a ~ {dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN</small>
           <Star aria-hidden="true" size={28} />
         </div>
@@ -222,10 +222,10 @@ function CustomerHome({
         >
           <CustomerSummaryCard
             icon={Star}
-            label="Pontos acumulados"
+            label="YELAS acumuladas"
             note={`Equivale a ~ ${dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN`}
             tone="points"
-            value={`${dashboard.totalPoints.toLocaleString("pt-MZ")} Pts`}
+            value={`${dashboard.totalPoints.toLocaleString("pt-MZ")} YL`}
           />
           <CustomerSummaryCard
             icon={CreditCard}
@@ -370,7 +370,7 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
               <div className="customer-card-hub-item__content">
                 <span>{card.currentTierName}</span>
                 <h3>{card.businessName}</h3>
-                <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
+                <strong>{card.availablePoints.toLocaleString("pt-MZ")} YL</strong>
               </div>
               <ChevronRight aria-hidden="true" size={18} />
             </Link>
@@ -426,7 +426,7 @@ function CustomerBusinesses({
         breadcrumbHref="/cliente?vista=cartoes"
         eyebrow="Cartões disponíveis"
         title="Negócios VUYELA"
-        description="Escolha os estabelecimentos onde pretende acumular pontos e adira ao cartão digital."
+        description="Escolha os estabelecimentos onde pretende acumular YELAS e adira ao cartão digital."
         titleId="customer-businesses-title"
       />
       {membershipStatus ? (
@@ -484,7 +484,7 @@ function CustomerBusinesses({
                     <span>
                       <Star aria-hidden="true" size={15} />
                       {business.program
-                        ? `${Math.round(business.program.earnRate * 100)}% em pontos`
+                        ? `${Math.round(business.program.earnRate * 100)}% em YELAS`
                         : "Programa de fidelização"}
                     </span>
                   </div>
@@ -555,7 +555,7 @@ function CustomerCardDetail({
           <div className="customer-card-identification">
             <h3>QR Code de identificação em loja</h3>
             <p>
-              Apresente este QR Code no momento do pagamento para acumular pontos ou resgatar
+              Apresente este QR Code no momento do pagamento para acumular YELAS ou resgatar
               recompensas pendentes. O número do cartão ou o telefone associado também podem ser
               usados no POS.
             </p>
@@ -565,7 +565,7 @@ function CustomerCardDetail({
               </span>
               <span>
                 Saldo disponível
-                <strong>{card.availablePoints.toLocaleString("pt-MZ")} pontos</strong>
+                <strong>{card.availablePoints.toLocaleString("pt-MZ")} YELAS</strong>
               </span>
               <span>
                 Valor equivalente<strong>{card.valueMzn.toLocaleString("pt-MZ")} MZN</strong>
@@ -591,12 +591,12 @@ function CustomerCardDetail({
 function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <section aria-labelledby="customer-activity-title">
-      <CustomerMobileHeader action="notifications" title="Histórico de Pontos" />
+      <CustomerMobileHeader action="notifications" title="Histórico de YELAS" />
       <CustomerPageHeading
         breadcrumb="Início"
         breadcrumbHref="/cliente"
         title="Histórico de Atividade"
-        description="Consulte todos os pontos ganhos e utilizados nos seus cartões."
+        description="Consulte todos as YELAS ganhas e utilizados nos seus cartões."
         titleId="customer-activity-title"
       />
       {dashboard.hasActivity ? (
@@ -605,7 +605,7 @@ function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel
         <SectionEmpty
           icon={Activity}
           title="Sem movimentos"
-          body="O seu histórico de compras, pontos ganhos e utilizações aparecerá aqui."
+          body="O seu histórico de compras, YELAS ganhas e utilizações aparecerá aqui."
         />
       )}
     </section>
@@ -655,7 +655,7 @@ function CustomerOffers({
         />
         <div>
           <span>Campanha em destaque</span>
-          <h3>Ganhe mais pontos nos estabelecimentos que prefere.</h3>
+          <h3>Ganhe mais YELAS nos estabelecimentos que prefere.</h3>
           <p>Ative um benefício disponível e volte a comprar com mais vantagens.</p>
         </div>
       </div>
@@ -901,7 +901,7 @@ function CustomerActivityPreview({ dashboard }: { dashboard: CustomerDashboardVi
       <SectionEmpty
         icon={Activity}
         title="Sem movimentos recentes"
-        body="O histórico de pontos aparecerá aqui."
+        body="O histórico de YELAS aparecerá aqui."
       />
     );
   }
@@ -920,7 +920,7 @@ function CustomerActivityPreview({ dashboard }: { dashboard: CustomerDashboardVi
           <span className="customer-activity-preview__amount">
             <b className={`is-${item.tone}`}>
               {item.points > 0 ? "+" : ""}
-              {item.points.toLocaleString("pt-MZ")} Pts
+              {item.points.toLocaleString("pt-MZ")} YL
             </b>
             <time dateTime={item.occurredAt}>{formatActivityPreviewDate(item.occurredAt)}</time>
           </span>

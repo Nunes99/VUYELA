@@ -35,7 +35,7 @@ const siteUrl = getSiteUrl();
 export const metadata: Metadata = {
   title: "Fidelização digital em Moçambique",
   description:
-    "Cada compra cria uma razão para voltar com cartões digitais, pontos e benefícios VUYELA.",
+    "Cada compra cria uma razão para voltar com cartões digitais, YELAS e benefícios VUYELA.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "VUYELA - Cada compra cria uma razão para voltar",
@@ -54,9 +54,9 @@ const steps = [
     title: "Compre"
   },
   {
-    body: "Apresente o seu QR Code no telemóvel para acumular pontos instantaneamente.",
+    body: "Apresente o seu QR Code no telemóvel para acumular YELAS instantaneamente.",
     icon: Gift,
-    title: "Acumule pontos"
+    title: "Acumule YELAS"
   },
   {
     body: "Quanto mais regressa aos seus locais favoritos, mais valor acumula na sua conta.",
@@ -64,7 +64,7 @@ const steps = [
     title: "Volte"
   },
   {
-    body: "Desconte os pontos em novos serviços, compras ou receba benefícios diretos.",
+    body: "Desconte as YELAS em novos serviços, compras ou receba benefícios diretos.",
     icon: CircleDollarSign,
     title: "Use e economize"
   }
@@ -77,9 +77,9 @@ const benefits = [
     title: "Descontos exclusivos"
   },
   {
-    body: "1 ponto equivale, por defeito, a 1 MZN promocional.",
+    body: "1 YELA equivale, por defeito, a 1 MZN promocional.",
     icon: CircleDollarSign,
-    title: "Pontos que valem"
+    title: "YELAS que valem"
   },
   {
     body: "Descubra parceiros e vantagens em diferentes categorias.",
@@ -137,11 +137,11 @@ export default async function HomePage() {
               Cada compra cria uma razão para <em>voltar.</em>
             </h1>
             <p>
-              Acumule pontos em cada visita a restaurantes, farmácias e lojas locais parceiras.
+              Acumule YELAS em cada visita a restaurantes, farmácias e lojas locais parceiras.
               Converta o seu consumo diário em recompensas digitais e benefícios reais em MZN.
             </p>
             <div className="marketing-actions">
-              <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
+              <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
                 Sou um negócio <ArrowRight size={17} />
               </Link>
               <Link className="marketing-button marketing-button--outline" href="/cadastrar">
@@ -180,7 +180,7 @@ export default async function HomePage() {
           </div>
           <div>
             <strong>2M+ MZN</strong>
-            <span>Poupados em pontos</span>
+            <span>Poupados em YELAS</span>
           </div>
         </div>
       </section>
@@ -221,7 +221,7 @@ export default async function HomePage() {
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--inverse">
             <span>Vantagens exclusivas</span>
-            <h2 id="benefits-title">Muito mais do que pontos, uma experiência completa.</h2>
+            <h2 id="benefits-title">Muito mais do que YELAS, uma experiência completa.</h2>
           </div>
           <div className="marketing-benefit-grid">
             {benefits.map((benefit) => {
@@ -278,7 +278,7 @@ export default async function HomePage() {
               </li>
               <li>
                 <Check size={17} />
-                Pontos associados ao negócio emissor.
+                YELAS associadas ao negócio emissor.
               </li>
               <li>
                 <Check size={17} />
@@ -337,7 +337,7 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="marketing-actions">
-              <Link className="marketing-button marketing-button--teal" href="/onboarding/negocio">
+              <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
                 Criar programa
               </Link>
               <Link className="marketing-button marketing-button--outline" href="/negocios">
@@ -359,7 +359,7 @@ export default async function HomePage() {
             <article>
               <BarChart3 size={20} />
               <h3>Painel de gestão</h3>
-              <p>Indicadores de clientes, pontos e transações.</p>
+              <p>Indicadores de clientes, YELAS e transações.</p>
             </article>
             <article>
               <Store size={20} />
@@ -400,15 +400,15 @@ export default async function HomePage() {
           </div>
           <div>
             <details open>
-              <summary>Os pontos VUYELA expiram?</summary>
-              <p>Cada negócio pode configurar a validade dos pontos do seu programa.</p>
+              <summary>As YELAS VUYELA expiram?</summary>
+              <p>Cada negócio pode configurar a validade das YELAS do seu programa.</p>
             </details>
             <details>
-              <summary>Posso usar pontos noutro estabelecimento?</summary>
-              <p>Não. Os pontos são utilizados apenas no negócio que os atribuiu.</p>
+              <summary>Posso usar YELAS noutro estabelecimento?</summary>
+              <p>Não. As YELAS são utilizadas apenas no negócio que as atribuiu.</p>
             </details>
             <details>
-              <summary>A VUYELA assume o valor dos pontos?</summary>
+              <summary>A VUYELA assume o valor das YELAS?</summary>
               <p>Não. O valor promocional é responsabilidade do negócio emissor.</p>
             </details>
           </div>

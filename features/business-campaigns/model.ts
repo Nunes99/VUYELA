@@ -161,12 +161,12 @@ export function getCampaignTypeLabel(type: CampaignType): string {
     second_purchase: "Segunda compra",
     birthday: "Aniversário",
     inactive_customer: "Cliente inativo",
-    double_points: "Pontos em dobro",
+    double_points: "YELAS em dobro",
     specific_product: "Produto especifico",
     specific_time: "Horario especifico",
     weekend: "Fim de semana",
     referral: "Indicação",
-    expiring_points: "Pontos a expirar",
+    expiring_points: "YELAS a expirar",
     vip: "VIP",
     location: "Localização"
   };
@@ -371,14 +371,14 @@ function getAudienceEligibilityReason(
     audience.minPointsBalance !== undefined &&
     customer.pointsBalance < audience.minPointsBalance
   ) {
-    return "Saldo de pontos abaixo do mínimo";
+    return "Saldo de YELAS abaixo do mínimo";
   }
 
   if (
     audience.maxPointsBalance !== undefined &&
     customer.pointsBalance > audience.maxPointsBalance
   ) {
-    return "Saldo de pontos acima do máximo";
+    return "Saldo de YELAS acima do máximo";
   }
 
   if (audience.lastPurchaseBeforeDays !== undefined) {

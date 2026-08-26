@@ -297,8 +297,8 @@ function DashboardOverview({ dashboard }: { dashboard: BusinessDashboardViewMode
           meta={`${dashboard.overview.customerCount.toLocaleString("pt-MZ")} registados`}
         />
         <Metric
-          label="Pontos emitidos"
-          value={`${dashboard.points.lifetimeEarned.toLocaleString("pt-MZ")} Pts`}
+          label="YELAS emitidas"
+          value={`${dashboard.points.lifetimeEarned.toLocaleString("pt-MZ")} YL`}
           meta={formatMznMinor(dashboard.points.liabilityMznMinor)}
           tone="teal"
         />
@@ -311,20 +311,20 @@ function DashboardOverview({ dashboard }: { dashboard: BusinessDashboardViewMode
             labels={monthSeries.map((item) => item.label)}
           />
         </Panel>
-        <Panel title="Atividade de pontos" meta="Responsabilidade atual">
+        <Panel title="Atividade de YELAS" meta="Responsabilidade atual">
           <ProgressRows
             rows={[
               {
-                label: "Pontos disponíveis",
+                label: "YELAS disponíveis",
                 value: dashboard.points.availablePoints,
                 total: Math.max(dashboard.points.lifetimeEarned, 1),
-                display: `${dashboard.points.availablePoints.toLocaleString("pt-MZ")} Pts`
+                display: `${dashboard.points.availablePoints.toLocaleString("pt-MZ")} YL`
               },
               {
-                label: "Pontos resgatados",
+                label: "YELAS utilizadas",
                 value: dashboard.points.lifetimeRedeemed,
                 total: Math.max(dashboard.points.lifetimeEarned, 1),
-                display: `${dashboard.points.lifetimeRedeemed.toLocaleString("pt-MZ")} Pts`
+                display: `${dashboard.points.lifetimeRedeemed.toLocaleString("pt-MZ")} YL`
               },
               {
                 label: "Responsabilidade",
@@ -394,8 +394,8 @@ function CardsView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
         <Metric label="Total de cartões" value={activeCards.toLocaleString("pt-MZ")} />
         <Metric label="Cartões ativos" value={activeCards.toLocaleString("pt-MZ")} tone="teal" />
         <Metric
-          label="Pontos em circulação"
-          value={`${dashboard.points.availablePoints.toLocaleString("pt-MZ")} Pts`}
+          label="YELAS em circulação"
+          value={`${dashboard.points.availablePoints.toLocaleString("pt-MZ")} YL`}
         />
         <Metric
           label="Valor equivalente"
@@ -428,9 +428,9 @@ function CardsView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
                 <strong>#{customer.cardNumber}</strong>
                 <span>{customer.customerName}</span>
                 <span>{formatDate(customer.joinedAt)}</span>
-                <strong>{customer.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
-                <span>{customer.lifetimeEarned.toLocaleString("pt-MZ")} Pts</span>
-                <span>{customer.lifetimeRedeemed.toLocaleString("pt-MZ")} Pts</span>
+                <strong>{customer.availablePoints.toLocaleString("pt-MZ")} YL</strong>
+                <span>{customer.lifetimeEarned.toLocaleString("pt-MZ")} YL</span>
+                <span>{customer.lifetimeRedeemed.toLocaleString("pt-MZ")} YL</span>
                 <StatusBadge value="active" label="Ativo" />
               </div>
             ))}
@@ -457,8 +457,8 @@ function CustomersView({ dashboard }: { dashboard: BusinessDashboardViewModel })
           value={dashboard.retention.retainedCustomerCount.toLocaleString("pt-MZ")}
         />
         <Metric
-          label="Pontos médios"
-          value={`${averagePoints.toLocaleString("pt-MZ")} Pts`}
+          label="YELAS médios"
+          value={`${averagePoints.toLocaleString("pt-MZ")} YL`}
           tone="teal"
         />
       </div>
@@ -488,7 +488,7 @@ function CustomersView({ dashboard }: { dashboard: BusinessDashboardViewModel })
               >
                 <strong>{customer.customerName}</strong>
                 <span>{customer.cardNumber}</span>
-                <strong>{customer.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
+                <strong>{customer.availablePoints.toLocaleString("pt-MZ")} YL</strong>
                 <span>{formatMznMinor(customer.liabilityMznMinor)}</span>
                 <span>
                   {customer.lastTransactionAt
@@ -511,12 +511,12 @@ function LoyaltyView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
     <>
       <div className="business-metric-grid business-metric-grid--four">
         <Metric
-          label="Total de pontos emitidos"
-          value={`${dashboard.points.lifetimeEarned.toLocaleString("pt-MZ")} Pts`}
+          label="Total de YELAS emitidas"
+          value={`${dashboard.points.lifetimeEarned.toLocaleString("pt-MZ")} YL`}
         />
         <Metric
-          label="Pontos resgatados"
-          value={`${dashboard.points.lifetimeRedeemed.toLocaleString("pt-MZ")} Pts`}
+          label="YELAS utilizadas"
+          value={`${dashboard.points.lifetimeRedeemed.toLocaleString("pt-MZ")} YL`}
         />
         <Metric
           label="Taxa de resgate"
@@ -539,7 +539,7 @@ function LoyaltyView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
                 value={`${Number(program.earnRate) * 100}% do valor da compra`}
               />
               <Fact
-                label="Valor unitário do ponto"
+                label="Valor unitário do YELA"
                 value={formatMznMinor(program.pointValueMznMinor)}
               />
               <Fact
@@ -547,7 +547,7 @@ function LoyaltyView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
                 value={`${program.maximumRedemptionPercent}% do total`}
               />
               <Fact
-                label="Validade dos pontos"
+                label="Validade das YELAS"
                 value={
                   program.pointsExpireAfterDays
                     ? `${program.pointsExpireAfterDays} dias`
@@ -558,7 +558,7 @@ function LoyaltyView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
           ) : (
             <EmptyState
               title="Sem programa"
-              body="Configure o programa para começar a emitir pontos."
+              body="Configure o programa para começar a emitir YELAS."
             />
           )}
         </Panel>
@@ -567,7 +567,7 @@ function LoyaltyView({ dashboard }: { dashboard: BusinessDashboardViewModel }) {
             <strong>Responsabilidade promocional do emissor</strong>
             <p>
               {program?.name
-                ? `O programa ${program.name} atribui pontos promocionais segundo as regras configuradas pelo negócio.`
+                ? `O programa ${program.name} atribui YELAS promocionais segundo as regras configuradas pelo negócio.`
                 : "Os termos serão apresentados após a configuração do programa."}
             </p>
             <div>
@@ -601,7 +601,7 @@ function AnalyticsView({ dashboard }: { dashboard: BusinessDashboardViewModel })
         />
         <Metric label="Taxa de retenção" value={formatPercent(dashboard.retention.retentionRate)} />
         <Metric
-          label="Responsabilidade de pontos"
+          label="Responsabilidade de YELAS"
           value={formatMznMinor(dashboard.points.liabilityMznMinor)}
           tone="teal"
         />
@@ -616,7 +616,7 @@ function AnalyticsView({ dashboard }: { dashboard: BusinessDashboardViewModel })
         <Panel title="Transações por tipo" meta="Compras e resgates">
           <DonutMetric
             value={Math.round(dashboard.points.redemptionRate * 100)}
-            label="Com pontos"
+            label="Com YELAS"
           />
         </Panel>
         <Panel title="Distribuição por filial" meta="Receita">
@@ -778,7 +778,7 @@ function TransactionTable({ transactions }: { transactions: BusinessDashboardTra
         <span>Cliente</span>
         <span>Filial</span>
         <span>Valor real</span>
-        <span>Pontos</span>
+        <span>YELAS</span>
         <span>Data</span>
       </div>
       {transactions.map((transaction) => (
@@ -790,7 +790,7 @@ function TransactionTable({ transactions }: { transactions: BusinessDashboardTra
           <span>{transaction.customerName}</span>
           <span>{transaction.branchName}</span>
           <strong>{formatMznMinor(transaction.netAmountMznMinor)}</strong>
-          <span className="is-teal">+{transaction.pointsEarned.toLocaleString("pt-MZ")} Pts</span>
+          <span className="is-teal">+{transaction.pointsEarned.toLocaleString("pt-MZ")} YL</span>
           <span>{formatDateTime(transaction.occurredAt)}</span>
         </div>
       ))}
@@ -952,7 +952,7 @@ function statusLabel(value: string): string {
 
 function buildDashboardCsvUrl(dashboard: BusinessDashboardViewModel): string {
   const rows = [
-    ["Transação", "Cliente", "Filial", "Valor MZN", "Pontos ganhos", "Data"],
+    ["Transação", "Cliente", "Filial", "Valor MZN", "YELAS ganhas", "Data"],
     ...dashboard.transactions.map((transaction) => [
       transaction.id,
       transaction.customerName,

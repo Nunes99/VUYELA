@@ -717,11 +717,11 @@ function QuoteForm({
         <div className="pos-loyalty-manager__heading">
           <div>
             <span className="pos-section-label">Fidelização VUYELA</span>
-            <h3 id="pos-loyalty-title">Gerir pontos desta compra</h3>
+            <h3 id="pos-loyalty-title">Gerir YELAS desta compra</h3>
           </div>
           <div className="pos-loyalty-manager__balance">
             <small>Saldo disponível</small>
-            <strong>{card.availablePoints.toLocaleString("pt-MZ")} pontos</strong>
+            <strong>{card.availablePoints.toLocaleString("pt-MZ")} YELAS</strong>
             <span>
               Equivale a {formatMznCompact(card.availablePoints * card.pointValueMznMinor)}
             </span>
@@ -730,8 +730,8 @@ function QuoteForm({
 
         <label className="pos-loyalty-toggle">
           <span>
-            <strong>Usar pontos como parte do pagamento</strong>
-            <small>Até {maximumRedeemablePoints.toLocaleString("pt-MZ")} pontos nesta compra</small>
+            <strong>Usar YELAS como parte do pagamento</strong>
+            <small>Até {maximumRedeemablePoints.toLocaleString("pt-MZ")} YELAS nesta compra</small>
           </span>
           <input
             checked={usePoints}
@@ -753,7 +753,7 @@ function QuoteForm({
         {usePoints ? (
           <div className="pos-loyalty-manager__controls">
             <div className="pos-loyalty-manager__field">
-              <label htmlFor="pos-points-to-redeem">Pontos a utilizar</label>
+              <label htmlFor="pos-points-to-redeem">YELAS a utilizar</label>
               <div>
                 <input
                   id="pos-points-to-redeem"
@@ -773,7 +773,7 @@ function QuoteForm({
                 </button>
               </div>
               <input
-                aria-label="Ajustar pontos a utilizar"
+                aria-label="Ajustar YELAS a utilizar"
                 max={maximumRedeemablePoints}
                 min="0"
                 onChange={(event) => updateRequestedPoints(Number(event.currentTarget.value))}
@@ -787,7 +787,7 @@ function QuoteForm({
 
         <dl className="pos-loyalty-manager__preview">
           <div>
-            <dt>Desconto em pontos</dt>
+            <dt>Desconto em YELAS</dt>
             <dd>-{formatMznCompact(quotePreview?.pointsRedeemedValueMznMinor ?? 0)}</dd>
           </div>
           <div>
@@ -795,12 +795,12 @@ function QuoteForm({
             <dd>{quotePreview ? formatMznCompact(quotePreview.netAmountMznMinor) : "-"}</dd>
           </div>
           <div>
-            <dt>Pontos a creditar</dt>
-            <dd>+{quotePreview?.pointsEarned.toLocaleString("pt-MZ") ?? 0} pts</dd>
+            <dt>YELAS a creditar</dt>
+            <dd>+{quotePreview?.pointsEarned.toLocaleString("pt-MZ") ?? 0} YL</dd>
           </div>
         </dl>
         <p className="pos-loyalty-manager__note">
-          O saldo e os novos pontos são confirmados no servidor quando o pagamento for concluído.
+          O saldo e as novas YELAS são confirmados no servidor quando o pagamento for concluído.
         </p>
       </section>
 
@@ -846,7 +846,7 @@ function AuthorizationStep({
         ? [
             {
               id: "points",
-              label: "Pontos VUYELA",
+              label: "YELAS VUYELA",
               detail: "Compra totalmente liquidada",
               icon: BadgeCheck,
               enabled: true
@@ -1039,16 +1039,16 @@ function ConfirmForm({
         </div>
         {state.quote?.pointsToRedeem ? (
           <div>
-            <dt>Pontos utilizados</dt>
+            <dt>YELAS utilizados</dt>
             <dd>
-              {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pts (-
+              {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} YL (-
               {formatMznCompact(state.quote.pointsRedeemedValueMznMinor)})
             </dd>
           </div>
         ) : null}
         <div>
-          <dt>Pontos a creditar</dt>
-          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} pts</dd>
+          <dt>YELAS a creditar</dt>
+          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} YL</dd>
         </div>
         <div className="pos-confirmation-list__total">
           <dt>Total a Liquidar</dt>
@@ -1120,9 +1120,9 @@ function SuccessState({
         `Recibo: ${receiptNumber}`,
         `Data e hora: ${completedAt}`,
         `Valor da compra: ${state.quote ? formatMznCompact(state.quote.grossAmountMznMinor) : "-"}`,
-        `Pontos utilizados: ${state.quote?.pointsToRedeem ?? 0}`,
+        `YELAS utilizados: ${state.quote?.pointsToRedeem ?? 0}`,
         `Total pago: ${state.quote ? formatMznCompact(state.quote.netAmountMznMinor) : "-"}`,
-        `Pontos creditados: ${state.quote?.pointsEarned ?? 0}`,
+        `YELAS creditadas: ${state.quote?.pointsEarned ?? 0}`,
         `Método: ${state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}`
       ].join("\n")
     );
@@ -1153,16 +1153,16 @@ function SuccessState({
           <dd>{state.paymentMethod ? paymentMethodLabel(state.paymentMethod) : "-"}</dd>
         </div>
         <div>
-          <dt>Pontos utilizados</dt>
-          <dd>{state.quote?.pointsToRedeem.toLocaleString("pt-MZ") ?? 0} pts</dd>
+          <dt>YELAS utilizados</dt>
+          <dd>{state.quote?.pointsToRedeem.toLocaleString("pt-MZ") ?? 0} YL</dd>
         </div>
         <div>
-          <dt>Pontos creditados</dt>
-          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} pts</dd>
+          <dt>YELAS creditadas</dt>
+          <dd>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} YL</dd>
         </div>
         <div>
           <dt>Saldo atualizado</dt>
-          <dd>{state.card?.availablePoints.toLocaleString("pt-MZ") ?? 0} pts</dd>
+          <dd>{state.card?.availablePoints.toLocaleString("pt-MZ") ?? 0} YL</dd>
         </div>
       </dl>
       <div className="pos-success__actions">
@@ -1228,7 +1228,7 @@ function PosTransactionSummary({
         <div className="pos-summary__guide">
           <p>
             <Info aria-hidden="true" size={18} />
-            <span>Identifique o cliente para ver os pontos e o equivalente em MZN.</span>
+            <span>Identifique o cliente para ver as YELAS e o equivalente em MZN.</span>
           </p>
           <p>
             <ShoppingBag aria-hidden="true" size={18} />
@@ -1290,9 +1290,9 @@ function PosTransactionSummary({
           ) : null}
           {state.quote.pointsToRedeem > 0 ? (
             <div>
-              <dt>Pontos utilizados</dt>
+              <dt>YELAS utilizados</dt>
               <dd>
-                {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pts (-
+                {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} YL (-
                 {formatMznCompact(state.quote.pointsRedeemedValueMznMinor)})
               </dd>
             </div>
@@ -1310,8 +1310,8 @@ function PosTransactionSummary({
             <dd>{formatMznCompact(state.quote.netAmountMznMinor)}</dd>
           </div>
           <div className="pos-summary__points-credit">
-            <dt>Pontos a creditar</dt>
-            <dd>+{state.quote.pointsEarned.toLocaleString("pt-MZ")} pts</dd>
+            <dt>YELAS a creditar</dt>
+            <dd>+{state.quote.pointsEarned.toLocaleString("pt-MZ")} YL</dd>
           </div>
         </dl>
       </aside>
@@ -1334,7 +1334,7 @@ function PosTransactionSummary({
           </div>
           {state.quote.pointsToRedeem > 0 ? (
             <div>
-              <span>Pontos utilizados ({state.quote.pointsToRedeem.toLocaleString("pt-MZ")})</span>
+              <span>YELAS utilizados ({state.quote.pointsToRedeem.toLocaleString("pt-MZ")})</span>
               <strong>-{formatMznCompact(state.quote.pointsRedeemedValueMznMinor)}</strong>
             </div>
           ) : null}
@@ -1343,8 +1343,8 @@ function PosTransactionSummary({
             <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
           </div>
           <div className="pos-summary__receipt-points">
-            <span>Pontos a creditar</span>
-            <strong>+{state.quote.pointsEarned.toLocaleString("pt-MZ")} pts</strong>
+            <span>YELAS a creditar</span>
+            <strong>+{state.quote.pointsEarned.toLocaleString("pt-MZ")} YL</strong>
           </div>
           <small>{paymentMethod ? paymentMethodLabel(paymentMethod) : ""}</small>
         </div>
@@ -1353,20 +1353,20 @@ function PosTransactionSummary({
   }
 
   return (
-    <aside className="pos-summary pos-summary--success" aria-label="Pontos acumulados">
+    <aside className="pos-summary pos-summary--success" aria-label="YELAS acumuladas">
       <h3>Cliente Fiel</h3>
-      <p>O saldo de pontos do cliente foi atualizado com sucesso.</p>
+      <p>O saldo de YELAS do cliente foi atualizado com sucesso.</p>
       <div>
         <BadgeCheck aria-hidden="true" size={22} />
-        <strong>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} Pontos Acumulados</strong>
+        <strong>+{state.quote?.pointsEarned.toLocaleString("pt-MZ") ?? 0} YELAS Acumulados</strong>
       </div>
       {state.quote?.pointsToRedeem ? (
-        <p>{state.quote.pointsToRedeem.toLocaleString("pt-MZ")} pontos foram utilizados.</p>
+        <p>{state.quote.pointsToRedeem.toLocaleString("pt-MZ")} YELAS foram utilizados.</p>
       ) : null}
       <div className="pos-summary__updated-balance">
         <WalletCards aria-hidden="true" size={22} />
         <strong>
-          {state.card?.availablePoints.toLocaleString("pt-MZ") ?? 0} pontos disponíveis
+          {state.card?.availablePoints.toLocaleString("pt-MZ") ?? 0} YELAS disponíveis
         </strong>
       </div>
     </aside>
@@ -1407,7 +1407,7 @@ function paymentMethodLabel(method: PosPaymentMethod): string {
     mkesh: "Mkesh",
     cash: "Dinheiro",
     card: "Cartão bancário",
-    points: "Pontos VUYELA"
+    points: "YELAS VUYELA"
   };
 
   return labels[method];
@@ -1445,7 +1445,7 @@ function channelIsReady(
 }
 
 function channelDetail(channels: PosPaymentChannelContext[], method: PosPaymentMethod) {
-  if (method === "points") return "Saldo de pontos VUYELA";
+  if (method === "points") return "Saldo de YELAS VUYELA";
 
   const channel = channels.find((candidate) => candidate.method === method);
 

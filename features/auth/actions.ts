@@ -100,7 +100,7 @@ export async function signInWithEmailAction(
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: email.value,
     password: password.value
   });
@@ -110,6 +110,31 @@ export async function signInWithEmailAction(
       status: "error",
       message: "Não foi possível entrar. Confirme o e-mail e a palavra-passe."
     };
+  }
+
+  const portal = getFormString(formData, "portal");
+  if (portal === "customer" || portal === "business") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("account_type")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    const accountType = profile?.account_type;
+    const isAllowed =
+      portal === "business"
+        ? accountType === "business"
+        : accountType === "customer" || accountType === "platform";
+
+    if (!isAllowed) {
+      await supabase.auth.signOut();
+      return {
+        status: "error",
+        message:
+          portal === "business"
+            ? "Estas credenciais não pertencem a uma conta de negócio. Use o acesso de cliente."
+            : "Estas credenciais pertencem a um negócio. Use o Portal de Negócio."
+      };
+    }
   }
 
   redirect(getSafeNextPath(formData));
@@ -226,7 +251,8 @@ export async function signUpWithEmailAction(
     options: {
       emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
       data: {
-        display_name: displayName.value
+        display_name: displayName.value,
+        account_type: "customer"
       }
     }
   });
@@ -245,6 +271,177 @@ export async function signUpWithEmailAction(
   return {
     status: "success",
     message: "Conta criada. Confirme o e-mail para terminar a entrada."
+  };
+}
+
+export async function signUpBusinessWithEmailAction(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState();
+  }
+
+  const representativeName = getRequiredFormString(
+    formData,
+    "representativeName",
+    "Nome do responsável"
+  );
+  if (!representativeName.ok) return representativeName.state;
+
+  const businessName = getRequiredFormString(formData, "businessName", "Nome do negócio");
+  if (!businessName.ok) return businessName.state;
+
+  const city = getRequiredFormString(formData, "city", "Cidade");
+  if (!city.ok) return city.state;
+
+  const email = getRequiredFormString(formData, "email", "E-mail de acesso");
+  if (!email.ok) return email.state;
+
+  const password = getRequiredFormString(formData, "password", "Palavra-passe");
+  if (!password.ok) return password.state;
+  if (password.value.length < 8) {
+    return { status: "error", message: "A palavra-passe deve ter pelo menos 8 caracteres." };
+  }
+
+  const passwordConfirmation = getRequiredFormString(
+    formData,
+    "passwordConfirmation",
+    "Confirmação da palavra-passe"
+  );
+  if (!passwordConfirmation.ok) return passwordConfirmation.state;
+  if (password.value !== passwordConfirmation.value) {
+    return { status: "error", message: "As palavras-passe introduzidas não coincidem." };
+  }
+
+  const nuit = getOptionalNuit(formData);
+  if (!nuit.ok) return nuit.state;
+
+  const slug = `${slugifyBusinessName(businessName.value)}-${crypto.randomUUID().slice(0, 8)}`;
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+    options: {
+      emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/negocio")}`,
+      data: {
+        display_name: representativeName.value,
+        account_type: "business",
+        business_registration: {
+          slug,
+          name: businessName.value,
+          legal_name: getFormString(formData, "legalName") || null,
+          nuit: nuit.value,
+          description: getFormString(formData, "description") || null,
+          phone: getFormString(formData, "phone") || null,
+          email: email.value,
+          city: city.value,
+          province: getFormString(formData, "province") || null
+        }
+      }
+    }
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: "Não foi possível criar a conta de negócio. Reveja os dados e tente novamente."
+    };
+  }
+
+  if (data.session) {
+    redirect("/negocio");
+  }
+
+  return {
+    status: "success",
+    message: "Conta de negócio criada. Confirme o e-mail para entrar no Portal de Negócio."
+  };
+}
+
+export async function signUpBusinessMemberWithEmailAction(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState();
+  }
+
+  const token = getRequiredFormString(formData, "token", "Convite");
+  if (!token.ok || !/^[0-9a-f]{48}$/.test(token.value)) {
+    return { status: "error", message: "O convite é inválido ou expirou." };
+  }
+
+  const displayName = getRequiredFormString(formData, "displayName", "Nome");
+  if (!displayName.ok) return displayName.state;
+
+  const email = getRequiredFormString(formData, "email", "E-mail de acesso");
+  if (!email.ok) return email.state;
+
+  const phone = getFormString(formData, "phone");
+  const password = getRequiredFormString(formData, "password", "Palavra-passe");
+  if (!password.ok) return password.state;
+  if (password.value.length < 8) {
+    return { status: "error", message: "A palavra-passe deve ter pelo menos 8 caracteres." };
+  }
+
+  const passwordConfirmation = getRequiredFormString(
+    formData,
+    "passwordConfirmation",
+    "Confirmação da palavra-passe"
+  );
+  if (!passwordConfirmation.ok) return passwordConfirmation.state;
+  if (password.value !== passwordConfirmation.value) {
+    return { status: "error", message: "As palavras-passe introduzidas não coincidem." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: invitationIsValid, error: invitationError } = await supabase.rpc(
+    "validate_business_member_invitation",
+    {
+      p_token: token.value,
+      p_email: email.value,
+      p_phone: phone || null
+    }
+  );
+
+  if (invitationError || invitationIsValid !== true) {
+    return {
+      status: "error",
+      message: "O convite não corresponde a estes contactos, é inválido ou expirou."
+    };
+  }
+
+  const invitationPath = `/negocio/convite?token=${encodeURIComponent(token.value)}`;
+  const { data, error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+    options: {
+      emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(invitationPath)}`,
+      data: {
+        display_name: displayName.value,
+        phone: phone || null,
+        account_type: "business"
+      }
+    }
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message:
+        "Não foi possível criar as credenciais de equipa. Confirme os dados e tente novamente."
+    };
+  }
+
+  if (data.session) {
+    redirect(invitationPath);
+  }
+
+  return {
+    status: "success",
+    message:
+      "Credenciais criadas. Confirme o e-mail e depois aceite o convite para entrar na equipa."
   };
 }
 

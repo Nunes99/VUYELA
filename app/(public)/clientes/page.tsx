@@ -9,7 +9,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Para clientes",
-  description: "Todos os cartões, pontos, ofertas e movimentos VUYELA numa área digital simples.",
+  description: "Todos os cartões, YELAS, ofertas e movimentos VUYELA numa área digital simples.",
   alternates: { canonical: "/clientes" }
 };
 

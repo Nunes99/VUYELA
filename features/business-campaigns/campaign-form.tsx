@@ -110,8 +110,8 @@ export function CampaignCreationForm({
             requiredMark
             required
           >
-            <option value="points_multiplier">Multiplicador de pontos</option>
-            <option value="bonus_points">Pontos bonus</option>
+            <option value="points_multiplier">Multiplicador de YELAS</option>
+            <option value="bonus_points">YELAS bonus</option>
             <option value="discount_percent">Desconto percentual</option>
             <option value="message_only">Mensagem</option>
           </Select>
@@ -121,7 +121,7 @@ export function CampaignCreationForm({
             inputMode="decimal"
             placeholder="2"
           />
-          <Input label="Pontos bonus" name="bonusPoints" inputMode="numeric" />
+          <Input label="YELAS bonus" name="bonusPoints" inputMode="numeric" />
           <Input label="Desconto (%)" name="discountPercent" inputMode="decimal" />
         </div>
       </div>
@@ -135,7 +135,7 @@ export function CampaignCreationForm({
           <Input label="Compras máximas" name="maxPurchaseCount" inputMode="numeric" />
           <Input label="Gasto mínimo (MZN)" name="minTotalSpentMzn" inputMode="decimal" />
           <Input label="Dias inativo" name="lastPurchaseBeforeDays" inputMode="numeric" />
-          <Input label="Pontos mínimos" name="minPointsBalance" inputMode="numeric" />
+          <Input label="YELAS mínimos" name="minPointsBalance" inputMode="numeric" />
         </div>
         <label className="business-campaign-check">
           <input name="requiresMarketingConsent" type="checkbox" defaultChecked />

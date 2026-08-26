@@ -224,6 +224,6 @@ describe("public marketplace model", () => {
     expect(buildBusinessDetail(snapshot, "restaurante-mares")?.canonicalPath).toBe(
       "/estabelecimentos/restaurante-mares"
     );
-    expect(getPointValueLabel(program)).toBe("1 ponto = 1,00 MZN promocional");
+    expect(getPointValueLabel(program)).toBe("1 YELA = 1,00 MZN promocional");
   });
 });

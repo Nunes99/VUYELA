@@ -121,14 +121,14 @@ function getStatusLabel(status: CardStatus): string {
 
 function getExpiryLabel(pointsExpireAfterDays: number | null): string {
   if (pointsExpireAfterDays === null) {
-    return "Pontos sem expiração configurada";
+    return "YELAS sem expiração configurada";
   }
 
   if (pointsExpireAfterDays === 1) {
-    return "Pontos expiram 1 dia após serem ganhos";
+    return "YELAS expiram 1 dia após serem ganhos";
   }
 
-  return `Pontos expiram ${pointsExpireAfterDays} dias após serem ganhos`;
+  return `YELAS expiram ${pointsExpireAfterDays} dias após serem ganhos`;
 }
 
 function assertPositiveInteger(fieldName: string, value: number): void {

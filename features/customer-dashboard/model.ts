@@ -88,30 +88,22 @@ export function buildCustomerDashboardViewModel({
   };
 }
 
-export function getActivityDescription(item: {
-  pointsEarned: number;
-  pointsRedeemed: number;
-  netAmountMznMinor: number;
+export function getLedgerActivityDescription(item: {
+  type: string;
+  reason: string | null;
 }): string {
-  if (item.pointsRedeemed > 0 && item.pointsEarned > 0) {
-    return `Resgatou ${item.pointsRedeemed.toLocaleString(
-      "pt-MZ"
-    )} pontos e ganhou ${item.pointsEarned.toLocaleString("pt-MZ")} pontos`;
+  if (item.type === "redeem") return "YELAS utilizadas no pagamento";
+  if (item.type === "earn" && item.reason === "purchase_earn_after_redemption") {
+    return "YELAS ganhas sobre o valor pago";
   }
-
-  if (item.pointsRedeemed > 0) {
-    return `Resgatou ${item.pointsRedeemed.toLocaleString("pt-MZ")} pontos`;
-  }
-
-  if (item.pointsEarned > 0) {
-    return `Ganhou ${item.pointsEarned.toLocaleString("pt-MZ")} pontos`;
-  }
-
-  return `Compra de ${Math.floor(item.netAmountMznMinor / 100).toLocaleString("pt-MZ")} MZN`;
-}
-
-export function getActivityPoints(item: { pointsEarned: number; pointsRedeemed: number }): number {
-  return item.pointsEarned - item.pointsRedeemed;
+  if (item.type === "earn") return "YELAS ganhas na compra";
+  if (item.type === "bonus") return "Bónus de YELAS";
+  if (item.type === "referral") return "YELAS por indicação";
+  if (item.type === "birthday") return "YELAS de aniversário";
+  if (item.type === "expire") return "YELAS expiradas";
+  if (item.type === "refund_reversal") return "Ajuste por reembolso";
+  if (item.type === "reversal") return "Movimento revertido";
+  return "Ajuste de YELAS";
 }
 
 export function getActivityTone(points: number): CustomerActivityItem["tone"] {

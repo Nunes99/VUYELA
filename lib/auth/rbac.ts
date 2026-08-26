@@ -2,6 +2,10 @@ export const profileRoles = ["customer", "support_agent", "platform_admin", "sup
 
 export type ProfileRole = (typeof profileRoles)[number];
 
+export const accountTypes = ["customer", "business", "platform"] as const;
+
+export type AccountType = (typeof accountTypes)[number];
+
 export const businessMemberRoles = [
   "cashier",
   "branch_manager",
@@ -25,6 +29,7 @@ export interface BusinessMembership {
 export interface AuthPrincipal {
   profileId: string;
   profileRole: ProfileRole;
+  accountType: AccountType;
   mfaVerified: boolean;
   businessMemberships: BusinessMembership[];
 }
@@ -59,6 +64,10 @@ const mfaRequiredProfileRoles = new Set<ProfileRole>([
 
 export function isProfileRole(value: string): value is ProfileRole {
   return profileRoles.includes(value as ProfileRole);
+}
+
+export function isAccountType(value: string): value is AccountType {
+  return accountTypes.includes(value as AccountType);
 }
 
 export function isBusinessMemberRole(value: string): value is BusinessMemberRole {
@@ -140,7 +149,7 @@ export function canAccessRoute(
   }
 
   if (route === "/cliente") {
-    return true;
+    return principal.accountType === "customer";
   }
 
   if (route === "/admin") {
@@ -178,13 +187,16 @@ export function getDefaultAuthenticatedPath(principal: AuthPrincipal): Protected
     return "/admin";
   }
 
-  if (hasActiveBusinessRole(principal, businessDashboardRoles)) {
+  if (
+    principal.accountType === "business" &&
+    hasActiveBusinessRole(principal, businessDashboardRoles)
+  ) {
     return "/negocio";
   }
 
-  if (hasActiveBusinessRole(principal, posRoles)) {
+  if (principal.accountType === "business" && hasActiveBusinessRole(principal, posRoles)) {
     return "/pos";
   }
 
-  return "/cliente";
+  return principal.accountType === "customer" ? "/cliente" : "/negocio";
 }

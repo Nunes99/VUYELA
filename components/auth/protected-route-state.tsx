@@ -14,7 +14,7 @@ import {
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
-import { canAccessRoute } from "@/lib/auth/rbac";
+import { canAccessRoute, getDefaultAuthenticatedPath } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 import type { ProtectedRouteState } from "@/lib/auth/session";
 
@@ -161,8 +161,8 @@ export function ProtectedRouteStateView({
       eyebrow="Sem permissão"
       title="Esta conta não tem acesso a esta área."
       body="As permissões são avaliadas no servidor por perfil, membro ativo, negócio e filial."
-      actionHref="/cliente"
-      actionLabel="Ir para cliente"
+      actionHref={getDefaultAuthenticatedPath(state.principal)}
+      actionLabel="Ir para a minha área"
     />
   );
 }
@@ -179,18 +179,23 @@ export function DashboardAreaMenu({
   includePosSettings?: boolean;
 }) {
   const areas = [
-    { href: "/cliente", label: "Cliente", icon: UserRound, visible: true },
+    {
+      href: "/cliente",
+      label: "Cliente",
+      icon: UserRound,
+      visible: principal.accountType === "customer"
+    },
     {
       href: "/negocio",
       label: "Negócio",
       icon: BriefcaseBusiness,
-      visible: canAccessRoute(principal, "/negocio")
+      visible: principal.accountType === "business" && canAccessRoute(principal, "/negocio")
     },
     {
       href: "/pos",
       label: "POS",
       icon: ScanLine,
-      visible: canAccessRoute(principal, "/pos")
+      visible: principal.accountType === "business" && canAccessRoute(principal, "/pos")
     },
     {
       href: "/pos/definicoes",

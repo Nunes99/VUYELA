@@ -6,6 +6,7 @@ import {
   Grid2X2,
   LayoutDashboard,
   LogOut,
+  Menu,
   MessageSquare,
   PackageSearch,
   ScanLine,
@@ -18,7 +19,6 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
@@ -85,6 +85,51 @@ export function BusinessPortalShell({
 
   return (
     <div className="business-portal">
+      <header className="business-portal__mobile-header">
+        <VuyelaLogo className="business-portal__mobile-brand" href="/negocio" inverse />
+        <div className="business-portal__mobile-context">
+          <small>Portal de Negócio</small>
+          <strong>{sectionLabels[activeSection]}</strong>
+        </div>
+        <details className="business-portal__mobile-menu">
+          <summary aria-label="Abrir navegação do negócio" title="Menu do negócio">
+            <Menu aria-hidden="true" size={22} />
+          </summary>
+          <div className="business-portal__mobile-menu-panel">
+            <div className="business-portal__mobile-identity">
+              <span className="business-portal__avatar" aria-hidden="true">
+                {initials(identityLabel)}
+              </span>
+              <span>
+                <strong>{identityLabel}</strong>
+                <small>{businessRoleLabel(principal)}</small>
+              </span>
+            </div>
+            <nav aria-label="Navegação móvel do negócio">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    aria-current={activeSection === item.id ? "page" : undefined}
+                    className={activeSection === item.id ? "is-active" : undefined}
+                    href={withBusinessContext(item.href, businessId)}
+                    key={item.id}
+                  >
+                    <Icon aria-hidden="true" size={18} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+            <form action={signOutAction}>
+              <button type="submit">
+                <LogOut aria-hidden="true" size={18} />
+                <span>Terminar sessão</span>
+              </button>
+            </form>
+          </div>
+        </details>
+      </header>
       <aside className="business-portal__sidebar">
         <div className="business-portal__sidebar-main">
           <VuyelaLogo className="business-portal__brand" href="/" inverse />
@@ -143,7 +188,6 @@ export function BusinessPortalShell({
             <p>{subtitle ?? "Controlo e auditoria operacional de negócio parceiro"}</p>
           </div>
           <div className="business-portal__identity">
-            <DashboardAreaMenu principal={principal} variant="default" />
             <span className="business-portal__avatar" aria-hidden="true">
               {initials(identityLabel)}
             </span>

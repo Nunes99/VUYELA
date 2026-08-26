@@ -158,7 +158,7 @@ export async function getBusinessSettings(
         websiteUrl: selectedBusiness.website_url ?? ""
       },
       program: {
-        name: program?.name ?? `Pontos ${selectedBusiness.name}`,
+        name: program?.name ?? `YELAS ${selectedBusiness.name}`,
         earnPercent: Number(program?.earn_rate ?? 0.05) * 100,
         pointValueMzn: (program?.point_value_mzn_minor ?? 100) / 100,
         maximumRedemptionPercent: Number(program?.maximum_redemption_percent ?? 50),

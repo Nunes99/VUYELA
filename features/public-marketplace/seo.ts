@@ -30,9 +30,9 @@ export function buildBusinessMetadata(business: MarketplaceBusiness): Metadata {
   const cityLabel = getBusinessCityLabel(business);
 
   return buildMetadata({
-    title: `${business.name} - pontos e benefícios em ${cityLabel}`,
+    title: `${business.name} - YELAS e benefícios em ${cityLabel}`,
     description: business.description
-      ? `${business.description} Veja pontos, filiais, regras e ofertas públicas de ${business.name}.`
+      ? `${business.description} Veja YELAS, filiais, regras e ofertas públicas de ${business.name}.`
       : `Conheça ${business.name}, as suas filiais e o programa de benefícios VUYELA.`,
     canonicalPath: `/estabelecimentos/${business.slug}`,
     indexable: isIndexableBusiness(business),
@@ -163,18 +163,18 @@ export function buildBusinessFaqJsonLd(business: MarketplaceBusiness): Record<st
     mainEntity: [
       {
         "@type": "Question",
-        name: `Onde posso usar pontos de ${business.name}?`,
+        name: `Onde posso usar YELAS de ${business.name}?`,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `Os pontos podem ser usados no próprio negócio emissor. ${getPointValueLabel(business.program)}.`
+          text: `As YELAS podem ser utilizadas no próprio negócio emissor. ${getPointValueLabel(business.program)}.`
         }
       },
       {
         "@type": "Question",
-        name: "Os pontos VUYELA podem ser levantados em dinheiro?",
+        name: "As YELAS VUYELA podem ser levantados em dinheiro?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Não. Os pontos são benefícios promocionais do negócio emissor e não representam dinheiro, saldo bancário ou valor transferível."
+          text: "Não. As YELAS são benefícios promocionais do negócio emissor e não representam dinheiro, saldo bancário ou valor transferível."
         }
       }
     ]

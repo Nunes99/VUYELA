@@ -639,7 +639,7 @@ function CustomerCardRow({
         <strong>{mode === "cards" ? card.cardNumber : card.customerName}</strong>
         <span>{mode === "cards" ? card.customerName : card.cardNumber}</span>
       </div>
-      <strong>{card.availablePoints.toLocaleString("pt-MZ")} Pts</strong>
+      <strong>{card.availablePoints.toLocaleString("pt-MZ")} YL</strong>
       <span>{formatMznMinor(card.totalSpentMznMinor)}</span>
       <OperationStatus active={card.status === "active"} label={cardStatusLabel(card.status)} />
       <details className="business-operation-editor business-operation-editor--inline">
@@ -656,13 +656,10 @@ function CustomerCardRow({
             label="Última compra"
             value={card.lastTransactionAt ? formatDate(card.lastTransactionAt) : "Sem compras"}
           />
+          <Fact label="YELAS ganhas" value={`${card.lifetimeEarned.toLocaleString("pt-MZ")} YL`} />
           <Fact
-            label="Pontos ganhos"
-            value={`${card.lifetimeEarned.toLocaleString("pt-MZ")} Pts`}
-          />
-          <Fact
-            label="Pontos usados"
-            value={`${card.lifetimeRedeemed.toLocaleString("pt-MZ")} Pts`}
+            label="YELAS utilizadas"
+            value={`${card.lifetimeRedeemed.toLocaleString("pt-MZ")} YL`}
           />
         </dl>
         <form

@@ -207,7 +207,7 @@ export function buildEstablishmentsList(
     kind: "all",
     title: "Estabelecimentos com benefícios VUYELA",
     description:
-      "Descubra negócios ativos em Moçambique com programas de pontos, benefícios e ofertas públicas.",
+      "Descubra negócios ativos em Moçambique com programas de YELAS, benefícios e ofertas públicas.",
     canonicalPath: "/estabelecimentos",
     indexable: snapshot.businesses.some(isIndexableBusiness),
     businesses: snapshot.businesses,
@@ -238,10 +238,10 @@ export function buildCategoryList(
 
   return {
     kind: "category",
-    title: `${category.name} com pontos VUYELA`,
+    title: `${category.name} com YELAS VUYELA`,
     description: category.description
       ? `${category.description} Veja estabelecimentos com benefícios e ofertas ativas.`
-      : `Veja estabelecimentos de ${category.name} com pontos, benefícios e ofertas ativas.`,
+      : `Veja estabelecimentos de ${category.name} com YELAS, benefícios e ofertas ativas.`,
     canonicalPath: `/categorias/${category.slug}`,
     indexable: businesses.length >= MIN_CATEGORY_ESTABLISHMENTS_FOR_INDEX,
     businesses,
@@ -263,7 +263,7 @@ export function buildCategoriesIndex(
     kind: "all",
     title: "Categorias com benefícios VUYELA",
     description:
-      "Explore categorias de negócios com programas de pontos, ofertas públicas e benefícios claros.",
+      "Explore categorias de negócios com programas de YELAS, ofertas públicas e benefícios claros.",
     canonicalPath: "/categorias",
     indexable: snapshot.categories.length > 0,
     businesses: snapshot.businesses.slice(0, 9),
@@ -293,7 +293,7 @@ export function buildCityList(
   return {
     kind: "city",
     title: `Estabelecimentos VUYELA em ${city.name}`,
-    description: `Descubra negócios em ${city.name} com pontos, benefícios promocionais e ofertas ativas.`,
+    description: `Descubra negócios em ${city.name} com YELAS, benefícios promocionais e ofertas ativas.`,
     canonicalPath: `/locais/${city.slug}`,
     indexable: businesses.length >= MIN_CITY_ESTABLISHMENTS_FOR_INDEX,
     businesses,
@@ -332,7 +332,7 @@ export function buildCityCategoryList(
   return {
     kind: "city-category",
     title: `${item.category.name} com benefícios em ${item.city.name}`,
-    description: `Veja ${item.category.name.toLocaleLowerCase("pt-MZ")} em ${item.city.name} com pontos VUYELA, benefícios e ofertas ativas.`,
+    description: `Veja ${item.category.name.toLocaleLowerCase("pt-MZ")} em ${item.city.name} com YELAS VUYELA, benefícios e ofertas ativas.`,
     canonicalPath: `/locais/${item.city.slug}/${item.category.slug}`,
     indexable: businesses.length >= MIN_CITY_CATEGORY_ESTABLISHMENTS_FOR_INDEX,
     businesses,
@@ -386,7 +386,7 @@ export function buildOffersIndex(snapshot: PublicMarketplaceSnapshot): Marketpla
     kind: "all",
     title: "Ofertas ativas VUYELA",
     description:
-      "Encontre ofertas públicas ativas em negócios VUYELA e veja onde pode acumular ou usar pontos.",
+      "Encontre ofertas públicas ativas em negócios VUYELA e veja onde pode acumular ou usar YELAS.",
     canonicalPath: "/ofertas",
     indexable: snapshot.offers.length > 0,
     businesses: snapshot.businesses.slice(0, 9),
@@ -468,7 +468,7 @@ export function getBusinessCityLabel(business: MarketplaceBusiness): string {
 
 export function getProgramEarnRateLabel(program: MarketplaceProgram | null): string {
   if (!program) {
-    return "Programa de pontos ativo";
+    return "Programa de YELAS ativo";
   }
 
   const percent = Math.round(program.earnRate * 100);
@@ -477,15 +477,15 @@ export function getProgramEarnRateLabel(program: MarketplaceProgram | null): str
     return "Benefícios configurados";
   }
 
-  return `${percent}% em pontos`;
+  return `${percent}% em YELAS`;
 }
 
 export function getPointValueLabel(program: MarketplaceProgram | null): string {
   if (!program) {
-    return "1 ponto = 1 MZN promocional";
+    return "1 YELA = 1 MZN promocional";
   }
 
-  return `1 ponto = ${formatMznMinor(program.pointValueMznMinor)} promocional`;
+  return `1 YELA = ${formatMznMinor(program.pointValueMznMinor)} promocional`;
 }
 
 export function getExpiryLabel(program: MarketplaceProgram | null): string {

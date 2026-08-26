@@ -58,7 +58,7 @@ export function MarketplaceListPage({ viewModel }: { viewModel: MarketplaceListV
               }
               description={
                 viewModel.businesses.length > 0
-                  ? "Cada perfil mostra pontos, benefícios, localização e ofertas públicas ativas."
+                  ? "Cada perfil mostra YELAS, benefícios, localização e ofertas públicas ativas."
                   : "Esta página fica fora do índice enquanto não houver conteúdo público suficiente."
               }
               id="marketplace-results-title"
@@ -131,7 +131,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
               <BenefitTile
                 icon={<Gift size={20} />}
                 title={getProgramEarnRateLabel(business.program)}
-                body="Pontos promocionais acumulados no próprio negócio."
+                body="YELAS promocionais acumulados no próprio negócio."
               />
               <BenefitTile
                 icon={<ShieldCheck size={20} />}
@@ -187,13 +187,13 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
             <DetailSection title="Perguntas frequentes">
               <div className="marketplace-faq">
                 <details>
-                  <summary>Posso usar estes pontos noutro negócio?</summary>
-                  <p>Não. Os pontos são promocionais e pertencem ao negócio que os emitiu.</p>
+                  <summary>Posso usar estas YELAS noutro negócio?</summary>
+                  <p>Não. As YELAS são promocionais e pertencem ao negócio que as emitiu.</p>
                 </details>
                 <details>
-                  <summary>Os pontos podem ser levantados em dinheiro?</summary>
+                  <summary>As YELAS podem ser levantados em dinheiro?</summary>
                   <p>
-                    Não. Pontos VUYELA não são saldo bancário, dinheiro eletrónico ou valor
+                    Não. YELAS VUYELA não são saldo bancário, dinheiro eletrónico ou valor
                     transferível.
                   </p>
                 </details>
@@ -207,7 +207,7 @@ export function BusinessDetailPage({ viewModel }: { viewModel: MarketplaceDetail
               <p>
                 {business.program
                   ? "Entre ou crie uma conta para emitir o seu cartão digital deste negócio."
-                  : "O programa de pontos deste negócio está a ser preparado."}
+                  : "O programa de YELAS deste negócio está a ser preparado."}
               </p>
               {business.program ? (
                 <form action={joinBusinessLoyaltyProgramAction}>
@@ -281,7 +281,7 @@ export function OfferDetailPage({ viewModel }: { viewModel: MarketplaceOfferView
           <aside className="marketplace-detail-aside" aria-label="Ação da oferta">
             <div className="marketplace-action-panel">
               <h2>Ver estabelecimento</h2>
-              <p>Consulte as regras de pontos e as filiais onde esta oferta pode ser relevante.</p>
+              <p>Consulte as regras de YELAS e as filiais onde esta oferta pode ser relevante.</p>
               <Link
                 className="marketplace-button marketplace-button--reward"
                 href={`/estabelecimentos/${viewModel.business.slug}`}
@@ -778,10 +778,10 @@ function MarketplaceEmptyState() {
       <Store size={24} />
       <h2>Conteúdo público em preparação</h2>
       <p>
-        Assim que houver estabelecimentos ativos com categoria, programa de pontos e filial
+        Assim que houver estabelecimentos ativos com categoria, programa de YELAS e filial
         publicada, esta página passa a ser indexavel.
       </p>
-      <Link className="marketplace-button marketplace-button--reward" href="/onboarding/negocio">
+      <Link className="marketplace-button marketplace-button--reward" href="/cadastrar/negocio">
         Registar negócio
       </Link>
     </div>

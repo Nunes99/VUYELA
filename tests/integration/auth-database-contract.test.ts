@@ -10,6 +10,14 @@ const migration = readFileSync(
   ),
   "utf8"
 );
+const accountSeparationMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/separate_customer_business_accounts.sql"),
+  "utf8"
+);
+const businessTeamMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/support_business_team_accounts.sql"),
+  "utf8"
+);
 const actions = readFileSync(join(process.cwd(), "features/auth/actions.ts"), "utf8");
 const forms = readFileSync(join(process.cwd(), "features/auth/forms.tsx"), "utf8");
 const callback = readFileSync(join(process.cwd(), "app/(auth)/auth/callback/route.ts"), "utf8");
@@ -27,15 +35,28 @@ describe("authentication database contract", () => {
   });
 
   it("keeps business onboarding in one authenticated database transaction", () => {
-    expect(migration).toContain("create or replace function public.submit_business_onboarding");
-    expect(migration).toContain("v_actor_id uuid := auth.uid()");
-    expect(migration).toContain("insert into public.businesses");
-    expect(migration).toContain("insert into public.branches");
-    expect(migration).toContain("insert into public.business_members");
-    expect(migration).toContain("insert into public.audit_logs");
-    expect(migration).toContain("grant execute on function public.submit_business_onboarding");
-    expect(actions).toContain('supabase.rpc("submit_business_onboarding"');
+    expect(accountSeparationMigration).toContain(
+      "account_type in ('customer', 'business', 'platform')"
+    );
+    expect(accountSeparationMigration).toContain(
+      "new.raw_user_meta_data -> 'business_registration'"
+    );
+    expect(accountSeparationMigration).toContain("insert into public.businesses");
+    expect(accountSeparationMigration).toContain("insert into public.branches");
+    expect(accountSeparationMigration).toContain("insert into public.business_members");
+    expect(accountSeparationMigration).toContain("'business_owner'");
+    expect(actions).toContain("signUpBusinessWithEmailAction");
+    expect(actions).toContain('account_type: "business"');
     expect(actions).not.toContain("createSupabaseServiceRoleClient");
+  });
+
+  it("creates invited team identities without provisioning another business", () => {
+    expect(businessTeamMigration).toContain("validate_business_member_invitation");
+    expect(businessTeamMigration).toContain("v_registration = '{}'::jsonb");
+    expect(businessTeamMigration).toContain("v_profile.account_type <> 'business'");
+    expect(actions).toContain("signUpBusinessMemberWithEmailAction");
+    expect(actions).toContain('account_type: "business"');
+    expect(actions).toContain("validate_business_member_invitation");
   });
 
   it("validates the NUIT before business onboarding reaches PostgreSQL", () => {

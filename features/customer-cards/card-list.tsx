@@ -22,8 +22,8 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
       <div className="customer-cards-notice" role="status">
         <h2>Ainda não tem cartões</h2>
         <p>
-          Quando aderir a um negócio VUYELA, o cartão digital aparece aqui com pontos, equivalente
-          em MZN e código de identificação.
+          Quando aderir a um negócio VUYELA, o cartão digital aparece aqui com YELAS, equivalente em
+          MZN e código de identificação.
         </p>
       </div>
     );
@@ -33,7 +33,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
     <div className="customer-cards">
       <div className="customer-cards__header">
         <p>
-          Cada cartão pertence ao negócio que o emitiu. Os pontos não são dinheiro e só podem ser
+          Cada cartão pertence ao negócio que o emitiu. As YELAS não são dinheiro e só podem ser
           usados nesse estabelecimento.
         </p>
       </div>
@@ -75,7 +75,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
                 <RewardBadge
                   label={`Faltam ${card.pointsUntilNextTier.toLocaleString(
                     "pt-MZ"
-                  )} pontos para ${card.nextTierName}`}
+                  )} YELAS para ${card.nextTierName}`}
                 />
               ) : (
                 <RewardBadge label="Nível máximo atual" />

@@ -78,7 +78,7 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
                 <th>Estabelecimento</th>
                 <th>Movimento</th>
                 <th>Cartão vinculado</th>
-                <th>Pontos</th>
+                <th>YELAS</th>
               </tr>
             </thead>
             <tbody>
@@ -89,11 +89,11 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
                     <strong>{item.businessName}</strong>
                     <small>{item.description}</small>
                   </td>
-                  <td>{item.tone === "redeem" ? "Utilização de pontos" : "Compra realizada"}</td>
+                  <td>{item.tone === "redeem" ? "Utilização de YELAS" : "Compra realizada"}</td>
                   <td>{item.cardName ?? "Cartão VUYELA"}</td>
                   <td className={`is-${item.tone}`}>
                     {item.points > 0 ? "+" : ""}
-                    {item.points.toLocaleString("pt-MZ")} Pts
+                    {item.points.toLocaleString("pt-MZ")} YL
                   </td>
                 </tr>
               ))}

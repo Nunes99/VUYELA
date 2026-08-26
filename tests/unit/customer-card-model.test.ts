@@ -54,7 +54,7 @@ describe("customer card model", () => {
       currentTierName: "Prata",
       nextTierName: "Ouro",
       pointsUntilNextTier: 750,
-      expiryLabel: "Pontos expiram 180 dias após serem ganhos",
+      expiryLabel: "YELAS expiram 180 dias após serem ganhos",
       qrCode: "VY-8F2K-91M"
     });
   });
@@ -81,7 +81,7 @@ describe("customer card model", () => {
       currentTierName: "Base",
       nextTierName: null,
       pointsUntilNextTier: null,
-      expiryLabel: "Pontos sem expiração configurada"
+      expiryLabel: "YELAS sem expiração configurada"
     });
   });
 
