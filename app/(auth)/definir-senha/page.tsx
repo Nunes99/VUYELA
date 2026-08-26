@@ -20,7 +20,7 @@ export default function UpdatePasswordPage() {
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="update-password-title">
         <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" />
+          <VuyelaLogo className="auth-brand auth-brand--dark" href="/" />
           <span className="auth-kicker">Nova palavra-passe</span>
           <h1 id="update-password-title">Defina uma nova palavra-passe segura.</h1>
           <p className="auth-intro">

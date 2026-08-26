@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
@@ -10,6 +11,7 @@ import type { PosContextState } from "./data";
 
 export function PosPortalShell({
   principal,
+  section = "transaction",
   children
 }: {
   principal: AuthPrincipal;
@@ -39,7 +41,17 @@ export function PosPortalShell({
           </form>
         </nav>
       </header>
-      <div className="pos-portal__content">{children}</div>
+      <div className="pos-portal__content">
+        <FlowBreadcrumbs
+          className="pos-portal__breadcrumbs"
+          items={[
+            { label: "Negócio", href: "/negocio" },
+            { label: "POS", href: section === "settings" ? "/pos" : undefined },
+            ...(section === "settings" ? [{ label: "Definições" }] : [])
+          ]}
+        />
+        {children}
+      </div>
     </div>
   );
 }

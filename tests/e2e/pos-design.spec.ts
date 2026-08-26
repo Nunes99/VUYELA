@@ -23,6 +23,10 @@ test("renders the five approved POS frames without horizontal overflow", async (
     await expect(page.locator(".pos-panel")).toBeVisible();
     await expect(page.locator(".pos-summary")).toBeVisible();
 
+    if (frame.step !== "identify" && frame.step !== "success") {
+      await expect(page.locator(".pos-flow-controls")).toBeVisible();
+    }
+
     const viewport = page.viewportSize();
     const dimensions = await page.evaluate(() => ({
       clientWidth: document.documentElement.clientWidth,
@@ -86,4 +90,7 @@ test("keeps lookup, catalogue, payment and confirmation controls functional", as
   await expect(confirmButton).toBeDisabled();
   await authorization.check();
   await expect(confirmButton).toBeEnabled();
+
+  await page.getByRole("button", { name: "Voltar ao pagamento" }).click();
+  await expect(page.getByRole("heading", { name: "Autorizar Pagamento" })).toBeVisible();
 });

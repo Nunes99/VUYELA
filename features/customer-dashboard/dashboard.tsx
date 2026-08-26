@@ -415,8 +415,15 @@ function CustomerBusinesses({
 
   return (
     <section aria-labelledby="customer-businesses-title">
-      <CustomerMobileHeader action="notifications" title="Descobrir Negócios" />
+      <CustomerMobileHeader
+        action="notifications"
+        back
+        backHref="/cliente?vista=cartoes"
+        title="Descobrir Negócios"
+      />
       <CustomerPageHeading
+        breadcrumb="Cartões"
+        breadcrumbHref="/cliente?vista=cartoes"
         eyebrow="Cartões disponíveis"
         title="Negócios VUYELA"
         description="Escolha os estabelecimentos onde pretende acumular pontos e adira ao cartão digital."
@@ -535,6 +542,7 @@ function CustomerCardDetail({
       <div className="customer-desktop-only">
         <CustomerPageHeading
           breadcrumb="Seus Cartões"
+          breadcrumbHref="/cliente?vista=cartoes"
           title="Detalhes do Cartão"
           description={`${card.businessName} · ${card.currentTierName} · ${card.statusLabel}`}
           titleId="customer-card-detail-title"
@@ -586,6 +594,7 @@ function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel
       <CustomerMobileHeader action="notifications" title="Histórico de Pontos" />
       <CustomerPageHeading
         breadcrumb="Início"
+        breadcrumbHref="/cliente"
         title="Histórico de Atividade"
         description="Consulte todos os pontos ganhos e utilizados nos seus cartões."
         titleId="customer-activity-title"
@@ -622,6 +631,8 @@ function CustomerOffers({
     <section aria-labelledby="customer-offers-title">
       <CustomerMobileHeader action="notifications" title="Explorar Ofertas" />
       <CustomerPageHeading
+        breadcrumb="Início"
+        breadcrumbHref="/cliente"
         title="Explorar Ofertas"
         description="Descubra benefícios exclusivos dos estabelecimentos VUYELA."
         titleId="customer-offers-title"
@@ -663,6 +674,7 @@ function CustomerNotifications({ dashboard }: { dashboard: CustomerDashboardView
       <CustomerMobileHeader action="read" back title="Avisos e Alertas" />
       <CustomerPageHeading
         breadcrumb="Início"
+        breadcrumbHref="/cliente"
         title="Avisos e Alertas"
         description="Novidades, movimentos e campanhas dos seus programas."
         titleId="customer-notifications-title"
@@ -702,6 +714,7 @@ function CustomerProfile({
         </Link>
         <CustomerPageHeading
           breadcrumb="Perfil"
+          breadcrumbHref="/cliente?vista=perfil"
           title="O Seu Perfil"
           description="Edite os seus dados pessoais e mantenha a identificação no POS atualizada."
           titleId="customer-profile-edit-title"
@@ -725,6 +738,8 @@ function CustomerProfile({
     <section aria-labelledby="customer-profile-title">
       <CustomerMobileHeader action="notifications" title="O Seu Perfil" />
       <CustomerPageHeading
+        breadcrumb="Início"
+        breadcrumbHref="/cliente"
         title="O Seu Perfil"
         description="Consulte os seus dados pessoais e preferências."
         titleId="customer-profile-title"
@@ -948,12 +963,14 @@ function CustomerSummaryCard({
 function CustomerPageHeading({
   eyebrow,
   breadcrumb,
+  breadcrumbHref,
   title,
   description,
   titleId
 }: {
   eyebrow?: string;
   breadcrumb?: string;
+  breadcrumbHref?: string;
   title: string;
   description: string;
   titleId: string;
@@ -964,7 +981,8 @@ function CustomerPageHeading({
       <h2 id={titleId}>{title}</h2>
       {breadcrumb ? (
         <span className="customer-page-heading__breadcrumb">
-          {breadcrumb} <ChevronRight aria-hidden="true" size={14} /> <strong>{title}</strong>
+          {breadcrumbHref ? <Link href={breadcrumbHref}>{breadcrumb}</Link> : breadcrumb}
+          <ChevronRight aria-hidden="true" size={14} /> <strong>{title}</strong>
         </span>
       ) : null}
       <p>{description}</p>
@@ -1001,10 +1019,12 @@ function CustomerSectionHeader({
 function CustomerMobileHeader({
   action,
   back = false,
+  backHref = "/cliente",
   title
 }: {
   action: "add" | "notifications" | "read";
   back?: boolean;
+  backHref?: string;
   title: string;
 }) {
   const actionContent = action === "add" ? <Plus /> : action === "read" ? <Check /> : <Bell />;
@@ -1018,7 +1038,7 @@ function CustomerMobileHeader({
   return (
     <header className="customer-mobile-header">
       {back ? (
-        <Link aria-label="Voltar ao início" href="/cliente">
+        <Link aria-label="Voltar à página anterior" href={backHref}>
           <ArrowLeft />
         </Link>
       ) : (

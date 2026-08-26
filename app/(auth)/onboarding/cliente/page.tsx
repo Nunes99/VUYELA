@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CustomerOnboardingForm } from "@/features/auth/forms";
 import { getProtectedRouteState } from "@/lib/auth/session";
 import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
+import { FlowBackLink } from "@/components/navigation/flow-navigation";
 
 export const metadata: Metadata = {
   title: "Onboarding de cliente",
@@ -20,6 +21,7 @@ export default async function CustomerOnboardingPage() {
 
   return (
     <ProtectedRouteStateView state={state} title="Complete o seu perfil de cliente.">
+      <FlowBackLink href="/cliente" label="Voltar à área do cliente" />
       <div className="dashboard-card">
         <p>
           Estes dados criam a base para cartões digitais, notificações e recuperação de acesso nas

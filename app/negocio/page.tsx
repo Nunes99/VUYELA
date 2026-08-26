@@ -69,6 +69,9 @@ export default async function BusinessAreaPage({
       {state.status === "authorized" && dashboardState ? (
         <BusinessPortalShell
           activeSection={sectionByView[view]}
+          businessId={
+            dashboardState.status === "ready" ? dashboardState.selectedBusinessId : undefined
+          }
           principal={state.principal}
           title={view === "dashboard" ? "Painel do Negócio" : undefined}
         >

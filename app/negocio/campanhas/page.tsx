@@ -39,6 +39,9 @@ export default async function BusinessCampaignsPage({
       {state.status === "authorized" && campaignsState ? (
         <BusinessPortalShell
           activeSection="campaigns"
+          businessId={
+            campaignsState.status === "ready" ? campaignsState.selectedBusinessId : undefined
+          }
           principal={state.principal}
           title="Campanhas"
         >

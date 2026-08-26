@@ -47,6 +47,7 @@ describe("POS server actions", () => {
 
     expect(state.status).toBe("success");
     expect(state.quote?.pointsToRedeem).toBe(20);
+    expect(state.draftQuote).toEqual(state.quote);
     expect(state.idempotencyKey).toBe("pos_1234567890ab");
   });
 
@@ -133,6 +134,30 @@ describe("POS server actions", () => {
 
   it("routes the unified POS action by intent", async () => {
     const state = await submitPosAction(identifiedState, formWith({ intent: "reset" }));
+
+    expect(state).toEqual(initialPosActionState);
+  });
+
+  it("returns to services without losing the identified customer or the draft values", async () => {
+    const quotedState = await quotePosTransactionAction(
+      identifiedState,
+      formWith({
+        grossAmountMzn: "200",
+        serviceDescription: "Corte e barba",
+        idempotencyKey: "pos_1234567890ab"
+      })
+    );
+    const state = await submitPosAction(quotedState, formWith({ intent: "back_to_services" }));
+
+    expect(state.card?.customerCardId).toBe("card-1");
+    expect(state.quote).toBeNull();
+    expect(state.draftQuote?.grossAmountMznMinor).toBe(20_000);
+    expect(state.serviceDescription).toBe("Corte e barba");
+    expect(state.idempotencyKey).toBe("");
+  });
+
+  it("returns to identification by discarding only the unconfirmed transaction", async () => {
+    const state = await submitPosAction(identifiedState, formWith({ intent: "back_to_identify" }));
 
     expect(state).toEqual(initialPosActionState);
   });

@@ -55,6 +55,30 @@ export async function submitPosAction(
     return initialPosActionState;
   }
 
+  if (intent === "back_to_identify") {
+    return initialPosActionState;
+  }
+
+  if (intent === "back_to_services") {
+    if (!previousState.card) {
+      return initialPosActionState;
+    }
+
+    return {
+      ...previousState,
+      status: "idle",
+      message: "Pode ajustar os serviços, o valor e os pontos antes de continuar.",
+      quote: null,
+      transactionId: null,
+      idempotencyKey: "",
+      paymentMethod: null,
+      paymentAttemptId: null,
+      paymentStatus: null,
+      receiptNumber: null,
+      completedAt: null
+    };
+  }
+
   return createErrorState("Ação de POS inválida.", previousState);
 }
 
@@ -225,6 +249,7 @@ export async function quotePosTransactionAction(
     status: "success",
     message: "Valor calculado. Confirme com o cliente.",
     quote,
+    draftQuote: quote,
     serviceDescription,
     catalogItemId,
     transactionId: null,

@@ -21,7 +21,7 @@ export default function PasswordResetPage() {
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="reset-title">
         <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" />
+          <VuyelaLogo className="auth-brand auth-brand--dark" href="/" />
           <span className="auth-kicker">Recuperação</span>
           <h1 id="reset-title">Recupere o acesso com seguranca.</h1>
           <p className="auth-intro">

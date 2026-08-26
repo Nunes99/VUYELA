@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ArrowLeft,
   ArrowRight,
   BadgeCheck,
   Banknote,
@@ -23,7 +24,8 @@ import {
   Sparkles,
   Smartphone,
   UserRound,
-  WalletCards
+  WalletCards,
+  X
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
@@ -102,6 +104,13 @@ export function PosWorkflow({
   const selectedCatalogItem =
     selectedCatalogItems.find((item) => item.id === (catalogItemId || state.catalogItemId)) ?? null;
 
+  const resetLocalState = () => {
+    setQuoteIdempotencyKey(createBrowserIdempotencyKey());
+    setCustomerAuthorized(false);
+    setPaymentMethod(null);
+    setCatalogItemId("");
+  };
+
   useEffect(() => {
     setQuoteIdempotencyKey(createBrowserIdempotencyKey());
   }, []);
@@ -137,6 +146,18 @@ export function PosWorkflow({
       <div className="pos-layout">
         <section className={`pos-panel pos-panel--${activeStep}`} aria-labelledby="pos-flow-title">
           {activeStep !== "success" ? <PosPanelHeading activeStep={activeStep} /> : null}
+          {activeStep !== "identify" && activeStep !== "success" ? (
+            <PosFlowControls
+              activeStep={activeStep}
+              formAction={formAction}
+              onCancel={resetLocalState}
+              onConfirmBack={() => {
+                setCustomerAuthorized(false);
+                setPaymentMethod(null);
+              }}
+              pending={pending}
+            />
+          ) : null}
 
           {!state.card ? (
             <IdentifyForm
@@ -156,6 +177,8 @@ export function PosWorkflow({
               pending={pending}
               terminalId={state.terminalId}
               catalogItems={selectedCatalogItems}
+              initialDescription={state.serviceDescription}
+              initialGrossAmountMznMinor={state.draftQuote?.grossAmountMznMinor}
               selectedItemId={catalogItemId}
               onSelectItem={setCatalogItemId}
             />
@@ -189,10 +212,7 @@ export function PosWorkflow({
             <SuccessState
               formAction={formAction}
               onReset={() => {
-                setQuoteIdempotencyKey(createBrowserIdempotencyKey());
-                setCustomerAuthorized(false);
-                setPaymentMethod(null);
-                setCatalogItemId("");
+                resetLocalState();
               }}
               state={state}
             />
@@ -229,26 +249,84 @@ function PosPanelHeading({ activeStep }: { activeStep: Exclude<PosStepId, "succe
   );
 }
 
+function PosFlowControls({
+  activeStep,
+  formAction,
+  onCancel,
+  onConfirmBack,
+  pending
+}: {
+  activeStep: Exclude<PosStepId, "identify" | "success">;
+  formAction: (formData: FormData) => void;
+  onCancel: () => void;
+  onConfirmBack: () => void;
+  pending: boolean;
+}) {
+  const backLabel = {
+    services: "Alterar cliente",
+    authorize: "Voltar aos serviços",
+    confirm: "Voltar ao pagamento"
+  }[activeStep];
+
+  return (
+    <div className="pos-flow-controls" aria-label="Navegação da transação">
+      {activeStep === "confirm" ? (
+        <button disabled={pending} onClick={onConfirmBack} type="button">
+          <ArrowLeft aria-hidden="true" size={17} />
+          {backLabel}
+        </button>
+      ) : (
+        <form action={formAction}>
+          <input
+            name="intent"
+            type="hidden"
+            value={activeStep === "services" ? "back_to_identify" : "back_to_services"}
+          />
+          <button disabled={pending} onClick={activeStep === "services" ? onCancel : undefined}>
+            <ArrowLeft aria-hidden="true" size={17} />
+            {backLabel}
+          </button>
+        </form>
+      )}
+      {activeStep !== "services" ? (
+        <form action={formAction}>
+          <input name="intent" type="hidden" value="reset" />
+          <button className="is-cancel" disabled={pending} onClick={onCancel}>
+            <X aria-hidden="true" size={16} />
+            Cancelar transação
+          </button>
+        </form>
+      ) : null}
+    </div>
+  );
+}
+
 function PosSteps({ activeStep }: { activeStep: PosStepId }) {
   const activeIndex = posSteps.findIndex((step) => step.id === activeStep);
 
   return (
-    <ol className="pos-steps" aria-label="Progresso do POS">
-      {posSteps.map((step, index) => {
-        const isActive = step.id === activeStep;
+    <div className="pos-step-progress">
+      <p aria-live="polite">
+        Passo {activeIndex + 1} de {posSteps.length}:{" "}
+        <strong>{posSteps[activeIndex]?.label}</strong>
+      </p>
+      <ol className="pos-steps" aria-label="Progresso do POS">
+        {posSteps.map((step, index) => {
+          const isActive = step.id === activeStep;
 
-        return (
-          <li
-            aria-current={isActive ? "step" : undefined}
-            className={isActive ? "is-active" : index < activeIndex ? "is-done" : ""}
-            key={step.id}
-          >
-            <span>{index + 1}</span>
-            <strong>{step.label}</strong>
-          </li>
-        );
-      })}
-    </ol>
+          return (
+            <li
+              aria-current={isActive ? "step" : undefined}
+              className={isActive ? "is-active" : index < activeIndex ? "is-done" : ""}
+              key={step.id}
+            >
+              <span>{index + 1}</span>
+              <strong>{step.label}</strong>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
 
@@ -484,6 +562,8 @@ function QuoteForm({
   idempotencyKey,
   terminalId,
   catalogItems,
+  initialDescription,
+  initialGrossAmountMznMinor,
   selectedItemId,
   onSelectItem
 }: {
@@ -495,11 +575,15 @@ function QuoteForm({
   pending: boolean;
   terminalId: string;
   catalogItems: PosCatalogItemContext[];
+  initialDescription: string;
+  initialGrossAmountMznMinor?: number;
   selectedItemId: string;
   onSelectItem: (itemId: string) => void;
 }) {
-  const [customDescription, setCustomDescription] = useState("");
-  const [customAmount, setCustomAmount] = useState("");
+  const [customDescription, setCustomDescription] = useState(initialDescription);
+  const [customAmount, setCustomAmount] = useState(
+    initialGrossAmountMznMinor ? minorUnitsToInput(initialGrossAmountMznMinor) : ""
+  );
   const [usePoints, setUsePoints] = useState(false);
   const [requestedPoints, setRequestedPoints] = useState(0);
   const selectedItem = catalogItems.find((item) => item.id === selectedItemId) ?? null;

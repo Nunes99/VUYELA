@@ -21,7 +21,7 @@ export default function SignUpPage() {
     <main className="auth-page">
       <section className="auth-shell auth-shell--compact" aria-labelledby="signup-title">
         <div className="auth-panel auth-panel--copy">
-          <VuyelaLogo className="auth-brand" inverse />
+          <VuyelaLogo className="auth-brand" href="/" inverse />
           <span className="auth-kicker">Nova conta</span>
           <h1 id="signup-title">Crie a base da sua conta VUYELA.</h1>
           <p>

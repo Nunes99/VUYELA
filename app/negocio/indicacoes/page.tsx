@@ -39,6 +39,9 @@ export default async function BusinessReferralsPage({
       {state.status === "authorized" && referralState ? (
         <BusinessPortalShell
           activeSection="referrals"
+          businessId={
+            referralState.status === "ready" ? referralState.selectedBusinessId : undefined
+          }
           principal={state.principal}
           title="Indicações"
         >

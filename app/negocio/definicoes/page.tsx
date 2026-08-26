@@ -34,6 +34,9 @@ export default async function BusinessSettingsPage({
       {state.status === "authorized" && settingsState ? (
         <BusinessPortalShell
           activeSection="settings"
+          businessId={
+            settingsState.status === "ready" ? settingsState.settings.business.id : undefined
+          }
           principal={state.principal}
           title="Definições"
         >

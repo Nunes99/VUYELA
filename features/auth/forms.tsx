@@ -1,7 +1,19 @@
 "use client";
 
-import { useActionState } from "react";
-import { KeyRound, LogIn, Mail, Phone, Save, Store, UserPlus } from "lucide-react";
+import Link from "next/link";
+import React, { useActionState, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  KeyRound,
+  LogIn,
+  Mail,
+  Phone,
+  Save,
+  Store,
+  UserPlus
+} from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Textarea } from "../../vuyela-design-system/src/components/Field";
@@ -230,15 +242,12 @@ export function CustomerOnboardingForm() {
       <Input label="Telefone" name="phone" type="tel" autoComplete="tel" />
       <Input label="E-mail" name="email" type="email" autoComplete="email" />
       <ActionMessage status={state.status} message={state.message} />
-      <Button
-        type="submit"
-        variant="primary"
-        fullWidth
-        loading={pending}
-        leadingIcon={<Save size={18} />}
-      >
-        Guardar perfil
-      </Button>
+      <div className="auth-form-actions">
+        <Link href="/cliente">Cancelar</Link>
+        <Button type="submit" variant="primary" loading={pending} leadingIcon={<Save size={18} />}>
+          Guardar perfil
+        </Button>
+      </div>
     </form>
   );
 }
@@ -248,43 +257,210 @@ export function BusinessOnboardingForm() {
     submitBusinessOnboardingAction,
     initialAuthActionState
   );
+  const [step, setStep] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const [values, setValues] = useState({
+    businessName: "",
+    legalName: "",
+    nuit: "",
+    city: "",
+    province: "",
+    phone: "",
+    email: "",
+    description: ""
+  });
+  const steps = ["Identificação", "Local e contactos", "Revisão"];
+
+  const updateValue = (field: keyof typeof values, value: string) => {
+    setValues((current) => ({ ...current, [field]: value }));
+  };
+
+  const focusStep = () => {
+    window.requestAnimationFrame(() => headingRef.current?.focus());
+  };
+
+  const goToStep = (nextStep: number) => {
+    setStep(Math.max(0, Math.min(nextStep, steps.length - 1)));
+    focusStep();
+  };
+
+  const continueToNextStep = () => {
+    const currentPanel = formRef.current?.querySelector<HTMLElement>(`[data-step="${step}"]`);
+    const controls = Array.from(
+      currentPanel?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea") ??
+        []
+    );
+    const firstInvalid = controls.find((control) => !control.checkValidity());
+
+    if (firstInvalid) {
+      firstInvalid.reportValidity();
+      firstInvalid.focus();
+      return;
+    }
+
+    goToStep(step + 1);
+  };
 
   return (
-    <form action={formAction} className="auth-form">
-      <Input
-        label="Nome do negócio"
-        name="businessName"
-        autoComplete="organization"
-        requiredMark
-        required
-      />
-      <Input label="Nome legal" name="legalName" autoComplete="organization" />
-      <Input
-        label="NUIT"
-        name="nuit"
-        inputMode="numeric"
-        autoComplete="off"
-        minLength={9}
-        maxLength={12}
-        pattern="[0-9]{9,12}"
-        hint="Opcional. Introduza entre 9 e 12 algarismos, sem espacos."
-        title="Introduza entre 9 e 12 algarismos."
-      />
-      <Input label="Cidade" name="city" autoComplete="address-level2" requiredMark required />
-      <Input label="Província" name="province" autoComplete="address-level1" />
-      <Input label="Telefone" name="phone" type="tel" autoComplete="tel" />
-      <Input label="E-mail do negócio" name="email" type="email" autoComplete="email" />
-      <Textarea label="Descrição" name="description" rows={4} />
+    <form action={formAction} className="auth-form auth-wizard" ref={formRef}>
+      <div className="auth-wizard__status">
+        <p>
+          Passo {step + 1} de {steps.length}
+        </p>
+        <ol aria-label="Progresso do registo do negócio">
+          {steps.map((label, index) => (
+            <li
+              aria-current={index === step ? "step" : undefined}
+              className={index === step ? "is-active" : index < step ? "is-done" : ""}
+              key={label}
+            >
+              <span>{index < step ? <Check aria-hidden="true" size={13} /> : index + 1}</span>
+              <strong>{label}</strong>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <h2 className="auth-wizard__heading" ref={headingRef} tabIndex={-1}>
+        {steps[step]}
+      </h2>
+
+      <fieldset className="auth-wizard__panel" data-step="0" hidden={step !== 0}>
+        <legend className="sr-only">Identificação do negócio</legend>
+        <Input
+          label="Nome do negócio"
+          name="businessName"
+          autoComplete="organization"
+          onChange={(event) => updateValue("businessName", event.currentTarget.value)}
+          requiredMark
+          required
+          value={values.businessName}
+        />
+        <Input
+          label="Nome legal"
+          name="legalName"
+          autoComplete="organization"
+          onChange={(event) => updateValue("legalName", event.currentTarget.value)}
+          value={values.legalName}
+        />
+        <Input
+          label="NUIT"
+          name="nuit"
+          inputMode="numeric"
+          autoComplete="off"
+          minLength={9}
+          maxLength={12}
+          onChange={(event) => updateValue("nuit", event.currentTarget.value)}
+          pattern="[0-9]{9,12}"
+          hint="Opcional. Introduza entre 9 e 12 algarismos, sem espaços."
+          title="Introduza entre 9 e 12 algarismos."
+          value={values.nuit}
+        />
+      </fieldset>
+
+      <fieldset className="auth-wizard__panel" data-step="1" hidden={step !== 1}>
+        <legend className="sr-only">Localização e contactos</legend>
+        <div className="auth-wizard__grid">
+          <Input
+            label="Cidade"
+            name="city"
+            autoComplete="address-level2"
+            onChange={(event) => updateValue("city", event.currentTarget.value)}
+            requiredMark
+            required
+            value={values.city}
+          />
+          <Input
+            label="Província"
+            name="province"
+            autoComplete="address-level1"
+            onChange={(event) => updateValue("province", event.currentTarget.value)}
+            value={values.province}
+          />
+          <Input
+            label="Telefone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            onChange={(event) => updateValue("phone", event.currentTarget.value)}
+            value={values.phone}
+          />
+          <Input
+            label="E-mail do negócio"
+            name="email"
+            type="email"
+            autoComplete="email"
+            onChange={(event) => updateValue("email", event.currentTarget.value)}
+            value={values.email}
+          />
+        </div>
+      </fieldset>
+
+      <fieldset className="auth-wizard__panel" data-step="2" hidden={step !== 2}>
+        <legend className="sr-only">Revisão do registo</legend>
+        <dl className="auth-wizard__review">
+          <div>
+            <dt>Negócio</dt>
+            <dd>{values.businessName}</dd>
+          </div>
+          <div>
+            <dt>Nome legal / NUIT</dt>
+            <dd>{[values.legalName, values.nuit].filter(Boolean).join(" · ") || "Não indicado"}</dd>
+          </div>
+          <div>
+            <dt>Localização</dt>
+            <dd>{[values.city, values.province].filter(Boolean).join(", ")}</dd>
+          </div>
+          <div>
+            <dt>Contactos</dt>
+            <dd>{[values.phone, values.email].filter(Boolean).join(" · ") || "Não indicados"}</dd>
+          </div>
+        </dl>
+        <Textarea
+          label="Descrição"
+          name="description"
+          onChange={(event) => updateValue("description", event.currentTarget.value)}
+          rows={4}
+          value={values.description}
+        />
+        <p className="auth-wizard__hint">
+          Confirme os dados antes de enviar. Pode voltar às etapas anteriores sem perder o que já
+          preencheu.
+        </p>
+      </fieldset>
+
       <ActionMessage status={state.status} message={state.message} />
-      <Button
-        type="submit"
-        variant="reward"
-        fullWidth
-        loading={pending}
-        leadingIcon={<Store size={18} />}
-      >
-        Enviar para validação
-      </Button>
+      <div className="auth-wizard__actions">
+        <span>
+          {step > 0 ? (
+            <button onClick={() => goToStep(step - 1)} type="button">
+              <ArrowLeft aria-hidden="true" size={17} /> Voltar
+            </button>
+          ) : (
+            <Link href="/cliente">Cancelar</Link>
+          )}
+        </span>
+        {step < steps.length - 1 ? (
+          <Button
+            onClick={continueToNextStep}
+            trailingIcon={<ArrowRight aria-hidden="true" size={18} />}
+            type="button"
+            variant="primary"
+          >
+            Continuar
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            variant="reward"
+            loading={pending}
+            leadingIcon={<Store size={18} />}
+          >
+            Enviar para validação
+          </Button>
+        )}
+      </div>
     </form>
   );
 }

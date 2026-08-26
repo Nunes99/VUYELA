@@ -8,6 +8,7 @@ export interface PosActionState {
   terminalId: string;
   card: PosCustomerCard | null;
   quote: PosQuote | null;
+  draftQuote: PosQuote | null;
   transactionId: string | null;
   idempotencyKey: string;
   serviceDescription: string;
@@ -27,6 +28,7 @@ export const initialPosActionState: PosActionState = {
   terminalId: "",
   card: null,
   quote: null,
+  draftQuote: null,
   transactionId: null,
   idempotencyKey: "",
   serviceDescription: "",

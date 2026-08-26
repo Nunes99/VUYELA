@@ -20,6 +20,7 @@ import type { ReactNode } from "react";
 
 import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
@@ -59,12 +60,17 @@ const navigation: Array<{
   { id: "settings", href: "/negocio/definicoes", label: "Definições", icon: Settings }
 ];
 
+const sectionLabels: Record<BusinessPortalSection, string> = Object.fromEntries(
+  navigation.map((item) => [item.id, item.label])
+) as Record<BusinessPortalSection, string>;
+
 export function BusinessPortalShell({
   principal,
   activeSection,
   title,
   subtitle,
   identityLabel = "Gestor VUYELA",
+  businessId,
   children
 }: {
   principal: AuthPrincipal;
@@ -72,8 +78,11 @@ export function BusinessPortalShell({
   title?: string;
   subtitle?: string;
   identityLabel?: string;
+  businessId?: string;
   children: ReactNode;
 }) {
+  const dashboardHref = withBusinessContext("/negocio", businessId);
+
   return (
     <div className="business-portal">
       <aside className="business-portal__sidebar">
@@ -86,7 +95,7 @@ export function BusinessPortalShell({
                 <Link
                   aria-current={activeSection === item.id ? "page" : undefined}
                   className={activeSection === item.id ? "is-active" : undefined}
-                  href={item.href}
+                  href={withBusinessContext(item.href, businessId)}
                   key={item.id}
                 >
                   <span className="business-portal__active-bar" aria-hidden="true" />
@@ -117,6 +126,16 @@ export function BusinessPortalShell({
       <section className="business-portal__workspace">
         <header className="business-portal__topbar">
           <div>
+            <FlowBreadcrumbs
+              className="business-portal__breadcrumbs"
+              items={[
+                {
+                  label: "Painel",
+                  href: activeSection === "dashboard" ? undefined : dashboardHref
+                },
+                ...(activeSection === "dashboard" ? [] : [{ label: sectionLabels[activeSection] }])
+              ]}
+            />
             <span>
               <h1>{title ?? "Painel do Negócio"}</h1>
               <small>MFA ativo</small>
@@ -138,6 +157,14 @@ export function BusinessPortalShell({
       </section>
     </div>
   );
+}
+
+function withBusinessContext(href: string, businessId?: string): string {
+  if (!businessId) {
+    return href;
+  }
+
+  return `${href}${href.includes("?") ? "&" : "?"}businessId=${encodeURIComponent(businessId)}`;
 }
 
 function businessRoleLabel(principal: AuthPrincipal): string {

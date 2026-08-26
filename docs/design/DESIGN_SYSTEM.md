@@ -59,3 +59,17 @@ Each component should cover relevant default, hover, active, focus, disabled, lo
   borders and elevation.
 - Gold remains reserved for points, rewards, and the commercial reward action.
 - Operational navigation must never overlap content on small screens.
+
+## Navigation and Multi-step Flows
+
+- Every protected subpage shows its location and a deterministic route back to the parent surface.
+- Business portal links preserve the selected `businessId`; changing sections must not silently
+  change tenant context.
+- Multi-step flows show the current step and total number of steps.
+- Users can return to every uncommitted prior step to correct data without losing valid input.
+- Cancellation is explicit and visually secondary to the dominant action.
+- Financial and loyalty operations remain drafts while moving between POS steps. Only the final
+  server confirmation can persist payment and points movements.
+- Route transitions provide an accessible loading state without blocking browser history.
+- On mobile, back, continue, cancel, and submit controls use touch targets of at least 44px and do
+  not sit underneath fixed navigation.

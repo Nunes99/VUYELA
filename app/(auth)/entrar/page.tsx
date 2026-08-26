@@ -46,7 +46,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     <main className="auth-page">
       <section className="auth-shell" aria-labelledby="signin-title">
         <div className="auth-panel auth-panel--copy">
-          <VuyelaLogo className="auth-brand" inverse />
+          <VuyelaLogo className="auth-brand" href="/" inverse />
           <span className="auth-kicker">Acesso seguro</span>
           <h1 id="signin-title">Entre para ver os seus pontos e negócios.</h1>
           <p>

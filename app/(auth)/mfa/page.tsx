@@ -46,7 +46,7 @@ export default async function MfaPage({ searchParams }: MfaPageProps) {
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="mfa-title">
         <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" />
+          <VuyelaLogo className="auth-brand auth-brand--dark" href="/" />
           <span className="auth-kicker">Verificação em dois passos</span>
           <h1 id="mfa-title">Verificação adicional necessária.</h1>
           <p className="auth-intro">

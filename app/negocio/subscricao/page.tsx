@@ -34,6 +34,9 @@ export default async function BusinessSubscriptionPage({
       {state.status === "authorized" && subscriptionState ? (
         <BusinessPortalShell
           activeSection="subscription"
+          businessId={
+            subscriptionState.status === "ready" ? subscriptionState.selectedBusinessId : undefined
+          }
           principal={state.principal}
           title="Subscrição"
         >
