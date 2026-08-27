@@ -63,6 +63,7 @@ describe("RBAC", () => {
 
   it("limits cashier POS access to the assigned branch", () => {
     expect(canAccessRoute(cashier, "/cliente")).toBe(false);
+    expect(canAccessRoute(cashier, "/negocio")).toBe(false);
     expect(
       canAccessRoute(cashier, "/pos", {
         businessId: "business-a",

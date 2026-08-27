@@ -1,7 +1,7 @@
-import { getPwaManifest, isPwaArea } from "@/features/pwa/apps";
+import { getPwaManifest, isPwaArea, pwaAreas } from "@/features/pwa/apps";
 
 export function generateStaticParams() {
-  return [{ area: "cliente" }, { area: "negocio" }, { area: "admin" }];
+  return pwaAreas.map((area) => ({ area }));
 }
 
 export async function GET(_request: Request, context: { params: Promise<{ area: string }> }) {

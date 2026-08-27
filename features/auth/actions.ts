@@ -113,19 +113,29 @@ export async function signInWithEmailAction(
   }
 
   const portal = getFormString(formData, "portal");
-  if (portal === "customer" || portal === "business" || portal === "admin") {
+  if (portal === "customer" || portal === "business" || portal === "pos" || portal === "admin") {
     const { data: profile } = await supabase
       .from("profiles")
       .select("account_type")
       .eq("id", data.user.id)
       .maybeSingle();
     const accountType = profile?.account_type;
-    const isAllowed =
-      portal === "business"
+    let isAllowed =
+      portal === "business" || portal === "pos"
         ? accountType === "business"
         : portal === "admin"
           ? accountType === "platform"
           : accountType === "customer";
+
+    if (portal === "pos" && isAllowed) {
+      const { count, error: membershipError } = await supabase
+        .from("business_members")
+        .select("id", { count: "exact", head: true })
+        .eq("profile_id", data.user.id)
+        .eq("status", "active")
+        .in("role", ["cashier", "branch_manager", "business_admin", "business_owner"]);
+      isAllowed = !membershipError && (count ?? 0) > 0;
+    }
 
     if (!isAllowed) {
       await supabase.auth.signOut();
@@ -134,9 +144,11 @@ export async function signInWithEmailAction(
         message:
           portal === "business"
             ? "Estas credenciais não pertencem a uma conta de negócio."
-            : portal === "admin"
-              ? "Estas credenciais não pertencem à Administração VUYELA."
-              : "Estas credenciais não pertencem a uma conta de cliente."
+            : portal === "pos"
+              ? "Estas credenciais não têm uma função ativa para operar o POS."
+              : portal === "admin"
+                ? "Estas credenciais não pertencem à Administração VUYELA."
+                : "Estas credenciais não pertencem a uma conta de cliente."
       };
     }
   }
@@ -416,7 +428,11 @@ export async function signUpBusinessMemberWithEmailAction(
     };
   }
 
-  const invitationPath = `/negocio/convite?token=${encodeURIComponent(token.value)}`;
+  const destination = getFormString(formData, "destination") === "pos" ? "pos" : "business";
+  const invitationPath =
+    destination === "pos"
+      ? `/pos/convite?token=${encodeURIComponent(token.value)}`
+      : `/negocio/convite?token=${encodeURIComponent(token.value)}`;
   const { data, error } = await supabase.auth.signUp({
     email: email.value,
     password: password.value,
@@ -674,6 +690,11 @@ export async function signOutAction(formData?: FormData) {
   }
 
   const returnTo = formData ? getFormString(formData, "returnTo") : null;
-  const allowedReturnPaths = new Set(["/cliente/entrar", "/negocio/entrar", "/admin/entrar"]);
+  const allowedReturnPaths = new Set([
+    "/cliente/entrar",
+    "/negocio/entrar",
+    "/pos/entrar",
+    "/admin/entrar"
+  ]);
   redirect(returnTo && allowedReturnPaths.has(returnTo) ? returnTo : "/");
 }

@@ -18,6 +18,11 @@ interface InvitationRpcRow {
   expires_at: string;
 }
 
+interface AcceptedInvitationRpcRow {
+  business_id: string;
+  member_id: string;
+}
+
 const initialInvitationState: BusinessInvitationActionState = {
   status: "idle",
   message: ""
@@ -108,7 +113,7 @@ export async function inviteBusinessMemberAction(
   return {
     status: "success",
     message: `Convite válido até ${formatDate(row.expires_at)}. Partilhe esta ligação apenas com a pessoa convidada.`,
-    invitePath: `/negocio/convite?token=${encodeURIComponent(row.invitation_token)}`
+    invitePath: `${role === "cashier" ? "/pos/convite" : "/negocio/convite"}?token=${encodeURIComponent(row.invitation_token)}`
   };
 }
 
@@ -131,20 +136,40 @@ export async function revokeBusinessInvitationAction(formData: FormData): Promis
 
 export async function acceptBusinessInvitationAction(formData: FormData): Promise<void> {
   const token = field(formData, "token");
-  if (!/^[0-9a-f]{48}$/.test(token)) redirect("/negocio/convite?estado=invalido");
-  const principal = await requireAuthenticatedUser(
-    `/negocio/convite?token=${encodeURIComponent(token)}`
-  );
+  const destination = field(formData, "destination") === "pos" ? "pos" : "business";
+  const invitationRoot = destination === "pos" ? "/pos/convite" : "/negocio/convite";
+  const invitationPath = `${invitationRoot}?token=${encodeURIComponent(token)}`;
+  if (!/^[0-9a-f]{48}$/.test(token)) redirect(`${invitationRoot}?estado=invalido`);
+  const principal = await requireAuthenticatedUser(invitationPath);
   if (principal.accountType !== "business") {
-    redirect(`/negocio/convite?token=${encodeURIComponent(token)}`);
+    redirect(invitationPath);
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("accept_business_member_invitation", { p_token: token });
-  if (error) redirect("/negocio/convite?estado=invalido");
+  const { data, error } = await supabase.rpc("accept_business_member_invitation", {
+    p_token: token
+  });
+  if (error) redirect(`${invitationRoot}?estado=invalido`);
+
+  const accepted = Array.isArray(data)
+    ? (data[0] as AcceptedInvitationRpcRow | undefined)
+    : undefined;
+  const { data: membership } = accepted
+    ? await supabase
+        .from("business_members")
+        .select("role")
+        .eq("id", accepted.member_id)
+        .eq("business_id", accepted.business_id)
+        .eq("profile_id", principal.profileId)
+        .maybeSingle()
+    : { data: null };
 
   revalidateBusinessPaths();
-  redirect("/negocio?resultado=convite-aceite");
+  redirect(
+    membership?.role === "cashier"
+      ? "/pos?resultado=convite-aceite"
+      : "/negocio?resultado=convite-aceite"
+  );
 }
 
 export async function manageBusinessMemberAction(formData: FormData): Promise<void> {
@@ -326,6 +351,7 @@ export async function manageBusinessOfferAction(formData: FormData): Promise<voi
 
 function revalidateBusinessPaths() {
   revalidatePath("/negocio");
+  revalidatePath("/pos");
   revalidatePath("/negocio/campanhas");
   revalidatePath("/cliente");
   revalidatePath("/estabelecimentos");

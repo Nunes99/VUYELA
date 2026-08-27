@@ -68,9 +68,11 @@ function buildSignInPath(route: ProtectedRoute, nextPath: string) {
   const signInPath =
     route === "/admin"
       ? "/admin/entrar"
-      : route === "/negocio" || route === "/pos"
-        ? "/negocio/entrar"
-        : "/cliente/entrar";
+      : route === "/pos"
+        ? "/pos/entrar"
+        : route === "/negocio"
+          ? "/negocio/entrar"
+          : "/cliente/entrar";
 
   return `${signInPath}?next=${encodeURIComponent(nextPath)}`;
 }

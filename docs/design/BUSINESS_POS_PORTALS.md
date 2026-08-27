@@ -25,8 +25,10 @@ Os campos não secretos são apresentados a partir de `business_payment_channels
 
 ## Definições e pagamentos
 
-- As seis vistas de definições usam `/negocio/pos/definicoes?vista=...` e o mesmo componente responsivo.
-- Os cinco métodos de pagamento usam `/negocio/pos/definicoes/pagamentos?metodo=...` e partilham a mesma fronteira de segurança.
+- As seis vistas de definições usam `/pos/definicoes?vista=...` e o mesmo componente responsivo.
+- Os cinco métodos de pagamento usam `/pos/definicoes/pagamentos?metodo=...` e partilham a mesma fronteira de segurança.
+- O POS tem manifesto, início de sessão e âmbito instalável próprios em `/pos`; `/negocio/pos`
+  existe apenas como redirecionamento de compatibilidade.
 - M-Pesa, e-Mola e mKesh expõem apenas os campos operacionais previstos no design e enviam segredos por ações de servidor para o Vault.
 - Dinheiro e cartão guardam limites, regras de fecho, arredondamento, terminal, bandeiras, contactless e custos de processamento na configuração pública autorizada.
 - Dados de negócio e filial apresentados no POS são carregados das fontes reais autorizadas por RLS.

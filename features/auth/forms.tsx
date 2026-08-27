@@ -32,7 +32,7 @@ import { initialAuthActionState } from "@/features/auth/state";
 
 interface FormProps {
   nextPath?: string | undefined;
-  portal?: "customer" | "business" | "admin" | undefined;
+  portal?: "customer" | "business" | "pos" | "admin" | undefined;
 }
 
 function ActionMessage({ status, message }: { status: string; message: string }) {
@@ -508,7 +508,13 @@ export function BusinessSignUpForm() {
   );
 }
 
-export function BusinessTeamSignUpForm({ token }: { token: string }) {
+export function BusinessTeamSignUpForm({
+  token,
+  destination = "business"
+}: {
+  token: string;
+  destination?: "business" | "pos";
+}) {
   const [state, formAction, pending] = useActionState(
     signUpBusinessMemberWithEmailAction,
     initialAuthActionState
@@ -517,6 +523,7 @@ export function BusinessTeamSignUpForm({ token }: { token: string }) {
   return (
     <form action={formAction} className="auth-form">
       <input name="token" type="hidden" value={token} />
+      <input name="destination" type="hidden" value={destination} />
       <Input label="Nome" name="displayName" autoComplete="name" requiredMark required />
       <Input
         label="E-mail de acesso"

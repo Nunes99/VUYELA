@@ -1,6 +1,6 @@
 import type { Metadata, MetadataRoute, Viewport } from "next";
 
-export const pwaAreas = ["cliente", "negocio", "admin"] as const;
+export const pwaAreas = ["cliente", "negocio", "pos", "admin"] as const;
 
 export type PwaArea = (typeof pwaAreas)[number];
 
@@ -45,7 +45,23 @@ export const pwaApplications: Record<PwaArea, PwaApplication> = {
     categories: ["business", "productivity"],
     shortcuts: [
       { name: "Painel do negócio", short_name: "Painel", url: "/negocio" },
-      { name: "Abrir POS", short_name: "POS", url: "/negocio/pos" }
+      { name: "Gerir equipa", short_name: "Equipa", url: "/negocio?vista=equipa" },
+      { name: "Gerir catálogo", short_name: "Catálogo", url: "/negocio?vista=catalogo" }
+    ]
+  },
+  pos: {
+    area: "pos",
+    name: "VUYELA POS by LEMOTE",
+    shortName: "VUYELA POS",
+    description: "Aplicação de caixa VUYELA para vendas, YELAS e pagamentos.",
+    startUrl: "/pos",
+    scope: "/pos",
+    themeColor: "#021e28",
+    backgroundColor: "#f4f8f9",
+    categories: ["business", "finance"],
+    shortcuts: [
+      { name: "Nova transação", short_name: "Transação", url: "/pos" },
+      { name: "Definições do POS", short_name: "Definições", url: "/pos/definicoes" }
     ]
   },
   admin: {

@@ -4,13 +4,13 @@ import { BusinessInvitationView } from "@/features/business-operations/invitatio
 import { getAuthContext } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Aceitar convite",
+  title: "Ativar acesso ao POS",
   robots: { index: false, follow: false }
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function AcceptBusinessInvitationPage({
+export default async function AcceptPosInvitationPage({
   searchParams
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -22,7 +22,7 @@ export default async function AcceptBusinessInvitationPage({
 
   return (
     <BusinessInvitationView
-      destination="business"
+      destination="pos"
       invalid={invalid}
       principal={authContext.principal}
       token={token}

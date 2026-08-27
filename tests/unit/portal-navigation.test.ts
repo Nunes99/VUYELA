@@ -17,9 +17,11 @@ describe("portal navigation", () => {
     expect(parsePosPaymentView("emola")).toBe("emola");
     expect(parsePosPaymentView("unknown")).toBe("mpesa");
     expect(posAppRoutes).toEqual({
-      root: "/negocio/pos",
-      settings: "/negocio/pos/definicoes",
-      payments: "/negocio/pos/definicoes/pagamentos"
+      root: "/pos",
+      signIn: "/pos/entrar",
+      invitation: "/pos/convite",
+      settings: "/pos/definicoes",
+      payments: "/pos/definicoes/pagamentos"
     });
   });
 });

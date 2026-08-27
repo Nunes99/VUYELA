@@ -15,6 +15,7 @@ import {
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
+import type { PwaArea } from "@/features/pwa/apps";
 import { posAppRoutes } from "@/features/pos/routes";
 import { canAccessRoute } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
@@ -42,7 +43,7 @@ function AuthNotice({
   body: string;
   actionHref?: string | undefined;
   actionLabel?: string | undefined;
-  installArea?: "cliente" | "negocio" | "admin" | undefined;
+  installArea?: PwaArea | undefined;
   allowAccountSwitch?: boolean;
 }) {
   return (
@@ -86,7 +87,9 @@ export function ProtectedRouteStateView({
       : variant === "admin"
         ? "admin"
         : variant === "business" || variant === "pos"
-          ? "negocio"
+          ? variant === "pos"
+            ? "pos"
+            : "negocio"
           : undefined;
 
   if (state.status === "authorized") {
@@ -229,7 +232,10 @@ export function DashboardAreaMenu({
       href: posAppRoutes.settings,
       label: "Definições do POS",
       icon: Settings,
-      visible: includePosSettings && canAccessRoute(principal, "/pos")
+      visible:
+        includePosSettings &&
+        canAccessRoute(principal, "/pos") &&
+        canAccessRoute(principal, "/negocio")
     },
     {
       href: "/admin",

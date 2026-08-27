@@ -305,10 +305,9 @@ A feature is complete only when:
 ## Phase 18 PWA Acceptance
 
 - the application exposes a valid standalone web manifest with regular and maskable icons;
-- customer, business, and administration expose unique manifest IDs, names, start URLs, and
+- customer, business, POS, and administration expose unique manifest IDs, names, start URLs, and
   navigation scopes;
-- the business scope includes the complete POS flow under `/negocio/pos` while legacy `/pos`
-  routes remain compatible;
+- the POS has an independent `/pos` scope and `/negocio/pos` redirects to it for compatibility;
 - each installed application uses its own login/logout flow and never redirects an incompatible
   account automatically into another portal;
 - the root service worker installs and updates without using a stale cached worker script;

@@ -19,13 +19,18 @@ const sync = readFileSync(join(process.cwd(), "features/pwa/offline-card-sync.ts
 const offlinePage = readFileSync(join(process.cwd(), "app/offline/page.tsx"), "utf8");
 
 describe("PWA contract", () => {
-  it("defines three separately installable manifests with closed navigation scopes", () => {
+  it("defines four separately installable manifests with closed navigation scopes", () => {
     const manifests = pwaAreas.map((area) => getPwaManifest(area));
 
-    expect(manifests.map((item) => item.id)).toEqual(["/cliente", "/negocio", "/admin"]);
-    expect(manifests.map((item) => item.start_url)).toEqual(["/cliente", "/negocio", "/admin"]);
-    expect(manifests.map((item) => item.scope)).toEqual(["/cliente", "/negocio", "/admin"]);
-    expect(new Set(manifests.map((item) => item.short_name)).size).toBe(3);
+    expect(manifests.map((item) => item.id)).toEqual(["/cliente", "/negocio", "/pos", "/admin"]);
+    expect(manifests.map((item) => item.start_url)).toEqual([
+      "/cliente",
+      "/negocio",
+      "/pos",
+      "/admin"
+    ]);
+    expect(manifests.map((item) => item.scope)).toEqual(["/cliente", "/negocio", "/pos", "/admin"]);
+    expect(new Set(manifests.map((item) => item.short_name)).size).toBe(4);
 
     for (const manifestDefinition of manifests) {
       expect(manifestDefinition.display).toBe("standalone");
@@ -37,7 +42,11 @@ describe("PWA contract", () => {
       }
     }
 
-    expect(pwaApplications.negocio.shortcuts[1]?.url).toBe("/negocio/pos");
+    expect(pwaApplications.negocio.shortcuts.every((item) => item.url.startsWith("/negocio"))).toBe(
+      true
+    );
+    expect(pwaApplications.pos.startUrl).toBe("/pos");
+    expect(manifestRoute).toContain("pwaAreas.map");
     expect(manifestRoute).toContain('"Content-Type": "application/manifest+json; charset=utf-8"');
     expect(legacyManifestRoute).toContain('getPwaManifest("cliente")');
   });
@@ -54,6 +63,7 @@ describe("PWA contract", () => {
     expect(worker).toContain('const OFFLINE_URL = "/offline"');
     expect(worker).toContain('"/pwa/cliente/manifest.webmanifest"');
     expect(worker).toContain('"/pwa/negocio/manifest.webmanifest"');
+    expect(worker).toContain('"/pwa/pos/manifest.webmanifest"');
     expect(worker).toContain('"/pwa/admin/manifest.webmanifest"');
     expect(worker).toContain('request.method !== "GET"');
     expect(worker).toContain('request.mode === "navigate"');

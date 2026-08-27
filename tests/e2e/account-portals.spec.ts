@@ -35,6 +35,13 @@ test("keeps customer and business registration as distinct responsive flows", as
   await expect(page.locator('input[name="portal"]')).toHaveValue("business");
   await expect(page).toHaveURL(/\/negocio\/entrar$/);
 
+  await page.goto("/pos/entrar");
+  await expect(page.locator('input[name="portal"]')).toHaveValue("pos");
+  await expect(
+    page.getByText("Peça ao administrador do negócio um convite de operador")
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/pos\/entrar$/);
+
   await page.goto("/admin/entrar");
   await expect(page.locator('input[name="portal"]')).toHaveValue("admin");
   await expect(page.getByText("Contas de cliente e de negócio não são aceites")).toBeVisible();

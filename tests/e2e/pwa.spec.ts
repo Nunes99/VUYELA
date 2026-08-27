@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("exposes three independently installable applications and one safe worker", async ({
+test("exposes four independently installable applications and one safe worker", async ({
   page
 }) => {
   test.setTimeout(120_000);
@@ -16,6 +16,12 @@ test("exposes three independently installable applications and one safe worker",
       page: "/negocio",
       name: "VUYELA Negócio by LEMOTE",
       scope: "/negocio"
+    },
+    {
+      area: "pos",
+      page: "/pos",
+      name: "VUYELA POS by LEMOTE",
+      scope: "/pos"
     },
     {
       area: "admin",
@@ -44,10 +50,10 @@ test("exposes three independently installable applications and one safe worker",
   }
 
   await page.goto("/negocio/pos");
-  await expect(page).toHaveURL(/\/negocio\/pos$/);
+  await expect(page).toHaveURL(/\/pos$/);
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
     "href",
-    "/pwa/negocio/manifest.webmanifest"
+    "/pwa/pos/manifest.webmanifest"
   );
 
   const workerResponse = await page.request.get("/sw.js");

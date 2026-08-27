@@ -6,7 +6,6 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 interface BusinessRow {
   id: string;
   name: string;
-  nuit: string | null;
   phone: string | null;
   email: string | null;
 }
@@ -147,7 +146,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
     await Promise.all([
       supabase
         .from("businesses")
-        .select("id, name, nuit, phone, email")
+        .select("id, name, phone, email")
         .in("id", businessIds)
         .eq("status", "active"),
       supabase
@@ -193,7 +192,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
       return {
         id: business.id,
         name: business.name,
-        nuit: business.nuit,
+        nuit: null,
         phone: business.phone,
         email: business.email,
         branches,

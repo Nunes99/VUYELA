@@ -14,16 +14,21 @@ VUYELA should become installable and useful on mobile devices with limited conne
 - appropriate cache control.
 
 FASE 18 uses a root-scoped service worker served from `/sw.js`. The worker precaches only the
-public `/offline` shell, its build assets, the three web manifests, the legacy customer manifest,
+public `/offline` shell, its build assets, the four web manifests, the legacy customer manifest,
 and PWA icons. Navigations remain network-first and authenticated HTML responses are never written
 to Cache Storage.
 
-The platform exposes three independent installable identities:
+The platform exposes four independent installable identities:
 
 - VUYELA Cliente: `id`, start URL, and scope `/cliente`;
-- VUYELA Negócio: `id`, start URL, and scope `/negocio`, including the POS alias under
-  `/negocio/pos`;
+- VUYELA Negócio: `id`, start URL, and scope `/negocio`;
+- VUYELA POS: `id`, start URL, and scope `/pos`;
 - VUYELA Administração: `id`, start URL, and scope `/admin`.
+
+The legacy `/negocio/pos` path redirects to `/pos`; it is not an application scope. Business
+owners, business administrators, branch managers, and cashiers reach the POS with their own active
+membership. Cashiers never receive business-dashboard navigation, while authorized managers may
+open the POS from the business portal.
 
 Each protected layout advertises only its own manifest and Apple web-app title. Login, MFA, logo,
 logout, and account-mismatch flows remain inside the current application scope. The old

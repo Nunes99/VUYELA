@@ -7,6 +7,7 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
+import { canAccessRoute } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
 import type { PosContextState } from "./data";
@@ -22,6 +23,8 @@ export function PosPortalShell({
   section?: "transaction" | "settings";
   children: ReactNode;
 }) {
+  const canManageBusiness = canAccessRoute(principal, "/negocio");
+
   return (
     <div className={`pos-portal pos-portal--${section}`}>
       <header className="pos-portal__header">
@@ -35,8 +38,12 @@ export function PosPortalShell({
           </Link>
         ) : null}
         <div className="pos-portal__brand-area">
-          <VuyelaLogo className="pos-portal__brand" href="/negocio" />
-          <Link aria-label="Área de negócio" className="pos-portal__mobile-symbol" href="/negocio">
+          <VuyelaLogo className="pos-portal__brand" href={posAppRoutes.root} />
+          <Link
+            aria-label="Início do POS"
+            className="pos-portal__mobile-symbol"
+            href={posAppRoutes.root}
+          >
             V
           </Link>
           <span aria-hidden="true" />
@@ -47,10 +54,12 @@ export function PosPortalShell({
         </div>
 
         <nav aria-label="Navegação do POS" className="pos-portal__actions">
-          <DashboardAreaMenu includePosSettings principal={principal} variant="default" />
-          <PwaInstallAction area="negocio" />
+          {canManageBusiness ? (
+            <DashboardAreaMenu includePosSettings principal={principal} variant="default" />
+          ) : null}
+          <PwaInstallAction area="pos" />
           <form action={signOutAction}>
-            <input type="hidden" name="returnTo" value="/negocio/entrar" />
+            <input type="hidden" name="returnTo" value={posAppRoutes.signIn} />
             <button type="submit">
               <LogOut aria-hidden="true" size={18} />
               <span>Terminar sessão</span>
@@ -62,7 +71,11 @@ export function PosPortalShell({
         {section === "transaction" ? (
           <FlowBreadcrumbs
             className="pos-portal__breadcrumbs"
-            items={[{ label: "Negócio", href: "/negocio" }, { label: "POS" }]}
+            items={
+              canManageBusiness
+                ? [{ label: "Negócio", href: "/negocio" }, { label: "POS" }]
+                : [{ label: "POS" }]
+            }
           />
         ) : null}
         {children}

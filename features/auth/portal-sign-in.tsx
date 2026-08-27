@@ -19,6 +19,14 @@ export function getBusinessNextPath(value: string | string[] | undefined) {
   return value;
 }
 
+export function getPosNextPath(value: string | string[] | undefined) {
+  if (typeof value !== "string" || !value.startsWith("/pos") || value.startsWith("//")) {
+    return "/pos";
+  }
+
+  return value;
+}
+
 export function CustomerSignInView({
   nextPath,
   callbackError,
@@ -86,6 +94,30 @@ export function BusinessSignInView({ nextPath }: { nextPath: string }) {
           <EmailSignInForm nextPath={nextPath} portal="business" />
           <p className="auth-footnote">
             Ainda não tem credenciais? <Link href="/cadastrar/negocio">Registar negócio</Link>.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export function PosSignInView({ nextPath }: { nextPath: string }) {
+  return (
+    <main className="auth-page auth-page--business">
+      <section className="auth-shell auth-shell--compact" aria-labelledby="pos-signin-title">
+        <div className="auth-panel auth-panel--copy">
+          <VuyelaLogo className="auth-brand" href="/pos" inverse />
+          <span className="auth-kicker">Aplicação POS</span>
+          <h1 id="pos-signin-title">Entre com as suas credenciais de operador.</h1>
+          <p>
+            O acesso fica limitado aos negócios e filiais atribuídos pela administração do negócio.
+          </p>
+        </div>
+        <div className="auth-panel auth-panel--forms">
+          <EmailSignInForm nextPath={nextPath} portal="pos" />
+          <p className="auth-footnote">
+            Ainda não tem acesso? Peça ao administrador do negócio um convite de operador. Esqueceu
+            a palavra-passe? <Link href="/recuperar-acesso">Recuperar acesso</Link>.
           </p>
         </div>
       </section>

@@ -13,6 +13,7 @@ const PUBLIC_ASSETS = [
   "/manifest.webmanifest",
   "/pwa/cliente/manifest.webmanifest",
   "/pwa/negocio/manifest.webmanifest",
+  "/pwa/pos/manifest.webmanifest",
   "/pwa/admin/manifest.webmanifest",
   "/icons/vuyela-192.png",
   "/icons/vuyela-512.png",
