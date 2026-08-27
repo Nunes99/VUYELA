@@ -89,6 +89,13 @@ platform identities before MFA. Cashier invitations create separate team credent
 to `/pos`; cashiers do not receive access to `/negocio`. A rejected account remains in the current
 area and can terminate its session without being redirected automatically to another portal.
 
+Business owners and administrators can also provision an operator directly from the team view.
+The server creates a confirmed Supabase Auth identity with a strong generated password, then calls
+the tenant-checked `provision_business_pos_operator` function to assign that identity to one active
+branch as `cashier`. The password is returned once and is never stored in application tables or
+audit data. If membership provisioning fails, the newly created Auth identity is removed. Existing
+e-mail identities must use the invitation flow instead of having their password reset by a manager.
+
 Password recovery returns through `/auth/callback` to `/definir-senha`, where the authenticated
 recovery session can set the new password. Invalid or expired callback codes return to the login
 screen with an explicit error state.

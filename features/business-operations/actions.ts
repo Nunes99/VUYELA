@@ -1,15 +1,19 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAuthenticatedUser, requireRouteAccess } from "@/lib/auth/session";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
   isCatalogItemKind,
   isManageableBusinessMemberRole,
-  type BusinessInvitationActionState
+  type BusinessInvitationActionState,
+  type PosOperatorProvisionActionState
 } from "./model";
 
 interface InvitationRpcRow {
@@ -115,6 +119,101 @@ export async function inviteBusinessMemberAction(
     message: `Convite válido até ${formatDate(row.expires_at)}. Partilhe esta ligação apenas com a pessoa convidada.`,
     invitePath: `${role === "cashier" ? "/pos/convite" : "/negocio/convite"}?token=${encodeURIComponent(row.invitation_token)}`
   };
+}
+
+export async function provisionPosOperatorAction(
+  _previousState: PosOperatorProvisionActionState,
+  formData: FormData
+): Promise<PosOperatorProvisionActionState> {
+  void _previousState;
+  const principal = await requireRouteAccess("/negocio", "/negocio");
+
+  const businessId = field(formData, "businessId");
+  const branchId = field(formData, "branchId");
+  const displayName = field(formData, "displayName");
+  const email = field(formData, "email").toLowerCase();
+  const phone = field(formData, "phone");
+
+  if (
+    !isUuid(businessId) ||
+    !isUuid(branchId) ||
+    displayName.length < 2 ||
+    displayName.length > 120 ||
+    !isEmail(email) ||
+    (phone && !/^\+?[0-9 ]{8,20}$/.test(phone))
+  ) {
+    return {
+      status: "error",
+      message: "Revise o nome, o e-mail, o telefone e a filial do operador."
+    };
+  }
+
+  const password = generateTemporaryPassword();
+  let createdUserId: string | null = null;
+  let adminSupabase: ReturnType<typeof createSupabaseServiceRoleClient> | null = null;
+
+  try {
+    adminSupabase = createSupabaseServiceRoleClient();
+    const { data, error: createUserError } = await adminSupabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        display_name: displayName,
+        phone: phone || null,
+        account_type: "business"
+      }
+    });
+
+    if (createUserError || !data.user) {
+      const message = createUserError?.message.toLowerCase() ?? "";
+      return {
+        status: "error",
+        message:
+          message.includes("already") || message.includes("registered")
+            ? "Este e-mail já possui credenciais VUYELA. Use o convite de equipa para associar essa conta."
+            : "Não foi possível criar as credenciais do operador. Confirme o e-mail e tente novamente."
+      };
+    }
+    createdUserId = data.user.id;
+
+    const { error: provisionError } = await adminSupabase.rpc("provision_business_pos_operator", {
+      p_actor_profile_id: principal.profileId,
+      p_business_id: businessId,
+      p_profile_id: createdUserId,
+      p_branch_id: branchId
+    });
+
+    if (provisionError) {
+      const { error: cleanupError } = await adminSupabase.auth.admin.deleteUser(createdUserId);
+      return {
+        status: "error",
+        message: cleanupError
+          ? "A associação à filial falhou e a credencial criada exige revisão pelo suporte VUYELA."
+          : operationErrorMessage(provisionError.message)
+      };
+    }
+
+    revalidateBusinessPaths();
+    return {
+      status: "success",
+      message:
+        "Operador criado com acesso exclusivo ao POS. Guarde estas credenciais agora: a palavra-passe não volta a ser apresentada.",
+      credentials: {
+        login: email,
+        password,
+        signInPath: "/pos/entrar"
+      }
+    };
+  } catch {
+    if (adminSupabase && createdUserId) {
+      await adminSupabase.auth.admin.deleteUser(createdUserId);
+    }
+    return {
+      status: "error",
+      message: "O serviço de criação de credenciais está indisponível. Tente novamente."
+    };
+  }
 }
 
 export async function revokeBusinessInvitationAction(formData: FormData): Promise<void> {
@@ -410,6 +509,28 @@ function slugify(value: string): string {
 
 function isAllowedAction<T extends string>(value: string, actions: readonly T[]): value is T {
   return actions.includes(value as T);
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function isEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function generateTemporaryPassword(): string {
+  return `${randomBytes(18).toString("base64url")}Aa9!`;
+}
+
+function operationErrorMessage(message: string): string {
+  if (message.includes("limit")) {
+    return "O limite de utilizadores do plano atual foi atingido.";
+  }
+  if (message.includes("Active branch")) {
+    return "A filial selecionada já não está ativa.";
+  }
+  return "Não foi possível associar o operador ao negócio. Confirme as permissões e tente novamente.";
 }
 
 function operationErrorCode(message: string): string {

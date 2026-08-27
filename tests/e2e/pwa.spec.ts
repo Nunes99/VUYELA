@@ -56,6 +56,13 @@ test("exposes four independently installable applications and one safe worker", 
     "/pwa/pos/manifest.webmanifest"
   );
 
+  await page.goto("/pos/entrar");
+  await expect(page.getByRole("button", { name: "Instalar aplicação" })).toBeVisible();
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+    "href",
+    "/pwa/pos/manifest.webmanifest"
+  );
+
   const workerResponse = await page.request.get("/sw.js");
   expect(workerResponse.ok()).toBe(true);
   expect(workerResponse.headers()["content-type"]).toContain("application/javascript");

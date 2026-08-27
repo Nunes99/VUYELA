@@ -308,6 +308,9 @@ A feature is complete only when:
 - customer, business, POS, and administration expose unique manifest IDs, names, start URLs, and
   navigation scopes;
 - the POS has an independent `/pos` scope and `/negocio/pos` redirects to it for compatibility;
+- the POS can be installed from its own sign-in page before authentication;
+- business managers can provision unique cashier credentials for one active branch without
+  granting access to the business dashboard;
 - each installed application uses its own login/logout flow and never redirects an incompatible
   account automatically into another portal;
 - the root service worker installs and updates without using a stale cached worker script;

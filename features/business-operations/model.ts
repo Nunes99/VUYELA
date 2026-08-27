@@ -105,6 +105,18 @@ export interface BusinessInvitationActionState {
   invitePath?: string | undefined;
 }
 
+export interface PosOperatorProvisionActionState {
+  status: "idle" | "success" | "error";
+  message: string;
+  credentials?:
+    | {
+        login: string;
+        password: string;
+        signInPath: string;
+      }
+    | undefined;
+}
+
 export function isManageableBusinessMemberRole(
   value: string
 ): value is ManageableBusinessMemberRole {

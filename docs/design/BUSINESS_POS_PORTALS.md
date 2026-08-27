@@ -29,6 +29,11 @@ Os campos não secretos são apresentados a partir de `business_payment_channels
 - Os cinco métodos de pagamento usam `/pos/definicoes/pagamentos?metodo=...` e partilham a mesma fronteira de segurança.
 - O POS tem manifesto, início de sessão e âmbito instalável próprios em `/pos`; `/negocio/pos`
   existe apenas como redirecionamento de compatibilidade.
+- A ação de instalação também está disponível em `/pos/entrar`, para permitir fixar a aplicação
+  antes de iniciar sessão ou sem entrar no portal administrativo do negócio.
+- Proprietários e administradores criam operadores POS na gestão da equipa. Cada operador recebe
+  credenciais individuais, fica associado a uma filial e a função `cashier` não permite abrir
+  `/negocio`; o acesso administrativo do proprietário continua válido no POS.
 - M-Pesa, e-Mola e mKesh expõem apenas os campos operacionais previstos no design e enviam segredos por ações de servidor para o Vault.
 - Dinheiro e cartão guardam limites, regras de fecho, arredondamento, terminal, bandeiras, contactless e custos de processamento na configuração pública autorizada.
 - Dados de negócio e filial apresentados no POS são carregados das fontes reais autorizadas por RLS.

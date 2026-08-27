@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { EmailSignInForm, PhoneOtpForm } from "@/features/auth/forms";
+import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 
 export function getCustomerNextPath(value: string | string[] | undefined) {
   if (typeof value !== "string" || !value.startsWith("/cliente") || value.startsWith("//")) {
@@ -115,9 +116,11 @@ export function PosSignInView({ nextPath }: { nextPath: string }) {
         </div>
         <div className="auth-panel auth-panel--forms">
           <EmailSignInForm nextPath={nextPath} portal="pos" />
+          <PwaInstallAction area="pos" />
           <p className="auth-footnote">
-            Ainda não tem acesso? Peça ao administrador do negócio um convite de operador. Esqueceu
-            a palavra-passe? <Link href="/recuperar-acesso">Recuperar acesso</Link>.
+            Ainda não tem acesso? Peça ao administrador do negócio credenciais individuais ou um
+            convite de operador. Esqueceu a palavra-passe?{" "}
+            <Link href="/recuperar-acesso">Recuperar acesso</Link>.
           </p>
         </div>
       </section>

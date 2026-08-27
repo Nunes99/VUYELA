@@ -37,9 +37,8 @@ test("keeps customer and business registration as distinct responsive flows", as
 
   await page.goto("/pos/entrar");
   await expect(page.locator('input[name="portal"]')).toHaveValue("pos");
-  await expect(
-    page.getByText("Peça ao administrador do negócio um convite de operador")
-  ).toBeVisible();
+  await expect(page.getByText(/credenciais individuais ou um convite de operador/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Instalar aplicação" })).toBeVisible();
   await expect(page).toHaveURL(/\/pos\/entrar$/);
 
   await page.goto("/admin/entrar");

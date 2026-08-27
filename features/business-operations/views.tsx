@@ -32,6 +32,7 @@ import {
   type BusinessOperationCard,
   type BusinessOperationMember
 } from "./model";
+import { PosOperatorForm } from "./pos-operator-form";
 import { TeamInviteForm } from "./team-invite-form";
 
 export function BusinessOperationResult({ result }: { result?: string | undefined }) {
@@ -176,8 +177,16 @@ export function BusinessTeamManagementView({
 
       <section className="business-panel">
         <header>
-          <h3>Convidar para a equipa</h3>
-          <span>Ligação privada válida por 7 dias</span>
+          <h3>Criar operador POS</h3>
+          <span>Credenciais individuais · acesso exclusivo ao caixa</span>
+        </header>
+        <PosOperatorForm businessId={businessId} branches={state.operations.branches} />
+      </section>
+
+      <section className="business-panel">
+        <header>
+          <h3>Convidar outro membro</h3>
+          <span>Convite privado válido por 7 dias</span>
         </header>
         <TeamInviteForm businessId={businessId} branches={state.operations.branches} />
       </section>

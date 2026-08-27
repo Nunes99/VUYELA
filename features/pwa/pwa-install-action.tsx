@@ -99,7 +99,9 @@ export function PwaInstallAction({ area }: { area: PwaArea }) {
                     ? "do negócio"
                     : area === "admin"
                       ? "de administração"
-                      : "do cliente"}
+                      : area === "pos"
+                        ? "POS"
+                        : "do cliente"}
                 </span>
                 <h2 id={`pwa-install-title-${area}`}>{application.shortName}</h2>
                 <p>
