@@ -32,7 +32,7 @@ import { initialAuthActionState } from "@/features/auth/state";
 
 interface FormProps {
   nextPath?: string | undefined;
-  portal?: "customer" | "business" | undefined;
+  portal?: "customer" | "business" | "admin" | undefined;
 }
 
 function ActionMessage({ status, message }: { status: string; message: string }) {

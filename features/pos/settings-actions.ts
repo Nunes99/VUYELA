@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { posAppRoutes } from "@/features/pos/routes";
 import { requireRouteAccess } from "@/lib/auth/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -11,7 +12,7 @@ const deviceActions = new Set(["create", "update", "activate", "revoke", "delete
 const deviceTypes = new Set(["browser", "camera", "printer", "card_terminal", "other"]);
 
 export async function managePosTerminalAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/pos", "/pos/definicoes");
+  await requireRouteAccess("/pos", posAppRoutes.settings);
   const businessId = field(formData, "businessId");
   const operation = field(formData, "operation");
   const name = field(formData, "name");
@@ -45,7 +46,7 @@ export async function managePosTerminalAction(formData: FormData): Promise<void>
 }
 
 export async function updatePosTerminalSettingsAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/pos", "/pos/definicoes");
+  await requireRouteAccess("/pos", posAppRoutes.settings);
   const businessId = field(formData, "businessId");
   const terminalId = field(formData, "terminalId");
   const timeout = Number(field(formData, "inactivity_timeout_minutes"));
@@ -84,7 +85,7 @@ export async function updatePosTerminalSettingsAction(formData: FormData): Promi
 }
 
 export async function managePosTerminalDeviceAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/pos", "/pos/definicoes");
+  await requireRouteAccess("/pos", posAppRoutes.settings);
   const businessId = field(formData, "businessId");
   const terminalId = field(formData, "terminalId");
   const operation = field(formData, "operation");
@@ -111,7 +112,7 @@ export async function managePosTerminalDeviceAction(formData: FormData): Promise
 }
 
 export async function managePosPaymentChannelAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/pos", "/pos/definicoes/pagamentos");
+  await requireRouteAccess("/pos", posAppRoutes.payments);
   const businessId = field(formData, "businessId");
   const channelId = field(formData, "channelId");
   const operation = field(formData, "operation");
@@ -146,12 +147,15 @@ function revalidatePos() {
   revalidatePath("/pos");
   revalidatePath("/pos/definicoes");
   revalidatePath("/pos/definicoes/pagamentos");
+  revalidatePath(posAppRoutes.root);
+  revalidatePath(posAppRoutes.settings);
+  revalidatePath(posAppRoutes.payments);
 }
 
 function redirectToSettings(view: string, terminalId: string, result: string): never {
   const params = new URLSearchParams({ vista: view, resultado: result });
   if (terminalId) params.set("terminal", terminalId);
-  redirect(`/pos/definicoes?${params.toString()}`);
+  redirect(`${posAppRoutes.settings}?${params.toString()}`);
 }
 
 function redirectToPayments(method: string, result: string): never {
@@ -166,5 +170,5 @@ function redirectToPayments(method: string, result: string): never {
     metodo: methodMap[method] ?? "mpesa",
     resultado: result
   });
-  redirect(`/pos/definicoes/pagamentos?${params.toString()}`);
+  redirect(`${posAppRoutes.payments}?${params.toString()}`);
 }

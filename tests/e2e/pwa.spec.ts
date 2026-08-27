@@ -1,22 +1,61 @@
 import { expect, test } from "@playwright/test";
 
-test("exposes an installable manifest and service worker", async ({ page }) => {
-  const manifestResponse = await page.request.get("/manifest.webmanifest");
-  expect(manifestResponse.ok()).toBe(true);
-  const manifest = await manifestResponse.json();
-  expect(manifest).toMatchObject({
-    name: "VUYELA by LEMOTE",
-    short_name: "VUYELA",
-    start_url: "/cliente",
-    display: "standalone"
-  });
+test("exposes three independently installable applications and one safe worker", async ({
+  page
+}) => {
+  test.setTimeout(120_000);
+  const applications = [
+    {
+      area: "cliente",
+      page: "/cliente",
+      name: "VUYELA Cliente by LEMOTE",
+      scope: "/cliente"
+    },
+    {
+      area: "negocio",
+      page: "/negocio",
+      name: "VUYELA Negócio by LEMOTE",
+      scope: "/negocio"
+    },
+    {
+      area: "admin",
+      page: "/admin",
+      name: "VUYELA Administração",
+      scope: "/admin"
+    }
+  ] as const;
+
+  for (const application of applications) {
+    const manifestPath = `/pwa/${application.area}/manifest.webmanifest`;
+    const manifestResponse = await page.request.get(manifestPath);
+    expect(manifestResponse.ok()).toBe(true);
+    expect(manifestResponse.headers()["content-type"]).toContain("application/manifest+json");
+    const manifest = await manifestResponse.json();
+    expect(manifest).toMatchObject({
+      id: application.page,
+      name: application.name,
+      start_url: application.page,
+      scope: application.scope,
+      display: "standalone"
+    });
+
+    await page.goto(application.page);
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", manifestPath);
+  }
+
+  await page.goto("/negocio/pos");
+  await expect(page).toHaveURL(/\/negocio\/pos$/);
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+    "href",
+    "/pwa/negocio/manifest.webmanifest"
+  );
 
   const workerResponse = await page.request.get("/sw.js");
   expect(workerResponse.ok()).toBe(true);
   expect(workerResponse.headers()["content-type"]).toContain("application/javascript");
   expect(workerResponse.headers()["service-worker-allowed"]).toBe("/");
 
-  await page.goto("/");
+  await page.goto("/cliente");
   await expect
     .poll(
       () =>

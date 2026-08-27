@@ -5,9 +5,11 @@ import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
+import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
 import type { PosContextState } from "./data";
+import { posAppRoutes } from "./routes";
 
 export function PosPortalShell({
   principal,
@@ -23,7 +25,7 @@ export function PosPortalShell({
     <div className="pos-portal">
       <header className="pos-portal__header">
         <div className="pos-portal__brand-area">
-          <VuyelaLogo className="pos-portal__brand" href="/" />
+          <VuyelaLogo className="pos-portal__brand" href="/negocio" />
           <span aria-hidden="true" />
           <span className="pos-portal__protected-title">
             <small>Área protegida</small>
@@ -33,7 +35,9 @@ export function PosPortalShell({
 
         <nav aria-label="Navegação do POS" className="pos-portal__actions">
           <DashboardAreaMenu includePosSettings principal={principal} variant="default" />
+          <PwaInstallAction area="negocio" />
           <form action={signOutAction}>
+            <input type="hidden" name="returnTo" value="/negocio/entrar" />
             <button type="submit">
               <LogOut aria-hidden="true" size={18} />
               <span>Terminar sessão</span>
@@ -46,7 +50,7 @@ export function PosPortalShell({
           className="pos-portal__breadcrumbs"
           items={[
             { label: "Negócio", href: "/negocio" },
-            { label: "POS", href: section === "settings" ? "/pos" : undefined },
+            { label: "POS", href: section === "settings" ? posAppRoutes.root : undefined },
             ...(section === "settings" ? [{ label: "Definições" }] : [])
           ]}
         />

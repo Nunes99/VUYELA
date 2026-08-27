@@ -4,6 +4,7 @@ import { ProtectedRouteStateView } from "@/components/auth/protected-route-state
 import { getPosContext } from "@/features/pos/data";
 import { PosPortalShell } from "@/features/pos/pos-shell";
 import { parsePosSettingsView, PosSettingsView } from "@/features/pos/pos-settings";
+import { posAppRoutes } from "@/features/pos/routes";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default async function PosSettingsPage({
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const state = await getProtectedRouteState("/pos", "/pos/definicoes");
+  const state = await getProtectedRouteState("/pos", posAppRoutes.settings);
   const context = state.status === "authorized" ? await getPosContext(state.principal) : null;
   const params = await searchParams;
   const view = parsePosSettingsView(params?.vista);

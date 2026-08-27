@@ -268,7 +268,6 @@ export default async function CustomerPreviewPage({
         editProfile={params.editar === "1"}
         membershipStatus={typeof params.adesao === "string" ? params.adesao : undefined}
         state={{ status: "populated", dashboard }}
-        workspaceAccess={{ business: false, pos: false }}
       />
     </ProtectedRouteStateView>
   );

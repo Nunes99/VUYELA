@@ -3,21 +3,43 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { getPwaManifest, pwaApplications, pwaAreas } from "@/features/pwa/apps";
 import { buildServiceWorkerSource } from "@/features/pwa/service-worker";
 
-const manifest = readFileSync(join(process.cwd(), "app/manifest.ts"), "utf8");
+const legacyManifestRoute = readFileSync(
+  join(process.cwd(), "app/manifest.webmanifest/route.ts"),
+  "utf8"
+);
+const manifestRoute = readFileSync(
+  join(process.cwd(), "app/pwa/[area]/manifest.webmanifest/route.ts"),
+  "utf8"
+);
 const registration = readFileSync(join(process.cwd(), "features/pwa/pwa-registration.tsx"), "utf8");
 const sync = readFileSync(join(process.cwd(), "features/pwa/offline-card-sync.tsx"), "utf8");
 const offlinePage = readFileSync(join(process.cwd(), "app/offline/page.tsx"), "utf8");
 
 describe("PWA contract", () => {
-  it("defines an installable standalone manifest with regular and maskable icons", () => {
-    expect(manifest).toContain('name: "VUYELA by LEMOTE"');
-    expect(manifest).toContain('start_url: "/cliente"');
-    expect(manifest).toContain('display: "standalone"');
-    expect(manifest).toContain('purpose: "maskable"');
-    expect(manifest).toContain("vuyela-192.png");
-    expect(manifest).toContain("vuyela-512.png");
+  it("defines three separately installable manifests with closed navigation scopes", () => {
+    const manifests = pwaAreas.map((area) => getPwaManifest(area));
+
+    expect(manifests.map((item) => item.id)).toEqual(["/cliente", "/negocio", "/admin"]);
+    expect(manifests.map((item) => item.start_url)).toEqual(["/cliente", "/negocio", "/admin"]);
+    expect(manifests.map((item) => item.scope)).toEqual(["/cliente", "/negocio", "/admin"]);
+    expect(new Set(manifests.map((item) => item.short_name)).size).toBe(3);
+
+    for (const manifestDefinition of manifests) {
+      expect(manifestDefinition.display).toBe("standalone");
+      expect(manifestDefinition.icons).toEqual(
+        expect.arrayContaining([expect.objectContaining({ purpose: "maskable" })])
+      );
+      for (const shortcut of manifestDefinition.shortcuts ?? []) {
+        expect(shortcut.url.startsWith(String(manifestDefinition.scope))).toBe(true);
+      }
+    }
+
+    expect(pwaApplications.negocio.shortcuts[1]?.url).toBe("/negocio/pos");
+    expect(manifestRoute).toContain('"Content-Type": "application/manifest+json; charset=utf-8"');
+    expect(legacyManifestRoute).toContain('getPwaManifest("cliente")');
   });
 
   it("registers one root-scoped service worker without relying on cached worker code", () => {
@@ -30,6 +52,9 @@ describe("PWA contract", () => {
     const worker = buildServiceWorkerSource("test-version");
 
     expect(worker).toContain('const OFFLINE_URL = "/offline"');
+    expect(worker).toContain('"/pwa/cliente/manifest.webmanifest"');
+    expect(worker).toContain('"/pwa/negocio/manifest.webmanifest"');
+    expect(worker).toContain('"/pwa/admin/manifest.webmanifest"');
     expect(worker).toContain('request.method !== "GET"');
     expect(worker).toContain('request.mode === "navigate"');
     expect(worker).toContain("fetch(request).catch");

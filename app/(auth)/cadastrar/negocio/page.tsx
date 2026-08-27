@@ -26,7 +26,7 @@ export default function BusinessSignUpPage() {
         <div className="auth-panel auth-panel--forms">
           <BusinessSignUpForm />
           <p className="auth-footnote">
-            Já tem uma conta de negócio? <Link href="/entrar/negocio">Entrar no portal</Link>.
+            Já tem uma conta de negócio? <Link href="/negocio/entrar">Entrar no portal</Link>.
           </p>
         </div>
       </section>

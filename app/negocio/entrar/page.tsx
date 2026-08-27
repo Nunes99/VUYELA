@@ -4,15 +4,14 @@ import { BusinessSignInView, getBusinessNextPath } from "@/features/auth/portal-
 
 export const metadata: Metadata = {
   title: "Entrar no Portal de Negócio",
-  description: "Aceda ao Portal de Negócio VUYELA com as credenciais da empresa.",
   robots: { index: false, follow: false }
 };
 
-interface BusinessSignInPageProps {
+export default async function BusinessSignInPage({
+  searchParams
+}: {
   searchParams: Promise<{ next?: string | string[] | undefined }>;
-}
-
-export default async function BusinessSignInPage({ searchParams }: BusinessSignInPageProps) {
+}) {
   const params = await searchParams;
   return <BusinessSignInView nextPath={getBusinessNextPath(params.next)} />;
 }

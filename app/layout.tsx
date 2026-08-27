@@ -31,12 +31,6 @@ export const metadata: Metadata = {
     locale: "pt_MZ",
     type: "website"
   },
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "VUYELA"
-  },
   icons: {
     icon: [
       { url: "/icons/vuyela-192.png", sizes: "192x192", type: "image/png" },

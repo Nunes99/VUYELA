@@ -15,7 +15,7 @@ export default defineConfig({
     trace: "on-first-retry"
   },
   webServer: {
-    command: `pnpm dev --hostname 127.0.0.1 --port ${port}`,
+    command: `pnpm dev --turbopack --hostname 127.0.0.1 --port ${port}`,
     url: baseURL,
     timeout: 180_000,
     reuseExistingServer: !process.env.CI,

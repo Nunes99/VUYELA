@@ -19,11 +19,12 @@ interface EnrollmentDetails {
 
 interface MfaFormProps {
   nextPath: string;
+  signInPath?: string;
 }
 
 const genericMfaError = "Não foi possível concluir a verificação. Tente novamente.";
 
-export function MfaForm({ nextPath }: MfaFormProps) {
+export function MfaForm({ nextPath, signInPath = "/entrar" }: MfaFormProps) {
   const router = useRouter();
   const [supabase] = useState(createSupabaseBrowserClient);
   const [step, setStep] = useState<MfaStep>("loading");
@@ -49,7 +50,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
       }
 
       if (userError || !userData.user) {
-        router.replace(`/entrar?next=${encodeURIComponent(nextPath)}`);
+        router.replace(`${signInPath}?next=${encodeURIComponent(nextPath)}`);
         return;
       }
 
@@ -86,7 +87,7 @@ export function MfaForm({ nextPath }: MfaFormProps) {
     return () => {
       cancelled = true;
     };
-  }, [nextPath, router, supabase]);
+  }, [nextPath, router, signInPath, supabase]);
 
   async function startEnrollment() {
     setError("");

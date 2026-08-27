@@ -43,7 +43,7 @@ export default async function BusinessTeamSignUpPage({
             </p>
           )}
           <p className="auth-footnote">
-            Já tem credenciais empresariais? <Link href="/entrar/negocio">Entrar no portal</Link>.
+            Já tem credenciais empresariais? <Link href="/negocio/entrar">Entrar no portal</Link>.
           </p>
         </div>
       </section>

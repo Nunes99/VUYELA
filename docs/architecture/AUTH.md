@@ -82,6 +82,11 @@ pending business, primary branch, and owner membership in the Auth trigger trans
 type never grants tenant access by itself: business and POS authorization still requires an active
 `business_members` row. User-editable Auth metadata is not referenced by RLS policies.
 
+Installed applications also use dedicated account entry points: `/cliente/entrar` accepts only
+customer identities, `/negocio/entrar` accepts only business identities, and `/admin/entrar`
+accepts only platform identities before MFA. A rejected account remains in the current area and
+can terminate its session without being redirected automatically to another portal.
+
 Password recovery returns through `/auth/callback` to `/definir-senha`, where the authenticated
 recovery session can set the new password. Invalid or expired callback codes return to the login
 screen with an explicit error state.

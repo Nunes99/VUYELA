@@ -127,7 +127,7 @@ function PublicFooter() {
             <strong>Soluções</strong>
             <Link href="/clientes">Para clientes</Link>
             <Link href="/negocios">Para negócios</Link>
-            <Link href="/pos">Integração POS</Link>
+            <Link href="/negocio/pos">Integração POS</Link>
           </nav>
           <nav aria-label="Empresa">
             <strong>Empresa</strong>

@@ -5,7 +5,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Bell,
-  BriefcaseBusiness,
   Check,
   ChevronRight,
   CreditCard,
@@ -19,7 +18,6 @@ import {
   Pencil,
   Phone,
   Save,
-  ScanLine,
   ShieldCheck,
   Star,
   Store,
@@ -32,6 +30,7 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
 import { InAppNotificationList } from "@/features/notifications/in-app-list";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
+import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import { joinBusinessLoyaltyProgramAction } from "@/features/public-marketplace/actions";
 import type { MarketplaceBusiness } from "@/features/public-marketplace/model";
 import { signOutAction } from "@/features/auth/actions";
@@ -55,12 +54,6 @@ interface CustomerDashboardViewProps {
   offerStatus?: string;
   membershipStatus?: string;
   businesses?: MarketplaceBusiness[];
-  workspaceAccess?: CustomerWorkspaceAccess;
-}
-
-export interface CustomerWorkspaceAccess {
-  business: boolean;
-  pos: boolean;
 }
 
 const navItems = [
@@ -97,8 +90,7 @@ export function CustomerDashboardView({
   profileStatus,
   offerStatus,
   membershipStatus,
-  businesses = [],
-  workspaceAccess = { business: false, pos: false }
+  businesses = []
 }: CustomerDashboardViewProps) {
   if (state.status === "error") {
     return (
@@ -118,9 +110,7 @@ export function CustomerDashboardView({
       <CustomerDashboardNav activeView={activeView} />
       <OfflineCardSync cards={state.dashboard.cards} />
       <main className="customer-dashboard-view">
-        {activeView === "inicio" ? (
-          <CustomerHome dashboard={state.dashboard} workspaceAccess={workspaceAccess} />
-        ) : null}
+        {activeView === "inicio" ? <CustomerHome dashboard={state.dashboard} /> : null}
         {activeView === "cartoes" ? (
           selectedCard ? (
             <CustomerCardDetail card={selectedCard} dashboard={state.dashboard} />
@@ -176,7 +166,9 @@ function CustomerDashboardNav({ activeView }: { activeView: CustomerDashboardVie
           </Link>
         );
       })}
+      <PwaInstallAction area="cliente" />
       <form action={signOutAction} className="customer-dashboard-nav__signout">
+        <input type="hidden" name="returnTo" value="/cliente/entrar" />
         <button type="submit">
           <LogOut aria-hidden="true" size={17} /> Terminar sessão
         </button>
@@ -192,13 +184,7 @@ function CustomerDashboardNav({ activeView }: { activeView: CustomerDashboardVie
   );
 }
 
-function CustomerHome({
-  dashboard,
-  workspaceAccess
-}: {
-  dashboard: CustomerDashboardViewModel;
-  workspaceAccess: CustomerWorkspaceAccess;
-}) {
+function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) {
   return (
     <>
       <section className="customer-dashboard-overview" aria-labelledby="customer-home-title">
@@ -314,18 +300,6 @@ function CustomerHome({
             <Store aria-hidden="true" />
             <span>Aderir</span>
           </Link>
-          {workspaceAccess.business ? (
-            <Link href="/negocio">
-              <BriefcaseBusiness aria-hidden="true" />
-              <span>Meus negócios</span>
-            </Link>
-          ) : null}
-          {workspaceAccess.pos ? (
-            <Link href="/pos">
-              <ScanLine aria-hidden="true" />
-              <span>POS</span>
-            </Link>
-          ) : null}
         </nav>
       </div>
 
@@ -804,8 +778,10 @@ function CustomerProfile({
           <Gift aria-hidden="true" /> Programa de indicações
           <ChevronRight aria-hidden="true" />
         </Link>
+        <PwaInstallAction area="cliente" />
       </div>
       <form action={signOutAction} className="customer-mobile-signout">
+        <input type="hidden" name="returnTo" value="/cliente/entrar" />
         <button type="submit">
           <LogOut aria-hidden="true" /> Terminar sessão da conta
         </button>

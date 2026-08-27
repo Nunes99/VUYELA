@@ -39,6 +39,7 @@ import {
   managePosTerminalDeviceAction,
   updatePosTerminalSettingsAction
 } from "./settings-actions";
+import { posAppRoutes } from "./routes";
 
 export const posSettingsViews = [
   "geral",
@@ -181,7 +182,7 @@ export function PosPaymentSettingsView({
               <Link
                 aria-current={item.id === method ? "page" : undefined}
                 className={item.id === method ? "is-active" : undefined}
-                href={`/pos/definicoes/pagamentos?metodo=${item.id}`}
+                href={`${posAppRoutes.payments}?metodo=${item.id}`}
                 key={item.id}
               >
                 <TabIcon aria-hidden="true" size={17} />
@@ -268,7 +269,10 @@ export function PosPaymentSettingsView({
           </div>
           {enabled ? (
             <div className="pos-settings-actions">
-              <Link className="pos-settings-button pos-settings-button--secondary" href="/pos">
+              <Link
+                className="pos-settings-button pos-settings-button--secondary"
+                href={posAppRoutes.root}
+              >
                 Testar confirmação manual
               </Link>
               {business?.canManage && channel ? (
@@ -316,7 +320,7 @@ function PosSettingsNavigation({
             <Link
               aria-current={active === item.id ? "page" : undefined}
               className={active === item.id ? "is-active" : undefined}
-              href={`/pos/definicoes?vista=${item.id}${terminalId ? `&terminal=${terminalId}` : ""}`}
+              href={`${posAppRoutes.settings}?vista=${item.id}${terminalId ? `&terminal=${terminalId}` : ""}`}
               key={item.id}
             >
               <Icon aria-hidden="true" size={18} />
@@ -327,13 +331,13 @@ function PosSettingsNavigation({
         <Link
           aria-current={active === "pagamentos" ? "page" : undefined}
           className={active === "pagamentos" ? "is-active" : undefined}
-          href="/pos/definicoes/pagamentos"
+          href={posAppRoutes.payments}
         >
           <WalletCards aria-hidden="true" size={18} />
           Pagamentos
         </Link>
       </nav>
-      <Link className="pos-settings-nav__back" href="/pos">
+      <Link className="pos-settings-nav__back" href={posAppRoutes.root}>
         Voltar ao POS
       </Link>
     </aside>
@@ -377,7 +381,7 @@ function GeneralSettings({
         <div className="pos-terminal-list">
           {business.terminals.map((item) => (
             <div className={item.id === terminal?.id ? "is-active" : undefined} key={item.id}>
-              <Link href={`/pos/definicoes?vista=geral&terminal=${item.id}`}>
+              <Link href={`${posAppRoutes.settings}?vista=geral&terminal=${item.id}`}>
                 <strong>{item.name}</strong>
                 <small>
                   {item.code} · {terminalStatusLabel(item.status)}
@@ -1033,7 +1037,7 @@ function PosSettingsNotice({ message }: { message: string }) {
     <section className="pos-notice">
       <h1>Definições indisponíveis</h1>
       <p>{message}</p>
-      <Link href="/pos">Voltar ao POS</Link>
+      <Link href={posAppRoutes.root}>Voltar ao POS</Link>
     </section>
   );
 }

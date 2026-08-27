@@ -31,6 +31,12 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: ["@lemote/vuyela-design-system"],
+  async rewrites() {
+    return [
+      { source: "/negocio/pos", destination: "/pos" },
+      { source: "/negocio/pos/:path*", destination: "/pos/:path*" }
+    ];
+  },
   async headers() {
     return [
       {

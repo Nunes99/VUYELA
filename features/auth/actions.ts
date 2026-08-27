@@ -113,7 +113,7 @@ export async function signInWithEmailAction(
   }
 
   const portal = getFormString(formData, "portal");
-  if (portal === "customer" || portal === "business") {
+  if (portal === "customer" || portal === "business" || portal === "admin") {
     const { data: profile } = await supabase
       .from("profiles")
       .select("account_type")
@@ -123,7 +123,9 @@ export async function signInWithEmailAction(
     const isAllowed =
       portal === "business"
         ? accountType === "business"
-        : accountType === "customer" || accountType === "platform";
+        : portal === "admin"
+          ? accountType === "platform"
+          : accountType === "customer";
 
     if (!isAllowed) {
       await supabase.auth.signOut();
@@ -131,8 +133,10 @@ export async function signInWithEmailAction(
         status: "error",
         message:
           portal === "business"
-            ? "Estas credenciais não pertencem a uma conta de negócio. Use o acesso de cliente."
-            : "Estas credenciais pertencem a um negócio. Use o Portal de Negócio."
+            ? "Estas credenciais não pertencem a uma conta de negócio."
+            : portal === "admin"
+              ? "Estas credenciais não pertencem à Administração VUYELA."
+              : "Estas credenciais não pertencem a uma conta de cliente."
       };
     }
   }
@@ -663,11 +667,13 @@ export async function submitBusinessOnboardingAction(
   };
 }
 
-export async function signOutAction() {
+export async function signOutAction(formData?: FormData) {
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
     await supabase.auth.signOut();
   }
 
-  redirect("/");
+  const returnTo = formData ? getFormString(formData, "returnTo") : null;
+  const allowedReturnPaths = new Set(["/cliente/entrar", "/negocio/entrar", "/admin/entrar"]);
+  redirect(returnTo && allowedReturnPaths.has(returnTo) ? returnTo : "/");
 }

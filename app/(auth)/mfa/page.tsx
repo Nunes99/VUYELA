@@ -29,9 +29,10 @@ export const dynamic = "force-dynamic";
 export default async function MfaPage({ searchParams }: MfaPageProps) {
   const [params, authContext] = await Promise.all([searchParams, getAuthContext()]);
   const nextPath = getSafeMfaNextPath(params.next);
+  const signInPath = nextPath.startsWith("/admin") ? "/admin/entrar" : "/entrar";
 
   if (!authContext.principal) {
-    redirect(`/entrar?next=${encodeURIComponent(nextPath)}`);
+    redirect(`${signInPath}?next=${encodeURIComponent(nextPath)}`);
   }
 
   if (!requiresMfa(authContext.principal.profileRole)) {
@@ -46,16 +47,16 @@ export default async function MfaPage({ searchParams }: MfaPageProps) {
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="mfa-title">
         <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" href="/" />
+          <VuyelaLogo className="auth-brand auth-brand--dark" href="/admin" />
           <span className="auth-kicker">Verificação em dois passos</span>
           <h1 id="mfa-title">Verificação adicional necessária.</h1>
           <p className="auth-intro">
             Funções de suporte e administração exigem um código temporário além da sua
             palavra-passe.
           </p>
-          <MfaForm nextPath={nextPath} />
+          <MfaForm nextPath={nextPath} signInPath={signInPath} />
           <p className="auth-footnote">
-            Não consegue concluir? <Link href="/entrar">Voltar ao login</Link>.
+            Não consegue concluir? <Link href={signInPath}>Voltar ao login</Link>.
           </p>
         </div>
       </section>

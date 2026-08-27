@@ -22,6 +22,7 @@ import type { ReactNode } from "react";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
+import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
 export type BusinessPortalSection =
@@ -121,7 +122,9 @@ export function BusinessPortalShell({
                 );
               })}
             </nav>
+            <PwaInstallAction area="negocio" />
             <form action={signOutAction}>
+              <input type="hidden" name="returnTo" value="/negocio/entrar" />
               <button type="submit">
                 <LogOut aria-hidden="true" size={18} />
                 <span>Terminar sessão</span>
@@ -132,7 +135,7 @@ export function BusinessPortalShell({
       </header>
       <aside className="business-portal__sidebar">
         <div className="business-portal__sidebar-main">
-          <VuyelaLogo className="business-portal__brand" href="/" inverse />
+          <VuyelaLogo className="business-portal__brand" href="/negocio" inverse />
           <nav aria-label="Navegação do negócio" className="business-portal__nav">
             {navigation.map((item) => {
               const Icon = item.icon;
@@ -152,7 +155,9 @@ export function BusinessPortalShell({
           </nav>
         </div>
         <div className="business-portal__sidebar-footer">
+          <PwaInstallAction area="negocio" />
           <form action={signOutAction}>
+            <input type="hidden" name="returnTo" value="/negocio/entrar" />
             <button type="submit">
               <LogOut aria-hidden="true" size={18} />
               <span>Terminar sessão</span>

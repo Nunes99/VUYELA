@@ -11,6 +11,9 @@ const OFFLINE_URL = "/offline";
 const PUBLIC_ASSETS = [
   OFFLINE_URL,
   "/manifest.webmanifest",
+  "/pwa/cliente/manifest.webmanifest",
+  "/pwa/negocio/manifest.webmanifest",
+  "/pwa/admin/manifest.webmanifest",
   "/icons/vuyela-192.png",
   "/icons/vuyela-512.png",
   "/icons/vuyela-maskable-512.png"
@@ -96,7 +99,8 @@ self.addEventListener("fetch", (event) => {
   const isPublicStaticAsset =
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
-    url.pathname === "/manifest.webmanifest";
+    url.pathname === "/manifest.webmanifest" ||
+    url.pathname.startsWith("/pwa/") && url.pathname.endsWith("/manifest.webmanifest");
 
   if (isPublicStaticAsset) {
     event.respondWith(

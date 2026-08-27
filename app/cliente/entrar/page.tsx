@@ -4,26 +4,20 @@ import { CustomerSignInView, getCustomerNextPath } from "@/features/auth/portal-
 import { isPhoneAuthEnabled } from "@/lib/env";
 
 export const metadata: Metadata = {
-  title: "Entrar",
-  description: "Entre na sua conta VUYELA com e-mail e palavra-passe.",
-  alternates: {
-    canonical: "/entrar"
-  },
-  robots: {
-    index: false,
-    follow: false
-  }
+  title: "Entrar como cliente",
+  robots: { index: false, follow: false }
 };
 
-interface SignInPageProps {
+export default async function CustomerSignInPage({
+  searchParams
+}: {
   searchParams: Promise<{
     erro?: string | string[] | undefined;
     next?: string | string[] | undefined;
   }>;
-}
-
-export default async function SignInPage({ searchParams }: SignInPageProps) {
+}) {
   const params = await searchParams;
+
   return (
     <CustomerSignInView
       callbackError={params.erro === "link-invalido"}

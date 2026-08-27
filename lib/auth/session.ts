@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 import { isSupabaseConfigured } from "@/lib/env";
 import {
   canAccessRoute,
-  getDefaultAuthenticatedPath,
   isAccountType,
   isBusinessMemberRole,
   isMfaVerifiedAssuranceLevel,
@@ -65,8 +64,15 @@ function toBusinessMembership(row: BusinessMembershipRow): BusinessMembership | 
   };
 }
 
-function buildSignInPath(nextPath: string) {
-  return `/entrar?next=${encodeURIComponent(nextPath)}`;
+function buildSignInPath(route: ProtectedRoute, nextPath: string) {
+  const signInPath =
+    route === "/admin"
+      ? "/admin/entrar"
+      : route === "/negocio" || route === "/pos"
+        ? "/negocio/entrar"
+        : "/cliente/entrar";
+
+  return `${signInPath}?next=${encodeURIComponent(nextPath)}`;
 }
 
 export async function getAuthContext(): Promise<AuthContext> {
@@ -156,14 +162,14 @@ export async function getProtectedRouteState(
   if (!authContext.principal) {
     return {
       status: "unauthenticated",
-      signInPath: buildSignInPath(currentPath)
+      signInPath: buildSignInPath(route, currentPath)
     };
   }
 
   if (requiresMfa(authContext.principal.profileRole) && !authContext.principal.mfaVerified) {
     return {
       status: "mfa_required",
-      mfaPath: `/mfa?next=${encodeURIComponent(currentPath)}`,
+      mfaPath: `/admin/mfa?next=${encodeURIComponent(currentPath)}`,
       principal: authContext.principal
     };
   }
@@ -185,7 +191,7 @@ export async function requireAuthenticatedUser(nextPath: string) {
   const authContext = await getAuthContext();
 
   if (!authContext.principal) {
-    redirect(buildSignInPath(nextPath));
+    redirect(`/entrar?next=${encodeURIComponent(nextPath)}`);
   }
 
   return authContext.principal;
@@ -195,7 +201,7 @@ export async function requireRouteAccess(route: ProtectedRoute, currentPath: str
   const state = await getProtectedRouteState(route, currentPath);
 
   if (state.status === "auth_not_configured" || state.status === "unauthenticated") {
-    redirect(buildSignInPath(currentPath));
+    redirect(buildSignInPath(route, currentPath));
   }
 
   if (state.status === "mfa_required") {
@@ -203,7 +209,7 @@ export async function requireRouteAccess(route: ProtectedRoute, currentPath: str
   }
 
   if (state.status === "forbidden") {
-    redirect(getDefaultAuthenticatedPath(state.principal));
+    redirect(currentPath);
   }
 
   return state.principal;

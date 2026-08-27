@@ -27,7 +27,7 @@ export default async function AcceptBusinessInvitationPage({
     : "/negocio/convite";
   const authContext = await getAuthContext();
   const principal = authContext.principal;
-  const businessSignInPath = `/entrar/negocio?next=${encodeURIComponent(currentPath)}`;
+  const businessSignInPath = `/negocio/entrar?next=${encodeURIComponent(currentPath)}`;
   const teamSignUpPath = `/cadastrar/negocio/equipa?token=${encodeURIComponent(token)}`;
 
   return (
@@ -67,6 +67,7 @@ export default async function AcceptBusinessInvitationPage({
             </p>
             <div className="business-invitation-actions">
               <form action={signOutAction}>
+                <input type="hidden" name="returnTo" value="/negocio/entrar" />
                 <button className="business-button business-button--primary" type="submit">
                   Terminar sessão
                 </button>

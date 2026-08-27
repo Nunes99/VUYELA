@@ -17,6 +17,7 @@ import {
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
+import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import { hasAdminCapability } from "@/lib/auth/admin-permissions";
 import type { AdminCapability } from "@/lib/auth/admin-permissions";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
@@ -74,7 +75,7 @@ export function AdminDashboard({
     <div className="admin-console">
       <aside className="admin-sidebar">
         <div className="admin-sidebar__top">
-          <VuyelaLogo className="admin-sidebar__logo" href="/" inverse />
+          <VuyelaLogo className="admin-sidebar__logo" href="/admin" inverse />
           <nav aria-label="Administração da plataforma" className="admin-sidebar__nav">
             {adminNavigation
               .filter((item) => hasAdminCapability(principal.profileRole, item.capability))
@@ -97,7 +98,9 @@ export function AdminDashboard({
         </div>
 
         <div className="admin-sidebar__footer">
+          <PwaInstallAction area="admin" />
           <form action={signOutAction}>
+            <input type="hidden" name="returnTo" value="/admin/entrar" />
             <button type="submit">
               <span className="admin-sidebar__indicator" />
               <LogOut aria-hidden="true" size={18} />

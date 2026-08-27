@@ -20,6 +20,7 @@ import type {
   BusinessDashboardViewModel
 } from "./model";
 import type { BusinessOperationsState } from "@/features/business-operations/data";
+import { posAppRoutes } from "@/features/pos/routes";
 import {
   BusinessBranchesManagementView,
   BusinessCardsCustomersManagementView,
@@ -224,7 +225,7 @@ function BusinessViewToolbar({
             Exportar relatório
           </a>
         ) : view === "pos" ? (
-          <Link className="business-button business-button--primary" href="/pos">
+          <Link className="business-button business-button--primary" href={posAppRoutes.root}>
             <ScanLine aria-hidden="true" size={16} />
             Abrir POS
           </Link>

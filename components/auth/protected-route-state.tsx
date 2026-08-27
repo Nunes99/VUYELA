@@ -14,7 +14,9 @@ import {
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
-import { canAccessRoute, getDefaultAuthenticatedPath } from "@/lib/auth/rbac";
+import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
+import { posAppRoutes } from "@/features/pos/routes";
+import { canAccessRoute } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 import type { ProtectedRouteState } from "@/lib/auth/session";
 
@@ -31,13 +33,17 @@ function AuthNotice({
   title,
   body,
   actionHref,
-  actionLabel
+  actionLabel,
+  installArea,
+  allowAccountSwitch = false
 }: {
   eyebrow: string;
   title: string;
   body: string;
   actionHref?: string | undefined;
   actionLabel?: string | undefined;
+  installArea?: "cliente" | "negocio" | "admin" | undefined;
+  allowAccountSwitch?: boolean;
 }) {
   return (
     <main className="auth-page">
@@ -52,6 +58,15 @@ function AuthNotice({
               {actionLabel}
             </Link>
           ) : null}
+          {allowAccountSwitch && installArea ? (
+            <form action={signOutAction} className="auth-account-switch">
+              <input type="hidden" name="returnTo" value={`/${installArea}/entrar`} />
+              <button className="home-link-button home-link-button--primary" type="submit">
+                Entrar com outra conta
+              </button>
+            </form>
+          ) : null}
+          {installArea ? <PwaInstallAction area={installArea} /> : null}
         </div>
       </section>
     </main>
@@ -65,6 +80,15 @@ export function ProtectedRouteStateView({
   variant = "default",
   customerName
 }: ProtectedRouteStateViewProps) {
+  const installArea =
+    variant === "customer"
+      ? "cliente"
+      : variant === "admin"
+        ? "admin"
+        : variant === "business" || variant === "pos"
+          ? "negocio"
+          : undefined;
+
   if (state.status === "authorized") {
     if (variant === "admin" || variant === "business" || variant === "pos") {
       const className =
@@ -109,6 +133,7 @@ export function ProtectedRouteStateView({
             />
             {!isCustomer ? (
               <form action={signOutAction}>
+                <input type="hidden" name="returnTo" value="/negocio/entrar" />
                 <button className="dashboard-signout" type="submit">
                   <LogOut aria-hidden="true" size={18} />
                   <span>Terminar sessão</span>
@@ -128,6 +153,7 @@ export function ProtectedRouteStateView({
         eyebrow="Configurar Supabase"
         title="Autenticação ainda não está ligada."
         body="Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY para testar esta área protegida com sessões reais."
+        installArea={installArea}
       />
     );
   }
@@ -140,6 +166,7 @@ export function ProtectedRouteStateView({
         body="Esta área usa helpers server-side e RBAC centralizado antes de renderizar dados privados."
         actionHref={state.signInPath}
         actionLabel="Entrar"
+        installArea={installArea}
       />
     );
   }
@@ -152,6 +179,7 @@ export function ProtectedRouteStateView({
         body="Funções privilegiadas precisam de MFA antes de acessar rotas sensiveis."
         actionHref={state.mfaPath}
         actionLabel="Verificar"
+        installArea={installArea}
       />
     );
   }
@@ -160,9 +188,9 @@ export function ProtectedRouteStateView({
     <AuthNotice
       eyebrow="Sem permissão"
       title="Esta conta não tem acesso a esta área."
-      body="As permissões são avaliadas no servidor por perfil, membro ativo, negócio e filial."
-      actionHref={getDefaultAuthenticatedPath(state.principal)}
-      actionLabel="Ir para a minha área"
+      body="Termine esta sessão e entre com as credenciais próprias desta aplicação. Nenhuma área será aberta automaticamente."
+      installArea={installArea}
+      allowAccountSwitch
     />
   );
 }
@@ -192,13 +220,13 @@ export function DashboardAreaMenu({
       visible: principal.accountType === "business" && canAccessRoute(principal, "/negocio")
     },
     {
-      href: "/pos",
+      href: posAppRoutes.root,
       label: "POS",
       icon: ScanLine,
       visible: principal.accountType === "business" && canAccessRoute(principal, "/pos")
     },
     {
-      href: "/pos/definicoes",
+      href: posAppRoutes.settings,
       label: "Definições do POS",
       icon: Settings,
       visible: includePosSettings && canAccessRoute(principal, "/pos")
@@ -247,6 +275,7 @@ export function DashboardAreaMenu({
         })}
         {variant === "customer" ? (
           <form action={signOutAction}>
+            <input type="hidden" name="returnTo" value="/cliente/entrar" />
             <button type="submit">
               <LogOut aria-hidden="true" size={18} />
               <span>Terminar sessão</span>

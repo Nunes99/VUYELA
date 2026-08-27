@@ -17,8 +17,12 @@ function getSafeMfaNextPath(value: string | null) {
 }
 
 export async function middleware(request: NextRequest) {
-  const signInUrl = new URL("/entrar", request.url);
-  signInUrl.searchParams.set("next", getSafeMfaNextPath(request.nextUrl.searchParams.get("next")));
+  const nextPath = getSafeMfaNextPath(request.nextUrl.searchParams.get("next"));
+  const signInUrl = new URL(
+    nextPath.startsWith("/admin") ? "/admin/entrar" : "/entrar",
+    request.url
+  );
+  signInUrl.searchParams.set("next", nextPath);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
@@ -49,5 +53,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/mfa"]
+  matcher: ["/mfa", "/admin/mfa"]
 };
