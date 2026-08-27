@@ -1,4 +1,5 @@
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
@@ -22,10 +23,22 @@ export function PosPortalShell({
   children: ReactNode;
 }) {
   return (
-    <div className="pos-portal">
+    <div className={`pos-portal pos-portal--${section}`}>
       <header className="pos-portal__header">
+        {section === "settings" ? (
+          <Link
+            aria-label="Voltar ao POS"
+            className="pos-portal__mobile-back"
+            href={posAppRoutes.root}
+          >
+            <ArrowLeft aria-hidden="true" size={16} />
+          </Link>
+        ) : null}
         <div className="pos-portal__brand-area">
           <VuyelaLogo className="pos-portal__brand" href="/negocio" />
+          <Link aria-label="Área de negócio" className="pos-portal__mobile-symbol" href="/negocio">
+            V
+          </Link>
           <span aria-hidden="true" />
           <span className="pos-portal__protected-title">
             <small>Área protegida</small>
@@ -46,14 +59,12 @@ export function PosPortalShell({
         </nav>
       </header>
       <div className="pos-portal__content">
-        <FlowBreadcrumbs
-          className="pos-portal__breadcrumbs"
-          items={[
-            { label: "Negócio", href: "/negocio" },
-            { label: "POS", href: section === "settings" ? posAppRoutes.root : undefined },
-            ...(section === "settings" ? [{ label: "Definições" }] : [])
-          ]}
-        />
+        {section === "transaction" ? (
+          <FlowBreadcrumbs
+            className="pos-portal__breadcrumbs"
+            items={[{ label: "Negócio", href: "/negocio" }, { label: "POS" }]}
+          />
+        ) : null}
         {children}
       </div>
     </div>

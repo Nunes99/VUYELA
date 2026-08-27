@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 interface BusinessRow {
   id: string;
   name: string;
+  nuit: string | null;
   phone: string | null;
   email: string | null;
 }
@@ -43,6 +44,7 @@ export interface PosTerminalSettingsContext {
   showMznEquivalent: boolean;
   inactivityTimeoutMinutes: number;
   allowedLookupMethods: Array<"qr" | "card" | "phone">;
+  configuration: Record<string, unknown>;
 }
 
 export interface PosDeviceContext {
@@ -93,6 +95,7 @@ export interface PosCatalogItemContext {
 export interface PosBusinessContext {
   id: string;
   name: string;
+  nuit: string | null;
   phone: string | null;
   email: string | null;
   branches: PosBranchContext[];
@@ -144,7 +147,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
     await Promise.all([
       supabase
         .from("businesses")
-        .select("id, name, phone, email")
+        .select("id, name, nuit, phone, email")
         .in("id", businessIds)
         .eq("status", "active"),
       supabase
@@ -190,6 +193,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
       return {
         id: business.id,
         name: business.name,
+        nuit: business.nuit,
         phone: business.phone,
         email: business.email,
         branches,
@@ -255,7 +259,8 @@ const defaultTerminalSettings: PosTerminalSettingsContext = {
   showPointsBalance: true,
   showMznEquivalent: true,
   inactivityTimeoutMinutes: 30,
-  allowedLookupMethods: ["qr", "card", "phone"]
+  allowedLookupMethods: ["qr", "card", "phone"],
+  configuration: {}
 };
 
 function firstRow<T>(data: unknown): T | null {
@@ -265,6 +270,7 @@ function firstRow<T>(data: unknown): T | null {
 function parseTerminals(value: unknown): PosTerminalContext[] {
   return objectRows(value).map((item) => {
     const settings = isRecord(item.settings) ? item.settings : {};
+    const configuration = isRecord(settings.settings) ? settings.settings : {};
     const lookupMethods = Array.isArray(settings.allowedLookupMethods)
       ? settings.allowedLookupMethods.filter(isLookupMethod)
       : defaultTerminalSettings.allowedLookupMethods;
@@ -288,7 +294,8 @@ function parseTerminals(value: unknown): PosTerminalContext[] {
         inactivityTimeoutMinutes: numberValue(settings.inactivityTimeoutMinutes, 30),
         allowedLookupMethods: lookupMethods.length
           ? lookupMethods
-          : defaultTerminalSettings.allowedLookupMethods
+          : defaultTerminalSettings.allowedLookupMethods,
+        configuration
       },
       devices: parseDevices(item.devices)
     };

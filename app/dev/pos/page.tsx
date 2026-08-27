@@ -36,6 +36,7 @@ const previewContext: PosContextState = {
     {
       id: "business-preview",
       name: "Barbershop 21",
+      nuit: "401234567",
       phone: "+258 84 123 4567",
       email: "pos@barbershop21.co.mz",
       branches: [
@@ -51,7 +52,7 @@ const previewContext: PosContextState = {
       defaultBranchId: "branch-preview",
       requiresBranch: false,
       roleLabels: ["Caixa"],
-      canManage: false,
+      canManage: true,
       terminals: [
         {
           id: "terminal-preview",
@@ -70,7 +71,47 @@ const previewContext: PosContextState = {
             showPointsBalance: true,
             showMznEquivalent: true,
             inactivityTimeoutMinutes: 15,
-            allowedLookupMethods: ["qr", "card", "phone"]
+            allowedLookupMethods: ["qr", "card", "phone"],
+            configuration: {
+              general: {
+                dateFormat: "DD/MM/AAAA",
+                receiptLogoEnabled: true,
+                receiptFooter: "Volte sempre à Barbershop 21.",
+                thankYouMessage: "Obrigado pela sua preferência!"
+              },
+              devices: {
+                aztec: false,
+                code128: true,
+                continuousReading: false,
+                dataMatrix: true,
+                ean13: true,
+                pdf417: true,
+                qrCode: true,
+                readTimeoutSeconds: 5,
+                scannerSensitivity: 75,
+                soundConfirmation: true,
+                vibration: true
+              },
+              network: {
+                allowOfflineSales: true,
+                apiBaseUrl: "https://api.vuyela.co.mz/v2",
+                syncIntervalMinutes: 5
+              },
+              printer: {
+                fontSize: "normal",
+                paperWidth: "80mm",
+                printAutomatically: true,
+                printLogo: true,
+                receiptCopies: 1
+              },
+              security: {
+                automaticCloudBackup: true,
+                backupFrequency: "daily",
+                forcePinChangeDays: 90,
+                inactivityTimeoutMinutes: 15,
+                requireQuickAccessPin: true
+              }
+            }
           },
           devices: [
             {
@@ -94,6 +135,72 @@ const previewContext: PosContextState = {
       ],
       paymentChannels: [
         {
+          id: "mpesa-preview",
+          businessId: "business-preview",
+          branchId: "branch-preview",
+          method: "mpesa",
+          mode: "provider",
+          status: "testing",
+          providerKey: "vodacom-mpesa",
+          maskedIdentifier: "******4567",
+          credentialsConfigured: true,
+          publicSettings: {
+            autoReconciliation: true,
+            confirmationNumber: "+258 84 123 4567",
+            environment: "sandbox",
+            maximumAmount: 50000,
+            merchantId: "MPESA-BRB-001",
+            minimumAmount: 10,
+            reconciliationFrequency: "daily",
+            smsNotifications: true,
+            timeoutSeconds: 60,
+            ussdShortcode: "*150#"
+          }
+        },
+        {
+          id: "emola-preview",
+          businessId: "business-preview",
+          branchId: "branch-preview",
+          method: "emola",
+          mode: "provider",
+          status: "testing",
+          providerKey: "movitel-emola",
+          maskedIdentifier: "******2021",
+          credentialsConfigured: true,
+          publicSettings: {
+            callbackUrl: "https://vuyela.co.mz/api/payments/emola/callback",
+            dailyTransactionLimit: 1000,
+            maximumAmount: 50000,
+            minimumAmount: 10,
+            partnerCode: "EMOLA-BRB-001",
+            pushNotifications: true,
+            smsFallback: true,
+            supportEmail: "pagamentos@barbershop21.co.mz"
+          }
+        },
+        {
+          id: "mkesh-preview",
+          businessId: "business-preview",
+          branchId: "branch-preview",
+          method: "mkesh",
+          mode: "provider",
+          status: "testing",
+          providerKey: "tmcel-mkesh",
+          maskedIdentifier: "******8147",
+          credentialsConfigured: true,
+          publicSettings: {
+            automaticRetry: true,
+            environment: "sandbox",
+            failureUrl: "https://vuyela.co.mz/pagamentos/falhou",
+            maximumRetries: 3,
+            merchantId: "MKESH-BRB-001",
+            qrValidityMinutes: 15,
+            referencePrefix: "BRB-",
+            staticQrCode: true,
+            successUrl: "https://vuyela.co.mz/pagamentos/sucesso"
+          }
+        },
+        {
           id: "cash-preview",
           businessId: "business-preview",
           branchId: "branch-preview",
@@ -103,7 +210,17 @@ const previewContext: PosContextState = {
           providerKey: null,
           maskedIdentifier: null,
           credentialsConfigured: false,
-          publicSettings: {}
+          publicSettings: {
+            initialFloat: 5000,
+            lowFundAlert: 1000,
+            managerApprovalThreshold: 10000,
+            maximumCashBalance: 50000,
+            mandatoryCloseCount: true,
+            printClosingReport: true,
+            automaticRounding: true,
+            roundingUnit: 1,
+            safeDepositThreshold: 40000
+          }
         },
         {
           id: "card-preview",
@@ -115,7 +232,20 @@ const previewContext: PosContextState = {
           providerKey: null,
           maskedIdentifier: null,
           credentialsConfigured: false,
-          publicSettings: {}
+          publicSettings: {
+            connectionType: "wifi_4g",
+            contactless: true,
+            contactlessLimit: 5000,
+            fixedFee: 0,
+            maestro: true,
+            mastercard: true,
+            pinThreshold: 1000,
+            preAuthorization: false,
+            processingRate: 2.5,
+            terminalModel: "PAX A920 Pro",
+            terminalSerialNumber: "VY-PAX-2026-001",
+            visa: true
+          }
         }
       ],
       catalogItems: [

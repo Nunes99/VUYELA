@@ -7,7 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/secure_operational_flow_foundation.sql"),
   "utf8"
 );
-const posSettings = readFileSync(join(process.cwd(), "features/pos/pos-settings.tsx"), "utf8");
+const posPaymentSettings = readFileSync(
+  join(process.cwd(), "features/pos/pos-payment-settings.tsx"),
+  "utf8"
+);
 const posActions = readFileSync(join(process.cwd(), "features/pos/actions.ts"), "utf8");
 const privilegeMigration = readFileSync(
   join(process.cwd(), "supabase/migrations/restrict_operational_flow_privileges.sql"),
@@ -108,9 +111,13 @@ describe("operational flow security boundary", () => {
   });
 
   it("presents unconfigured providers honestly and rejects forged selection", () => {
-    expect(posSettings).not.toMatch(/•••• (2048|8170|4632|9021)/);
-    expect(posSettings).not.toContain("Online e operacional");
-    expect(posSettings.match(/statusLabel: "Por configurar"/g)).toHaveLength(3);
+    expect(posPaymentSettings).not.toMatch(/•••• (2048|8170|4632|9021)/);
+    expect(posPaymentSettings).not.toContain("Online e operacional");
+    expect(posPaymentSettings).toContain(
+      'unconfigured: { label: "Não configurado", tone: "muted" as const }'
+    );
+    expect(posPaymentSettings).toContain('testing: { label: "Aguarda teste"');
+    expect(posPaymentSettings).toContain("channel.status");
     expect(posActions).toContain("isAvailablePosPaymentMethod(paymentMethodValue)");
     expect(posActions).toContain(
       "Este método de pagamento ainda não está configurado para utilização."

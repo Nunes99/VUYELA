@@ -7,6 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/implement_pos_terminal_operations.sql"),
   "utf8"
 );
+const configurationMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/configure_pos_terminal_and_payment_channels.sql"),
+  "utf8"
+);
 const actions = readFileSync(join(process.cwd(), "features/pos/actions.ts"), "utf8");
 const settingsActions = readFileSync(
   join(process.cwd(), "features/pos/settings-actions.ts"),
@@ -52,9 +56,28 @@ describe("POS terminal operations contract", () => {
 
   it("routes configuration writes through protected server actions", () => {
     expect(settingsActions).toContain('requireRouteAccess("/pos"');
+    expect(settingsActions).toContain('rpc("configure_pos_terminal_section"');
+    expect(settingsActions).toContain('rpc("configure_business_payment_channel"');
     expect(settingsActions).toContain('rpc("manage_pos_terminal"');
     expect(settingsActions).toContain('rpc("update_pos_terminal_settings"');
     expect(settingsActions).toContain('rpc("manage_pos_terminal_device"');
     expect(settingsActions).toContain('rpc("manage_business_payment_channel"');
+  });
+
+  it("stores provider secrets in Vault without exposing them as public settings", () => {
+    expect(configurationMigration).toContain("create extension if not exists supabase_vault");
+    expect(configurationMigration).toContain("vault.create_secret");
+    expect(configurationMigration).toContain("vault.update_secret");
+    expect(configurationMigration).toContain("Secrets cannot be stored in public settings");
+    expect(configurationMigration).not.toContain("vault.decrypted_secrets");
+  });
+
+  it("validates tenant ownership and keeps the configuration RPCs authenticated", () => {
+    expect(configurationMigration).toContain("not public.can_manage_business(p_business_id)");
+    expect(configurationMigration).toContain("security definer");
+    expect(configurationMigration).toContain("set search_path = ''");
+    expect(configurationMigration).toMatch(
+      /revoke all on function public\.configure_business_payment_channel[\s\S]+from public, anon/
+    );
   });
 });

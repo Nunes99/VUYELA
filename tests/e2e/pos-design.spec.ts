@@ -16,20 +16,20 @@ const frames = [
 ] as const;
 
 const settingsFrames = [
-  ["geral", "Definições Gerais"],
-  ["dispositivos", "Dispositivos Conectados"],
-  ["impressora", "Impressoras"],
-  ["rede", "Rede e Conectividade"],
-  ["utilizadores", "Gestão de Utilizadores"],
-  ["seguranca", "Segurança e Acesso"]
+  ["geral", "Definições Gerais", "Geral"],
+  ["dispositivos", "Dispositivos Conectados", "Dispositivos"],
+  ["impressora", "Impressoras", "Impressora"],
+  ["rede", "Rede e Conectividade", "Rede"],
+  ["utilizadores", "Gestão de Utilizadores", "Utilizadores"],
+  ["seguranca", "Segurança e Acesso", "Segurança"]
 ] as const;
 
 const paymentFrames = [
-  ["mpesa", "Configuração M-Pesa"],
-  ["emola", "Configuração e-Mola"],
-  ["mkesh", "Configuração mKesh"],
-  ["dinheiro", "Configuração Dinheiro"],
-  ["cartao", "Configuração Cartão"]
+  ["mpesa", "M-Pesa — Configuração", "M-Pesa"],
+  ["emola", "e-Mola — Configuração", "e-Mola"],
+  ["mkesh", "Mkesh — Configuração", "Mkesh"],
+  ["dinheiro", "Dinheiro — Configuração", "Dinheiro"],
+  ["cartao", "Cartão — Configuração", "Cartão"]
 ] as const;
 
 test("renders the five approved POS frames without horizontal overflow", async ({ page }) => {
@@ -114,27 +114,38 @@ test("keeps lookup, catalogue, payment and confirmation controls functional", as
 });
 
 test("renders every settings and payment frame without horizontal overflow", async ({ page }) => {
-  for (const [view, heading] of settingsFrames) {
-    await page.goto(`/dev/pos?ecra=definicoes&vista=${view}`);
-    await expect(page.getByRole("heading", { exact: true, name: heading })).toBeVisible();
-    await expect(page.locator(".pos-settings-layout")).toBeVisible();
-    await expectNoHorizontalOverflow(page);
-  }
-
-  for (const [method, heading] of paymentFrames) {
-    await page.goto(`/dev/pos?ecra=pagamentos&metodo=${method}`);
-    await expect(page.getByRole("heading", { exact: true, name: heading })).toBeVisible();
-    await expect(page.locator(".pos-settings-layout")).toBeVisible();
-    await expectNoHorizontalOverflow(page);
-  }
-
   const viewport = page.viewportSize();
-  if (viewport && viewport.width <= 760) {
-    await expect(page.locator(".pos-settings-mobile-nav")).toBeVisible();
-    await expect(page.locator(".pos-settings-nav__desktop")).toBeHidden();
+  const isMobile = Boolean(viewport && viewport.width <= 760);
+
+  for (const [view, heading, mobileLabel] of settingsFrames) {
+    await page.goto(`/dev/pos?ecra=definicoes&vista=${view}`);
+    await expect(page.locator(".pos-figma-settings-layout")).toBeVisible();
+    if (isMobile) {
+      await expect(page.locator(".pos-figma-mobile-breadcrumb")).toContainText(mobileLabel);
+    } else {
+      await expect(page.getByRole("heading", { exact: true, name: heading })).toBeVisible();
+    }
+    await expectNoHorizontalOverflow(page);
+  }
+
+  for (const [method, heading, mobileLabel] of paymentFrames) {
+    await page.goto(`/dev/pos?ecra=pagamentos&metodo=${method}`);
+    await expect(page.locator(".pos-figma-settings-layout")).toBeVisible();
+    if (isMobile) {
+      await expect(page.locator(".pos-figma-mobile-breadcrumb")).toContainText(mobileLabel);
+    } else {
+      await expect(page.getByRole("heading", { exact: true, name: heading })).toBeVisible();
+    }
+    await expectNoHorizontalOverflow(page);
+  }
+
+  if (isMobile) {
+    await expect(page.locator(".pos-figma-mobile-nav")).toBeVisible();
+    await expect(page.locator(".pos-figma-side-links")).toBeHidden();
+    await expect(page.locator(".pos-figma-mobile-nav nav a")).toHaveCount(5);
   } else {
-    await expect(page.locator(".pos-settings-nav__desktop")).toBeVisible();
-    await expect(page.locator(".pos-settings-mobile-nav")).toBeHidden();
+    await expect(page.locator(".pos-figma-side-links")).toBeVisible();
+    await expect(page.locator(".pos-figma-mobile-nav")).toBeHidden();
   }
 });
 

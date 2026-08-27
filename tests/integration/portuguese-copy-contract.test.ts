@@ -33,7 +33,10 @@ function collectVisibleCopy(file: string): string[] {
 
   function appendCopy(value: string): void {
     const normalized = value.trim();
-    const looksTechnical = /^(?:\/|#|\.|@|https?:|[a-z0-9_@./?=&:#-]+$)/.test(normalized);
+    const looksTechnical =
+      /^(?:\/|#|\.|@|https?:)/.test(normalized) ||
+      /^[a-z0-9_@./?=&:#-]+$/.test(normalized) ||
+      /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(normalized);
 
     if (normalized && !looksTechnical) {
       copy.push(normalized);

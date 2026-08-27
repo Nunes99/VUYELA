@@ -19,18 +19,20 @@ As vistas são selecionadas por parâmetros validados no servidor. Não devem se
 
 ## Segurança das definições POS
 
-As páginas de definições representam o estado e os requisitos do terminal. Credenciais privadas dos provedores de pagamento não são enviadas para o navegador nem guardadas em estado de cliente. Uma integração futura deve persistir esses segredos apenas no servidor, com encriptação, RLS, validação de propriedade do negócio e auditoria.
+As páginas de definições representam o estado persistido do terminal. Credenciais privadas dos provedores de pagamento não são enviadas para o navegador nem guardadas em estado de cliente. A função `configure_business_payment_channel` guarda-as encriptadas no Supabase Vault, valida a propriedade do negócio e regista a alteração em auditoria sem incluir os valores secretos.
 
-Os campos públicos de configuração podem ser apresentados a partir de `business_payment_channels.public_settings`. Identificadores privados permanecem mascarados e a ativação de um canal continua dependente de uma configuração válida no servidor.
+Os campos não secretos são apresentados a partir de `business_payment_channels.public_settings`. Identificadores privados permanecem mascarados. Os canais de fornecedor ficam no estado `testing` depois de receberem credenciais e só devem passar a `active` após validação pelo adaptador oficial do fornecedor.
 
 ## Definições e pagamentos
 
 - As seis vistas de definições usam `/negocio/pos/definicoes?vista=...` e o mesmo componente responsivo.
 - Os cinco métodos de pagamento usam `/negocio/pos/definicoes/pagamentos?metodo=...` e partilham a mesma fronteira de segurança.
+- M-Pesa, e-Mola e mKesh expõem apenas os campos operacionais previstos no design e enviam segredos por ações de servidor para o Vault.
+- Dinheiro e cartão guardam limites, regras de fecho, arredondamento, terminal, bandeiras, contactless e custos de processamento na configuração pública autorizada.
 - Dados de negócio e filial apresentados no POS são carregados das fontes reais autorizadas por RLS.
 - Estados não suportados, como alteração de saldos offline, são apresentados como indisponíveis em vez de simulados.
 - Os frames mobile do grupo `584` são adaptações dos mesmos ecrãs; não constituem páginas ou aplicações paralelas.
 
 ## Responsividade
 
-No desktop, o portal de negócio e as definições do POS usam navegação lateral, enquanto o POS mantém o cabeçalho operacional. Em ecrãs pequenos, as grelhas convertem-se numa coluna e as definições usam uma barra inferior fixa com as opções secundárias no menu `Mais`. Nenhuma vista deve provocar deslocação horizontal da página.
+No desktop, o portal de negócio e as definições do POS usam navegação lateral, enquanto o POS mantém o cabeçalho operacional. Em ecrãs pequenos, as grelhas convertem-se numa coluna e as definições usam uma barra inferior fixa: seis secções nas definições e cinco métodos nos pagamentos. Todas as opções cabem na largura disponível, sem menu paralelo nem deslocação horizontal.

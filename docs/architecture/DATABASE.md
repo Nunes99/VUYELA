@@ -52,6 +52,12 @@ profile account state, and optional date of birth. Composite foreign keys preser
 The accompanying security migration enables RLS, keeps sensitive writes server-side, and exposes
 only a sanitized, tenant-checked POS configuration RPC.
 
+The POS configuration extension persists the Figma terminal sections inside
+`pos_terminal_settings.settings` through a validated, tenant-scoped RPC. Non-secret payment fields
+remain in `business_payment_channels.public_settings`; M-Pesa, e-Mola, and mKesh credentials are
+stored as encrypted Supabase Vault secrets. Saving provider credentials moves a channel to
+`testing`, while activation remains dependent on a verified provider adapter.
+
 ## Core Tables
 
 Identity and access preparation:

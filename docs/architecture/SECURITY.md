@@ -96,6 +96,13 @@ FASE 09 adds `lookup_pos_customer_card` for identifying active cards through a s
 terminal unless a persisted terminal record says so. Unconfigured provider methods are rejected
 by the current POS action before any loyalty RPC is called.
 
+`configure_pos_terminal_section` and `configure_business_payment_channel` accept only explicit
+per-section key allowlists and require `can_manage_business`. Both functions deny anonymous
+execution, use an empty `search_path`, and write tenant audit events. Provider secrets are written
+to Supabase Vault and are neither copied to `public_settings` nor returned by an application-facing
+RPC. A saved provider configuration remains in `testing` until a real provider integration confirms
+it.
+
 ## PWA Security
 
 FASE 18 never caches authenticated dashboard HTML, API responses, Supabase requests, balances,
