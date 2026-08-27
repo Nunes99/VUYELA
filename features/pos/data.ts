@@ -6,6 +6,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 interface BusinessRow {
   id: string;
   name: string;
+  phone: string | null;
+  email: string | null;
 }
 
 interface BranchRow {
@@ -13,6 +15,8 @@ interface BranchRow {
   business_id: string;
   name: string;
   city: string;
+  phone: string | null;
+  address_line: string | null;
   is_primary: boolean;
 }
 
@@ -21,6 +25,8 @@ export interface PosBranchContext {
   businessId: string;
   name: string;
   city: string;
+  phone: string | null;
+  addressLine: string | null;
 }
 
 export type PosTerminalStatus = "provisioning" | "active" | "suspended" | "revoked";
@@ -87,6 +93,8 @@ export interface PosCatalogItemContext {
 export interface PosBusinessContext {
   id: string;
   name: string;
+  phone: string | null;
+  email: string | null;
   branches: PosBranchContext[];
   defaultBranchId: string;
   requiresBranch: boolean;
@@ -134,10 +142,14 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   const supabase = await createSupabaseServerClient();
   const [{ data: businessData, error: businessError }, { data: branchData, error: branchError }] =
     await Promise.all([
-      supabase.from("businesses").select("id, name").in("id", businessIds).eq("status", "active"),
+      supabase
+        .from("businesses")
+        .select("id, name, phone, email")
+        .in("id", businessIds)
+        .eq("status", "active"),
       supabase
         .from("branches")
-        .select("id, business_id, name, city, is_primary")
+        .select("id, business_id, name, city, phone, address_line, is_primary")
         .in("business_id", businessIds)
         .eq("is_active", true)
         .order("is_primary", { ascending: false })
@@ -178,6 +190,8 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
       return {
         id: business.id,
         name: business.name,
+        phone: business.phone,
+        email: business.email,
         branches,
         defaultBranchId,
         requiresBranch: !hasBusinessWideAccess,
@@ -407,7 +421,9 @@ function groupBranches(branches: BranchRow[]) {
         id: branch.id,
         businessId: branch.business_id,
         name: branch.name,
-        city: branch.city
+        city: branch.city,
+        phone: branch.phone,
+        addressLine: branch.address_line
       }
     ]);
   }

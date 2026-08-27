@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 test.setTimeout(180_000);
 
@@ -12,6 +13,23 @@ const frames = [
     heading: "Transação concluída com sucesso!",
     activeLabel: "Concluído"
   }
+] as const;
+
+const settingsFrames = [
+  ["geral", "Definições Gerais"],
+  ["dispositivos", "Dispositivos Conectados"],
+  ["impressora", "Impressoras"],
+  ["rede", "Rede e Conectividade"],
+  ["utilizadores", "Gestão de Utilizadores"],
+  ["seguranca", "Segurança e Acesso"]
+] as const;
+
+const paymentFrames = [
+  ["mpesa", "Configuração M-Pesa"],
+  ["emola", "Configuração e-Mola"],
+  ["mkesh", "Configuração mKesh"],
+  ["dinheiro", "Configuração Dinheiro"],
+  ["cartao", "Configuração Cartão"]
 ] as const;
 
 test("renders the five approved POS frames without horizontal overflow", async ({ page }) => {
@@ -94,3 +112,37 @@ test("keeps lookup, catalogue, payment and confirmation controls functional", as
   await page.getByRole("button", { name: "Voltar ao pagamento" }).click();
   await expect(page.getByRole("heading", { name: "Autorizar Pagamento" })).toBeVisible();
 });
+
+test("renders every settings and payment frame without horizontal overflow", async ({ page }) => {
+  for (const [view, heading] of settingsFrames) {
+    await page.goto(`/dev/pos?ecra=definicoes&vista=${view}`);
+    await expect(page.getByRole("heading", { exact: true, name: heading })).toBeVisible();
+    await expect(page.locator(".pos-settings-layout")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  }
+
+  for (const [method, heading] of paymentFrames) {
+    await page.goto(`/dev/pos?ecra=pagamentos&metodo=${method}`);
+    await expect(page.getByRole("heading", { exact: true, name: heading })).toBeVisible();
+    await expect(page.locator(".pos-settings-layout")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  }
+
+  const viewport = page.viewportSize();
+  if (viewport && viewport.width <= 760) {
+    await expect(page.locator(".pos-settings-mobile-nav")).toBeVisible();
+    await expect(page.locator(".pos-settings-nav__desktop")).toBeHidden();
+  } else {
+    await expect(page.locator(".pos-settings-nav__desktop")).toBeVisible();
+    await expect(page.locator(".pos-settings-mobile-nav")).toBeHidden();
+  }
+});
+
+async function expectNoHorizontalOverflow(page: Page) {
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  }));
+
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+}

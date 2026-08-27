@@ -342,6 +342,8 @@ function IdentifyForm({
   const firstBusiness = businesses[0] ?? {
     id: "",
     name: "Negócio VUYELA",
+    phone: null,
+    email: null,
     branches: [],
     defaultBranchId: "",
     requiresBranch: true,

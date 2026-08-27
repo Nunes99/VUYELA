@@ -4,6 +4,12 @@ import { ProtectedRouteStateView } from "@/components/auth/protected-route-state
 import type { PosContextState } from "@/features/pos/data";
 import type { PosPaymentMethod, PosStepId } from "@/features/pos/model";
 import { PosPortalShell } from "@/features/pos/pos-shell";
+import {
+  parsePosPaymentView,
+  parsePosSettingsView,
+  PosPaymentSettingsView,
+  PosSettingsView
+} from "@/features/pos/pos-settings";
 import type { PosActionState } from "@/features/pos/state";
 import { initialPosActionState } from "@/features/pos/state";
 import { PosWorkflow } from "@/features/pos/pos-workflow";
@@ -30,12 +36,16 @@ const previewContext: PosContextState = {
     {
       id: "business-preview",
       name: "Barbershop 21",
+      phone: "+258 84 123 4567",
+      email: "pos@barbershop21.co.mz",
       branches: [
         {
           id: "branch-preview",
           businessId: "business-preview",
           name: "Filial Principal",
-          city: "Maputo"
+          city: "Maputo",
+          phone: "+258 84 123 4567",
+          addressLine: "Av. Julius Nyerere, Maputo"
         }
       ],
       defaultBranchId: "branch-preview",
@@ -62,7 +72,24 @@ const previewContext: PosContextState = {
             inactivityTimeoutMinutes: 15,
             allowedLookupMethods: ["qr", "card", "phone"]
           },
-          devices: []
+          devices: [
+            {
+              id: "camera-preview",
+              type: "camera",
+              label: "Leitor QR Principal",
+              deviceReference: "CAM-POS-001",
+              status: "active",
+              lastSeenAt: new Date().toISOString()
+            },
+            {
+              id: "printer-preview",
+              type: "printer",
+              label: "Impressora Térmica",
+              deviceReference: "USB-PRINTER-001",
+              status: "active",
+              lastSeenAt: new Date().toISOString()
+            }
+          ]
         }
       ],
       paymentChannels: [
@@ -185,6 +212,10 @@ export default async function PosPreviewPage({
   const params = await searchParams;
   const step = stepFrom(params.etapa);
   const paymentMethod: PosPaymentMethod | null = step === "confirm" ? "cash" : null;
+  const screen = typeof params.ecra === "string" ? params.ecra : "transacao";
+  const settingsView = parsePosSettingsView(params.vista);
+  const paymentView = parsePosPaymentView(params.metodo);
+  const isSettings = screen === "definicoes" || screen === "pagamentos";
 
   return (
     <ProtectedRouteStateView
@@ -192,13 +223,23 @@ export default async function PosPreviewPage({
       title="POS VUYELA"
       variant="pos"
     >
-      <PosPortalShell context={previewContext} principal={previewPrincipal}>
-        <PosWorkflow
-          context={previewContext}
-          initialPaymentMethod={paymentMethod}
-          initialState={previewState(step)}
-          key={step}
-        />
+      <PosPortalShell
+        context={previewContext}
+        principal={previewPrincipal}
+        section={isSettings ? "settings" : "transaction"}
+      >
+        {screen === "definicoes" ? (
+          <PosSettingsView context={previewContext} view={settingsView} />
+        ) : screen === "pagamentos" ? (
+          <PosPaymentSettingsView context={previewContext} method={paymentView} />
+        ) : (
+          <PosWorkflow
+            context={previewContext}
+            initialPaymentMethod={paymentMethod}
+            initialState={previewState(step)}
+            key={step}
+          />
+        )}
       </PosPortalShell>
     </ProtectedRouteStateView>
   );

@@ -1,10 +1,14 @@
 import Link from "next/link";
 import {
+  ArrowLeft,
   Banknote,
   CheckCircle2,
   CreditCard,
+  DatabaseBackup,
   EthernetPort,
   Fingerprint,
+  Gauge,
+  HardDrive,
   KeyRound,
   Languages,
   LockKeyhole,
@@ -12,17 +16,23 @@ import {
   Network,
   Plus,
   Printer,
+  QrCode,
   ReceiptText,
-  Router,
+  RefreshCcw,
+  ScanLine,
+  Server,
   Settings2,
   ShieldCheck,
   Smartphone,
   Store,
   Trash2,
+  Usb,
   UserCog,
   UsersRound,
+  Volume2,
   WalletCards,
-  Wifi
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -95,6 +105,42 @@ const paymentNavigation: Array<{
   { id: "cartao", label: "Cartão", icon: CreditCard }
 ];
 
+const settingsPageCopy: Record<
+  PosSettingsViewId,
+  { eyebrow: string; title: string; body: string }
+> = {
+  geral: {
+    eyebrow: "Definições do sistema",
+    title: "Definições Gerais",
+    body: "Informações do negócio, região, recibos e comportamento do terminal."
+  },
+  dispositivos: {
+    eyebrow: "Hardware do terminal",
+    title: "Dispositivos Conectados",
+    body: "Leitores, câmaras e periféricos autorizados para este terminal."
+  },
+  impressora: {
+    eyebrow: "Impressão e recibos",
+    title: "Impressoras",
+    body: "Estado das impressoras e conteúdo dos comprovativos VUYELA."
+  },
+  rede: {
+    eyebrow: "Conectividade do POS",
+    title: "Rede e Conectividade",
+    body: "Ligação segura, sincronização e proteção contra interrupções."
+  },
+  utilizadores: {
+    eyebrow: "Acessos do terminal",
+    title: "Gestão de Utilizadores",
+    body: "Funções autorizadas e ligação à equipa do negócio."
+  },
+  seguranca: {
+    eyebrow: "Proteção da operação",
+    title: "Segurança e Acesso",
+    body: "Sessões, auditoria e garantias aplicadas às transações."
+  }
+};
+
 export function PosSettingsView({
   context,
   view,
@@ -116,6 +162,7 @@ export function PosSettingsView({
     business?.terminals.find((item) => item.status === "active") ??
     business?.terminals[0];
   const branch = business?.branches.find((item) => item.id === terminal?.branchId);
+  const pageCopy = settingsPageCopy[view];
 
   return (
     <div className="pos-settings-layout">
@@ -123,15 +170,15 @@ export function PosSettingsView({
       <section className="pos-settings-main">
         <PosSettingsResult result={result} />
         <SettingsHeader
-          eyebrow="Definições do terminal"
-          title={settingsNavigation.find((item) => item.id === view)?.label ?? "Geral"}
-          body={`${business?.name ?? "Negócio VUYELA"} · ${branch?.name ?? "Sede principal"}`}
+          eyebrow={pageCopy.eyebrow}
+          title={pageCopy.title}
+          body={`${pageCopy.body} ${business?.name ?? "Negócio VUYELA"} · ${branch?.name ?? "Sede principal"}`}
         />
         {view === "geral" ? <GeneralSettings business={business} terminal={terminal} /> : null}
         {view === "dispositivos" ? (
           <DeviceSettings business={business} terminal={terminal} />
         ) : null}
-        {view === "impressora" ? <PrinterSettings terminal={terminal} /> : null}
+        {view === "impressora" ? <PrinterSettings business={business} terminal={terminal} /> : null}
         {view === "rede" ? <NetworkSettings terminal={terminal} /> : null}
         {view === "utilizadores" ? <UserSettings roles={business?.roleLabels ?? []} /> : null}
         {view === "seguranca" ? <SecuritySettings /> : null}
@@ -167,13 +214,13 @@ export function PosPaymentSettingsView({
 
   return (
     <div className="pos-settings-layout">
-      <PosSettingsNavigation active="pagamentos" />
+      <PosSettingsNavigation active="pagamentos" paymentMethod={method} />
       <section className="pos-settings-main">
         <PosSettingsResult result={result} />
         <SettingsHeader
           eyebrow="Métodos de pagamento"
-          title="Configuração de pagamentos"
-          body="Estado dos canais aceites no terminal VUYELA"
+          title={`Configuração ${config.label}`}
+          body="Configure a disponibilidade e confirme o estado operacional deste canal no POS VUYELA."
         />
         <nav aria-label="Métodos de pagamento" className="pos-payment-tabs">
           {paymentNavigation.map((item) => {
@@ -195,7 +242,7 @@ export function PosPaymentSettingsView({
         <div className="pos-settings-grid pos-settings-grid--payment">
           <SettingsCard
             className="pos-payment-provider"
-            title={config.label}
+            title="Estado da integração"
             icon={<Icon size={22} />}
           >
             <div className="pos-payment-provider__status">
@@ -215,6 +262,7 @@ export function PosPaymentSettingsView({
               />
               <Fact label="Moeda" value="Metical moçambicano (MZN)" />
               <Fact label="Confirmação" value={config.confirmation} />
+              <Fact label="Ambiente" value={publicSetting(channel, "environment", "Produção")} />
             </dl>
           </SettingsCard>
 
@@ -240,61 +288,102 @@ export function PosPaymentSettingsView({
                   }
                 />
                 <p>
-                  Quando forem disponibilizadas, as credenciais serão guardadas exclusivamente no
-                  servidor e nunca serão enviadas para este navegador.
+                  As chaves privadas são guardadas exclusivamente no servidor. Este ecrã mostra
+                  apenas o identificador mascarado e o estado da integração.
                 </p>
               </div>
             )}
           </SettingsCard>
-        </div>
+          <SettingsCard title="Limites e confirmação" icon={<Gauge size={20} />}>
+            <dl className="pos-settings-facts">
+              <Fact
+                label="Valor mínimo"
+                value={publicSetting(channel, "minimumAmount", "Sem limite")}
+              />
+              <Fact
+                label="Valor máximo"
+                value={publicSetting(channel, "maximumAmount", "Sem limite")}
+              />
+              <Fact label="Tempo limite" value={publicSetting(channel, "timeout", "60 segundos")} />
+              <Fact
+                label="Notificação"
+                value={publicSetting(
+                  channel,
+                  "notification",
+                  config.mode === "manual" ? "No POS" : "Confirmação do provedor"
+                )}
+              />
+            </dl>
+          </SettingsCard>
 
-        <SettingsCard title="Disponibilidade no POS" icon={<CheckCircle2 size={20} />}>
-          <div className="pos-setting-row">
-            <div>
-              <strong>Apresentar {config.label}</strong>
-              <p>
-                {enabled
-                  ? "Disponível com confirmação manual na etapa de autorização."
-                  : "Oculto até existir uma configuração válida para este negócio."}
-              </p>
-            </div>
-            <span
-              aria-checked={enabled}
-              aria-label={`${config.label} disponível`}
-              className={`pos-readonly-toggle${enabled ? " is-active" : ""}`}
-              role="switch"
-            >
-              <span />
-            </span>
-          </div>
-          {enabled ? (
-            <div className="pos-settings-actions">
-              <Link
-                className="pos-settings-button pos-settings-button--secondary"
-                href={posAppRoutes.root}
+          <SettingsCard title="Disponibilidade no POS" icon={<CheckCircle2 size={20} />}>
+            <div className="pos-setting-row">
+              <div>
+                <strong>Apresentar {config.label}</strong>
+                <p>
+                  {enabled
+                    ? config.mode === "manual"
+                      ? "Disponível com confirmação do operador na etapa de autorização."
+                      : "Disponível após confirmação segura do provedor."
+                    : "Oculto até existir uma configuração válida para este negócio."}
+                </p>
+              </div>
+              <span
+                aria-checked={enabled}
+                aria-label={`${config.label} disponível`}
+                className={`pos-readonly-toggle${enabled ? " is-active" : ""}`}
+                role="switch"
               >
-                Testar confirmação manual
-              </Link>
-              {business?.canManage && channel ? (
+                <span />
+              </span>
+            </div>
+            {enabled ? (
+              <div className="pos-settings-actions">
+                <Link
+                  className="pos-settings-button pos-settings-button--secondary"
+                  href={posAppRoutes.root}
+                >
+                  Testar confirmação manual
+                </Link>
+                {business?.canManage && channel ? (
+                  <PaymentChannelForm
+                    businessId={business.id}
+                    channel={channel}
+                    label="Suspender no POS"
+                    operation="suspend"
+                  />
+                ) : null}
+              </div>
+            ) : business?.canManage && channel?.mode === "manual" ? (
+              <div className="pos-settings-actions">
                 <PaymentChannelForm
                   businessId={business.id}
                   channel={channel}
-                  label="Suspender no POS"
-                  operation="suspend"
+                  label="Ativar no POS"
+                  operation="activate"
                 />
-              ) : null}
-            </div>
-          ) : business?.canManage && channel?.mode === "manual" ? (
-            <div className="pos-settings-actions">
-              <PaymentChannelForm
-                businessId={business.id}
-                channel={channel}
-                label="Ativar no POS"
-                operation="activate"
-              />
-            </div>
-          ) : null}
-        </SettingsCard>
+              </div>
+            ) : null}
+          </SettingsCard>
+
+          <SettingsCard
+            className="pos-settings-span"
+            title="Reconciliação e segurança"
+            icon={<RefreshCcw size={20} />}
+          >
+            <SettingsRows
+              rows={[
+                [
+                  "Reconciliação",
+                  config.mode === "manual" ? "Confirmada pelo operador" : "Processada pelo provedor"
+                ],
+                ["Registo do pagamento", "Obrigatório em transaction_payments"],
+                ["Proteção contra duplicação", "Chave de idempotência por operação"],
+                ["Credenciais", config.mode === "manual" ? "Não aplicável" : "Geridas no servidor"]
+              ]}
+            />
+          </SettingsCard>
+        </div>
       </section>
     </div>
   );
@@ -302,44 +391,134 @@ export function PosPaymentSettingsView({
 
 function PosSettingsNavigation({
   active,
-  terminalId
+  terminalId,
+  paymentMethod
 }: {
   active: PosSettingsViewId | "pagamentos";
   terminalId?: string;
+  paymentMethod?: PosPaymentViewId;
 }) {
+  const isPaymentMenu = paymentMethod !== undefined;
+
   return (
-    <aside className="pos-settings-nav">
-      <div>
-        <span>CONFIGURAÇÃO</span>
-        <strong>Terminal POS</strong>
+    <aside className={`pos-settings-nav${isPaymentMenu ? " pos-settings-nav--payments" : ""}`}>
+      <div className="pos-settings-nav__heading">
+        <span>{isPaymentMenu ? "CONFIGURAÇÃO" : "CONFIGURAÇÕES POS"}</span>
+        <strong>{isPaymentMenu ? "Métodos de Pagamento" : "Definições do Terminal"}</strong>
       </div>
-      <nav aria-label="Definições do terminal">
-        {settingsNavigation.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link
-              aria-current={active === item.id ? "page" : undefined}
-              className={active === item.id ? "is-active" : undefined}
-              href={`${posAppRoutes.settings}?vista=${item.id}${terminalId ? `&terminal=${terminalId}` : ""}`}
-              key={item.id}
-            >
-              <Icon aria-hidden="true" size={18} />
-              {item.label}
+      <nav aria-label="Definições do terminal" className="pos-settings-nav__desktop">
+        {isPaymentMenu ? (
+          <>
+            <Link className="pos-settings-nav__return" href={posAppRoutes.settings}>
+              <ArrowLeft aria-hidden="true" size={18} />
+              Voltar às configurações
             </Link>
-          );
-        })}
+            {paymentNavigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  aria-current={paymentMethod === item.id ? "page" : undefined}
+                  className={paymentMethod === item.id ? "is-active" : undefined}
+                  href={`${posAppRoutes.payments}?metodo=${item.id}`}
+                  key={item.id}
+                >
+                  <Icon aria-hidden="true" size={18} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </>
+        ) : (
+          <>
+            {settingsNavigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  aria-current={active === item.id ? "page" : undefined}
+                  className={active === item.id ? "is-active" : undefined}
+                  href={`${posAppRoutes.settings}?vista=${item.id}${terminalId ? `&terminal=${terminalId}` : ""}`}
+                  key={item.id}
+                >
+                  <Icon aria-hidden="true" size={18} />
+                  {item.label}
+                </Link>
+              );
+            })}
+            <Link
+              aria-current={active === "pagamentos" ? "page" : undefined}
+              className={active === "pagamentos" ? "is-active" : undefined}
+              href={posAppRoutes.payments}
+            >
+              <WalletCards aria-hidden="true" size={18} />
+              Pagamentos
+            </Link>
+          </>
+        )}
+      </nav>
+      <Link className="pos-settings-nav__back" href={posAppRoutes.root}>
+        <ArrowLeft aria-hidden="true" size={17} />
+        Voltar ao POS
+      </Link>
+      <nav aria-label="Navegação móvel do POS" className="pos-settings-mobile-nav">
+        <Link href={posAppRoutes.root}>
+          <Store aria-hidden="true" size={19} />
+          <span>POS</span>
+        </Link>
+        <Link
+          aria-current={active === "geral" ? "page" : undefined}
+          className={active === "geral" ? "is-active" : undefined}
+          href={`${posAppRoutes.settings}?vista=geral${terminalId ? `&terminal=${terminalId}` : ""}`}
+        >
+          <Settings2 aria-hidden="true" size={19} />
+          <span>Geral</span>
+        </Link>
+        <Link
+          aria-current={active === "dispositivos" ? "page" : undefined}
+          className={active === "dispositivos" ? "is-active" : undefined}
+          href={`${posAppRoutes.settings}?vista=dispositivos${terminalId ? `&terminal=${terminalId}` : ""}`}
+        >
+          <MonitorSmartphone aria-hidden="true" size={19} />
+          <span>Dispositivos</span>
+        </Link>
         <Link
           aria-current={active === "pagamentos" ? "page" : undefined}
           className={active === "pagamentos" ? "is-active" : undefined}
           href={posAppRoutes.payments}
         >
-          <WalletCards aria-hidden="true" size={18} />
-          Pagamentos
+          <WalletCards aria-hidden="true" size={19} />
+          <span>Pagamentos</span>
         </Link>
+        <details
+          className={
+            active === "impressora" ||
+            active === "rede" ||
+            active === "utilizadores" ||
+            active === "seguranca"
+              ? "is-active"
+              : undefined
+          }
+        >
+          <summary>
+            <Settings2 aria-hidden="true" size={19} />
+            <span>Mais</span>
+          </summary>
+          <div>
+            {settingsNavigation.slice(2).map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  aria-current={active === item.id ? "page" : undefined}
+                  href={`${posAppRoutes.settings}?vista=${item.id}${terminalId ? `&terminal=${terminalId}` : ""}`}
+                  key={item.id}
+                >
+                  <Icon aria-hidden="true" size={18} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </details>
       </nav>
-      <Link className="pos-settings-nav__back" href={posAppRoutes.root}>
-        Voltar ao POS
-      </Link>
     </aside>
   );
 }
@@ -355,52 +534,85 @@ function GeneralSettings({
   const branch = business.branches.find((item) => item.id === terminal?.branchId);
 
   return (
-    <div className="pos-settings-grid">
-      <SettingsCard title="Identificação do terminal" icon={<Store size={20} />}>
-        <dl className="pos-settings-facts">
-          <Fact label="Negócio" value={business.name} />
-          <Fact label="Filial" value={branch?.name ?? "Não selecionada"} />
-          <Fact label="Terminal" value={terminal?.name ?? "Não registado"} />
-          <Fact label="Código" value={terminal?.code ?? "-"} />
-          <Fact label="Estado" value={terminalStatusLabel(terminal?.status)} />
-        </dl>
-      </SettingsCard>
-      <SettingsCard title="Localização e formato" icon={<Languages size={20} />}>
-        <dl className="pos-settings-facts">
-          <Fact label="Idioma" value={terminal?.settings.locale ?? "pt-MZ"} />
-          <Fact label="Moeda" value={`${terminal?.settings.currency ?? "MZN"} · Metical`} />
-          <Fact label="Fuso horário" value={terminal?.settings.timezone ?? "Africa/Maputo"} />
-          <Fact label="Formato de data" value="DD/MM/AAAA" />
-        </dl>
-      </SettingsCard>
+    <div className="pos-settings-stack">
       <SettingsCard
         className="pos-settings-span"
-        title="Terminais do negócio"
-        icon={<MonitorSmartphone size={20} />}
+        title="Informações do Negócio"
+        icon={<Store size={20} />}
       >
-        <div className="pos-terminal-list">
-          {business.terminals.map((item) => (
-            <div className={item.id === terminal?.id ? "is-active" : undefined} key={item.id}>
-              <Link href={`${posAppRoutes.settings}?vista=geral&terminal=${item.id}`}>
-                <strong>{item.name}</strong>
-                <small>
-                  {item.code} · {terminalStatusLabel(item.status)}
-                </small>
-              </Link>
-              {business.canManage ? (
-                <TerminalStateActions businessId={business.id} terminal={item} />
-              ) : null}
-            </div>
-          ))}
+        <div className="pos-settings-field-grid">
+          <ReadOnlyField label="Nome da empresa" value={business.name} />
+          <ReadOnlyField label="NIF / NUIT" value="Protegido na gestão do negócio" />
+          <ReadOnlyField
+            label="Endereço"
+            value={
+              branch?.addressLine
+                ? `${branch.addressLine}, ${branch.city}`
+                : (branch?.city ?? "Por configurar")
+            }
+          />
+          <ReadOnlyField
+            label="Telefone"
+            value={branch?.phone ?? business.phone ?? "Por configurar"}
+          />
+          <ReadOnlyField label="Email" value={business.email ?? "Por configurar"} />
+          <ReadOnlyField label="Filial ativa" value={branch?.name ?? "Não selecionada"} />
         </div>
-        {business.canManage ? <TerminalCreateForm business={business} /> : null}
+        {business.canManage ? (
+          <Link
+            className="pos-settings-button pos-settings-button--secondary"
+            href="/negocio/definicoes"
+          >
+            Editar informações
+          </Link>
+        ) : null}
       </SettingsCard>
+
+      <div className="pos-settings-grid">
+        <SettingsCard title="Moeda e Região" icon={<Languages size={20} />}>
+          <dl className="pos-settings-facts">
+            <Fact
+              label="Moeda padrão"
+              value={`${terminal?.settings.currency ?? "MZN"} · Metical`}
+            />
+            <Fact label="Fuso horário" value={terminal?.settings.timezone ?? "Africa/Maputo"} />
+            <Fact label="Formato de data" value="DD/MM/AAAA" />
+            <Fact label="Idioma do sistema" value={terminal?.settings.locale ?? "pt-MZ"} />
+          </dl>
+        </SettingsCard>
+
+        <SettingsCard title="Terminal Atual" icon={<MonitorSmartphone size={20} />}>
+          <dl className="pos-settings-facts">
+            <Fact label="Nome" value={terminal?.name ?? "Não registado"} />
+            <Fact label="Código" value={terminal?.code ?? "-"} />
+            {terminal?.status === "active" ? (
+              <Fact label="Estado" value="Ativo" tone="success" />
+            ) : (
+              <Fact label="Estado" value={terminalStatusLabel(terminal?.status)} />
+            )}
+            <Fact
+              label="Última atividade"
+              value={
+                terminal?.lastSeenAt ? formatDateTime(terminal.lastSeenAt) : "Ainda sem atividade"
+              }
+            />
+          </dl>
+        </SettingsCard>
+      </div>
+
       {terminal ? (
         <SettingsCard
           className="pos-settings-span"
-          title="Comportamento da caixa"
+          title="Personalização do Recibo e da Caixa"
           icon={<ReceiptText size={20} />}
         >
+          <div className="pos-settings-callout pos-settings-callout--muted">
+            <ReceiptText aria-hidden="true" size={23} />
+            <div>
+              <strong>Identidade VUYELA aplicada</strong>
+              <p>O comprovativo inclui negócio, filial, YELAS e referência de auditoria.</p>
+            </div>
+          </div>
           {business.canManage ? (
             <form action={updatePosTerminalSettingsAction} className="pos-persistent-form">
               <input name="businessId" type="hidden" value={business.id} />
@@ -454,7 +666,7 @@ function GeneralSettings({
                 />
               </label>
               <button className="pos-settings-button" type="submit">
-                Guardar definições
+                Guardar alterações
               </button>
             </form>
           ) : (
@@ -474,6 +686,29 @@ function GeneralSettings({
           )}
         </SettingsCard>
       ) : null}
+
+      <SettingsCard
+        className="pos-settings-span"
+        title="Terminais do negócio"
+        icon={<MonitorSmartphone size={20} />}
+      >
+        <div className="pos-terminal-list">
+          {business.terminals.map((item) => (
+            <div className={item.id === terminal?.id ? "is-active" : undefined} key={item.id}>
+              <Link href={`${posAppRoutes.settings}?vista=geral&terminal=${item.id}`}>
+                <strong>{item.name}</strong>
+                <small>
+                  {item.code} · {terminalStatusLabel(item.status)}
+                </small>
+              </Link>
+              {business.canManage ? (
+                <TerminalStateActions businessId={business.id} terminal={item} />
+              ) : null}
+            </div>
+          ))}
+        </div>
+        {business.canManage ? <TerminalCreateForm business={business} /> : null}
+      </SettingsCard>
     </div>
   );
 }
@@ -490,80 +725,192 @@ function DeviceSettings({
   }
 
   return (
-    <div className="pos-settings-grid">
-      {terminal.devices.map((device) => (
-        <SettingsCard title={device.label} icon={<MonitorSmartphone size={22} />} key={device.id}>
-          <p className="pos-settings-copy">
-            {deviceTypeLabel(device.type)} · {device.deviceReference}
-          </p>
-          <span
-            className={`pos-config-status pos-config-status--${device.status === "active" ? "success" : "muted"}`}
-          >
-            {deviceStatusLabel(device.status)}
-          </span>
-          {business.canManage ? (
-            <DeviceStateActions businessId={business.id} device={device} terminalId={terminal.id} />
-          ) : null}
+    <div className="pos-settings-stack">
+      <SettingsCard
+        className="pos-settings-span"
+        title="Leitores e Periféricos"
+        icon={<Usb size={20} />}
+      >
+        {terminal.devices.length > 0 ? (
+          <div className="pos-device-list">
+            {terminal.devices.map((device) => (
+              <div className="pos-device-list__item" key={device.id}>
+                <span className="pos-device-list__icon">
+                  <MonitorSmartphone aria-hidden="true" size={21} />
+                </span>
+                <div>
+                  <strong>{device.label}</strong>
+                  <small>
+                    {deviceTypeLabel(device.type)} · {device.deviceReference}
+                  </small>
+                  {device.lastSeenAt ? (
+                    <small>Visto em {formatDateTime(device.lastSeenAt)}</small>
+                  ) : null}
+                </div>
+                <span
+                  className={`pos-config-status pos-config-status--${device.status === "active" ? "success" : "muted"}`}
+                >
+                  {deviceStatusLabel(device.status)}
+                </span>
+                {business.canManage ? (
+                  <DeviceStateActions
+                    businessId={business.id}
+                    device={device}
+                    terminalId={terminal.id}
+                  />
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="pos-settings-empty">
+            <ScanLine aria-hidden="true" size={25} />
+            <div>
+              <strong>Nenhum dispositivo registado</strong>
+              <p>Registe o leitor, a câmara ou a impressora ligada a este terminal.</p>
+            </div>
+          </div>
+        )}
+      </SettingsCard>
+
+      <SettingsCard
+        className="pos-settings-span"
+        title="Códigos Suportados"
+        icon={<QrCode size={20} />}
+      >
+        <div className="pos-capability-grid">
+          {[
+            ["QR Code", terminal.settings.allowedLookupMethods.includes("qr")],
+            ["Número de cartão VUYELA", terminal.settings.allowedLookupMethods.includes("card")],
+            ["Telefone", terminal.settings.allowedLookupMethods.includes("phone")],
+            ["EAN-13", false],
+            ["Code 128", false],
+            ["DataMatrix", false]
+          ].map(([label, enabled]) => (
+            <div key={String(label)}>
+              <span>{label}</span>
+              <ReadonlyToggle active={Boolean(enabled)} label={`${label} suportado`} />
+            </div>
+          ))}
+        </div>
+      </SettingsCard>
+
+      <div className="pos-settings-grid">
+        <SettingsCard title="Preferências de Leitura" icon={<Volume2 size={20} />}>
+          <SettingsRows
+            rows={[
+              ["Som de confirmação", "Ativo no dispositivo"],
+              ["Vibração", "Conforme o equipamento"],
+              ["Leitura contínua", "Desativada por segurança"]
+            ]}
+          />
         </SettingsCard>
-      ))}
-      {terminal.devices.length === 0 ? (
-        <DeviceCard
-          icon={<MonitorSmartphone size={22} />}
-          name="Sem dispositivos"
-          detail="Registe um dispositivo para este terminal."
-          status="Por configurar"
-          muted
-        />
-      ) : null}
+        <SettingsCard title="Política dos Dispositivos" icon={<ShieldCheck size={20} />}>
+          <SettingsRows
+            rows={[
+              ["Acesso à câmara", "Apenas durante a leitura do QR Code"],
+              ["Dados locais", "Nenhum dado sensível"],
+              ["Sessão", "Controlada pela autenticação segura"]
+            ]}
+          />
+        </SettingsCard>
+      </div>
+
       {business.canManage ? (
         <DeviceCreateForm businessId={business.id} terminalId={terminal.id} />
       ) : null}
-      <SettingsCard
-        className="pos-settings-span"
-        title="Política dos dispositivos"
-        icon={<ShieldCheck size={20} />}
-      >
-        <SettingsRows
-          rows={[
-            ["Acesso à câmara", "Apenas durante a leitura do QR Code"],
-            ["Dados guardados localmente", "Nenhum dado sensível"],
-            ["Tempo limite da sessão", "Controlado pela autenticação segura"]
-          ]}
-        />
-      </SettingsCard>
     </div>
   );
 }
 
-function PrinterSettings({ terminal }: { terminal?: PosTerminalContext }) {
-  const printer = terminal?.devices.find(
-    (device) => device.type === "printer" && device.status === "active"
-  );
+function PrinterSettings({
+  business,
+  terminal
+}: {
+  business?: PosBusinessContext;
+  terminal?: PosTerminalContext;
+}) {
+  const printers = terminal?.devices.filter((device) => device.type === "printer") ?? [];
+  const activePrinter = printers.find((device) => device.status === "active");
+
   return (
-    <div className="pos-settings-grid">
-      <SettingsCard title="Impressora de recibos" icon={<Printer size={20} />}>
-        <div className="pos-settings-callout pos-settings-callout--muted">
-          <Printer size={24} />
-          <div>
-            <strong>{printer ? printer.label : "Impressora não ligada"}</strong>
-            <p>
-              {printer
-                ? "Dispositivo ativo neste terminal."
-                : "O comprovativo digital continua sempre disponível."}
-            </p>
+    <div className="pos-settings-stack">
+      <SettingsCard
+        className="pos-settings-span"
+        title="Impressoras Configuradas"
+        icon={<Printer size={20} />}
+      >
+        {printers.length > 0 && terminal ? (
+          <div className="pos-device-list">
+            {printers.map((printer) => (
+              <div className="pos-device-list__item" key={printer.id}>
+                <span className="pos-device-list__icon">
+                  <Printer aria-hidden="true" size={21} />
+                </span>
+                <div>
+                  <strong>{printer.label}</strong>
+                  <small>{printer.deviceReference}</small>
+                </div>
+                <span
+                  className={`pos-config-status pos-config-status--${printer.status === "active" ? "success" : "muted"}`}
+                >
+                  {deviceStatusLabel(printer.status)}
+                </span>
+                {business?.canManage ? (
+                  <DeviceStateActions
+                    businessId={business.id}
+                    device={printer}
+                    terminalId={terminal.id}
+                  />
+                ) : null}
+              </div>
+            ))}
           </div>
-        </div>
-        <dl className="pos-settings-facts">
-          <Fact label="Tipo recomendado" value="Térmica ESC/POS" />
-          <Fact label="Largura" value="80 mm" />
-          <Fact label="Ligação" value="USB, Bluetooth ou rede" />
-        </dl>
+        ) : (
+          <div className="pos-settings-empty">
+            <Printer aria-hidden="true" size={25} />
+            <div>
+              <strong>Impressora não ligada</strong>
+              <p>O comprovativo digital continua sempre disponível.</p>
+            </div>
+          </div>
+        )}
       </SettingsCard>
-      <SettingsCard title="Conteúdo do comprovativo" icon={<ReceiptText size={20} />}>
+
+      <div className="pos-settings-grid">
+        <SettingsCard title="Definições de Impressão" icon={<Settings2 size={20} />}>
+          <dl className="pos-settings-facts">
+            <Fact label="Papel" value="80 mm" />
+            <Fact label="Cópias" value="1" />
+            <Fact label="Tamanho da fonte" value="Normal" />
+            <Fact label="Ligação" value={activePrinter ? "Dispositivo ativo" : "Por configurar"} />
+          </dl>
+        </SettingsCard>
+        <SettingsCard title="Automatização" icon={<ReceiptText size={20} />}>
+          <div className="pos-capability-list">
+            <SettingStatus
+              active={terminal?.settings.printReceiptAutomatically ?? false}
+              detail="Após a confirmação do pagamento"
+              label="Imprimir automaticamente"
+            />
+            <SettingStatus
+              active
+              detail="Identidade visual oficial"
+              label="Logótipo no cabeçalho"
+            />
+          </div>
+        </SettingsCard>
+      </div>
+
+      <SettingsCard
+        className="pos-settings-span"
+        title="Conteúdo do Comprovativo"
+        icon={<ReceiptText size={20} />}
+      >
         <SettingsRows
           rows={[
             ["Logótipo VUYELA", "Visível no cabeçalho"],
-            ["YELAS ganhas e usados", "Detalhados por transação"],
+            ["YELAS ganhas e usadas", "Detalhadas por transação"],
             ["Referência anti-duplicação", "Visível para auditoria"],
             ["Contacto do negócio", "Obtido do perfil da filial"]
           ]}
@@ -574,15 +921,19 @@ function PrinterSettings({ terminal }: { terminal?: PosTerminalContext }) {
 }
 
 function NetworkSettings({ terminal }: { terminal?: PosTerminalContext }) {
+  const isOnline = terminal?.status === "active";
+
   return (
-    <div className="pos-settings-grid">
-      <SettingsCard title="Estado da ligação" icon={<Wifi size={20} />}>
-        <div className="pos-network-status pos-network-status--muted">
+    <div className="pos-settings-stack">
+      <SettingsCard
+        className="pos-settings-span"
+        title="Estado da Ligação"
+        icon={isOnline ? <Wifi size={20} /> : <WifiOff size={20} />}
+      >
+        <div className={`pos-network-status${isOnline ? "" : " pos-network-status--muted"}`}>
           <span />
           <div>
-            <strong>
-              {terminal?.status === "active" ? "Terminal ativo" : "Terminal indisponível"}
-            </strong>
+            <strong>{isOnline ? "Terminal ativo" : "Terminal indisponível"}</strong>
             <p>
               {terminal?.lastSeenAt
                 ? `Última atividade: ${formatDateTime(terminal.lastSeenAt)}`
@@ -591,30 +942,57 @@ function NetworkSettings({ terminal }: { terminal?: PosTerminalContext }) {
           </div>
         </div>
         <dl className="pos-settings-facts">
-          <Fact label="Canal" value="HTTPS cifrado" />
+          <Fact label="Ligação" value="HTTPS cifrado" />
+          <Fact label="Endereço IP" value="Oculto por segurança" />
           <Fact label="Região" value="Automática" />
-          <Fact label="Sincronização" value="Por verificar" />
+          <Fact label="Latência" value="Medida em cada operação" />
         </dl>
       </SettingsCard>
-      <SettingsCard title="Requisitos de rede" icon={<Router size={20} />}>
-        <SettingsRows
-          rows={[
-            ["Ligação principal", "Wi-Fi ou Ethernet"],
-            ["Protocolo", "TLS obrigatório"],
-            ["Operação offline", "Não permitida para saldos"],
-            ["Retoma", "Nova consulta ao servidor"]
-          ]}
-        />
-      </SettingsCard>
-      <SettingsCard
-        className="pos-settings-span"
-        title="Proteção contra falhas"
-        icon={<EthernetPort size={20} />}
-      >
-        <p className="pos-settings-copy">
-          Uma transação só é concluída depois da confirmação do servidor. A chave de idempotência
-          impede o registo duplicado quando a ligação é interrompida.
-        </p>
+
+      <div className="pos-settings-grid">
+        <SettingsCard title="Modo Offline" icon={<HardDrive size={20} />}>
+          <div className="pos-capability-list">
+            <SettingStatus
+              active={false}
+              detail="Saldos nunca são alterados sem confirmação do servidor"
+              label="Permitir vendas sem internet"
+            />
+            <SettingStatus
+              active={false}
+              detail="Não existem transações locais pendentes"
+              label="Fila local de transações"
+            />
+          </div>
+        </SettingsCard>
+        <SettingsCard title="Sincronização de Dados" icon={<RefreshCcw size={20} />}>
+          <SettingsRows
+            rows={[
+              ["Intervalo", "Em cada operação"],
+              [
+                "Última sincronização",
+                terminal?.lastSeenAt ? formatDateTime(terminal.lastSeenAt) : "Por iniciar"
+              ],
+              ["Retoma", "Nova consulta ao servidor"]
+            ]}
+          />
+        </SettingsCard>
+      </div>
+
+      <SettingsCard className="pos-settings-span" title="Servidor API" icon={<Server size={20} />}>
+        <div className="pos-settings-field-grid">
+          <ReadOnlyField label="Canal" value="Ligação VUYELA protegida por TLS" />
+          <ReadOnlyField label="Estado" value={isOnline ? "Operacional" : "A aguardar terminal"} />
+        </div>
+        <div className="pos-settings-callout">
+          <EthernetPort aria-hidden="true" size={23} />
+          <div>
+            <strong>Proteção contra falhas</strong>
+            <p>
+              Uma transação só termina após confirmação do servidor. A idempotência impede registos
+              duplicados quando a ligação é interrompida.
+            </p>
+          </div>
+        </div>
       </SettingsCard>
     </div>
   );
@@ -622,8 +1000,12 @@ function NetworkSettings({ terminal }: { terminal?: PosTerminalContext }) {
 
 function UserSettings({ roles }: { roles: string[] }) {
   return (
-    <div className="pos-settings-grid">
-      <SettingsCard title="Operador atual" icon={<UserCog size={20} />}>
+    <div className="pos-settings-stack">
+      <SettingsCard
+        className="pos-settings-span"
+        title="Utilizadores Registados"
+        icon={<UserCog size={20} />}
+      >
         <div className="pos-user-card">
           <span>VY</span>
           <div>
@@ -632,48 +1014,115 @@ function UserSettings({ roles }: { roles: string[] }) {
           </div>
           <span className="pos-config-status pos-config-status--success">Ativo</span>
         </div>
-        <dl className="pos-settings-facts">
-          <Fact label="Autenticação" value="Conta VUYELA" />
-          <Fact label="Filiais" value="Conforme associação ativa" />
-          <Fact label="Permissões" value="Validadas em cada operação" />
-        </dl>
-      </SettingsCard>
-      <SettingsCard title="Gestão da equipa" icon={<UsersRound size={20} />}>
-        <p className="pos-settings-copy">
-          A criação, suspensão e atribuição de filiais é feita na gestão do negócio para manter uma
-          única fonte de permissões.
-        </p>
-        <Link className="pos-settings-button" href="/negocio">
-          Abrir gestão do negócio
+        <div className="pos-user-table" role="table" aria-label="Utilizadores do terminal">
+          <div role="row">
+            <span role="columnheader">Utilizador</span>
+            <span role="columnheader">Função</span>
+            <span role="columnheader">Estado</span>
+            <span role="columnheader">Acesso</span>
+          </div>
+          <div role="row">
+            <strong role="cell">Operador autenticado</strong>
+            <span role="cell">{roles.join(", ") || "Operador POS"}</span>
+            <span role="cell" className="is-success">
+              Ativo
+            </span>
+            <span role="cell">Sessão atual</span>
+          </div>
+        </div>
+        <Link className="pos-settings-button" href="/negocio?vista=equipa">
+          Gerir equipa do negócio
         </Link>
       </SettingsCard>
+
+      <div className="pos-settings-grid">
+        <SettingsCard title="Administrador" icon={<ShieldCheck size={20} />}>
+          <SettingsRows
+            rows={[
+              ["Configurar terminais", "Permitido"],
+              ["Gerir pagamentos", "Permitido"],
+              ["Consultar relatórios", "Permitido"]
+            ]}
+          />
+        </SettingsCard>
+        <SettingsCard title="Operador" icon={<UsersRound size={20} />}>
+          <SettingsRows
+            rows={[
+              ["Efetuar transações", "Permitido"],
+              ["Consultar clientes", "Conforme filial"],
+              ["Alterar definições", "Bloqueado"]
+            ]}
+          />
+        </SettingsCard>
+      </div>
+
+      <div className="pos-settings-callout pos-settings-callout--muted">
+        <ShieldCheck aria-hidden="true" size={23} />
+        <div>
+          <strong>Uma única fonte de permissões</strong>
+          <p>A criação, suspensão e associação a filiais é feita na gestão da equipa do negócio.</p>
+        </div>
+      </div>
     </div>
   );
 }
 
 function SecuritySettings() {
   return (
-    <div className="pos-settings-grid">
-      <SettingsCard title="Sessão e acesso" icon={<Fingerprint size={20} />}>
+    <div className="pos-settings-stack">
+      <div className="pos-settings-grid">
+        <SettingsCard title="PIN e Acesso Rápido" icon={<Fingerprint size={20} />}>
+          <div className="pos-capability-list">
+            <SettingStatus
+              active
+              detail="Obrigatória para operar o terminal"
+              label="Sessão autenticada"
+            />
+            <SettingStatus
+              active
+              detail="Exigido em ações privilegiadas"
+              label="MFA administrativo"
+            />
+          </div>
+          <dl className="pos-settings-facts">
+            <Fact label="Bloqueio" value="Gerido pela plataforma" />
+            <Fact label="Sessão" value="Pode terminar no cabeçalho" />
+          </dl>
+        </SettingsCard>
+        <SettingsCard title="Cópias e Continuidade" icon={<DatabaseBackup size={20} />}>
+          <div className="pos-capability-list">
+            <SettingStatus
+              active
+              detail="Dados persistidos no servidor"
+              label="Proteção automática"
+            />
+            <SettingStatus
+              active
+              detail="Consultas repetíveis sem duplicação"
+              label="Idempotência"
+            />
+          </div>
+          <p className="pos-settings-copy">
+            Não são guardadas cópias de saldos ou credenciais neste dispositivo.
+          </p>
+        </SettingsCard>
+      </div>
+
+      <SettingsCard
+        className="pos-settings-span"
+        title="Registo de Atividade"
+        icon={<KeyRound size={20} />}
+      >
         <SettingsRows
           rows={[
-            ["Sessão autenticada", "Obrigatória"],
-            ["MFA para ações privilegiadas", "Ativo"],
-            ["Bloqueio por inatividade", "Gerido pela plataforma"],
-            ["Terminar sessão", "Disponível no cabeçalho"]
+            ["Autenticação", "Registada na sessão do operador"],
+            ["Cálculo de YELAS", "Executado no servidor"],
+            ["Alteração de saldo", "RPC transacional auditada"],
+            ["Pagamento", "Registado em transaction_payments"]
           ]}
         />
       </SettingsCard>
-      <SettingsCard title="Proteção das transações" icon={<KeyRound size={20} />}>
-        <SettingsRows
-          rows={[
-            ["Cálculo de YELAS", "Servidor"],
-            ["Alteração de saldo", "RPC transacional"],
-            ["Registo no ledger", "Obrigatório"],
-            ["Proteção anti-duplicação", "Chave única por transação"]
-          ]}
-        />
-      </SettingsCard>
+
       <SettingsCard
         className="pos-settings-span"
         title="Dados sensíveis"
@@ -929,6 +1378,18 @@ function paymentChannelStatusLabel(channel?: PosPaymentChannelContext) {
   return channel.mode === "manual" ? "Confirmação manual ativa" : "Ligado ao provedor";
 }
 
+function publicSetting(
+  channel: PosPaymentChannelContext | undefined,
+  key: string,
+  fallback: string
+) {
+  const value = channel?.publicSettings[key];
+  if (typeof value === "string" && value.trim()) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (typeof value === "boolean") return value ? "Ativo" : "Desativado";
+  return fallback;
+}
+
 function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("pt-MZ", { dateStyle: "medium", timeStyle: "short" }).format(
     new Date(value)
@@ -984,6 +1445,48 @@ function Fact({ label, value, tone }: { label: string; value: string; tone?: "su
   );
 }
 
+function ReadOnlyField({ label, value }: { label: string; value: string }) {
+  return (
+    <label className="pos-readonly-field">
+      <span>{label}</span>
+      <input readOnly value={value} />
+    </label>
+  );
+}
+
+function ReadonlyToggle({ active, label }: { active: boolean; label: string }) {
+  return (
+    <span
+      aria-checked={active}
+      aria-label={label}
+      className={`pos-readonly-toggle${active ? " is-active" : ""}`}
+      role="switch"
+    >
+      <span />
+    </span>
+  );
+}
+
+function SettingStatus({
+  active,
+  detail,
+  label
+}: {
+  active: boolean;
+  detail: string;
+  label: string;
+}) {
+  return (
+    <div className="pos-setting-row">
+      <div>
+        <strong>{label}</strong>
+        <p>{detail}</p>
+      </div>
+      <ReadonlyToggle active={active} label={label} />
+    </div>
+  );
+}
+
 function SettingsRows({ rows }: { rows: Array<[string, string]> }) {
   return (
     <div className="pos-settings-rows">
@@ -997,29 +1500,6 @@ function SettingsRows({ rows }: { rows: Array<[string, string]> }) {
         </div>
       ))}
     </div>
-  );
-}
-
-function DeviceCard({
-  icon,
-  name,
-  detail,
-  status,
-  muted = false
-}: {
-  icon: ReactNode;
-  name: string;
-  detail: string;
-  status: string;
-  muted?: boolean;
-}) {
-  return (
-    <SettingsCard title={name} icon={icon}>
-      <p className="pos-settings-copy">{detail}</p>
-      <span className={`pos-config-status pos-config-status--${muted ? "muted" : "success"}`}>
-        {status}
-      </span>
-    </SettingsCard>
   );
 }
 
