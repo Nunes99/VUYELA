@@ -13,6 +13,8 @@ import {
   Wifi
 } from "lucide-react";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+
 import type { PosPaymentViewId, PosSettingsViewId } from "./pos-settings";
 import { posAppRoutes } from "./routes";
 
@@ -168,7 +170,7 @@ function MobileNavFooter({ children }: { children: ReactNode }) {
       <nav>{children}</nav>
       <footer>
         <span>v2.4.12-Stable</span>
-        <strong>VUYELA BY LEMOTE</strong>
+        <VuyelaLogo className="pos-figma-mobile-brand" href={posAppRoutes.root} inverse />
       </footer>
       <i aria-hidden="true" />
     </div>

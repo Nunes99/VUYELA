@@ -1589,8 +1589,18 @@
   font-size: 0.6875rem;
 }
 .admin-page .admin-user-card-grid__logo {
-  font-size: 0.6875rem !important;
   color: #ffffff !important;
+  gap: 0.35rem;
+}
+.admin-page .admin-user-card-grid__logo img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.admin-page .admin-user-card-grid__logo .vuyela-logo__wordmark strong {
+  font-size: 0.6875rem;
+}
+.admin-page .admin-user-card-grid__logo .vuyela-logo__wordmark small {
+  font-size: 0.45rem;
 }
 .admin-page .is-positive {
   color: #059669 !important;
@@ -8312,16 +8322,30 @@
 }
 
 .auth-page {
+  min-height: 100svh;
   display: grid;
+  place-items: center;
+  padding: var(--vy-space-8);
   background: #eef4f4;
   color: var(--vy-text);
 }
 
 .auth-shell {
-  min-height: 100svh;
+  width: min(100%, 72rem);
+  min-height: auto;
+  grid-template-columns: minmax(0, 0.92fr) minmax(22rem, 1.08fr);
   align-items: stretch;
   gap: 0;
-  padding-block: var(--vy-space-8);
+  overflow: hidden;
+  border: 1px solid #d7e3e5;
+  border-radius: var(--vy-radius-sm);
+  background: #ffffff;
+  padding: 0;
+  box-shadow: 0 1rem 3rem rgba(5, 39, 48, 0.09);
+}
+
+.auth-shell--compact {
+  max-width: 64rem;
 }
 
 .auth-panel {
@@ -8336,10 +8360,11 @@
   isolation: isolate;
   overflow: hidden;
   border: 0;
-  border-radius: var(--vy-radius-xs) 0 0 var(--vy-radius-xs);
+  min-height: 34rem;
+  border-radius: 0;
   background: var(--vy-color-indigo-950);
   color: #ffffff;
-  padding: clamp(2rem, 5vw, 4.5rem);
+  padding: clamp(2.5rem, 5vw, 4.5rem);
 }
 
 .auth-panel--copy::before {
@@ -8349,23 +8374,68 @@
   background: url("/brand/pattern.svg") repeat;
   background-size: 20rem 20rem;
   content: "";
-  opacity: 0.28;
+  opacity: 0.07;
 }
 
 .auth-panel--forms {
   display: grid;
+  min-width: 0;
   align-content: center;
-  border: 1px solid var(--vy-border);
-  border-left: 0;
-  border-radius: 0 var(--vy-radius-xs) var(--vy-radius-xs) 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
   padding: clamp(1.5rem, 4vw, 3rem);
   box-shadow: none;
+}
+
+.auth-copy-content {
+  max-width: 31rem;
+}
+
+.auth-form-header {
+  display: grid;
+  gap: var(--vy-space-2);
+  margin-bottom: var(--vy-space-6);
+}
+
+.auth-form-header h2,
+.auth-form-header p {
+  margin: 0;
+}
+
+.auth-form-header h2 {
+  color: var(--vy-color-indigo);
+  font-size: var(--vy-text-2xl);
+}
+
+.auth-form-header p {
+  color: var(--vy-text-muted);
+  font-size: var(--vy-text-sm);
+}
+
+.auth-form-content {
+  min-width: 0;
+}
+
+.auth-form__recovery {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: calc(var(--vy-space-2) * -1);
+}
+
+.auth-form__recovery a {
+  color: var(--vy-color-teal-700);
+  font-size: var(--vy-text-sm);
+  font-weight: 800;
 }
 
 .auth-shell--single {
   max-width: 36rem;
   align-items: center;
-  padding-block: var(--vy-space-12);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
 }
 
 .auth-shell--single .auth-panel--forms {
@@ -8375,8 +8445,12 @@
   box-shadow: var(--vy-shadow-sm);
 }
 
+.auth-shell--single .auth-brand {
+  margin-bottom: var(--vy-space-6);
+}
+
 .auth-brand {
-  margin-bottom: var(--vy-space-12);
+  margin-bottom: var(--vy-space-16);
 }
 
 .auth-brand--dark {
@@ -8384,7 +8458,10 @@
 }
 
 .auth-panel h1 {
+  max-width: 14ch;
   font-weight: 650;
+  line-height: 1.08;
+  overflow-wrap: break-word;
 }
 
 .dashboard-page {
@@ -8692,24 +8769,42 @@
 
   .auth-shell,
   .auth-shell--compact {
+    width: 100%;
+    max-width: none;
+    min-height: 100svh;
     grid-template-columns: 1fr;
+    border: 0;
+    border-radius: 0;
     padding-block: 0;
+    box-shadow: none;
+  }
+
+  .auth-page {
+    place-items: stretch;
+    padding: 0;
   }
 
   .auth-panel--copy {
+    min-height: 17rem;
     border-radius: 0;
     padding: var(--vy-space-6) var(--vy-space-4);
   }
 
   .auth-panel--copy .auth-brand {
-    margin-bottom: var(--vy-space-8);
+    margin-bottom: var(--vy-space-10);
+  }
+
+  .auth-panel--copy h1 {
+    max-width: 18ch;
+    font-size: var(--vy-text-3xl);
   }
 
   .auth-panel--forms {
+    align-content: start;
     border: 0;
     border-top: 4px solid var(--vy-color-teal);
     border-radius: 0;
-    padding: var(--vy-space-6) var(--vy-space-4);
+    padding: var(--vy-space-8) var(--vy-space-4);
   }
 
   .auth-shell--single {
@@ -16495,31 +16590,9 @@
     flex: 0 0 auto;
   }
 
-  .business-portal__mobile-context {
-    display: grid;
-    min-width: 0;
-    flex: 1;
-    gap: 0.1rem;
-  }
-
-  .business-portal__mobile-context small,
-  .business-portal__mobile-context strong {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .business-portal__mobile-context small {
-    color: #92b3ba;
-    font-size: 0.68rem;
-  }
-
-  .business-portal__mobile-context strong {
-    font-size: 0.9rem;
-  }
-
   .business-portal__mobile-menu {
     position: relative;
+    margin-left: auto;
   }
 
   .business-portal__mobile-menu summary {
@@ -20787,14 +20860,15 @@
   }
 
   .pos-portal--settings .pos-portal__mobile-symbol {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
     flex: 0 0 auto;
-    border-radius: 0.25rem;
-    background: #123746;
-    color: #ffffff;
-    font-size: 0.7rem;
-    font-weight: 900;
+    background: transparent;
+  }
+
+  .pos-portal--settings .pos-portal__mobile-symbol img {
+    width: 1.75rem;
+    height: 1.75rem;
   }
 
   .pos-portal--settings .pos-portal__brand-area {
@@ -21045,9 +21119,25 @@
     font-size: 0.49rem;
   }
 
-  .pos-figma-mobile-nav > footer strong {
-    color: #ffffff;
+  .pos-figma-mobile-brand {
+    gap: 0.25rem;
+  }
+
+  .pos-figma-mobile-brand img {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .pos-figma-mobile-brand .vuyela-logo__wordmark {
+    gap: 0;
+  }
+
+  .pos-figma-mobile-brand .vuyela-logo__wordmark strong {
     font-size: 0.48rem;
+  }
+
+  .pos-figma-mobile-brand .vuyela-logo__wordmark small {
+    font-size: 0.34rem;
   }
 
   .pos-figma-mobile-nav > i {

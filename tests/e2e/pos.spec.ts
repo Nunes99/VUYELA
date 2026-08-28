@@ -22,8 +22,8 @@ test("protects the POS transaction and settings routes", async ({ page }) => {
     await page.goto(route);
 
     await expect(
-      page.getByRole("heading", { name: "Autenticação ainda não está ligada." })
+      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
     ).toBeVisible();
-    await expect(page.getByText("Configurar Supabase")).toBeVisible();
+    await expect(page.getByText("Serviço indisponível")).toBeVisible();
   }
 });

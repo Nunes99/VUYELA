@@ -4,7 +4,5 @@ test("requires an authenticated session before administrative MFA", async ({ pag
   await page.goto("/mfa?next=/admin");
 
   await expect(page).toHaveURL(/\/admin\/entrar\?next=%2Fadmin$/);
-  await expect(
-    page.getByRole("heading", { name: "Acesso reservado à gestão da plataforma." })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Administração da plataforma." })).toBeVisible();
 });

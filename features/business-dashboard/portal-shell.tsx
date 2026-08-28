@@ -88,10 +88,6 @@ export function BusinessPortalShell({
     <div className="business-portal">
       <header className="business-portal__mobile-header">
         <VuyelaLogo className="business-portal__mobile-brand" href="/negocio" inverse />
-        <div className="business-portal__mobile-context">
-          <small>Portal de Negócio</small>
-          <strong>{sectionLabels[activeSection]}</strong>
-        </div>
         <details className="business-portal__mobile-menu">
           <summary aria-label="Abrir navegação do negócio" title="Menu do negócio">
             <Menu aria-hidden="true" size={22} />
@@ -176,16 +172,15 @@ export function BusinessPortalShell({
       <section className="business-portal__workspace">
         <header className="business-portal__topbar">
           <div>
-            <FlowBreadcrumbs
-              className="business-portal__breadcrumbs"
-              items={[
-                {
-                  label: "Painel",
-                  href: activeSection === "dashboard" ? undefined : dashboardHref
-                },
-                ...(activeSection === "dashboard" ? [] : [{ label: sectionLabels[activeSection] }])
-              ]}
-            />
+            {activeSection === "dashboard" ? null : (
+              <FlowBreadcrumbs
+                className="business-portal__breadcrumbs"
+                items={[
+                  { label: "Painel", href: dashboardHref },
+                  { label: sectionLabels[activeSection] }
+                ]}
+              />
+            )}
             <span>
               <h1>{title ?? "Painel do Negócio"}</h1>
               <small>MFA ativo</small>

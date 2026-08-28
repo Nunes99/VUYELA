@@ -34,6 +34,7 @@ import { initialAuthActionState } from "@/features/auth/state";
 interface FormProps {
   nextPath?: string | undefined;
   portal?: "customer" | "business" | "pos" | "admin" | undefined;
+  recoveryHref?: string | undefined;
 }
 
 function ActionMessage({ status, message }: { status: string; message: string }) {
@@ -51,7 +52,11 @@ function ActionMessage({ status, message }: { status: string; message: string })
   );
 }
 
-export function EmailSignInForm({ nextPath = "/cliente", portal = "customer" }: FormProps) {
+export function EmailSignInForm({
+  nextPath = "/cliente",
+  portal = "customer",
+  recoveryHref
+}: FormProps) {
   const [state, formAction, pending] = useActionState(
     signInWithEmailAction,
     initialAuthActionState
@@ -70,6 +75,11 @@ export function EmailSignInForm({ nextPath = "/cliente", portal = "customer" }: 
         requiredMark
         required
       />
+      {recoveryHref ? (
+        <div className="auth-form__recovery">
+          <Link href={recoveryHref}>Esqueceu a palavra-passe?</Link>
+        </div>
+      ) : null}
       <ActionMessage status={state.status} message={state.message} />
       <Button
         type="submit"

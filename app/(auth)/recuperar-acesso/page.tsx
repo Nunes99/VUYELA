@@ -35,7 +35,7 @@ export default async function PasswordResetPage({
         <div className="auth-panel auth-panel--forms">
           <VuyelaLogo className="auth-brand auth-brand--dark" href="/" />
           <span className="auth-kicker">Recuperação</span>
-          <h1 id="reset-title">Recupere o acesso com seguranca.</h1>
+          <h1 id="reset-title">Recupere o acesso com segurança.</h1>
           <p className="auth-intro">
             Indique o e-mail da conta para receber as instruções de recuperação.
           </p>

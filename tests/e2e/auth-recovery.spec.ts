@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("hides phone authentication while no SMS provider is configured", async ({ page }) => {
   await page.goto("/entrar");
 
-  await expect(page.getByRole("heading", { name: "E-mail e palavra-passe" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Entrar na sua conta" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Telefone com código" })).toHaveCount(0);
   await expect(page.locator('input[name="next"]')).toHaveValue("/cliente");
 });
@@ -18,7 +18,7 @@ test("shows the complete password recovery forms", async ({ page }) => {
   await page.goto("/recuperar-acesso");
 
   await expect(
-    page.getByRole("heading", { name: "Recupere o acesso com seguranca." })
+    page.getByRole("heading", { name: "Recupere o acesso com segurança." })
   ).toBeVisible();
   await expect(page.getByLabel("E-mail")).toBeVisible();
   await expect(page.getByRole("button", { name: "Enviar link" })).toBeVisible();
@@ -35,7 +35,7 @@ test("shows the complete password recovery forms", async ({ page }) => {
 test("preserves the originating portal throughout password recovery", async ({ page }) => {
   await page.goto("/negocio/entrar?next=%2Fnegocio%3Fvista%3Dequipa");
 
-  const recoveryLink = page.getByRole("link", { name: "Recuperar acesso" });
+  const recoveryLink = page.getByRole("link", { name: "Esqueceu a palavra-passe?" });
   await expect(recoveryLink).toHaveAttribute(
     "href",
     "/recuperar-acesso?portal=business&next=%2Fnegocio%3Fvista%3Dequipa"

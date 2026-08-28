@@ -18,8 +18,8 @@ for (const view of [
     await page.goto(`/admin?view=${view}`);
 
     await expect(
-      page.getByRole("heading", { name: "Autenticação ainda não está ligada." })
+      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
     ).toBeVisible();
-    await expect(page.getByText("Configurar Supabase")).toBeVisible();
+    await expect(page.getByText("Configuração necessária")).toBeVisible();
   });
 }

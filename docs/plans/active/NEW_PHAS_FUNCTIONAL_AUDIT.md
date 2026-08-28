@@ -274,11 +274,19 @@ RLS sem política direta e funções `SECURITY DEFINER` executáveis pelos papé
 funções devem ser classificadas entre RPCs intencionalmente expostas e helpers internos antes de
 qualquer revogação, para não interromper RLS, adesões, POS ou movimentos de YELAS.
 
-Gate local de 28/08/2026: lint e typecheck aprovados, 252 testes unitários/integração aprovados,
+Gate local de 28/08/2026: lint e typecheck aprovados, 254 testes unitários/integração aprovados,
 build de produção aprovado e Playwright determinístico com 86 testes aprovados e 2 ignorados por
 serem específicos do outro dispositivo. O teste responsivo que falhou uma vez no primeiro CI foi
 estabilizado e aprovado em cinco repetições adicionais. A suite autenticada permanece dependente
 das contas E2E dedicadas descritas em `.env.e2e.example`.
+
+Convergência UI/UX de autenticação em 28/08/2026: os acessos Cliente, Negócio, POS e Administração,
+os registos e os convites usam um shell partilhado, a marca oficial VUYELA by LEMOTE e mensagens
+específicas de cada aplicação. Foram removidos detalhes de PostgreSQL/RBAC das mensagens públicas,
+marcas textuais paralelas no POS e offline, e o contexto duplicado que sobrepunha o cabeçalho móvel
+do Portal de Negócio. Os fluxos de recuperação preservam a aplicação de origem. A verificação
+Playwright completa aprovou 86 testes em desktop/mobile, com 2 testes ignorados apenas por serem
+específicos do outro dispositivo.
 
 ## Critério de conclusão
 

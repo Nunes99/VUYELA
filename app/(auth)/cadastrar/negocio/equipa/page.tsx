@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { BusinessTeamSignUpForm } from "@/features/auth/forms";
 
 export const metadata: Metadata = {
@@ -24,43 +24,38 @@ export default async function BusinessTeamSignUpPage({
   const token = typeof params.token === "string" ? params.token : "";
   const destination = params.destination === "pos" ? "pos" : "business";
   const validTokenFormat = /^[0-9a-f]{48}$/.test(token);
+  const isPosInvite = destination === "pos";
 
   return (
-    <main className="auth-page">
-      <section className="auth-shell auth-shell--compact" aria-labelledby="team-signup-title">
-        <div className="auth-panel auth-panel--copy">
-          <VuyelaLogo className="auth-brand" href="/" inverse />
-          <span className="auth-kicker">
-            {destination === "pos" ? "Convite de operador POS" : "Convite de equipa"}
-          </span>
-          <h1 id="team-signup-title">
-            {destination === "pos"
-              ? "Credenciais próprias para operar o POS."
-              : "Credenciais próprias para trabalhar no negócio."}
-          </h1>
-          <p>
-            Este acesso mantém a sua identidade de cliente separada e respeita a função e a filial
-            atribuídas pelo administrador.
-          </p>
-        </div>
-        <div className="auth-panel auth-panel--forms">
-          {validTokenFormat ? (
-            <BusinessTeamSignUpForm destination={destination} token={token} />
-          ) : (
-            <p className="auth-message auth-message--error" role="alert">
-              O convite é inválido ou está incompleto. Peça uma nova ligação ao administrador do
-              negócio.
-            </p>
-          )}
-          <p className="auth-footnote">
-            Já tem credenciais?{" "}
-            <Link href={destination === "pos" ? "/pos/entrar" : "/negocio/entrar"}>
-              {destination === "pos" ? "Entrar no POS" : "Entrar no portal"}
-            </Link>
-            .
-          </p>
-        </div>
-      </section>
-    </main>
+    <AuthShell
+      compact
+      description={
+        isPosInvite
+          ? "Crie as credenciais individuais associadas à filial e função definidas no convite."
+          : "Crie um acesso de equipa separado de qualquer conta de cliente."
+      }
+      eyebrow={isPosInvite ? "Convite de operador POS" : "Convite de equipa"}
+      formDescription="Confirme os seus dados para aceitar o convite."
+      formTitle="Criar credenciais"
+      id="team-signup-title"
+      title={isPosInvite ? "Prepare o seu acesso ao POS." : "Junte-se à equipa do negócio."}
+      variant={isPosInvite ? "pos" : "business"}
+    >
+      {validTokenFormat ? (
+        <BusinessTeamSignUpForm destination={destination} token={token} />
+      ) : (
+        <p className="auth-message auth-message--error" role="alert">
+          O convite é inválido ou está incompleto. Peça uma nova ligação ao administrador do
+          negócio.
+        </p>
+      )}
+      <p className="auth-footnote">
+        Já tem credenciais?{" "}
+        <Link href={destination === "pos" ? "/pos/entrar" : "/negocio/entrar"}>
+          {destination === "pos" ? "Entrar no POS" : "Entrar no portal"}
+        </Link>
+        .
+      </p>
+    </AuthShell>
   );
 }

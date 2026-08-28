@@ -65,6 +65,6 @@ describe("POS application boundary", () => {
 
   it("offers installation from the dedicated POS entry point", () => {
     expect(posSignIn).toContain('<PwaInstallAction area="pos" />');
-    expect(posSignIn).toContain("credenciais individuais ou um");
+    expect(posSignIn).toContain("Peça credenciais individuais ao administrador do negócio");
   });
 });

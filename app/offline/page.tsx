@@ -16,9 +16,8 @@ export default function OfflinePage() {
     <main className="offline-page">
       <div className="offline-shell">
         <header className="offline-header">
-          <VuyelaLogo compact />
+          <VuyelaLogo />
           <div>
-            <span>VUYELA by LEMOTE</span>
             <h1>Cartões disponíveis offline</h1>
           </div>
         </header>

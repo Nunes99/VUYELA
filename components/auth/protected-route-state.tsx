@@ -151,11 +151,17 @@ export function ProtectedRouteStateView({
   }
 
   if (state.status === "auth_not_configured") {
+    const isAdmin = variant === "admin";
+
     return (
       <AuthNotice
-        eyebrow="Configurar Supabase"
-        title="Autenticação ainda não está ligada."
-        body="Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY para testar esta área protegida com sessões reais."
+        eyebrow={isAdmin ? "Configuração necessária" : "Serviço indisponível"}
+        title="Não foi possível iniciar o acesso."
+        body={
+          isAdmin
+            ? "Confirme a configuração de autenticação do ambiente antes de continuar."
+            : "Tente novamente dentro de alguns minutos. Se o problema continuar, contacte o suporte VUYELA."
+        }
         installArea={installArea}
       />
     );
@@ -166,7 +172,7 @@ export function ProtectedRouteStateView({
       <AuthNotice
         eyebrow="Login necessário"
         title="Entre para continuar."
-        body="Esta área usa helpers server-side e RBAC centralizado antes de renderizar dados privados."
+        body="Inicie sessão com a conta correspondente a esta aplicação."
         actionHref={state.signInPath}
         actionLabel="Entrar"
         installArea={installArea}
@@ -179,7 +185,7 @@ export function ProtectedRouteStateView({
       <AuthNotice
         eyebrow="MFA necessário"
         title="Verificação adicional obrigatória."
-        body="Funções privilegiadas precisam de MFA antes de acessar rotas sensiveis."
+        body="As operações sensíveis exigem verificação multifator antes de continuar."
         actionHref={state.mfaPath}
         actionLabel="Verificar"
         installArea={installArea}

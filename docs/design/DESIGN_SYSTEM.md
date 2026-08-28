@@ -60,6 +60,17 @@ Each component should cover relevant default, hover, active, focus, disabled, lo
 - Gold remains reserved for points, rewards, and the commercial reward action.
 - Operational navigation must never overlap content on small screens.
 
+## Authentication Surfaces
+
+- Login, registration and invitation pages use the shared `AuthShell` and `VuyelaLogo` components.
+- Customer-facing authentication copy describes the user task, never database, RBAC, environment
+  variables or server implementation details.
+- Customer, business, POS and administration credentials remain distinct; the interface must not
+  offer an automatic transition from one protected application to another.
+- Password recovery stays next to the password field and preserves the originating application.
+- On mobile, the brand panel precedes the form in normal document flow without fixed positioning,
+  duplicated navigation or overlapping headings.
+
 ## Navigation and Multi-step Flows
 
 - Every protected subpage shows its location and a deterministic route back to the parent surface.

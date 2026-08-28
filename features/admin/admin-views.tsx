@@ -23,6 +23,7 @@ import {
   Webhook
 } from "lucide-react";
 
+import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
 import {
@@ -1161,7 +1162,7 @@ function UserDetail({
         ) : (
           user.cards.map((card) => (
             <article key={card.id}>
-              <span className="admin-user-card-grid__logo">VUYELA</span>
+              <VuyelaLogo className="admin-user-card-grid__logo" inverse />
               <StatusBadge value={card.status} />
               <strong>{card.businessName}</strong>
               <span>{card.availablePoints.toLocaleString("pt-MZ")} YL</span>

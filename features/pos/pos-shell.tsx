@@ -39,13 +39,7 @@ export function PosPortalShell({
         ) : null}
         <div className="pos-portal__brand-area">
           <VuyelaLogo className="pos-portal__brand" href={posAppRoutes.root} />
-          <Link
-            aria-label="Início do POS"
-            className="pos-portal__mobile-symbol"
-            href={posAppRoutes.root}
-          >
-            V
-          </Link>
+          <VuyelaLogo className="pos-portal__mobile-symbol" compact href={posAppRoutes.root} />
           <span aria-hidden="true" />
           <span className="pos-portal__protected-title">
             <small>Área protegida</small>

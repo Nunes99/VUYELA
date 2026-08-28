@@ -8,9 +8,7 @@ test("keeps customer and business registration as distinct responsive flows", as
 
   await page.goto("/cadastrar/negocio");
 
-  await expect(
-    page.getByRole("heading", { name: "Um acesso criado exclusivamente para o seu negócio." })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Registe o seu negócio." })).toBeVisible();
   await expect(page.getByLabel("Nome do responsável")).toBeVisible();
   await expect(page.getByLabel("E-mail de acesso")).toBeVisible();
   await expect(page.locator('input[name="portal"]')).toHaveCount(0);
@@ -26,9 +24,7 @@ test("keeps customer and business registration as distinct responsive flows", as
   await expect(page.getByText("Entrar como cliente")).toHaveCount(0);
 
   await page.goto(`/cadastrar/negocio/equipa?token=${"a".repeat(48)}`);
-  await expect(
-    page.getByRole("heading", { name: "Credenciais próprias para trabalhar no negócio." })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Junte-se à equipa do negócio." })).toBeVisible();
   await expect(page.getByRole("button", { name: "Criar credenciais de equipa" })).toBeVisible();
 
   await page.goto("/negocio/entrar");
@@ -37,7 +33,7 @@ test("keeps customer and business registration as distinct responsive flows", as
 
   await page.goto("/pos/entrar");
   await expect(page.locator('input[name="portal"]')).toHaveValue("pos");
-  await expect(page.getByText(/credenciais individuais ou um convite de operador/)).toBeVisible();
+  await expect(page.getByText(/Peça credenciais individuais ao administrador/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Instalar aplicação" })).toBeVisible();
   await expect(page).toHaveURL(/\/pos\/entrar$/);
 
@@ -53,7 +49,7 @@ test("uses a compact business menu on mobile without exposing the customer porta
   test.skip(testInfo.project.name !== "mobile-chrome", "Mobile navigation contract");
 
   await page.goto("/dev/business");
-  await expect(page.getByText("Portal de Negócio")).toBeVisible();
+  await expect(page.locator(".business-portal__mobile-brand")).toBeVisible();
   await page.locator('summary[aria-label="Abrir navegação do negócio"]').click();
 
   const mobileNavigation = page.getByRole("navigation", { name: "Navegação móvel do negócio" });

@@ -38,4 +38,27 @@ describe("professional UX flow contract", () => {
       'aria-label="Localização na plataforma"'
     );
   });
+
+  it("uses one branded authentication shell without exposing implementation details", () => {
+    const authShell = read("components/auth/auth-shell.tsx");
+    const portalSignIn = read("features/auth/portal-sign-in.tsx");
+    const protectedRoute = read("components/auth/protected-route-state.tsx");
+
+    expect(authShell).toContain("VuyelaLogo");
+    expect(portalSignIn).toContain("AuthShell");
+    expect(portalSignIn).not.toMatch(/PostgreSQL|server-side|RBAC/);
+    expect(protectedRoute).not.toContain("helpers server-side");
+  });
+
+  it("keeps one visible brand and one navigation trigger in compact portal headers", () => {
+    const businessShell = read("features/business-dashboard/portal-shell.tsx");
+    const posShell = read("features/pos/pos-shell.tsx");
+    const posSettingsNavigation = read("features/pos/pos-settings-navigation.tsx");
+    const offlinePage = read("app/offline/page.tsx");
+
+    expect(businessShell).not.toContain("business-portal__mobile-context");
+    expect(posShell).toContain('className="pos-portal__mobile-symbol" compact');
+    expect(posSettingsNavigation).toContain('className="pos-figma-mobile-brand"');
+    expect(offlinePage).not.toContain("<span>VUYELA by LEMOTE</span>");
+  });
 });
