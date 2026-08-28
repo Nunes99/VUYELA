@@ -5,11 +5,12 @@ import { createSupabasePublicClient } from "@/lib/supabase/public";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const startedAt = Date.now();
   const checkedAt = new Date().toISOString();
 
   if (!isSupabaseConfigured()) {
-    return healthResponse(503, "configuration_missing", checkedAt);
+    return healthResponse(request, 503, "configuration_missing", checkedAt, startedAt);
   }
 
   const { error } = await createSupabasePublicClient()
@@ -18,13 +19,36 @@ export async function GET() {
     .eq("is_active", true);
 
   return error
-    ? healthResponse(503, "database_unavailable", checkedAt)
-    : healthResponse(200, "ready", checkedAt);
+    ? healthResponse(request, 503, "database_unavailable", checkedAt, startedAt)
+    : healthResponse(request, 200, "ready", checkedAt, startedAt);
 }
 
-function healthResponse(status: number, state: string, checkedAt: string) {
+function healthResponse(
+  request: Request,
+  status: number,
+  state: string,
+  checkedAt: string,
+  startedAt: number
+) {
+  const durationMs = Date.now() - startedAt;
+  const log = JSON.stringify({
+    level: status === 200 ? "info" : "error",
+    message: "health_check",
+    route: "/api/health",
+    requestId: request.headers.get("x-vercel-id") ?? request.headers.get("x-request-id"),
+    status,
+    state,
+    durationMs
+  });
+
+  if (status === 200) {
+    console.info(log);
+  } else {
+    console.error(log);
+  }
+
   return NextResponse.json(
-    { service: "vuyela-web", state, checkedAt },
+    { service: "vuyela-web", state, checkedAt, durationMs },
     {
       status,
       headers: {

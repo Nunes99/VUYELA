@@ -262,8 +262,10 @@ avisos, estados globais de erro, health check e uma porta de qualidade em GitHub
 - build, migração de produção, monitorização e plano de reversão.
 
 Para concluir a fase ainda é necessário configurar as contas E2E dedicadas no GitHub, executar a
-suite autenticada contra um ambiente isolado, fechar os avisos live de segurança do Supabase,
-ligar monitorização externa ao health check e validar os quatro portais em produção.
+suite autenticada contra um ambiente isolado, fechar os avisos live de segurança do Supabase e
+validar os quatro portais em produção. A monitorização externa do health check está configurada
+para testar aplicação e Supabase a cada cinco minutos, abrir um único incidente no GitHub e
+fechá-lo automaticamente após recuperação.
 
 Auditoria live de 28/08/2026: o advisor de desempenho não apresentou avisos ou erros, apenas
 índices ainda sem utilização num projeto com pouco tráfego. O advisor de segurança continua a
@@ -272,10 +274,11 @@ RLS sem política direta e funções `SECURITY DEFINER` executáveis pelos papé
 funções devem ser classificadas entre RPCs intencionalmente expostas e helpers internos antes de
 qualquer revogação, para não interromper RLS, adesões, POS ou movimentos de YELAS.
 
-Gate local de 28/08/2026: lint e typecheck aprovados, 246 testes unitários/integração aprovados,
+Gate local de 28/08/2026: lint e typecheck aprovados, 252 testes unitários/integração aprovados,
 build de produção aprovado e Playwright determinístico com 86 testes aprovados e 2 ignorados por
-serem específicos do outro dispositivo. A suite autenticada permanece dependente das contas E2E
-dedicadas descritas em `.env.e2e.example`.
+serem específicos do outro dispositivo. O teste responsivo que falhou uma vez no primeiro CI foi
+estabilizado e aprovado em cinco repetições adicionais. A suite autenticada permanece dependente
+das contas E2E dedicadas descritas em `.env.e2e.example`.
 
 ## Critério de conclusão
 

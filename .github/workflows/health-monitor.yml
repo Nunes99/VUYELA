@@ -1,0 +1,155 @@
+name: Production health monitor
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      healthcheck_url:
+        description: Optional health endpoint override
+        required: false
+        type: string
+
+concurrency:
+  group: production-health-monitor
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      HEALTHCHECK_URL: ${{ inputs.healthcheck_url || vars.HEALTHCHECK_URL || 'https://vuyela-seven.vercel.app/api/health' }}
+    steps:
+      - name: Check production readiness
+        id: healthcheck
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          response_file="$(mktemp)"
+          curl_exit=0
+          http_status="$(
+            curl \
+              --silent \
+              --show-error \
+              --location \
+              --connect-timeout 10 \
+              --max-time 30 \
+              --retry 2 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --output "$response_file" \
+              --write-out "%{http_code}" \
+              "$HEALTHCHECK_URL"
+          )" || curl_exit=$?
+
+          service="$(jq -r '.service // empty' "$response_file" 2>/dev/null || true)"
+          state="$(jq -r '.state // empty' "$response_file" 2>/dev/null || true)"
+          checked_at="$(jq -r '.checkedAt // empty' "$response_file" 2>/dev/null || true)"
+          duration_ms="$(jq -r '.durationMs // empty' "$response_file" 2>/dev/null || true)"
+          healthy=false
+
+          if [[ "$curl_exit" -eq 0 && "$http_status" == "200" && "$service" == "vuyela-web" && "$state" == "ready" ]]; then
+            healthy=true
+          fi
+
+          echo "healthy=$healthy" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## Production health"
+            echo
+            echo "- URL: \`$HEALTHCHECK_URL\`"
+            echo "- HTTP: \`${http_status:-000}\`"
+            echo "- Service: \`${service:-unknown}\`"
+            echo "- State: \`${state:-unknown}\`"
+            echo "- Checked at: \`${checked_at:-unknown}\`"
+            echo "- Endpoint duration: \`${duration_ms:-unknown} ms\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "$healthy" != "true" ]]; then
+            exit 1
+          fi
+
+      - name: Manage production incident
+        id: incident
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          HEALTHY: ${{ steps.healthcheck.outputs.healthy }}
+          HEALTHCHECK_URL: ${{ env.HEALTHCHECK_URL }}
+        with:
+          script: |
+            const healthy = process.env.HEALTHY === "true";
+            const title = "[Monitorização] Produção indisponível em /api/health";
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "all",
+              per_page: 100,
+            });
+            const incident = issues.find((issue) => !issue.pull_request && issue.title === title);
+
+            core.setOutput("transitioned", "false");
+
+            if (!healthy && !incident) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body: [
+                  "O monitor externo não recebeu um estado saudável da produção.",
+                  "",
+                  `Endpoint: ${process.env.HEALTHCHECK_URL}`,
+                  `Execução: ${runUrl}`,
+                  `Detetado em: ${new Date().toISOString()}`,
+                  "",
+                  "O incidente será fechado automaticamente após a recuperação.",
+                ].join("\n"),
+              });
+              core.setOutput("transitioned", "true");
+              return;
+            }
+
+            if (!healthy && incident?.state === "closed") {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: incident.number,
+                state: "open",
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: incident.number,
+                body: `Nova indisponibilidade detetada em ${new Date().toISOString()}. [Ver execução](${runUrl}).`,
+              });
+              core.setOutput("transitioned", "true");
+              return;
+            }
+
+            if (healthy && incident?.state === "open") {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: incident.number,
+                body: `Produção recuperada em ${new Date().toISOString()}. [Ver execução](${runUrl}).`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: incident.number,
+                state: "closed",
+                state_reason: "completed",
+              });
+            }
+
+      - name: Signal a new incident
+        if: steps.healthcheck.outputs.healthy != 'true' && steps.incident.outputs.transitioned == 'true'
+        run: exit 1

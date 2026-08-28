@@ -60,6 +60,13 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
 
   for (const width of [320, 375, 390, 430, 768, 1024, 1280, 1440]) {
     await page.setViewportSize({ width, height: width < 640 ? 844 : 1000 });
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        })
+    );
+    await expect(page.locator(".marketing-product-image")).toBeVisible();
 
     const layout = await page.evaluate(() => {
       const title = document.querySelector("h1");

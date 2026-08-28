@@ -23,6 +23,19 @@ The GitHub Actions quality gate runs lint, typecheck, unit/integration tests, pr
 the deterministic Playwright suite. The authenticated suite is available through manual workflow
 dispatch after the repository secrets have been configured.
 
+## Production Health Monitoring
+
+`.github/workflows/health-monitor.yml` checks the public `/api/health` endpoint every five minutes.
+The endpoint verifies both the Next.js runtime configuration and a read against Supabase, returns
+`503` whenever the service is not ready, and emits structured Vercel runtime logs with state,
+request identifier and duration.
+
+The monitor retries transient network failures, validates the response contract and creates a
+single GitHub issue while an incident is active. Repeated failures do not create duplicate issues;
+the issue is closed automatically after recovery. Set the optional repository variable
+`HEALTHCHECK_URL` when the canonical production domain changes. Manual workflow runs can also
+override the URL for validation without changing repository configuration.
+
 ## Priority Unit Tests
 
 - point calculation;
