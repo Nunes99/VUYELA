@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { EmailSignInForm } from "@/features/auth/forms";
+import { getPasswordRecoveryPath, getPortalNextPath } from "@/features/auth/portal";
 
 export const metadata: Metadata = {
   title: "Entrar na Administração",
@@ -14,15 +16,12 @@ interface AdminSignInPageProps {
 }
 
 function getAdminNextPath(value: string | string[] | undefined) {
-  if (typeof value !== "string" || !value.startsWith("/admin") || value.startsWith("//")) {
-    return "/admin";
-  }
-
-  return value;
+  return getPortalNextPath("admin", value);
 }
 
 export default async function AdminSignInPage({ searchParams }: AdminSignInPageProps) {
   const params = await searchParams;
+  const nextPath = getAdminNextPath(params.next);
 
   return (
     <main className="auth-page auth-page--admin">
@@ -34,9 +33,10 @@ export default async function AdminSignInPage({ searchParams }: AdminSignInPageP
           <p>Use as credenciais administrativas e conclua a verificação multifator.</p>
         </div>
         <div className="auth-panel auth-panel--forms">
-          <EmailSignInForm nextPath={getAdminNextPath(params.next)} portal="admin" />
+          <EmailSignInForm nextPath={nextPath} portal="admin" />
           <p className="auth-footnote">
-            Contas de cliente e de negócio não são aceites nesta área.
+            Contas de cliente e de negócio não são aceites nesta área. Esqueceu a palavra-passe?{" "}
+            <Link href={getPasswordRecoveryPath("admin", nextPath)}>Recuperar acesso</Link>.
           </p>
         </div>
       </section>

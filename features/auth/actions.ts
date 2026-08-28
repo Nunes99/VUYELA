@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { getDefinePasswordPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
 import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isPhoneAuthEnabled, isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -478,9 +479,13 @@ export async function requestPasswordResetAction(
     return email.state;
   }
 
+  const portal = parseAuthPortal(getFormString(formData, "portal"));
+  const next = getPortalNextPath(portal, getFormString(formData, "next"));
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
-    redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/definir-senha")}`
+    redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(
+      getDefinePasswordPath(portal, next)
+    )}`
   });
 
   if (error) {
@@ -532,6 +537,8 @@ export async function updatePasswordAction(
     };
   }
 
+  const portal = parseAuthPortal(getFormString(formData, "portal"));
+  const next = getPortalNextPath(portal, getFormString(formData, "next"));
   const supabase = await createSupabaseServerClient();
   const {
     data: { user }
@@ -553,7 +560,7 @@ export async function updatePasswordAction(
     };
   }
 
-  redirect("/cliente");
+  redirect(next);
 }
 
 export async function updateCustomerProfileAction(

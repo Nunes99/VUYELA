@@ -19625,6 +19625,250 @@
   }
 }
 
+/* Fase 31: trustworthy customer controls and end-to-end navigation. */
+.customer-card-filters button,
+.customer-notification-filters a,
+.customer-activity-filters a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  cursor: pointer;
+  border: 1px solid #d7e0e5;
+  border-radius: 999px;
+  padding: 0 1rem;
+  background: #ffffff;
+  color: #334b56;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.customer-card-filters button:hover,
+.customer-notification-filters a:hover,
+.customer-activity-filters a:hover {
+  border-color: #00a6a6;
+  color: #007f7f;
+}
+
+.customer-card-filters button:focus-visible,
+.customer-notification-filters a:focus-visible,
+.customer-activity-filters a:focus-visible,
+.customer-activity-submit:focus-visible,
+.customer-notifications-read-all:focus-visible,
+.customer-pagination a:focus-visible {
+  outline: 3px solid rgba(0, 191, 165, 0.3);
+  outline-offset: 2px;
+}
+
+.customer-card-filters button.is-active,
+.customer-notification-filters a.is-active,
+.customer-activity-filters a.is-active {
+  border-color: #008f8c;
+  background: #008f8c;
+  color: #ffffff;
+}
+
+.customer-activity-toolbar {
+  display: grid;
+  grid-template-columns: minmax(15rem, 1fr) minmax(10rem, auto) auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.customer-activity-submit,
+.customer-notifications-read-all {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #008f8c;
+  border-radius: 0.5rem;
+  padding: 0 1rem;
+  background: #008f8c;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 0.4rem;
+}
+
+.customer-activity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.customer-activity-result-summary {
+  margin: 1rem 0 0.5rem;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.customer-notifications-panel__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.customer-notifications-panel__heading > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.customer-pagination {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.customer-pagination a,
+.customer-pagination span {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: #007f7f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 0.35rem;
+}
+
+.customer-pagination a:last-child,
+.customer-pagination span:last-child {
+  justify-self: end;
+}
+
+.customer-pagination span[aria-disabled="true"] {
+  color: #94a3b8;
+}
+
+.customer-pagination strong {
+  color: #334b56;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.customer-mobile-header > form {
+  display: contents;
+}
+
+@media (max-width: 46rem) {
+  .customer-activity-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customer-activity-submit,
+  .customer-notifications-read-all {
+    width: 100%;
+  }
+
+  .customer-notifications-panel__heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .customer-pagination {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customer-pagination strong {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}
+
+.application-error {
+  display: grid;
+  min-height: 100svh;
+  padding: 1.5rem;
+  background: #eef4f5;
+  place-items: center;
+}
+
+.application-error__panel {
+  display: grid;
+  width: min(100%, 36rem);
+  border: 1px solid #d7e0e5;
+  border-radius: 0.5rem;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: #ffffff;
+  color: #0f2832;
+  box-shadow: 0 1rem 2.5rem rgba(4, 45, 55, 0.1);
+  gap: 1rem;
+}
+
+.application-error__icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  background: #fff2f1;
+  color: #d84d45;
+  place-items: center;
+}
+
+.application-error__eyebrow {
+  color: #008f8c;
+  font-size: 0.75rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.application-error h1,
+.application-error p {
+  margin: 0;
+}
+
+.application-error h1 {
+  font-size: clamp(1.6rem, 4vw, 2.25rem);
+  letter-spacing: 0;
+}
+
+.application-error p,
+.application-error small {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.application-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.application-error__actions button,
+.application-error__actions a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #008f8c;
+  border-radius: 0.5rem;
+  padding: 0 1rem;
+  background: #008f8c;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  gap: 0.45rem;
+  text-decoration: none;
+}
+
+.application-error__actions a {
+  background: #ffffff;
+  color: #007f7f;
+}
+
 /* POS settings flow — Figma 491/492/497/584 */
 .pos-portal__mobile-back,
 .pos-portal__mobile-symbol {

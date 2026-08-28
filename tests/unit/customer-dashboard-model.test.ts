@@ -56,7 +56,8 @@ describe("customer dashboard model", () => {
         email: "ana@example.com",
         phone: null,
         locale: "pt-MZ",
-        marketingConsent: true
+        marketingConsent: true,
+        dateOfBirth: null
       }
     });
 

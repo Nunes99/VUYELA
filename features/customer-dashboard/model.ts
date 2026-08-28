@@ -36,6 +36,24 @@ export interface CustomerProfileSummary {
   phone: string | null;
   locale: string;
   marketingConsent: boolean;
+  dateOfBirth: string | null;
+}
+
+export type CustomerActivityMovement = "all" | "earn" | "redeem";
+export type CustomerActivityPeriod = "30" | "90" | "all";
+export type CustomerNotificationCategory = "all" | "offers" | "transactions" | "system";
+
+export interface CustomerPagination {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface CustomerActivityFilters {
+  movement: CustomerActivityMovement;
+  period: CustomerActivityPeriod;
+  query: string;
 }
 
 export interface CustomerDashboardViewModel {
@@ -52,6 +70,10 @@ export interface CustomerDashboardViewModel {
   hasOffers: boolean;
   hasNotifications: boolean;
   unreadNotificationCount: number;
+  activityPagination: CustomerPagination;
+  activityFilters: CustomerActivityFilters;
+  notificationPagination: CustomerPagination;
+  notificationCategory: CustomerNotificationCategory;
 }
 
 export function buildCustomerDashboardViewModel({
@@ -59,13 +81,23 @@ export function buildCustomerDashboardViewModel({
   activity,
   offers,
   notifications,
-  profile
+  profile,
+  activityPagination,
+  activityFilters,
+  notificationPagination,
+  notificationCategory,
+  unreadNotificationCount
 }: {
   cards: DigitalCustomerCard[];
   activity: CustomerActivityItem[];
   offers: CustomerExploreOffer[];
   notifications: CustomerNotification[];
   profile: CustomerProfileSummary;
+  activityPagination?: CustomerPagination;
+  activityFilters?: CustomerActivityFilters;
+  notificationPagination?: CustomerPagination;
+  notificationCategory?: CustomerNotificationCategory;
+  unreadNotificationCount?: number;
 }): CustomerDashboardViewModel {
   const totalPoints = cards.reduce((sum, card) => sum + card.availablePoints, 0);
   const totalValueMzn = cards.reduce((sum, card) => sum + card.valueMzn, 0);
@@ -84,7 +116,20 @@ export function buildCustomerDashboardViewModel({
     hasActivity: activity.length > 0,
     hasOffers: offers.length > 0,
     hasNotifications: notifications.length > 0,
-    unreadNotificationCount: countUnreadNotifications(notifications)
+    unreadNotificationCount: unreadNotificationCount ?? countUnreadNotifications(notifications),
+    activityPagination: activityPagination ?? buildDefaultPagination(activity.length),
+    activityFilters: activityFilters ?? { movement: "all", period: "30", query: "" },
+    notificationPagination: notificationPagination ?? buildDefaultPagination(notifications.length),
+    notificationCategory: notificationCategory ?? "all"
+  };
+}
+
+function buildDefaultPagination(total: number): CustomerPagination {
+  return {
+    page: 1,
+    pageSize: Math.max(total, 1),
+    total,
+    totalPages: 1
   };
 }
 

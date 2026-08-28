@@ -25,3 +25,19 @@ export async function markNotificationReadAction(formData: FormData): Promise<vo
     revalidatePath("/cliente");
   }
 }
+
+export async function markAllNotificationsReadAction(): Promise<void> {
+  await requireRouteAccess("/cliente", "/cliente?vista=notificacoes");
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("notifications")
+    .update({ read_at: new Date().toISOString() })
+    .eq("channel", "in_app")
+    .in("status", ["sent", "delivered"])
+    .is("read_at", null);
+
+  if (!error) {
+    revalidatePath("/cliente");
+  }
+}

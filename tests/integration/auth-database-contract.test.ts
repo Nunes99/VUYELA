@@ -85,7 +85,8 @@ describe("authentication database contract", () => {
   });
 
   it("implements password reset completion and handles invalid callback links", () => {
-    expect(actions).toContain('encodeURIComponent("/definir-senha")');
+    expect(actions).toContain("getDefinePasswordPath(portal, next)");
+    expect(actions).toContain("getPortalNextPath(portal");
     expect(actions).toContain("supabase.auth.updateUser({ password: password.value })");
     expect(callback).toContain("link-invalido");
     expect(callback).toContain("exchangeCodeForSession");

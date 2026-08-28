@@ -8,6 +8,21 @@
 - Supabase/PostgreSQL tests for migrations, RLS, and transactional loyalty behavior.
 - Static migration tests for schema, RLS, and RPC invariants until a runnable local Supabase/PostgreSQL test harness is available.
 
+## Fase 31 Reliability Gate
+
+The default Playwright suite remains deterministic and intentionally runs without Supabase
+credentials. It validates public routes, protected fallbacks, responsive layout and interaction
+contracts.
+
+`pnpm test:e2e:live` is the authenticated reliability suite. It keeps the configured Supabase
+environment, uses dedicated accounts for customer, business, POS and admin, verifies that each
+identity reaches only its own portal, and checks `/api/health`. Configure it with the variables in
+`.env.e2e.example`; never use personal or production administrator credentials.
+
+The GitHub Actions quality gate runs lint, typecheck, unit/integration tests, production build and
+the deterministic Playwright suite. The authenticated suite is available through manual workflow
+dispatch after the repository secrets have been configured.
+
 ## Priority Unit Tests
 
 - point calculation;

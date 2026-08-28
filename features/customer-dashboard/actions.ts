@@ -15,6 +15,7 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
   const principal = await requireAuthenticatedUser("/cliente?vista=perfil&editar=1");
   const displayName = value(formData, "displayName");
   const phone = value(formData, "phone");
+  const dateOfBirth = normalizeDateOfBirth(value(formData, "dateOfBirth"));
 
   if (displayName.length < 2 || displayName.length > 100) {
     redirect("/cliente?vista=perfil&editar=1&perfil=erro");
@@ -24,12 +25,17 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
     redirect("/cliente?vista=perfil&editar=1&perfil=erro");
   }
 
+  if (dateOfBirth === undefined) {
+    redirect("/cliente?vista=perfil&editar=1&perfil=erro");
+  }
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase
     .from("profiles")
     .update({
       display_name: displayName,
       phone: phone || null,
+      date_of_birth: dateOfBirth,
       locale: "pt-MZ",
       marketing_consent_at:
         value(formData, "marketingConsent") === "on" ? new Date().toISOString() : null
@@ -42,6 +48,26 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
 
   revalidatePath("/cliente");
   redirect("/cliente?vista=perfil&editar=1&perfil=guardado");
+}
+
+function normalizeDateOfBirth(input: string): string | null | undefined {
+  if (!input) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) return undefined;
+
+  const parsed = new Date(`${input}T00:00:00.000Z`);
+  const today = new Date();
+  const minimum = new Date("1900-01-01T00:00:00.000Z");
+
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.toISOString().slice(0, 10) !== input ||
+    parsed < minimum ||
+    parsed > today
+  ) {
+    return undefined;
+  }
+
+  return input;
 }
 
 export async function updateCustomerBusinessPreferenceAction(formData: FormData): Promise<void> {

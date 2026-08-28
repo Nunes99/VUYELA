@@ -251,10 +251,31 @@ registo de auditoria. Filtros e paginação deixam de ser apenas visuais.
 
 ### Fase 31 — Convergência e produção
 
+**Estado: em implementação desde 28/08/2026.** A primeira entrega corrige a recuperação de acesso
+por portal, substitui filtros decorativos do cliente por controlos reais, pagina histórico e
+notificações no servidor, permite guardar a data de nascimento, adiciona leitura em massa de
+avisos, estados globais de erro, health check e uma porta de qualidade em GitHub Actions.
+
 - testes unitários, integração, RLS e E2E dos fluxos completos;
 - comparação visual Figma em mobile e desktop;
 - acessibilidade, desempenho e revisão ortográfica;
 - build, migração de produção, monitorização e plano de reversão.
+
+Para concluir a fase ainda é necessário configurar as contas E2E dedicadas no GitHub, executar a
+suite autenticada contra um ambiente isolado, fechar os avisos live de segurança do Supabase,
+ligar monitorização externa ao health check e validar os quatro portais em produção.
+
+Auditoria live de 28/08/2026: o advisor de desempenho não apresentou avisos ou erros, apenas
+índices ainda sem utilização num projeto com pouco tráfego. O advisor de segurança continua a
+indicar a proteção contra palavras-passe expostas como desativada, uma tabela administrativa com
+RLS sem política direta e funções `SECURITY DEFINER` executáveis pelos papéis públicos. Estas
+funções devem ser classificadas entre RPCs intencionalmente expostas e helpers internos antes de
+qualquer revogação, para não interromper RLS, adesões, POS ou movimentos de YELAS.
+
+Gate local de 28/08/2026: lint e typecheck aprovados, 246 testes unitários/integração aprovados,
+build de produção aprovado e Playwright determinístico com 86 testes aprovados e 2 ignorados por
+serem específicos do outro dispositivo. A suite autenticada permanece dependente das contas E2E
+dedicadas descritas em `.env.e2e.example`.
 
 ## Critério de conclusão
 

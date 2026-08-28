@@ -28,6 +28,7 @@ import {
   updateCustomerProfileAction,
   verifyPhoneOtpAction
 } from "@/features/auth/actions";
+import type { AuthPortal } from "@/features/auth/portal";
 import { initialAuthActionState } from "@/features/auth/state";
 
 interface FormProps {
@@ -172,7 +173,7 @@ export function SignUpForm({ nextPath = "/onboarding/cliente" }: FormProps) {
   );
 }
 
-export function PasswordResetForm() {
+export function PasswordResetForm({ nextPath, portal }: { nextPath: string; portal: AuthPortal }) {
   const [state, formAction, pending] = useActionState(
     requestPasswordResetAction,
     initialAuthActionState
@@ -180,6 +181,8 @@ export function PasswordResetForm() {
 
   return (
     <form action={formAction} className="auth-form">
+      <input name="next" type="hidden" value={nextPath} />
+      <input name="portal" type="hidden" value={portal} />
       <Input label="E-mail" name="email" type="email" autoComplete="email" requiredMark required />
       <ActionMessage status={state.status} message={state.message} />
       <Button
@@ -195,11 +198,13 @@ export function PasswordResetForm() {
   );
 }
 
-export function UpdatePasswordForm() {
+export function UpdatePasswordForm({ nextPath, portal }: { nextPath: string; portal: AuthPortal }) {
   const [state, formAction, pending] = useActionState(updatePasswordAction, initialAuthActionState);
 
   return (
     <form action={formAction} className="auth-form">
+      <input name="next" type="hidden" value={nextPath} />
+      <input name="portal" type="hidden" value={portal} />
       <Input
         label="Nova palavra-passe"
         name="password"

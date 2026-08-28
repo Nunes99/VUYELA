@@ -21,6 +21,7 @@ export interface CustomerCardSource {
   pointValueMznMinor: number;
   pointsExpireAfterDays: number | null;
   tiers: CustomerCardTier[];
+  isFavorite?: boolean;
 }
 
 export interface DigitalCustomerCard {
@@ -40,6 +41,7 @@ export interface DigitalCustomerCard {
   pointsUntilNextTier: number | null;
   expiryLabel: string;
   qrCode: string;
+  isFavorite?: boolean;
 }
 
 export function buildDigitalCustomerCard(source: CustomerCardSource): DigitalCustomerCard {
@@ -85,7 +87,8 @@ export function buildDigitalCustomerCard(source: CustomerCardSource): DigitalCus
       ? Math.max(nextTier.minimumLifetimePoints - source.lifetimeEarned, 0)
       : null,
     expiryLabel: getExpiryLabel(source.pointsExpireAfterDays),
-    qrCode: buildIdentificationQrCode(source.cardNumber)
+    qrCode: buildIdentificationQrCode(source.cardNumber),
+    isFavorite: source.isFavorite ?? false
   };
 }
 

@@ -5,7 +5,7 @@ test("hides phone authentication while no SMS provider is configured", async ({ 
 
   await expect(page.getByRole("heading", { name: "E-mail e palavra-passe" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Telefone com código" })).toHaveCount(0);
-  await expect(page.locator('input[name="next"]')).toHaveValue("/conta");
+  await expect(page.locator('input[name="next"]')).toHaveValue("/cliente");
 });
 
 test("protects the account router before choosing the correct dashboard", async ({ page }) => {
@@ -30,6 +30,24 @@ test("shows the complete password recovery forms", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByLabel(/^Nova palavra-passe/)).toBeVisible();
   await expect(page.getByLabel("Confirmar nova palavra-passe")).toBeVisible();
+});
+
+test("preserves the originating portal throughout password recovery", async ({ page }) => {
+  await page.goto("/negocio/entrar?next=%2Fnegocio%3Fvista%3Dequipa");
+
+  const recoveryLink = page.getByRole("link", { name: "Recuperar acesso" });
+  await expect(recoveryLink).toHaveAttribute(
+    "href",
+    "/recuperar-acesso?portal=business&next=%2Fnegocio%3Fvista%3Dequipa"
+  );
+  await recoveryLink.click();
+
+  await expect(page.locator('input[name="portal"]')).toHaveValue("business");
+  await expect(page.locator('input[name="next"]')).toHaveValue("/negocio?vista=equipa");
+
+  await page.goto("/definir-senha?portal=pos&next=%2Fpos%3Fetapa%3Dservices");
+  await expect(page.locator('input[name="portal"]')).toHaveValue("pos");
+  await expect(page.locator('input[name="next"]')).toHaveValue("/pos?etapa=services");
 });
 
 test("rejects an auth callback without a code", async ({ page }) => {

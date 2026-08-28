@@ -9,6 +9,7 @@ export interface CustomerNotification {
   body: string;
   createdAt: string;
   readAt: string | null;
+  category?: "offers" | "transactions" | "system";
 }
 
 const retryDelaysSeconds = [60, 5 * 60, 30 * 60, 2 * 60 * 60, 6 * 60 * 60] as const;

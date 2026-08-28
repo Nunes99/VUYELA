@@ -125,7 +125,8 @@ const dashboard = buildCustomerDashboardViewModel({
     email: "nunes.jose@lemote.com",
     phone: "+258 84 123 4567",
     locale: "pt-MZ",
-    marketingConsent: true
+    marketingConsent: true,
+    dateOfBirth: "1995-09-24"
   },
   activity: [
     {

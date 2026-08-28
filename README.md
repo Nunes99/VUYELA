@@ -12,7 +12,7 @@ Points are promotional benefits issued by each business. They are not cash, cann
 
 ## Current Phase
 
-This repository has completed **FASE 14 — Notifications**.
+This repository is implementing **FASE 31 — Convergência, confiabilidade e produção**.
 
 Completed foundation work includes:
 
@@ -36,7 +36,9 @@ Completed foundation work includes:
 - business campaign creation with rule-based segmentation, scheduled start/end dates, consent-aware eligibility calculation, materialized audiences, and campaign analytics
 - idempotent in-app and email notification delivery with customer read state, campaign delivery metrics, server-only providers, leased retries, and a protected Vercel Cron worker
 
-Product features such as referrals, subscriptions, and platform administration are intentionally not implemented yet.
+Referrals, subscriptions, platform administration, business operations and the independent POS
+application are implemented. The current phase concentrates on authenticated end-to-end proof,
+operational monitoring, UX reliability and production hardening.
 
 ## Scripts
 

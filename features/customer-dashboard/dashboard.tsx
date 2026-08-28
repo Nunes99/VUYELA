@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ArrowLeft,
   Bell,
+  CalendarDays,
   Check,
   ChevronRight,
   CreditCard,
@@ -28,7 +29,7 @@ import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input } from "../../vuyela-design-system/src/components/Field";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
-import { InAppNotificationList } from "@/features/notifications/in-app-list";
+import { markAllNotificationsReadAction } from "@/features/notifications/actions";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import { joinBusinessLoyaltyProgramAction } from "@/features/public-marketplace/actions";
@@ -37,7 +38,9 @@ import { signOutAction } from "@/features/auth/actions";
 
 import { updateCustomerProfileAction } from "./actions";
 import { CustomerActivityTable } from "./activity-table";
+import { CustomerCardHub } from "./card-hub";
 import { CustomerMobileCardDetail } from "./mobile-card-detail";
+import { CustomerNotificationCenter } from "./notification-center";
 import { CustomerOfferGrid } from "./offer-grid";
 import type { CustomerDashboardState } from "./data";
 import type { CustomerDashboardViewModel } from "./model";
@@ -325,34 +328,8 @@ function CustomerCardsHub({ dashboard }: { dashboard: CustomerDashboardViewModel
         description="Aceda ao saldo de fidelidade de cada estabelecimento."
         titleId="customer-cards-title"
       />
-      <div className="customer-card-filters" aria-label="Resumo dos cartões">
-        <span className="is-active">Todos</span>
-        <span>Parceiros</span>
-        <span>Lojas</span>
-        <span>Favoritos</span>
-      </div>
       {dashboard.hasCards ? (
-        <div className="customer-cards-hub-grid">
-          {dashboard.cards.map((card) => (
-            <Link
-              aria-label={`Abrir cartão ${card.businessName}`}
-              className="customer-card-hub-item"
-              href={`/cliente?vista=cartoes&cartao=${encodeURIComponent(card.id)}`}
-              key={card.id}
-            >
-              <CustomerCardVisual card={card} compact />
-              <div className="customer-card-hub-item__content">
-                <span>{card.currentTierName}</span>
-                <h3>{card.businessName}</h3>
-                <strong>{card.availablePoints.toLocaleString("pt-MZ")} YL</strong>
-              </div>
-              <ChevronRight aria-hidden="true" size={18} />
-            </Link>
-          ))}
-          <Link className="customer-add-card" href="/cliente?vista=negocios">
-            <Plus aria-hidden="true" size={16} /> Adicionar novo cartão digital
-          </Link>
-        </div>
+        <CustomerCardHub cards={dashboard.cards} />
       ) : (
         <div className="customer-cards-empty-with-action">
           <SectionEmpty
@@ -570,18 +547,14 @@ function CustomerActivity({ dashboard }: { dashboard: CustomerDashboardViewModel
         breadcrumb="Início"
         breadcrumbHref="/cliente"
         title="Histórico de Atividade"
-        description="Consulte todos as YELAS ganhas e utilizados nos seus cartões."
+        description="Consulte todas as YELAS ganhas e utilizadas nos seus cartões."
         titleId="customer-activity-title"
       />
-      {dashboard.hasActivity ? (
-        <CustomerActivityTable activity={dashboard.activity} />
-      ) : (
-        <SectionEmpty
-          icon={Activity}
-          title="Sem movimentos"
-          body="O seu histórico de compras, YELAS ganhas e utilizações aparecerá aqui."
-        />
-      )}
+      <CustomerActivityTable
+        activity={dashboard.activity}
+        filters={dashboard.activityFilters}
+        pagination={dashboard.activityPagination}
+      />
     </section>
   );
 }
@@ -653,19 +626,12 @@ function CustomerNotifications({ dashboard }: { dashboard: CustomerDashboardView
         description="Novidades, movimentos e campanhas dos seus programas."
         titleId="customer-notifications-title"
       />
-      <div className="customer-notifications-panel">
-        <div className="customer-notifications-panel__heading">
-          <h3>Últimas notificações</h3>
-          <span>{dashboard.unreadNotificationCount.toLocaleString("pt-MZ")} por ler</span>
-        </div>
-        <div className="customer-notification-filters" aria-label="Categorias de notificações">
-          <span className="is-active">Todas</span>
-          <span>Transações</span>
-          <span>Ofertas</span>
-          <span>Sistema</span>
-        </div>
-        <InAppNotificationList notifications={dashboard.notifications} />
-      </div>
+      <CustomerNotificationCenter
+        category={dashboard.notificationCategory}
+        notifications={dashboard.notifications}
+        pagination={dashboard.notificationPagination}
+        unreadCount={dashboard.unreadNotificationCount}
+      />
     </section>
   );
 }
@@ -700,7 +666,7 @@ function CustomerProfile({
         ) : null}
         {profileStatus === "erro" ? (
           <p className="customer-profile-message customer-profile-message--error" role="alert">
-            Não foi possível atualizar o perfil. Confirme o nome e o formato do telefone.
+            Não foi possível atualizar o perfil. Confirme o nome, o telefone e a data de nascimento.
           </p>
         ) : null}
         <CustomerProfileForm dashboard={dashboard} />
@@ -748,6 +714,11 @@ function CustomerProfile({
               icon={Phone}
               label="Telefone"
               value={dashboard.profile.phone ?? "Não definido"}
+            />
+            <ProfileFact
+              icon={CalendarDays}
+              label="Data de nascimento"
+              value={formatProfileDate(dashboard.profile.dateOfBirth)}
             />
             <ProfileFact icon={MapPin} label="Região" value="Moçambique" />
           </dl>
@@ -845,7 +816,13 @@ function CustomerProfileForm({ dashboard }: { dashboard: CustomerDashboardViewMo
         </label>
         <label>
           <span>Data de nascimento</span>
-          <input disabled placeholder="Ex.: 24/09/1995" type="text" />
+          <input
+            defaultValue={dashboard.profile.dateOfBirth ?? ""}
+            max={new Date().toISOString().slice(0, 10)}
+            min="1900-01-01"
+            name="dateOfBirth"
+            type="date"
+          />
         </label>
       </div>
       <div className="customer-profile-form__email">
@@ -1030,9 +1007,11 @@ function CustomerMobileHeader({
           {actionContent}
         </Link>
       ) : (
-        <button aria-label={actionLabel} disabled title={actionLabel} type="button">
-          {actionContent}
-        </button>
+        <form action={markAllNotificationsReadAction}>
+          <button aria-label={actionLabel} title={actionLabel} type="submit">
+            {actionContent}
+          </button>
+        </form>
       )}
     </header>
   );
@@ -1081,6 +1060,17 @@ function formatMemberDate(value: string | undefined): string {
   return value
     ? new Intl.DateTimeFormat("pt-MZ", { month: "long", year: "numeric" }).format(new Date(value))
     : "hoje";
+}
+
+function formatProfileDate(value: string | null): string {
+  if (!value) return "Não definida";
+
+  return new Intl.DateTimeFormat("pt-MZ", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(`${value}T00:00:00.000Z`));
 }
 
 function formatToday(): string {

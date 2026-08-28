@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CustomerActivityTable } from "@/features/customer-dashboard/activity-table";
@@ -24,18 +24,25 @@ const activity = [
 ];
 
 describe("customer activity table", () => {
-  it("filters activity by movement and establishment", () => {
-    render(<CustomerActivityTable activity={activity} />);
+  it("keeps server-side filters and pagination in shareable links", () => {
+    render(
+      <CustomerActivityTable
+        activity={activity}
+        filters={{ movement: "all", period: "90", query: "barber" }}
+        pagination={{ page: 2, pageSize: 25, total: 52, totalPages: 3 }}
+      />
+    );
 
-    fireEvent.click(screen.getByRole("button", { name: "Usados" }));
-    expect(screen.getByText("Café Maputo")).toBeVisible();
-    expect(screen.queryByText("Barbershop 21")).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Todos" }));
-    fireEvent.change(screen.getByRole("searchbox", { name: "Pesquisar atividade" }), {
-      target: { value: "barber" }
-    });
     expect(screen.getByText("Barbershop 21")).toBeVisible();
-    expect(screen.queryByText("Café Maputo")).not.toBeInTheDocument();
+    expect(screen.getByRole("searchbox", { name: "Pesquisar atividade" })).toHaveValue("barber");
+    expect(screen.getByRole("link", { name: "Usados" })).toHaveAttribute(
+      "href",
+      "/cliente?vista=atividade&movimento=redeem&periodo=90&q=barber"
+    );
+    expect(screen.getByRole("link", { name: /Seguinte/ })).toHaveAttribute(
+      "href",
+      "/cliente?vista=atividade&movimento=all&periodo=90&q=barber&pagina=3"
+    );
+    expect(screen.getByText("26-50 de 52 movimentos encontrados")).toBeVisible();
   });
 });

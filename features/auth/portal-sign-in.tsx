@@ -2,30 +2,19 @@ import Link from "next/link";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { EmailSignInForm, PhoneOtpForm } from "@/features/auth/forms";
+import { getPasswordRecoveryPath, getPortalNextPath } from "@/features/auth/portal";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 
 export function getCustomerNextPath(value: string | string[] | undefined) {
-  if (typeof value !== "string" || !value.startsWith("/cliente") || value.startsWith("//")) {
-    return "/cliente";
-  }
-
-  return value;
+  return getPortalNextPath("customer", value);
 }
 
 export function getBusinessNextPath(value: string | string[] | undefined) {
-  if (typeof value !== "string" || !value.startsWith("/negocio") || value.startsWith("//")) {
-    return "/negocio";
-  }
-
-  return value;
+  return getPortalNextPath("business", value);
 }
 
 export function getPosNextPath(value: string | string[] | undefined) {
-  if (typeof value !== "string" || !value.startsWith("/pos") || value.startsWith("//")) {
-    return "/pos";
-  }
-
-  return value;
+  return getPortalNextPath("pos", value);
 }
 
 export function CustomerSignInView({
@@ -73,7 +62,8 @@ export function CustomerSignInView({
           ) : null}
           <p className="auth-footnote">
             Ainda não tem conta? <Link href="/cadastrar">Criar conta</Link>. Esqueceu a
-            palavra-passe? <Link href="/recuperar-acesso">Recuperar acesso</Link>.
+            palavra-passe?{" "}
+            <Link href={getPasswordRecoveryPath("customer", nextPath)}>Recuperar acesso</Link>.
           </p>
         </div>
       </section>
@@ -95,6 +85,8 @@ export function BusinessSignInView({ nextPath }: { nextPath: string }) {
           <EmailSignInForm nextPath={nextPath} portal="business" />
           <p className="auth-footnote">
             Ainda não tem credenciais? <Link href="/cadastrar/negocio">Registar negócio</Link>.
+            Esqueceu a palavra-passe?{" "}
+            <Link href={getPasswordRecoveryPath("business", nextPath)}>Recuperar acesso</Link>.
           </p>
         </div>
       </section>
@@ -120,7 +112,7 @@ export function PosSignInView({ nextPath }: { nextPath: string }) {
           <p className="auth-footnote">
             Ainda não tem acesso? Peça ao administrador do negócio credenciais individuais ou um
             convite de operador. Esqueceu a palavra-passe?{" "}
-            <Link href="/recuperar-acesso">Recuperar acesso</Link>.
+            <Link href={getPasswordRecoveryPath("pos", nextPath)}>Recuperar acesso</Link>.
           </p>
         </div>
       </section>

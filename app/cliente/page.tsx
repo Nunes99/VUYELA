@@ -4,6 +4,7 @@ import { ProtectedRouteStateView } from "@/components/auth/protected-route-state
 import { CustomerDashboardView } from "@/features/customer-dashboard/dashboard";
 import type { CustomerDashboardViewName } from "@/features/customer-dashboard/dashboard";
 import { getCustomerDashboard } from "@/features/customer-dashboard/data";
+import type { CustomerDashboardQuery } from "@/features/customer-dashboard/data";
 import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
 import { getProtectedRouteState } from "@/lib/auth/session";
 
@@ -38,6 +39,33 @@ function viewParam(value: string | string[] | undefined): CustomerDashboardViewN
   return "inicio";
 }
 
+function pageParam(value: string | string[] | undefined): number {
+  const parsed = Number.parseInt(param(value) ?? "1", 10);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function customerQuery(
+  params: Record<string, string | string[] | undefined>
+): CustomerDashboardQuery {
+  const movement = param(params.movimento);
+  const period = param(params.periodo);
+  const notificationCategory = param(params.aviso);
+
+  return {
+    activityPage: pageParam(params.pagina),
+    activityMovement: movement === "earn" || movement === "redeem" ? movement : "all",
+    activityPeriod: period === "90" || period === "all" ? period : "30",
+    activityQuery: param(params.q) ?? "",
+    notificationPage: pageParam(params.paginaAvisos),
+    notificationCategory:
+      notificationCategory === "offers" ||
+      notificationCategory === "transactions" ||
+      notificationCategory === "system"
+        ? notificationCategory
+        : "all"
+  };
+}
+
 const viewTitles: Record<CustomerDashboardViewName, string> = {
   inicio: "Painel do Cliente",
   cartoes: "Gerir Cartões",
@@ -59,8 +87,8 @@ export default async function CustomerAreaPage({
   const [dashboardState, marketplaceState] =
     state.status === "authorized"
       ? await Promise.all([
-          getCustomerDashboard(state.principal.profileId),
-          getPublicMarketplaceSnapshot()
+          getCustomerDashboard(state.principal.profileId, customerQuery(params)),
+          activeView === "negocios" ? getPublicMarketplaceSnapshot() : Promise.resolve(null)
         ])
       : [null, null];
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { PasswordResetForm } from "@/features/auth/forms";
+import { getPortalLoginPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
 
 export const metadata: Metadata = {
   title: "Recuperar acesso",
@@ -16,7 +17,18 @@ export const metadata: Metadata = {
   }
 };
 
-export default function PasswordResetPage() {
+export default async function PasswordResetPage({
+  searchParams
+}: {
+  searchParams: Promise<{
+    next?: string | string[] | undefined;
+    portal?: string | string[] | undefined;
+  }>;
+}) {
+  const params = await searchParams;
+  const portal = parseAuthPortal(params.portal);
+  const nextPath = getPortalNextPath(portal, params.next);
+
   return (
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="reset-title">
@@ -27,9 +39,9 @@ export default function PasswordResetPage() {
           <p className="auth-intro">
             Indique o e-mail da conta para receber as instruções de recuperação.
           </p>
-          <PasswordResetForm />
+          <PasswordResetForm nextPath={nextPath} portal={portal} />
           <p className="auth-footnote">
-            Lembrou a palavra-passe? <Link href="/entrar">Voltar ao login</Link>.
+            Lembrou a palavra-passe? <Link href={getPortalLoginPath(portal)}>Voltar ao login</Link>.
           </p>
         </div>
       </section>

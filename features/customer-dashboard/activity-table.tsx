@@ -1,105 +1,94 @@
-"use client";
+import Link from "next/link";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import React from "react";
 
-import React, { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import type {
+  CustomerActivityFilters,
+  CustomerActivityItem,
+  CustomerActivityMovement,
+  CustomerPagination
+} from "./model";
 
-import type { CustomerActivityItem } from "./model";
-
-type ActivityFilter = "all" | "earn" | "redeem";
-type ActivityPeriod = "30" | "90" | "all";
-
-export function CustomerActivityTable({ activity }: { activity: CustomerActivityItem[] }) {
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<ActivityFilter>("all");
-  const [period, setPeriod] = useState<ActivityPeriod>("30");
-  const filteredActivity = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("pt-MZ");
-    const periodStart = getPeriodStart(period);
-
-    return activity.filter((item) => {
-      const matchesFilter = filter === "all" || item.tone === filter;
-      const matchesPeriod = periodStart === null || new Date(item.occurredAt) >= periodStart;
-      const matchesQuery =
-        !normalizedQuery ||
-        item.businessName.toLocaleLowerCase("pt-MZ").includes(normalizedQuery) ||
-        item.description.toLocaleLowerCase("pt-MZ").includes(normalizedQuery);
-
-      return matchesFilter && matchesPeriod && matchesQuery;
-    });
-  }, [activity, filter, period, query]);
-
+export function CustomerActivityTable({
+  activity,
+  filters,
+  pagination
+}: {
+  activity: CustomerActivityItem[];
+  filters: CustomerActivityFilters;
+  pagination: CustomerPagination;
+}) {
   return (
     <div className="customer-activity-panel">
-      <div className="customer-activity-toolbar">
+      <form action="/cliente" className="customer-activity-toolbar" method="get">
+        <input name="vista" type="hidden" value="atividade" />
         <label className="customer-activity-search">
           <Search aria-hidden="true" size={17} />
           <span className="sr-only">Pesquisar atividade</span>
           <input
-            onChange={(event) => setQuery(event.target.value)}
+            defaultValue={filters.query}
+            name="q"
             placeholder="Pesquisar estabelecimento..."
             type="search"
-            value={query}
           />
         </label>
         <label className="customer-activity-period">
           <span className="sr-only">Período</span>
-          <select
-            value={period}
-            onChange={(event) => setPeriod(event.target.value as ActivityPeriod)}
-          >
+          <select defaultValue={filters.period} name="periodo">
             <option value="30">Últimos 30 dias</option>
             <option value="90">Últimos 90 dias</option>
             <option value="all">Todo o período</option>
           </select>
         </label>
-        <div className="customer-activity-filters" aria-label="Filtrar atividade">
-          <button aria-pressed={filter === "all"} onClick={() => setFilter("all")} type="button">
-            Todos
-          </button>
-          <button aria-pressed={filter === "earn"} onClick={() => setFilter("earn")} type="button">
-            Ganhos
-          </button>
-          <button
-            aria-pressed={filter === "redeem"}
-            onClick={() => setFilter("redeem")}
-            type="button"
-          >
-            Usados
-          </button>
-        </div>
+        <input name="movimento" type="hidden" value={filters.movement} />
+        <button className="customer-activity-submit" type="submit">
+          Aplicar filtros
+        </button>
+      </form>
+
+      <div className="customer-activity-filters" aria-label="Filtrar atividade">
+        <MovementLink filters={filters} label="Todos" movement="all" />
+        <MovementLink filters={filters} label="Ganhos" movement="earn" />
+        <MovementLink filters={filters} label="Usados" movement="redeem" />
       </div>
 
-      {filteredActivity.length > 0 ? (
-        <div className="customer-activity-table-wrap">
-          <table className="customer-activity-table">
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Estabelecimento</th>
-                <th>Movimento</th>
-                <th>Cartão vinculado</th>
-                <th>YELAS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredActivity.map((item) => (
-                <tr key={item.id}>
-                  <td>{formatActivityDate(item.occurredAt)}</td>
-                  <td>
-                    <strong>{item.businessName}</strong>
-                    <small>{item.description}</small>
-                  </td>
-                  <td>{item.tone === "redeem" ? "Utilização de YELAS" : "Compra realizada"}</td>
-                  <td>{item.cardName ?? "Cartão VUYELA"}</td>
-                  <td className={`is-${item.tone}`}>
-                    {item.points > 0 ? "+" : ""}
-                    {item.points.toLocaleString("pt-MZ")} YL
-                  </td>
+      {activity.length > 0 ? (
+        <>
+          <div className="customer-activity-result-summary" role="status">
+            {formatResultRange(pagination)} movimentos encontrados
+          </div>
+          <div className="customer-activity-table-wrap">
+            <table className="customer-activity-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Estabelecimento</th>
+                  <th>Movimento</th>
+                  <th>Cartão vinculado</th>
+                  <th>YELAS</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {activity.map((item) => (
+                  <tr key={item.id}>
+                    <td>{formatActivityDate(item.occurredAt)}</td>
+                    <td>
+                      <strong>{item.businessName}</strong>
+                      <small>{item.description}</small>
+                    </td>
+                    <td>{item.tone === "redeem" ? "Utilização de YELAS" : "Compra realizada"}</td>
+                    <td>{item.cardName ?? "Cartão VUYELA"}</td>
+                    <td className={`is-${item.tone}`}>
+                      {item.points > 0 ? "+" : ""}
+                      {item.points.toLocaleString("pt-MZ")} YL
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <ActivityPagination filters={filters} pagination={pagination} />
+        </>
       ) : (
         <div
           className={[
@@ -108,21 +97,90 @@ export function CustomerActivityTable({ activity }: { activity: CustomerActivity
           ].join(" ")}
         >
           <h3>Nenhum movimento encontrado</h3>
-          <p>Altere a pesquisa ou o filtro para ver outros resultados.</p>
+          <p>Altere a pesquisa ou os filtros para consultar outros movimentos.</p>
         </div>
       )}
     </div>
   );
 }
 
-function getPeriodStart(period: ActivityPeriod): Date | null {
-  if (period === "all") {
-    return null;
-  }
+function MovementLink({
+  filters,
+  label,
+  movement
+}: {
+  filters: CustomerActivityFilters;
+  label: string;
+  movement: CustomerActivityMovement;
+}) {
+  return (
+    <Link
+      aria-current={filters.movement === movement ? "page" : undefined}
+      className={filters.movement === movement ? "is-active" : undefined}
+      href={buildActivityHref(filters, movement, 1)}
+    >
+      {label}
+    </Link>
+  );
+}
 
-  const start = new Date();
-  start.setDate(start.getDate() - Number(period));
-  return start;
+function ActivityPagination({
+  filters,
+  pagination
+}: {
+  filters: CustomerActivityFilters;
+  pagination: CustomerPagination;
+}) {
+  if (pagination.totalPages <= 1) return null;
+
+  return (
+    <nav className="customer-pagination" aria-label="Páginas do histórico">
+      {pagination.page > 1 ? (
+        <Link href={buildActivityHref(filters, filters.movement, pagination.page - 1)}>
+          <ChevronLeft aria-hidden="true" size={17} /> Anterior
+        </Link>
+      ) : (
+        <span aria-disabled="true">
+          <ChevronLeft aria-hidden="true" size={17} /> Anterior
+        </span>
+      )}
+      <strong>
+        Página {pagination.page.toLocaleString("pt-MZ")} de{" "}
+        {pagination.totalPages.toLocaleString("pt-MZ")}
+      </strong>
+      {pagination.page < pagination.totalPages ? (
+        <Link href={buildActivityHref(filters, filters.movement, pagination.page + 1)}>
+          Seguinte <ChevronRight aria-hidden="true" size={17} />
+        </Link>
+      ) : (
+        <span aria-disabled="true">
+          Seguinte <ChevronRight aria-hidden="true" size={17} />
+        </span>
+      )}
+    </nav>
+  );
+}
+
+function buildActivityHref(
+  filters: CustomerActivityFilters,
+  movement: CustomerActivityMovement,
+  page: number
+): string {
+  const params = new URLSearchParams({
+    vista: "atividade",
+    movimento: movement,
+    periodo: filters.period
+  });
+  if (filters.query) params.set("q", filters.query);
+  if (page > 1) params.set("pagina", String(page));
+  return `/cliente?${params.toString()}`;
+}
+
+function formatResultRange(pagination: CustomerPagination): string {
+  if (pagination.total === 0) return "0 de 0";
+  const start = (pagination.page - 1) * pagination.pageSize + 1;
+  const end = Math.min(start + pagination.pageSize - 1, pagination.total);
+  return `${start.toLocaleString("pt-MZ")}-${end.toLocaleString("pt-MZ")} de ${pagination.total.toLocaleString("pt-MZ")}`;
 }
 
 function formatActivityDate(value: string): string {

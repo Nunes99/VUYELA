@@ -3,6 +3,11 @@ import Link from "next/link";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { UpdatePasswordForm } from "@/features/auth/forms";
+import {
+  getPasswordRecoveryPath,
+  getPortalNextPath,
+  parseAuthPortal
+} from "@/features/auth/portal";
 
 export const metadata: Metadata = {
   title: "Definir nova palavra-passe",
@@ -15,7 +20,18 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function UpdatePasswordPage() {
+export default async function UpdatePasswordPage({
+  searchParams
+}: {
+  searchParams: Promise<{
+    next?: string | string[] | undefined;
+    portal?: string | string[] | undefined;
+  }>;
+}) {
+  const params = await searchParams;
+  const portal = parseAuthPortal(params.portal);
+  const nextPath = getPortalNextPath(portal, params.next);
+
   return (
     <main className="auth-page">
       <section className="auth-shell auth-shell--single" aria-labelledby="update-password-title">
@@ -27,9 +43,10 @@ export default function UpdatePasswordPage() {
             O link recebido por e-mail abriu uma sessão temporária para atualizar a sua
             palavra-passe.
           </p>
-          <UpdatePasswordForm />
+          <UpdatePasswordForm nextPath={nextPath} portal={portal} />
           <p className="auth-footnote">
-            O link expirou? <Link href="/recuperar-acesso">Solicitar outro link</Link>.
+            O link expirou?{" "}
+            <Link href={getPasswordRecoveryPath(portal, nextPath)}>Solicitar outro link</Link>.
           </p>
         </div>
       </section>
