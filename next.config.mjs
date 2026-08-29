@@ -30,6 +30,13 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Server Actions carry the image multipart payload before the media validator runs.
+  // Keep this slightly above the product limit to account for multipart overhead.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "6mb"
+    }
+  },
   transpilePackages: ["@lemote/vuyela-design-system"],
   async redirects() {
     return [

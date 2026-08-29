@@ -8,6 +8,7 @@ const migration = readFileSync(
   "utf8"
 );
 const mediaService = readFileSync(join(process.cwd(), "lib/business-media.ts"), "utf8");
+const nextConfig = readFileSync(join(process.cwd(), "next.config.mjs"), "utf8");
 
 describe("business media contract", () => {
   it("adds media references without storing binary data in operational tables", () => {
@@ -34,5 +35,10 @@ describe("business media contract", () => {
     expect(migration).toContain("insert into public.audit_logs");
     expect(migration).toContain("from public, anon");
     expect(migration).toContain("to authenticated");
+  });
+
+  it("allows the Server Action envelope to reach the 5 MB media validator", () => {
+    expect(nextConfig).toContain('bodySizeLimit: "6mb"');
+    expect(mediaService).toContain("businessMediaMaxBytes");
   });
 });
