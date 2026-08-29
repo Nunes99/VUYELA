@@ -16,6 +16,14 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     await expect(
       page.locator(".customer-home-card-link").first().getByText("Equivale a 345 MZN")
     ).toBeVisible();
+    const equivalentValueFits = await page
+      .locator(".customer-home-card-link")
+      .first()
+      .locator(".customer-digital-card__balance > b")
+      .evaluate((value) =>
+        value.scrollWidth <= value.clientWidth && value.scrollHeight <= value.clientHeight
+      );
+    expect(equivalentValueFits).toBe(true);
 
     if (viewport.mobile) {
       const customerNavigation = page.getByLabel("Navegação do cliente");

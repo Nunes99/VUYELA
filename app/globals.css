@@ -13897,9 +13897,9 @@
 
   .customer-digital-card__balance > b {
     display: block;
-    max-width: calc(100% - 4.75rem);
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: none;
+    overflow: visible;
+    text-overflow: clip;
     white-space: nowrap;
   }
 
