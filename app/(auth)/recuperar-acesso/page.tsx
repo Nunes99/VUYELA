@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { AuthStandalone } from "@/components/auth/auth-standalone";
 import { PasswordResetForm } from "@/features/auth/forms";
 import { getPortalLoginPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
 
@@ -30,21 +30,19 @@ export default async function PasswordResetPage({
   const nextPath = getPortalNextPath(portal, params.next);
 
   return (
-    <main className="auth-page">
-      <section className="auth-shell auth-shell--single" aria-labelledby="reset-title">
-        <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" href="/" />
-          <span className="auth-kicker">Recuperação</span>
-          <h1 id="reset-title">Recupere o acesso com segurança.</h1>
-          <p className="auth-intro">
-            Indique o e-mail da conta para receber as instruções de recuperação.
-          </p>
-          <PasswordResetForm nextPath={nextPath} portal={portal} />
-          <p className="auth-footnote">
-            Lembrou a palavra-passe? <Link href={getPortalLoginPath(portal)}>Voltar ao login</Link>.
-          </p>
-        </div>
-      </section>
-    </main>
+    <AuthStandalone
+      description="Indique o e-mail da conta para receber as instruções de recuperação."
+      eyebrow="Recuperação"
+      footer={
+        <p className="auth-footnote">
+          Lembrou a palavra-passe? <Link href={getPortalLoginPath(portal)}>Voltar ao login</Link>.
+        </p>
+      }
+      id="reset-title"
+      title="Recupere o acesso com segurança."
+      variant={portal === "customer" ? "customer" : portal}
+    >
+      <PasswordResetForm nextPath={nextPath} portal={portal} />
+    </AuthStandalone>
   );
 }

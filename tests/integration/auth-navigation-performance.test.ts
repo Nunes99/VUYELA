@@ -21,6 +21,7 @@ describe("authentication and navigation performance contract", () => {
     expect(middleware).toContain('"/negocio/:path*"');
     expect(middleware).toContain('"/pos/:path*"');
     expect(middleware).toContain('"/admin/:path*"');
+    expect(middleware).toContain('"/conta"');
     expect(middleware).toContain('"Cache-Control", "private, no-store"');
   });
 

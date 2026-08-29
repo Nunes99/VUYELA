@@ -29,7 +29,7 @@ export default async function AdminSignInPage({ searchParams }: AdminSignInPageP
       eyebrow="Administração VUYELA"
       formDescription="Use a sua conta administrativa."
       formTitle="Entrar na Administração"
-      homeHref="/admin"
+      homeHref="/"
       id="admin-signin-title"
       title="Administração da plataforma."
       variant="admin"

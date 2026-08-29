@@ -8325,6 +8325,7 @@
   min-height: 100svh;
   display: grid;
   place-items: center;
+  overflow-x: clip;
   padding: var(--vy-space-8);
   background: #eef4f4;
   color: var(--vy-text);
@@ -8332,6 +8333,7 @@
 
 .auth-shell {
   width: min(100%, 72rem);
+  min-width: 0;
   min-height: auto;
   grid-template-columns: minmax(0, 0.92fr) minmax(22rem, 1.08fr);
   align-items: stretch;
@@ -8430,8 +8432,11 @@
 }
 
 .auth-shell--single {
+  width: min(100%, 36rem);
   max-width: 36rem;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
+  overflow: visible;
   border: 0;
   background: transparent;
   padding: 0;
@@ -8439,6 +8444,8 @@
 }
 
 .auth-shell--single .auth-panel--forms {
+  width: 100%;
+  min-width: 0;
   border: 1px solid var(--vy-border);
   border-top: 4px solid var(--vy-color-teal);
   border-radius: var(--vy-radius-xs);
@@ -8460,8 +8467,72 @@
 .auth-panel h1 {
   max-width: 14ch;
   font-weight: 650;
+  letter-spacing: 0;
   line-height: 1.08;
   overflow-wrap: break-word;
+}
+
+.auth-standalone .auth-panel--forms {
+  align-content: start;
+  padding: clamp(2rem, 5vw, 3rem);
+}
+
+.auth-standalone .auth-brand {
+  margin-bottom: var(--vy-space-8);
+}
+
+.auth-standalone__header {
+  display: grid;
+  gap: var(--vy-space-2);
+}
+
+.auth-standalone__header h1,
+.auth-standalone__header p {
+  margin: 0;
+}
+
+.auth-standalone__header h1 {
+  max-width: 21ch;
+  font-size: var(--vy-text-3xl);
+}
+
+.auth-standalone__header .auth-intro {
+  max-width: 46ch;
+  color: var(--vy-text-muted);
+  line-height: 1.6;
+}
+
+.auth-standalone__content {
+  min-width: 0;
+  margin-top: var(--vy-space-6);
+}
+
+.auth-standalone__footer {
+  margin-top: var(--vy-space-5);
+  border-top: 1px solid var(--vy-border);
+  padding-top: var(--vy-space-4);
+}
+
+.auth-standalone__footer .auth-footnote {
+  margin: 0;
+}
+
+.auth-notice__actions {
+  display: grid;
+  gap: var(--vy-space-3);
+}
+
+.auth-notice__actions .home-link-button,
+.auth-notice__actions .auth-account-switch,
+.auth-notice__actions .pwa-install-action {
+  width: 100%;
+}
+
+.auth-notice__actions .home-link-button,
+.auth-notice__actions .pwa-install-action > button {
+  min-height: 3rem;
+  justify-content: center;
+  text-align: center;
 }
 
 .dashboard-page {
@@ -8773,6 +8844,7 @@
     max-width: none;
     min-height: 100svh;
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
     border: 0;
     border-radius: 0;
     padding-block: 0;
@@ -8809,11 +8881,21 @@
 
   .auth-shell--single {
     width: 100%;
+    grid-template-rows: 1fr;
     padding: var(--vy-space-4);
   }
 
   .auth-shell--single .auth-panel--forms {
     border-radius: var(--vy-radius-xs);
+  }
+
+  .auth-standalone .auth-panel--forms {
+    align-self: center;
+    padding: var(--vy-space-6) var(--vy-space-5);
+  }
+
+  .auth-standalone__header h1 {
+    font-size: var(--vy-text-2xl);
   }
 
   .dashboard-shell {
@@ -24488,8 +24570,18 @@
   font-size: 0.82rem;
 }
 
-.pos-portal--transaction .pos-sale__catalog-grid > button > .pos-sale__item-details > .pos-sale__item-price-action > svg,
-.pos-portal--transaction .pos-sale__catalog-grid > button > .pos-sale__item-details > .pos-sale__item-price-action > i {
+.pos-portal--transaction
+  .pos-sale__catalog-grid
+  > button
+  > .pos-sale__item-details
+  > .pos-sale__item-price-action
+  > svg,
+.pos-portal--transaction
+  .pos-sale__catalog-grid
+  > button
+  > .pos-sale__item-details
+  > .pos-sale__item-price-action
+  > i {
   width: 2rem;
   height: 2rem;
   padding: 0.35rem;
@@ -24749,8 +24841,18 @@
     font-size: 0.6rem;
   }
 
-  .pos-portal--transaction .pos-sale__catalog-grid > button > .pos-sale__item-details > .pos-sale__item-price-action > svg,
-  .pos-portal--transaction .pos-sale__catalog-grid > button > .pos-sale__item-details > .pos-sale__item-price-action > i {
+  .pos-portal--transaction
+    .pos-sale__catalog-grid
+    > button
+    > .pos-sale__item-details
+    > .pos-sale__item-price-action
+    > svg,
+  .pos-portal--transaction
+    .pos-sale__catalog-grid
+    > button
+    > .pos-sale__item-details
+    > .pos-sale__item-price-action
+    > i {
     width: 1.75rem;
     height: 1.75rem;
   }

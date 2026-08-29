@@ -28,9 +28,7 @@ const publicPortalPaths = [
 ];
 
 function isPublicPortalPath(pathname: string): boolean {
-  return publicPortalPaths.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
-  );
+  return publicPortalPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 function getRequestedPath(request: NextRequest): string {
@@ -126,7 +124,11 @@ export async function middleware(request: NextRequest) {
   if (!claims?.sub || error) {
     const clearedSession = clearStaleRequestSession(request);
 
-    if (request.nextUrl.pathname === "/mfa" || request.nextUrl.pathname === "/admin/mfa") {
+    if (
+      request.nextUrl.pathname === "/conta" ||
+      request.nextUrl.pathname === "/mfa" ||
+      request.nextUrl.pathname === "/admin/mfa"
+    ) {
       const redirectResponse = NextResponse.redirect(signInUrl);
       expireResponseAuthCookies(redirectResponse, clearedSession.cookieNames);
       return protectResponse(redirectResponse);
@@ -139,11 +141,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/mfa",
-    "/cliente/:path*",
-    "/negocio/:path*",
-    "/pos/:path*",
-    "/admin/:path*"
-  ]
+  matcher: ["/mfa", "/conta", "/cliente/:path*", "/negocio/:path*", "/pos/:path*", "/admin/:path*"]
 };

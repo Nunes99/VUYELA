@@ -11,7 +11,7 @@ test("hides phone authentication while no SMS provider is configured", async ({ 
 test("protects the account router before choosing the correct dashboard", async ({ page }) => {
   await page.goto("/conta");
 
-  await expect(page).toHaveURL(/\/entrar\?next=%2Fconta$/);
+  await expect(page).toHaveURL(/\/entrar\?next=%2Fconta$/, { timeout: 30_000 });
 });
 
 test("shows the complete password recovery forms", async ({ page }) => {

@@ -12,6 +12,7 @@ import {
   UserRound
 } from "lucide-react";
 
+import { AuthStandalone } from "@/components/auth/auth-standalone";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
@@ -36,7 +37,8 @@ function AuthNotice({
   actionHref,
   actionLabel,
   installArea,
-  allowAccountSwitch = false
+  allowAccountSwitch = false,
+  variant = "customer"
 }: {
   eyebrow: string;
   title: string;
@@ -45,32 +47,33 @@ function AuthNotice({
   actionLabel?: string | undefined;
   installArea?: PwaArea | undefined;
   allowAccountSwitch?: boolean;
+  variant?: "customer" | "business" | "pos" | "admin";
 }) {
   return (
-    <main className="auth-page">
-      <section className="auth-shell auth-shell--single" aria-labelledby="protected-title">
-        <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" />
-          <span className="auth-kicker">{eyebrow}</span>
-          <h1 id="protected-title">{title}</h1>
-          <p className="auth-intro">{body}</p>
-          {actionHref && actionLabel ? (
-            <Link className="home-link-button home-link-button--primary" href={actionHref}>
-              {actionLabel}
-            </Link>
-          ) : null}
-          {allowAccountSwitch && installArea ? (
-            <form action={signOutAction} className="auth-account-switch">
-              <input type="hidden" name="returnTo" value={`/${installArea}/entrar`} />
-              <button className="home-link-button home-link-button--primary" type="submit">
-                Entrar com outra conta
-              </button>
-            </form>
-          ) : null}
-          {installArea ? <PwaInstallAction area={installArea} /> : null}
-        </div>
-      </section>
-    </main>
+    <AuthStandalone
+      description={body}
+      eyebrow={eyebrow}
+      id="protected-title"
+      title={title}
+      variant={variant}
+    >
+      <div className="auth-notice__actions">
+        {actionHref && actionLabel ? (
+          <Link className="home-link-button home-link-button--primary" href={actionHref}>
+            {actionLabel}
+          </Link>
+        ) : null}
+        {allowAccountSwitch && installArea ? (
+          <form action={signOutAction} className="auth-account-switch">
+            <input type="hidden" name="returnTo" value={`/${installArea}/entrar`} />
+            <button className="home-link-button home-link-button--primary" type="submit">
+              Entrar com outra conta
+            </button>
+          </form>
+        ) : null}
+        {installArea ? <PwaInstallAction area={installArea} /> : null}
+      </div>
+    </AuthStandalone>
   );
 }
 
@@ -163,6 +166,7 @@ export function ProtectedRouteStateView({
             : "Tente novamente dentro de alguns minutos. Se o problema continuar, contacte o suporte VUYELA."
         }
         installArea={installArea}
+        variant={normalizeAuthVariant(variant)}
       />
     );
   }
@@ -176,6 +180,7 @@ export function ProtectedRouteStateView({
         actionHref={state.signInPath}
         actionLabel="Entrar"
         installArea={installArea}
+        variant={normalizeAuthVariant(variant)}
       />
     );
   }
@@ -189,6 +194,7 @@ export function ProtectedRouteStateView({
         actionHref={state.mfaPath}
         actionLabel="Verificar"
         installArea={installArea}
+        variant={normalizeAuthVariant(variant)}
       />
     );
   }
@@ -200,8 +206,15 @@ export function ProtectedRouteStateView({
       body="Termine esta sessão e entre com as credenciais próprias desta aplicação. Nenhuma área será aberta automaticamente."
       installArea={installArea}
       allowAccountSwitch
+      variant={normalizeAuthVariant(variant)}
     />
   );
+}
+
+function normalizeAuthVariant(
+  variant: ProtectedRouteStateViewProps["variant"]
+): "customer" | "business" | "pos" | "admin" {
+  return variant === "business" || variant === "pos" || variant === "admin" ? variant : "customer";
 }
 
 export function DashboardAreaMenu({

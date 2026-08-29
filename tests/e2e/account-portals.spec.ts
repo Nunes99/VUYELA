@@ -1,5 +1,67 @@
 import { expect, test } from "@playwright/test";
 
+const authenticationRoutes = [
+  "/cliente/entrar",
+  "/negocio/entrar",
+  "/pos/entrar",
+  "/admin/entrar",
+  "/recuperar-acesso",
+  "/definir-senha",
+  "/cliente"
+];
+
+test("keeps every authentication surface readable and inside the viewport", async ({ page }) => {
+  test.setTimeout(120_000);
+
+  for (const route of authenticationRoutes) {
+    await page.goto(route);
+
+    const layout = await page.evaluate(() => {
+      const shell = document.querySelector<HTMLElement>(".auth-shell");
+      const formPanel = document.querySelector<HTMLElement>(".auth-panel--forms");
+      const heading = document.querySelector<HTMLElement>(".auth-panel h1");
+      const headingPanel = heading?.closest<HTMLElement>(".auth-panel");
+      const controls = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          '.auth-page input:not([type="hidden"]), .auth-page button'
+        )
+      );
+      const shellRect = shell?.getBoundingClientRect();
+      const formRect = formPanel?.getBoundingClientRect();
+      const headingRect = heading?.getBoundingClientRect();
+      const headingPanelRect = headingPanel?.getBoundingClientRect();
+
+      return {
+        bodyScrollWidth: document.body.scrollWidth,
+        controlHeights: controls.map((control) => control.getBoundingClientRect().height),
+        formWidth: formRect?.width ?? 0,
+        headingInsidePanel: Boolean(
+          headingRect &&
+          headingPanelRect &&
+          headingRect.left >= headingPanelRect.left &&
+          headingRect.right <= headingPanelRect.right
+        ),
+        isSingle: shell?.classList.contains("auth-shell--single") ?? false,
+        logoHref: document.querySelector<HTMLAnchorElement>(".auth-brand")?.getAttribute("href"),
+        shellInsideViewport: Boolean(
+          shellRect && shellRect.left >= 0 && shellRect.right <= window.innerWidth + 0.5
+        ),
+        viewportWidth: window.innerWidth
+      };
+    });
+
+    expect(layout.bodyScrollWidth, route).toBeLessThanOrEqual(layout.viewportWidth);
+    expect(layout.shellInsideViewport, route).toBe(true);
+    expect(layout.headingInsidePanel, route).toBe(true);
+    expect(Math.min(...layout.controlHeights), route).toBeGreaterThanOrEqual(44);
+    expect(layout.logoHref, route).toBe("/");
+
+    if (layout.isSingle && layout.viewportWidth >= 768) {
+      expect(layout.formWidth, route).toBeGreaterThanOrEqual(480);
+    }
+  }
+});
+
 test("keeps customer and business registration as distinct responsive flows", async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto("/cliente/entrar");

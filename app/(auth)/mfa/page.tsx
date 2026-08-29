@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { AuthStandalone } from "@/components/auth/auth-standalone";
 import { redirect } from "next/navigation";
 
 import { MfaForm } from "@/features/auth/mfa-form";
@@ -44,22 +44,19 @@ export default async function MfaPage({ searchParams }: MfaPageProps) {
   }
 
   return (
-    <main className="auth-page">
-      <section className="auth-shell auth-shell--single" aria-labelledby="mfa-title">
-        <div className="auth-panel auth-panel--forms">
-          <VuyelaLogo className="auth-brand auth-brand--dark" href="/admin" />
-          <span className="auth-kicker">Verificação em dois passos</span>
-          <h1 id="mfa-title">Verificação adicional necessária.</h1>
-          <p className="auth-intro">
-            Funções de suporte e administração exigem um código temporário além da sua
-            palavra-passe.
-          </p>
-          <MfaForm nextPath={nextPath} signInPath={signInPath} />
-          <p className="auth-footnote">
-            Não consegue concluir? <Link href={signInPath}>Voltar ao login</Link>.
-          </p>
-        </div>
-      </section>
-    </main>
+    <AuthStandalone
+      description="Introduza o código temporário da sua aplicação de autenticação."
+      eyebrow="Verificação em dois passos"
+      footer={
+        <p className="auth-footnote">
+          Não consegue concluir? <Link href={signInPath}>Voltar ao login</Link>.
+        </p>
+      }
+      id="mfa-title"
+      title="Verificação adicional necessária."
+      variant="admin"
+    >
+      <MfaForm nextPath={nextPath} signInPath={signInPath} />
+    </AuthStandalone>
   );
 }

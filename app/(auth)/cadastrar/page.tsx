@@ -29,8 +29,7 @@ export default function SignUpPage() {
     >
       <SignUpForm />
       <p className="auth-footnote">
-        Já tem conta? <Link href="/entrar">Entrar</Link>. Pretende gerir uma empresa?{" "}
-        <Link href="/cadastrar/negocio">Registar negócio</Link>.
+        Já tem conta? <Link href="/cliente/entrar">Entrar</Link>.
       </p>
     </AuthShell>
   );
