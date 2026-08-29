@@ -1,7 +1,7 @@
 import "server-only";
 
-import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { isSupabaseConfigured } from "@/lib/env";
 import {
@@ -43,7 +43,6 @@ export type ProtectedRouteState =
 
 export interface AuthContext {
   isConfigured: boolean;
-  user: User | null;
   principal: AuthPrincipal | null;
 }
 
@@ -77,41 +76,37 @@ function buildSignInPath(route: ProtectedRoute, nextPath: string) {
   return `${signInPath}?next=${encodeURIComponent(nextPath)}`;
 }
 
-export async function getAuthContext(): Promise<AuthContext> {
+export const getAuthContext = cache(async function getAuthContext(): Promise<AuthContext> {
   if (!isSupabaseConfigured()) {
     return {
       isConfigured: false,
-      user: null,
       principal: null
     };
   }
 
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  const claims = claimsData?.claims;
+  const profileId = typeof claims?.sub === "string" ? claims.sub : null;
 
-  if (userError || !user) {
+  if (claimsError || !profileId) {
     return {
       isConfigured: true,
-      user: null,
       principal: null
     };
   }
 
-  const [{ data: profileData }, { data: membershipData }, assurance] = await Promise.all([
+  const [{ data: profileData }, { data: membershipData }] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, role, account_type, account_status")
-      .eq("id", user.id)
+      .eq("id", profileId)
       .maybeSingle(),
     supabase
       .from("business_members")
       .select("business_id, branch_id, role, status")
-      .eq("profile_id", user.id)
-      .eq("status", "active"),
-    supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      .eq("profile_id", profileId)
+      .eq("status", "active")
   ]);
 
   const profile = profileData as ProfileRow | null;
@@ -119,7 +114,6 @@ export async function getAuthContext(): Promise<AuthContext> {
   if (!profile || profile.account_status !== "active") {
     return {
       isConfigured: true,
-      user,
       principal: null
     };
   }
@@ -140,16 +134,15 @@ export async function getAuthContext(): Promise<AuthContext> {
 
   return {
     isConfigured: true,
-    user,
     principal: {
-      profileId: user.id,
+      profileId,
       profileRole,
       accountType,
-      mfaVerified: isMfaVerifiedAssuranceLevel(assurance.data?.currentLevel),
+      mfaVerified: isMfaVerifiedAssuranceLevel(claims?.aal),
       businessMemberships
     }
   };
-}
+});
 
 export async function getProtectedRouteState(
   route: ProtectedRoute,

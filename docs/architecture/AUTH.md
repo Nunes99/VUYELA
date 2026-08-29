@@ -47,6 +47,16 @@ Protected routes use server-side route state instead of duplicating permission c
 - `/onboarding/cliente`
 - `/onboarding/negocio`
 
+The protected application middleware refreshes cookie sessions before Server Components render,
+because Server Components cannot persist renewed cookies. It uses verified JWT claims for the hot
+navigation path, clears obsolete chunked Auth cookies when a refresh token is no longer valid, and
+marks authenticated responses `private, no-store`. Page-level RBAC also derives identity and AAL
+from verified claims, while sensitive mutations continue to use a fresh Supabase user check.
+
+Submitting a login starts a clean local browser session. Logging out or rejecting credentials for
+the wrong portal uses Supabase's local scope, so it does not revoke sessions on other installed
+VUYELA applications or devices.
+
 ## Administrative MFA
 
 Privileged platform roles require a Supabase Auth `aal2` session before `/admin` access:

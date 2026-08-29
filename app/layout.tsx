@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import "../vuyela-design-system/src/styles/tokens.css";
 import "../vuyela-design-system/src/styles/base.css";
@@ -7,6 +7,7 @@ import "../vuyela-design-system/src/styles/components.css";
 import "../vuyela-design-system/src/styles/utilities.css";
 import "./globals.css";
 import "./marketing.css";
+import { NavigationProgress } from "@/components/navigation/navigation-progress";
 import { PwaRegistration } from "@/features/pwa/pwa-registration";
 import { getSiteUrl } from "@/lib/env";
 
@@ -53,6 +54,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-MZ">
       <body>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         {children}
         <PwaRegistration />
       </body>

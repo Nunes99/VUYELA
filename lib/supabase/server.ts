@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/env";
+import { isSupabaseAuthCookieName } from "@/lib/supabase/auth-cookies";
 
 type CookieToSet = {
   name: string;
@@ -31,4 +32,18 @@ export async function createSupabaseServerClient() {
       }
     }
   });
+}
+
+export async function clearSupabaseAuthCookies() {
+  const cookieStore = await cookies();
+
+  for (const cookie of cookieStore.getAll()) {
+    if (isSupabaseAuthCookieName(cookie.name)) {
+      cookieStore.set(cookie.name, "", {
+        expires: new Date(0),
+        maxAge: 0,
+        path: "/"
+      });
+    }
+  }
 }

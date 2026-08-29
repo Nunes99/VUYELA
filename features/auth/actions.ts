@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { getDefinePasswordPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
 import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isPhoneAuthEnabled, isSupabaseConfigured } from "@/lib/env";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  clearSupabaseAuthCookies,
+  createSupabaseServerClient
+} from "@/lib/supabase/server";
 
 function getFormString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -100,6 +103,9 @@ export async function signInWithEmailAction(
     return password.state;
   }
 
+  // A login always starts a new local session. Removing an obsolete cookie first
+  // prevents Supabase from attempting a failed refresh before password validation.
+  await clearSupabaseAuthCookies();
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.value,
@@ -115,11 +121,22 @@ export async function signInWithEmailAction(
 
   const portal = getFormString(formData, "portal");
   if (portal === "customer" || portal === "business" || portal === "pos" || portal === "admin") {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("account_type")
-      .eq("id", data.user.id)
-      .maybeSingle();
+    const [profileResult, membershipResult] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("account_type")
+        .eq("id", data.user.id)
+        .maybeSingle(),
+      portal === "pos"
+        ? supabase
+            .from("business_members")
+            .select("id", { count: "exact", head: true })
+            .eq("profile_id", data.user.id)
+            .eq("status", "active")
+            .in("role", ["cashier", "branch_manager", "business_admin", "business_owner"])
+        : Promise.resolve({ count: null, error: null })
+    ]);
+    const profile = profileResult.data;
     const accountType = profile?.account_type;
     let isAllowed =
       portal === "business" || portal === "pos"
@@ -129,17 +146,11 @@ export async function signInWithEmailAction(
           : accountType === "customer";
 
     if (portal === "pos" && isAllowed) {
-      const { count, error: membershipError } = await supabase
-        .from("business_members")
-        .select("id", { count: "exact", head: true })
-        .eq("profile_id", data.user.id)
-        .eq("status", "active")
-        .in("role", ["cashier", "branch_manager", "business_admin", "business_owner"]);
-      isAllowed = !membershipError && (count ?? 0) > 0;
+      isAllowed = !membershipResult.error && (membershipResult.count ?? 0) > 0;
     }
 
     if (!isAllowed) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: "local" });
       return {
         status: "error",
         message:
@@ -693,7 +704,7 @@ export async function submitBusinessOnboardingAction(
 export async function signOutAction(formData?: FormData) {
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
   }
 
   const returnTo = formData ? getFormString(formData, "returnTo") : null;

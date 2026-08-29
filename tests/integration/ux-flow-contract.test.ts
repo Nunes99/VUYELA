@@ -34,7 +34,8 @@ describe("professional UX flow contract", () => {
   });
 
   it("provides global loading feedback and reusable route orientation", () => {
-    expect(read("app/loading.tsx")).toContain('aria-live="polite"');
+    expect(read("app/loading.tsx")).toContain("PortalLoading");
+    expect(read("components/system/portal-loading.tsx")).toContain('aria-live="polite"');
     expect(read("components/navigation/flow-navigation.tsx")).toContain(
       'aria-label="Localização na plataforma"'
     );

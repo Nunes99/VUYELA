@@ -120,14 +120,14 @@ export function ProtectedRouteStateView({
               <h1 id="dashboard-title">{title}</h1>
             </div>
             {isCustomer ? (
-              <a
+              <Link
                 aria-label="Ver notificações"
                 className="customer-shell-alert"
                 href="/cliente?vista=notificacoes"
               >
                 <Bell aria-hidden="true" size={22} />
                 <span aria-hidden="true" />
-              </a>
+              </Link>
             ) : null}
             <DashboardAreaMenu
               customerName={customerName}

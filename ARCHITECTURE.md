@@ -4,6 +4,10 @@
 
 VUYELA is a hybrid-rendered SaaS/PWA built with Next.js, React, TypeScript, Supabase, PostgreSQL, Tailwind CSS, and a dedicated VUYELA design system.
 
+Dynamic Vercel functions execute in Dublin (`dub1`) to stay close to the Supabase project in
+`eu-west-1`. This minimizes cross-region latency for authentication, dashboards, POS and
+administrative navigation.
+
 The public surface is SEO-first and should use static generation or server rendering. Authenticated areas such as the customer dashboard, business dashboard, POS, cards, campaigns, and analytics can use client-side interactivity where it improves the workflow.
 
 Public marketplace pages use server rendering with anon Supabase reads. Sitemap and metadata generation share the same indexability rules so empty, duplicate, or low-value generated pages are not published. Public search URLs are shareable but noindex to prevent arbitrary query combinations from becoming crawlable pages.

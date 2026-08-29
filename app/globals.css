@@ -23194,6 +23194,47 @@
   }
 }
 
+.navigation-progress {
+  inset: 0 0 auto;
+  height: 3px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  transition: opacity 120ms ease;
+  z-index: 10000;
+}
+
+.navigation-progress.is-active {
+  opacity: 1;
+}
+
+.navigation-progress span {
+  animation: navigation-progress-slide 1.1s ease-in-out infinite;
+  background: var(--color-brand-teal, #0aa6a6);
+  display: block;
+  height: 100%;
+  transform: translateX(-100%);
+  width: 45%;
+}
+
+@keyframes navigation-progress-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(325%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation-progress span {
+    animation: none;
+    transform: none;
+    width: 100%;
+  }
+}
+
 @media (max-width: 639px) {
   .flow-breadcrumbs li {
     font-size: 0.68rem;
