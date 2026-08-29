@@ -19,7 +19,7 @@ As vistas são selecionadas por parâmetros validados no servidor. Não devem se
 
 ## Segurança das definições POS
 
-As páginas de definições representam o estado persistido do terminal. Credenciais privadas dos provedores de pagamento não são enviadas para o navegador nem guardadas em estado de cliente. A função `configure_business_payment_channel` guarda-as encriptadas no Supabase Vault, valida a propriedade do negócio e regista a alteração em auditoria sem incluir os valores secretos.
+As páginas de definições representam o estado persistido do terminal. Credenciais privadas dos provedores de pagamento não são enviadas para o navegador nem guardadas em estado de cliente. `configure_business_payment_channel` cobre os canais genéricos e `configure_mpesa_payment_channel` valida a API key, a chave pública RSA e o endpoint C2B antes de guardar os segredos no Supabase Vault. Ambas validam a propriedade do negócio e registam auditoria sem incluir os valores secretos.
 
 Os campos não secretos são apresentados a partir de `business_payment_channels.public_settings`. Identificadores privados permanecem mascarados. Os canais de fornecedor ficam no estado `testing` depois de receberem credenciais e só devem passar a `active` após validação pelo adaptador oficial do fornecedor.
 
@@ -34,7 +34,7 @@ Os campos não secretos são apresentados a partir de `business_payment_channels
 - Proprietários e administradores criam operadores POS na gestão da equipa. Cada operador recebe
   credenciais individuais, fica associado a uma filial e a função `cashier` não permite abrir
   `/negocio`; o acesso administrativo do proprietário continua válido no POS.
-- M-Pesa, e-Mola e mKesh expõem apenas os campos operacionais previstos no design e enviam segredos por ações de servidor para o Vault.
+- M-Pesa expõe configuração C2B, ativa-se explicitamente por filial e suporta pedido no telemóvel, estado pendente e reconciliação por callback; e-Mola e mKesh continuam visíveis mas indisponíveis sem adaptador.
 - Dinheiro e cartão guardam limites, regras de fecho, arredondamento, terminal, bandeiras, contactless e custos de processamento na configuração pública autorizada.
 - Dados de negócio e filial apresentados no POS são carregados das fontes reais autorizadas por RLS.
 - Estados não suportados, como alteração de saldos offline, são apresentados como indisponíveis em vez de simulados.

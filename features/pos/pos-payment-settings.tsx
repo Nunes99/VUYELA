@@ -91,19 +91,19 @@ function MpesaSettings({
           <SecretField configured={channel.credentialsConfigured} label="API Key" name="apiKey" />
           <SecretField
             configured={channel.credentialsConfigured}
-            label="API Secret"
-            name="apiSecret"
+            label="Chave pública RSA"
+            name="publicKey"
           />
           <Field
             defaultValue={settingString(settings, "merchantId", "")}
-            label="Merchant ID"
+            label="Código do prestador"
             maxLength={80}
             name="merchantId"
             required
           />
           <div className="pos-figma-environment-field">
             <SelectField
-              defaultValue={settingString(settings, "environment", "production")}
+              defaultValue={settingString(settings, "environment", "sandbox")}
               label="Ambiente"
               name="environment"
             >
@@ -113,13 +113,40 @@ function MpesaSettings({
             <ChannelStatus channel={channel} />
             <button
               disabled
-              title="Disponível após configuração do adaptador oficial M-Pesa."
+              title="As credenciais e o endpoint são validados ao guardar."
               type="button"
             >
-              Testar ligação
+              Validação ao guardar
             </button>
           </div>
         </div>
+      </SettingsCard>
+      <SettingsCard title="Endpoint C2B">
+        <Field
+          className="pos-figma-field--wide"
+          defaultValue={settingString(
+            settings,
+            "c2bResourceUrl",
+            "https://api.sandbox.vm.co.mz:18352/ipg/v1x/c2bPayment/singleStage/"
+          )}
+          label="URL do recurso C2B"
+          name="c2bResourceUrl"
+          required
+          type="url"
+        />
+        <Field
+          defaultValue={settingString(settings, "requestOrigin", "*")}
+          label="Origem autorizada"
+          maxLength={300}
+          name="requestOrigin"
+          required
+        />
+        <SwitchField
+          defaultChecked={channel.status === "active"}
+          description="Disponibilizar M-Pesa no checkout depois de guardar esta configuração."
+          label="Ativar no POS"
+          name="activateAfterSave"
+        />
       </SettingsCard>
       <SettingsCard title="Configurações de Transação">
         <div className="pos-figma-grid pos-figma-grid--three">

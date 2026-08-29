@@ -9,12 +9,16 @@ import type { PosQuote } from "@/features/pos/model";
 import { initialPosActionState } from "@/features/pos/state";
 import type { PosActionState } from "@/features/pos/state";
 
-const rpc = vi.fn();
+const { rpc, processMpesaPaymentAttempt } = vi.hoisted(() => ({
+  rpc: vi.fn(),
+  processMpesaPaymentAttempt: vi.fn()
+}));
 
 vi.mock("@/lib/env", () => ({ isSupabaseConfigured: () => true }));
 vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: async () => ({ rpc })
 }));
+vi.mock("@/features/payments/mpesa/service", () => ({ processMpesaPaymentAttempt }));
 
 const cart = [{ catalogItemId: "1a9cdb03-8b4a-4c4f-88eb-4723008eeb91", quantity: 2 }];
 const quote: PosQuote = {
@@ -63,6 +67,7 @@ describe("POS server actions", () => {
   beforeEach(() => {
     rpc.mockReset();
     rpc.mockResolvedValue({ data: quote, error: null });
+    processMpesaPaymentAttempt.mockReset();
   });
 
   it("keeps the current customer when cart validation fails", async () => {
@@ -161,22 +166,45 @@ describe("POS server actions", () => {
     );
   });
 
-  it("rejects provider methods until their adapter is active", async () => {
+  it("prepares and reconciles M-Pesa without using the manual confirmation RPC", async () => {
     const noRedemptionQuote = {
       ...quote,
       pointsToRedeem: 0,
       pointsRedeemedValueMznMinor: 0,
       netAmountMznMinor: 18_000
     };
+    rpc.mockResolvedValueOnce({
+      data: [
+        {
+          payment_attempt_id: "attempt-mpesa-1",
+          payment_status: "initiated",
+          amount_mzn_minor: 18_000
+        }
+      ],
+      error: null
+    });
+    processMpesaPaymentAttempt.mockResolvedValueOnce({
+      transactionId: "transaction-mpesa-1",
+      availableBalance: 120,
+      paymentAttemptId: "attempt-mpesa-1",
+      paymentStatus: "reconciled",
+      receiptNumber: "VY-MPESA-1"
+    });
     const state = await confirmPosTransactionAction(
       { ...cartState, quote: noRedemptionQuote },
-      formWith({ paymentMethod: "mpesa" })
+      formWith({ paymentMethod: "mpesa", customerMsisdn: "+258 84 123 4567" })
     );
 
-    expect(state.status).toBe("error");
-    expect(state.message).toBe(
-      "Este método de pagamento ainda não está configurado para utilização."
+    expect(rpc).toHaveBeenCalledWith(
+      "prepare_pos_mpesa_payment",
+      expect.objectContaining({
+        p_customer_msisdn: "258841234567",
+        p_expected_net_amount_mzn_minor: 18_000
+      })
     );
+    expect(processMpesaPaymentAttempt).toHaveBeenCalledWith("attempt-mpesa-1");
+    expect(state.transactionId).toBe("transaction-mpesa-1");
+    expect(state.paymentStatus).toBe("reconciled");
   });
 
   it("returns to the catalogue without losing the draft cart", async () => {

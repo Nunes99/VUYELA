@@ -2,6 +2,8 @@
 
 import { isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { normalizeMpesaMsisdn } from "@/features/payments/mpesa/model";
+import { processMpesaPaymentAttempt } from "@/features/payments/mpesa/service";
 
 import {
   buildFallbackIdempotencyKey,
@@ -32,6 +34,12 @@ interface PosTransactionRow {
   payment_attempt_id: string | null;
   payment_status: string;
   receipt_number: string;
+}
+
+interface PosMpesaAttemptRow {
+  payment_attempt_id: string;
+  payment_status: string;
+  amount_mzn_minor: number;
 }
 
 interface PosFormContext {
@@ -79,6 +87,10 @@ export async function submitPosAction(
 
   if (intent === "confirm") {
     return confirmPosTransactionAction(previousState, formData);
+  }
+
+  if (intent === "check_payment") {
+    return checkMpesaPaymentAction(previousState);
   }
 
   if (intent === "reset") {
@@ -300,6 +312,20 @@ export async function confirmPosTransactionAction(
   }
 
   const supabase = await createSupabaseServerClient();
+
+  if (paymentMethodValue === "mpesa") {
+    return confirmMpesaTransaction({
+      previousState: { ...previousState, quote: previousState.quote },
+      formData,
+      supabase,
+      businessId,
+      branchId,
+      terminalId,
+      customerAuthorized,
+      idempotencyKey
+    });
+  }
+
   const { data, error } = await supabase.rpc("confirm_pos_cart", {
     p_business_id: businessId,
     p_branch_id: branchId,
@@ -348,6 +374,156 @@ export async function confirmPosTransactionAction(
     paymentStatus: row.payment_status,
     receiptNumber: row.receipt_number,
     completedAt: new Date().toISOString()
+  };
+}
+
+async function confirmMpesaTransaction({
+  previousState,
+  formData,
+  supabase,
+  businessId,
+  branchId,
+  terminalId,
+  customerAuthorized,
+  idempotencyKey
+}: {
+  previousState: PosActionState & { quote: PosQuote };
+  formData: FormData;
+  supabase: PosServerClient;
+  businessId: string;
+  branchId: string;
+  terminalId: string;
+  customerAuthorized: boolean;
+  idempotencyKey: string;
+}): Promise<PosActionState> {
+  let customerMsisdn: string;
+  try {
+    customerMsisdn = normalizeMpesaMsisdn(getFormString(formData, "customerMsisdn"));
+  } catch (error) {
+    return createErrorState(
+      error instanceof Error ? error.message : "Introduza um número M-Pesa válido.",
+      previousState
+    );
+  }
+
+  const { data, error } = await supabase.rpc("prepare_pos_mpesa_payment", {
+    p_business_id: businessId,
+    p_branch_id: branchId,
+    p_terminal_id: terminalId,
+    p_customer_card_id: previousState.card?.customerCardId ?? null,
+    p_items: previousState.cart,
+    p_points_to_redeem: previousState.quote.pointsToRedeem,
+    p_expected_gross_amount_mzn_minor: previousState.quote.grossAmountMznMinor,
+    p_expected_discount_amount_mzn_minor: previousState.quote.discountAmountMznMinor,
+    p_expected_net_amount_mzn_minor: previousState.quote.netAmountMznMinor,
+    p_customer_msisdn: customerMsisdn,
+    p_idempotency_key: idempotencyKey,
+    p_customer_authorized: customerAuthorized,
+    p_metadata: {
+      source: "pos",
+      cart_line_count: previousState.quote.lines.length,
+      customer_authorized: customerAuthorized
+    }
+  });
+
+  if (error) {
+    return createErrorState(posConfirmationErrorMessage(error.message), previousState);
+  }
+
+  const attempt = Array.isArray(data) ? (data[0] as PosMpesaAttemptRow | undefined) : undefined;
+  if (!attempt) {
+    return createErrorState("O servidor não criou a tentativa M-Pesa.", previousState);
+  }
+
+  try {
+    const result = await processMpesaPaymentAttempt(attempt.payment_attempt_id);
+    return mpesaResultState(previousState, idempotencyKey, result);
+  } catch {
+    return {
+      ...previousState,
+      status: "success",
+      message:
+        "O pedido foi enviado, mas o estado ainda não foi confirmado. Não repita a cobrança; verifique o estado.",
+      transactionId: null,
+      idempotencyKey,
+      paymentMethod: "mpesa",
+      paymentAttemptId: attempt.payment_attempt_id,
+      paymentStatus: attempt.payment_status === "initiated" ? "pending" : attempt.payment_status,
+      receiptNumber: null,
+      completedAt: null
+    };
+  }
+}
+
+async function checkMpesaPaymentAction(previousState: PosActionState): Promise<PosActionState> {
+  if (!previousState.paymentAttemptId || previousState.paymentMethod !== "mpesa") {
+    return createErrorState("Não existe uma tentativa M-Pesa para consultar.", previousState);
+  }
+  if (!isSupabaseConfigured()) return getSupabaseNotConfiguredState(previousState);
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("get_mpesa_payment_attempt_status", {
+    p_payment_attempt_id: previousState.paymentAttemptId
+  });
+  if (error) {
+    return createErrorState("Não foi possível consultar o estado M-Pesa.", previousState);
+  }
+
+  const row = Array.isArray(data) ? (data[0] as PosTransactionRow | undefined) : undefined;
+  if (!row) return createErrorState("A tentativa M-Pesa não foi encontrada.", previousState);
+
+  return mpesaResultState(previousState, previousState.idempotencyKey, {
+    transactionId: row.transaction_id,
+    availableBalance: row.available_balance,
+    paymentAttemptId: row.payment_attempt_id ?? previousState.paymentAttemptId,
+    paymentStatus: row.payment_status,
+    receiptNumber: row.receipt_number
+  });
+}
+
+function mpesaResultState(
+  previousState: PosActionState,
+  idempotencyKey: string,
+  result: {
+    transactionId: string | null;
+    availableBalance: number;
+    paymentAttemptId: string;
+    paymentStatus: string;
+    receiptNumber: string | null;
+  }
+): PosActionState {
+  if (result.paymentStatus === "reconciled" && result.transactionId) {
+    return {
+      ...previousState,
+      card: previousState.card
+        ? { ...previousState.card, availablePoints: result.availableBalance }
+        : null,
+      status: "success",
+      message: "Pagamento M-Pesa confirmado e venda reconciliada.",
+      transactionId: result.transactionId,
+      idempotencyKey,
+      paymentMethod: "mpesa",
+      paymentAttemptId: result.paymentAttemptId,
+      paymentStatus: result.paymentStatus,
+      receiptNumber: result.receiptNumber,
+      completedAt: new Date().toISOString()
+    };
+  }
+
+  const declined = ["declined", "cancelled", "expired"].includes(result.paymentStatus);
+  return {
+    ...previousState,
+    status: declined ? "error" : "success",
+    message: declined
+      ? "O pagamento M-Pesa não foi autorizado. As YELAS reservadas foram devolvidas; pode escolher outro método."
+      : "Confirme o pedido no telemóvel. A venda só termina depois da resposta do M-Pesa.",
+    transactionId: null,
+    idempotencyKey,
+    paymentMethod: "mpesa",
+    paymentAttemptId: result.paymentAttemptId,
+    paymentStatus: result.paymentStatus,
+    receiptNumber: null,
+    completedAt: null
   };
 }
 

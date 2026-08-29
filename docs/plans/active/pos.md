@@ -13,6 +13,8 @@ Implemented.
 - Customer authorization is required before confirmation.
 - Transaction confirmation calls the server-side loyalty RPCs from FASE 06.
 - Duplicate submission protection uses pending button disabling and an idempotency key stored as `external_reference`.
+- M-Pesa C2B creates a pending sale, sends the payment request server-side, and reconciles the sale only after provider authorization.
+- M-Pesa callbacks are authenticated, sanitized, and idempotent; duplicate events cannot duplicate payments or YELAS.
 
 ## Decisions
 
@@ -23,5 +25,5 @@ Implemented.
 
 ## Next Integration Points
 
-- Add receipt/payment metadata after the payments model is wired into POS.
+- Complete provider-side status-query and reversal operations after the production API package is available in the authenticated M-Pesa portal.
 - Surface POS transaction history in the future business dashboard.

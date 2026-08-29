@@ -15,6 +15,7 @@ import {
   Plus,
   Printer,
   QrCode,
+  RefreshCw,
   ReceiptText,
   ScanLine,
   Search,
@@ -100,6 +101,15 @@ export function PosWorkflow({
     if (state.cart.length > 0) setCart(state.cart);
     if (state.idempotencyKey) setIdempotencyKey(state.idempotencyKey);
   }, [state.branchId, state.businessId, state.cart, state.idempotencyKey, state.terminalId]);
+
+  useEffect(() => {
+    if (
+      state.paymentMethod === "mpesa" &&
+      ["declined", "cancelled", "expired"].includes(state.paymentStatus ?? "")
+    ) {
+      setIdempotencyKey(createBrowserIdempotencyKey());
+    }
+  }, [state.paymentMethod, state.paymentStatus]);
 
   useEffect(() => {
     if (!selectedBusiness) return;
@@ -222,7 +232,15 @@ export function PosWorkflow({
           formAction={formAction}
           formContext={formContext}
           onBack={() => setPaymentMethod(null)}
-          onPaymentMethodChange={setPaymentMethod}
+          onPaymentMethodChange={(method) => {
+            if (
+              state.paymentAttemptId &&
+              ["declined", "cancelled", "expired"].includes(state.paymentStatus ?? "")
+            ) {
+              setIdempotencyKey(createBrowserIdempotencyKey());
+            }
+            setPaymentMethod(method);
+          }}
           paymentMethod={paymentMethod}
           pending={pending}
           state={{ ...state, quote: state.quote }}
@@ -859,6 +877,10 @@ function PaymentStep({
     state.quote.netAmountMznMinor === 0
       ? ["points"]
       : ["cash", "card", "mpesa", "emola", "mkesh"];
+  const awaitingMpesa =
+    paymentMethod === "mpesa" &&
+    Boolean(state.paymentAttemptId) &&
+    ["initiated", "pending"].includes(state.paymentStatus ?? "");
 
   return (
     <div className="pos-checkout">
@@ -884,7 +906,7 @@ function PaymentStep({
               <button
                 aria-checked={paymentMethod === method}
                 className={paymentMethod === method ? "is-selected" : ""}
-                disabled={!available}
+                disabled={!available || (awaitingMpesa && method !== "mpesa")}
                 key={method}
                 onClick={() => onPaymentMethodChange(method)}
                 role="radio"
@@ -901,45 +923,92 @@ function PaymentStep({
           })}
         </div>
 
-        <form action={formAction} className="pos-payment-confirm">
-          <PosContextFields {...formContext} />
-          <input name="intent" type="hidden" value="confirm" />
-          <input name="paymentMethod" type="hidden" value={paymentMethod} />
+        {awaitingMpesa ? (
+          <section className="pos-payment-pending" aria-live="polite">
+            <span className="pos-payment-pending__icon">
+              <Smartphone aria-hidden="true" size={24} />
+            </span>
+            <div>
+              <span>Pedido enviado</span>
+              <h2>Confirme o pagamento no telemóvel</h2>
+              <p>
+                Não repita a cobrança. Assim que o M-Pesa responder, a venda e as YELAS serão
+                reconciliadas automaticamente.
+              </p>
+            </div>
+            <form action={formAction}>
+              <input name="intent" type="hidden" value="check_payment" />
+              <button disabled={pending} type="submit">
+                <RefreshCw aria-hidden="true" size={17} />
+                {pending ? "A verificar..." : "Verificar estado"}
+              </button>
+            </form>
+          </section>
+        ) : (
+          <form action={formAction} className="pos-payment-confirm">
+            <PosContextFields {...formContext} />
+            <input name="intent" type="hidden" value="confirm" />
+            <input name="paymentMethod" type="hidden" value={paymentMethod} />
 
-          {paymentMethod === "card" ? (
-            <label>
-              <span>Referência do terminal bancário</span>
-              <input name="paymentReference" placeholder="Ex.: TPA-458921" required />
-            </label>
-          ) : null}
+            {paymentMethod === "card" ? (
+              <label>
+                <span>Referência do terminal bancário</span>
+                <input name="paymentReference" placeholder="Ex.: TPA-458921" required />
+              </label>
+            ) : null}
 
-          {state.quote.pointsToRedeem > 0 ? (
-            <label className="pos-payment-confirm__authorization">
-              <input
-                checked={authorized}
-                name="customerAuthorized"
-                onChange={(event) => setAuthorized(event.target.checked)}
-                type="checkbox"
-              />
-              <span>
-                O cliente autorizou o débito de {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} YL.
-              </span>
-            </label>
-          ) : null}
+            {paymentMethod === "mpesa" ? (
+              <label>
+                <span>Número M-Pesa do cliente</span>
+                <input
+                  autoComplete="tel"
+                  inputMode="tel"
+                  name="customerMsisdn"
+                  placeholder="Ex.: +258 84 123 4567"
+                  required
+                  type="tel"
+                />
+                <small>O cliente receberá o pedido de confirmação neste número.</small>
+              </label>
+            ) : null}
 
-          <div className="pos-payment-confirm__amount">
-            <span>A cobrar agora</span>
-            <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
-          </div>
-          <button
-            className="pos-sale__primary"
-            disabled={pending || (state.quote.pointsToRedeem > 0 && !authorized)}
-            type="submit"
-          >
-            {pending ? "A concluir..." : "Confirmar pagamento"}
-            <CheckCircle2 aria-hidden="true" size={19} />
-          </button>
-        </form>
+            {state.quote.pointsToRedeem > 0 ? (
+              <label className="pos-payment-confirm__authorization">
+                <input
+                  checked={authorized}
+                  name="customerAuthorized"
+                  onChange={(event) => setAuthorized(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>
+                  O cliente autorizou o débito de{" "}
+                  {state.quote.pointsToRedeem.toLocaleString("pt-MZ")} YL.
+                </span>
+              </label>
+            ) : null}
+
+            <div className="pos-payment-confirm__amount">
+              <span>A cobrar agora</span>
+              <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
+            </div>
+            <button
+              className="pos-sale__primary"
+              disabled={pending || (state.quote.pointsToRedeem > 0 && !authorized)}
+              type="submit"
+            >
+              {pending
+                ? "A processar..."
+                : paymentMethod === "mpesa"
+                  ? "Enviar pedido M-Pesa"
+                  : "Confirmar pagamento"}
+              {paymentMethod === "mpesa" ? (
+                <Smartphone aria-hidden="true" size={19} />
+              ) : (
+                <CheckCircle2 aria-hidden="true" size={19} />
+              )}
+            </button>
+          </form>
+        )}
       </section>
 
       <OrderSummary quote={state.quote} cardName={state.card?.customerName ?? null} />
@@ -1203,7 +1272,10 @@ function paymentHint(method: PosPaymentMethod): string {
 function availablePaymentSummary(channels: PosPaymentChannelContext[], quote: PosQuote): string {
   if (quote.netAmountMznMinor === 0) return "YELAS";
   const labels = channels
-    .filter((channel) => channel.status === "active" && ["cash", "card"].includes(channel.method))
+    .filter(
+      (channel) =>
+        channel.status === "active" && ["cash", "card", "mpesa"].includes(channel.method)
+    )
     .map((channel) => paymentLabel(channel.method));
   return labels.length > 0 ? labels.join(" · ") : "Nenhum canal ativo";
 }

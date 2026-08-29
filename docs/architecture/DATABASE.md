@@ -58,6 +58,11 @@ remain in `business_payment_channels.public_settings`; M-Pesa, e-Mola, and mKesh
 stored as encrypted Supabase Vault secrets. Saving provider credentials moves a channel to
 `testing`, while activation remains dependent on a verified provider adapter.
 
+The M-Pesa extension adds private `payment_provider_contexts` and idempotent
+`payment_provider_events`. Browser roles receive no grants on either table. A pending C2B sale
+uses `pending_customer_confirmation`; optional YELAS are reserved with a ledger debit and either
+completed with the earned ledger credit or returned through a compensating reversal.
+
 ## Core Tables
 
 Identity and access preparation:

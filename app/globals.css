@@ -21262,6 +21262,83 @@
   width: 100%;
 }
 
+.pos-payment-confirm > label:not(.pos-payment-confirm__authorization) {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.pos-payment-confirm > label:not(.pos-payment-confirm__authorization) > span {
+  color: var(--pos-ink);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.pos-payment-confirm > label:not(.pos-payment-confirm__authorization) > small {
+  color: var(--pos-muted);
+  font-size: 0.72rem;
+}
+
+.pos-payment-pending {
+  align-items: start;
+  background: #f2fbfa;
+  border: 1px solid #b8e2dd;
+  border-radius: 6px;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.pos-payment-pending__icon {
+  align-items: center;
+  background: #d9f2ef;
+  border-radius: 50%;
+  color: var(--pos-teal-dark);
+  display: inline-flex;
+  height: 2.75rem;
+  justify-content: center;
+  width: 2.75rem;
+}
+
+.pos-payment-pending > div > span {
+  color: var(--pos-teal-dark);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pos-payment-pending h2 {
+  font-size: 1rem;
+  margin: 0.15rem 0 0.3rem;
+}
+
+.pos-payment-pending p {
+  color: var(--pos-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.pos-payment-pending form {
+  grid-column: 1 / -1;
+}
+
+.pos-payment-pending button {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--pos-teal);
+  border-radius: 6px;
+  color: var(--pos-teal-dark);
+  display: inline-flex;
+  font-weight: 750;
+  gap: 0.45rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
+  width: 100%;
+}
+
 .pos-payment-confirm__authorization {
   align-items: center;
   background: #fff9e9;

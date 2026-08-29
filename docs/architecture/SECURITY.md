@@ -94,14 +94,16 @@ FASE 09 adds `lookup_pos_customer_card` for identifying active cards through a s
 `get_pos_terminal_configuration` uses `SECURITY DEFINER` with an empty `search_path`, checks
 `can_access_pos_terminal`, and returns sanitized JSON. A web session is not considered an active
 terminal unless a persisted terminal record says so. Unconfigured provider methods are rejected
-by the current POS action before any loyalty RPC is called.
+by the POS action before a provider request is created.
 
 `configure_pos_terminal_section` and `configure_business_payment_channel` accept only explicit
 per-section key allowlists and require `can_manage_business`. Both functions deny anonymous
 execution, use an empty `search_path`, and write tenant audit events. Provider secrets are written
 to Supabase Vault and are neither copied to `public_settings` nor returned by an application-facing
-RPC. A saved provider configuration remains in `testing` until a real provider integration confirms
-it.
+RPC. M-Pesa uses a dedicated allowlist that accepts an API key and public RSA key in server actions,
+stores both in Vault, and returns neither to browser roles. Only `service_role` may read the private
+provider context or call reconciliation. Callbacks require `MPESA_CALLBACK_TOKEN`, store only
+sanitized response fields and use a stable event hash so duplicate delivery has no second effect.
 
 ## PWA Security
 

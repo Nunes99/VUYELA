@@ -54,7 +54,10 @@ export async function configurePosPaymentChannelAction(formData: FormData): Prom
   if (!payload) redirectToPayments(method, "dados-invalidos");
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("configure_business_payment_channel", {
+  const rpcName = method === "mpesa"
+    ? "configure_mpesa_payment_channel"
+    : "configure_business_payment_channel";
+  const { data, error } = await supabase.rpc(rpcName, {
     p_business_id: businessId,
     p_channel_id: channelId,
     p_public_settings: payload.publicSettings,
@@ -62,8 +65,23 @@ export async function configurePosPaymentChannelAction(formData: FormData): Prom
   });
 
   if (error) redirectToPayments(method, "erro");
+  if (method === "mpesa" && checked(formData, "activateAfterSave")) {
+    const { error: activationError } = await supabase.rpc("manage_business_payment_channel", {
+      p_business_id: businessId,
+      p_channel_id: channelId,
+      p_action: "activate"
+    });
+    if (activationError) redirectToPayments(method, "nao-configurado");
+  }
   revalidatePos();
-  redirectToPayments(method, data === "testing" ? "aguarda-teste" : "guardado");
+  redirectToPayments(
+    method,
+    method === "mpesa" && checked(formData, "activateAfterSave")
+      ? "guardado"
+      : data === "testing"
+        ? "aguarda-teste"
+        : "guardado"
+  );
 }
 
 export async function managePosTerminalAction(formData: FormData): Promise<void> {
@@ -298,17 +316,21 @@ function paymentConfigurationPayload(
     const minimumAmount = integerField(formData, "minimumAmount", 1, 1_000_000);
     const maximumAmount = integerField(formData, "maximumAmount", 1, 10_000_000);
     const timeoutSeconds = integerField(formData, "timeoutSeconds", 30, 600);
+    const c2bResourceUrl = field(formData, "c2bResourceUrl");
     if (
       minimumAmount === null ||
       maximumAmount === null ||
       timeoutSeconds === null ||
-      maximumAmount < minimumAmount
+      maximumAmount < minimumAmount ||
+      !isHttpUrl(c2bResourceUrl)
     )
       return null;
     return {
       publicSettings: {
         merchantId: field(formData, "merchantId").slice(0, 80),
-        environment: field(formData, "environment") || "production",
+        environment: field(formData, "environment") || "sandbox",
+        c2bResourceUrl: c2bResourceUrl.slice(0, 500),
+        requestOrigin: field(formData, "requestOrigin").slice(0, 300) || "*",
         minimumAmount,
         maximumAmount,
         timeoutSeconds,
@@ -319,7 +341,7 @@ function paymentConfigurationPayload(
         reconciliationFrequency: field(formData, "reconciliationFrequency") || "daily",
         reportEmail: field(formData, "reportEmail").slice(0, 254)
       },
-      credentials: nonEmptySecrets(formData, ["apiKey", "apiSecret"])
+      credentials: nonEmptySecrets(formData, ["apiKey", "publicKey"])
     };
   }
 

@@ -244,7 +244,9 @@ Phase 26 includes tests that verify:
 - browser roles cannot write terminals, channels, payment attempts, invitations, claims or global
   settings;
 - invitation token hashes and common provider secret keys are excluded from browser-readable data;
-- unconfigured provider methods are disabled in the POS and rejected again by the server action;
+- unconfigured provider methods are disabled in the POS and rejected again by PostgreSQL;
+- M-Pesa tests cover MSISDN normalization, RSA API-key encryption, C2B payload shape, ambiguous
+  network state, callback authentication, service-role isolation and idempotent reconciliation;
 - the protected POS and settings routes pass Playwright on an isolated local test port.
 
 ## Priority E2E

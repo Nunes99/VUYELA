@@ -68,8 +68,8 @@ export function isPosPaymentMethod(value: string): value is PosPaymentMethod {
 
 export function isAvailablePosPaymentMethod(
   value: PosPaymentMethod
-): value is Extract<PosPaymentMethod, "cash" | "card" | "points"> {
-  return value === "cash" || value === "card" || value === "points";
+): value is Extract<PosPaymentMethod, "cash" | "card" | "mpesa" | "points"> {
+  return value === "cash" || value === "card" || value === "mpesa" || value === "points";
 }
 
 const MONEY_PATTERN = /^\d+(?:[,.]\d{1,2})?$/;

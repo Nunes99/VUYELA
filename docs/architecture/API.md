@@ -38,10 +38,12 @@ FASE 26 adds `get_pos_terminal_configuration`, a sanitized read boundary for reg
 settings, device and payment-channel state. It validates the authenticated operator against both
 the business and branch before returning data and never returns provider credentials.
 
-Payment-provider methods remain unavailable until a later server-side adapter can persist and
-reconcile `payment_attempts`. Cash and external card terminal flows are explicitly manual. A
-payment attempt and a loyalty transaction are separate contracts; neither one proves completion
-of the other.
+The M-Pesa C2B adapter persists a pending `payment_attempt`, sends the provider request only from
+the server, and reconciles synchronous or authenticated callback results through a service-role-
+only PostgreSQL function. Provider credentials are read from Vault only inside that boundary.
+Ambiguous network results remain pending and the POS checks the stored state instead of repeating
+the charge. Cash and external card terminal flows remain explicitly manual; e-Mola and mKesh stay
+unavailable until their own adapters exist.
 
 ## Customer Card Reads
 

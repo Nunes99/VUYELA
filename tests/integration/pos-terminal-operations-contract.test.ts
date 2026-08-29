@@ -15,6 +15,10 @@ const checkoutMigration = readFileSync(
   join(process.cwd(), "supabase/migrations/implement_cart_first_pos_checkout.sql"),
   "utf8"
 );
+const mpesaMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/integrate_mpesa_pos_payments.sql"),
+  "utf8"
+);
 const actions = readFileSync(join(process.cwd(), "features/pos/actions.ts"), "utf8");
 const settingsActions = readFileSync(
   join(process.cwd(), "features/pos/settings-actions.ts"),
@@ -53,12 +57,15 @@ describe("POS terminal operations contract", () => {
     expect(checkoutMigration).toContain("public.record_purchase_points");
   });
 
-  it("keeps provider methods unavailable without server credentials", () => {
+  it("keeps unconfigured provider methods unavailable and implements M-Pesa reconciliation", () => {
     expect(migration).toContain("v_channel.credentials_configured_at is null");
     expect(checkoutMigration).toContain("p_payment_method not in ('cash', 'card')");
-    expect(actions).toContain(
-      "Este método de pagamento ainda não está configurado para utilização."
-    );
+    expect(mpesaMigration).toContain("function public.prepare_pos_mpesa_payment");
+    expect(mpesaMigration).toContain("function public.reconcile_mpesa_payment_attempt");
+    expect(mpesaMigration).toContain("mpesa_payment_reservation");
+    expect(mpesaMigration).toContain("mpesa_payment_reservation_released");
+    expect(mpesaMigration).toContain("to service_role");
+    expect(actions).toContain('paymentMethodValue === "mpesa"');
   });
 
   it("checks authenticated tenant access and removes anonymous execution", () => {
@@ -77,7 +84,8 @@ describe("POS terminal operations contract", () => {
   it("routes configuration writes through protected server actions", () => {
     expect(settingsActions).toContain('requireRouteAccess("/pos"');
     expect(settingsActions).toContain('rpc("configure_pos_terminal_section"');
-    expect(settingsActions).toContain('rpc("configure_business_payment_channel"');
+    expect(settingsActions).toContain('"configure_business_payment_channel"');
+    expect(settingsActions).toContain('"configure_mpesa_payment_channel"');
     expect(settingsActions).toContain('rpc("manage_pos_terminal"');
     expect(settingsActions).toContain('rpc("update_pos_terminal_settings"');
     expect(settingsActions).toContain('rpc("manage_pos_terminal_device"');
@@ -90,6 +98,10 @@ describe("POS terminal operations contract", () => {
     expect(configurationMigration).toContain("vault.update_secret");
     expect(configurationMigration).toContain("Secrets cannot be stored in public settings");
     expect(configurationMigration).not.toContain("vault.decrypted_secrets");
+    expect(mpesaMigration).toContain("vault.decrypted_secrets");
+    expect(mpesaMigration).toMatch(
+      /get_mpesa_payment_attempt_context[\s\S]+from public, anon, authenticated/
+    );
   });
 
   it("validates tenant ownership and keeps the configuration RPCs authenticated", () => {

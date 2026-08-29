@@ -38,9 +38,11 @@ Cada tentativa financeira usa uma chave de idempotência por negócio e percorre
 autorizada e reconciliada poderá originar um `transaction_payments` nas fases transacionais
 seguintes.
 
-Até existirem contratos e credenciais reais, M-Pesa, e-Mola e mKesh permanecem indisponíveis. O
-dinheiro usa confirmação manual no balcão. O cartão usa confirmação manual depois da aprovação no
-terminal bancário externo.
+M-Pesa fica disponível por filial depois da configuração e ativação explícita do canal C2B. A
+venda permanece pendente até a resposta síncrona ou callback autenticado ser reconciliado; uma
+resposta repetida reutiliza a mesma tentativa. e-Mola e mKesh permanecem indisponíveis até terem
+adaptadores próprios. O dinheiro usa confirmação manual no balcão. O cartão usa confirmação
+manual depois da aprovação no terminal bancário externo.
 
 ## Catálogo, equipa e cliente
 

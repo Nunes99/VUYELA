@@ -11,6 +11,13 @@ import {
   parsePosQuote,
   splitVatInclusive
 } from "@/features/pos/model";
+import {
+  attemptIdFromMpesaReference,
+  formatMpesaAmount,
+  mpesaAttemptReference,
+  normalizeMpesaMsisdn,
+  parseMpesaProviderResponse
+} from "@/features/payments/mpesa/model";
 
 describe("POS model", () => {
   it("parses and formats MZN minor units", () => {
@@ -119,6 +126,35 @@ describe("POS model", () => {
     ).toEqual({
       method: "qr",
       value: "VUYELA:CARD:6ab0d80e-e6f2-4ad2-b747-75876d1c70ba:VY-8F2K-91M"
+    });
+  });
+
+  it("normalizes Mozambican Vodacom numbers for M-Pesa", () => {
+    expect(normalizeMpesaMsisdn("+258 84 123 4567")).toBe("258841234567");
+    expect(normalizeMpesaMsisdn("85 987 6543")).toBe("258859876543");
+    expect(() => normalizeMpesaMsisdn("82 123 4567")).toThrow(/Vodacom/);
+    expect(formatMpesaAmount(12_505)).toBe("125.05");
+  });
+
+  it("keeps the M-Pesa third-party reference reversible and maps provider results", () => {
+    const attemptId = "6ab0d80e-e6f2-4ad2-b747-75876d1c70ba";
+    const reference = mpesaAttemptReference(attemptId);
+
+    expect(attemptIdFromMpesaReference(reference)).toBe(attemptId);
+    expect(
+      parseMpesaProviderResponse(
+        {
+          output_ResponseCode: "INS-0",
+          output_ResponseDesc: "Request processed successfully",
+          output_TransactionID: "49XKD31",
+          output_ConversationID: "AG_20260829_01"
+        },
+        200
+      )
+    ).toMatchObject({
+      status: "authorized",
+      providerReference: "49XKD31",
+      conversationId: "AG_20260829_01"
     });
   });
 });

@@ -2,8 +2,8 @@
 
 ## Estado
 
-Fundação do checkout POS implementada em 29 de agosto de 2026. A integração M-Pesa permanece como
-a próxima etapa deste plano.
+Fundação do checkout POS e integração C2B M-Pesa implementadas em 29 de agosto de 2026. A ativação
+externa depende das credenciais e endpoints atribuídos no portal M-Pesa.
 
 ## Entrega concluída
 
@@ -16,11 +16,15 @@ a próxima etapa deste plano.
 - autorização do cliente exigida apenas quando há débito de YELAS;
 - linhas imutáveis da venda em `transaction_items`;
 - reconciliação de numerário e cartão bancário com idempotência;
+- pedido C2B M-Pesa no servidor, estado pendente e callback idempotente;
+- credenciais M-Pesa cifradas no Vault e API key cifrada por RSA em cada pedido;
+- reserva de YELAS com ledger e reversão compensatória quando o pagamento é recusado;
 - UI responsiva validada em desktop e Pixel 5;
 - migration aplicada ao projeto Supabase de produção.
 
-Ficam para as entregas seguintes o adaptador M-Pesa, callbacks assíncronos, pagamentos divididos,
-vendas suspensas/retomadas, autorização forte de resgate e reembolsos operacionais no POS.
+Ficam para as entregas seguintes a consulta remota de estado e reversão M-Pesa, pagamentos
+divididos, vendas suspensas/retomadas, autorização forte de resgate e reembolsos operacionais no
+POS.
 
 ## Objetivo
 
@@ -50,7 +54,7 @@ As principais limitações do fluxo atual são:
 - uma venda sem cartão não pode ser concluída;
 - o estado guarda um único `catalogItemId`, não um carrinho com várias linhas e quantidades;
 - o desconto é recebido como um total, sem explicar a regra e os itens abrangidos;
-- M-Pesa, e-Mola e mKesh existem no modelo, mas permanecem indisponíveis sem adaptador real;
+- M-Pesa tem adaptador C2B e callback; e-Mola e mKesh permanecem indisponíveis sem adaptador real;
 - uma confirmação genérica do caixa representa a autorização do cliente para usar YELAS;
 - o fluxo rígido de cinco passos cria mais navegação do que um caixa precisa;
 - a transação guarda totais, mas não possui linhas imutáveis dos produtos vendidos;
@@ -508,7 +512,8 @@ Objetivos iniciais:
 - venda simples em numerário concluída sem cartão e sem passos desnecessários;
 - cartão associado sem perder o carrinho;
 - método recusado recuperado sem recriar a venda;
-- nenhuma movimentação de YELAS antes da confirmação financeira;
+- nenhum crédito final de YELAS antes da confirmação financeira; uma utilização parcial fica
+  reservada no ledger e recebe reversão explícita se o pagamento falhar;
 - nenhuma duplicação por repetição de ação ou callback.
 
 ## Casos de aceitação prioritários
@@ -534,7 +539,7 @@ Objetivos iniciais:
 4. Refazer o POS como catálogo e carrinho, mantendo o aplicativo e autenticação atuais.
 5. Adicionar cartão opcional, descontos elegíveis e autorização forte de YELAS.
 6. Ligar numerário e terminal externo manual ao novo fluxo.
-7. Implementar o adaptador M-Pesa e callbacks em ambiente de testes.
+7. Implementar o adaptador M-Pesa e callbacks em ambiente de testes. **Concluído localmente.**
 8. Adicionar recuperação de vendas, recibos, reembolsos e auditoria.
 9. Executar testes RLS, concorrência, integração e Playwright por dispositivo.
 10. Fazer piloto com uma filial e métricas antes de ativar outros provedores.
