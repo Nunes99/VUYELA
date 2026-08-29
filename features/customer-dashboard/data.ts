@@ -63,6 +63,7 @@ interface OfferRow {
   business_id: string;
   title: string;
   description: string;
+  image_url: string | null;
 }
 
 interface CustomerPreferenceRow {
@@ -170,7 +171,7 @@ export async function getCustomerDashboard(
     ledgerRequest,
     supabase
       .from("offers")
-      .select("id, business_id, title, description")
+      .select("id, business_id, title, description, image_url")
       .eq("is_public", true)
       .eq("is_active", true),
     notificationRequest,
@@ -374,6 +375,7 @@ function buildOffers(
       businessName: business?.name ?? "Negócio VUYELA",
       title: row.title,
       description: row.description,
+      imageUrl: row.image_url,
       categorySlug: category?.slug ?? null,
       categoryName: category?.name ?? null,
       href: business?.slug ? `/estabelecimentos/${business.slug}` : "/ofertas",

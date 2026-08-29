@@ -13,7 +13,9 @@ import {
   Trash2,
   UserRoundCog
 } from "lucide-react";
+import Image from "next/image";
 
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 import { formatMznMinor } from "@/features/business-dashboard/model";
 
 import {
@@ -41,6 +43,8 @@ export function BusinessOperationResult({ result }: { result?: string | undefine
     guardado: "Alteração guardada e registada na auditoria.",
     "convite-aceite": "Convite aceite. A área do negócio já está disponível.",
     "dados-invalidos": "Existem dados inválidos ou incompletos.",
+    "imagem-invalida": "Use uma imagem JPEG, PNG ou WebP com no máximo 5 MB.",
+    "imagem-erro": "Os dados foram guardados, mas não foi possível atualizar a imagem.",
     "limite-atingido": "O limite definido pelo plano atual foi atingido.",
     "operacao-bloqueada": "Esta operação está bloqueada porque existem registos associados.",
     erro: "Não foi possível concluir a operação. Confirme as permissões e tente novamente."
@@ -289,8 +293,12 @@ export function BusinessCatalogManagementView({
           {state.operations.catalogItems.map((item) => (
             <article className="business-operation-card" key={item.id}>
               <header>
-                <span className="business-operation-card__icon">
-                  <Boxes aria-hidden="true" size={19} />
+                <span className="business-operation-card__media">
+                  {item.imageUrl ? (
+                    <Image alt="" fill sizes="72px" src={item.imageUrl} unoptimized />
+                  ) : (
+                    <Boxes aria-hidden="true" size={22} />
+                  )}
                 </span>
                 <div>
                   <h3>{item.name}</h3>
@@ -538,6 +546,15 @@ function CatalogItemForm({
       <input name="businessId" type="hidden" value={businessId} />
       <input name="itemId" type="hidden" value={item?.id ?? ""} />
       <input name="operation" type="hidden" value={operation} />
+      <input name="previousImageUrl" type="hidden" value={item?.imageUrl ?? ""} />
+      <div className="business-operation-form__wide">
+        <ImageUploadField
+          currentUrl={item?.imageUrl}
+          label="Fotografia do produto ou serviço"
+          name="image"
+          removeName="removeImage"
+        />
+      </div>
       <label>
         <span>Nome</span>
         <input defaultValue={item?.name} name="name" required />
@@ -625,6 +642,7 @@ function CatalogStatusForm({
         description: item.description ?? "",
         priceMzn: (item.priceMznMinor / 100).toFixed(2),
         loyaltyDiscountPercent: String(item.loyaltyDiscountPercent),
+        previousImageUrl: item.imageUrl ?? "",
         sortOrder: String(item.sortOrder)
       }).map(([name, value]) => (
         <input key={name} name={name} type="hidden" value={value} />

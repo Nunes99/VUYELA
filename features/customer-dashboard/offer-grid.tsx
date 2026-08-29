@@ -69,14 +69,15 @@ export function CustomerOfferGrid({ offers, limit, showFilters = false }: Custom
       ) : null}
 
       <div className="customer-offer-grid">
-        {visibleOffers.map((offer, index) => (
+        {visibleOffers.map((offer) => (
           <article className="customer-offer-card" key={offer.id}>
             <div className="customer-offer-card__image">
               <Image
                 alt=""
                 fill
                 sizes="(max-width: 760px) 100vw, 32vw"
-                src={index % 2 === 0 ? "/images/offer-prawns.jpg" : "/images/offer-bakery.jpg"}
+                src={offer.imageUrl ?? "/images/offer-prawns.jpg"}
+                unoptimized={Boolean(offer.imageUrl)}
               />
               <span>{offer.categoryName ?? "Oferta"}</span>
             </div>

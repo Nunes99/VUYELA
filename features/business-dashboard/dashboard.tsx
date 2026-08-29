@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   BriefcaseBusiness,
   CheckCircle2,
@@ -144,7 +145,7 @@ export function BusinessProfileHeader({
   activeTab,
   scopeLabel
 }: {
-  business: { id: string; name: string; status: string };
+  business: { id: string; name: string; status: string; logoUrl?: string | null | undefined };
   activeTab: string;
   scopeLabel?: string;
 }) {
@@ -163,8 +164,12 @@ export function BusinessProfileHeader({
   return (
     <section className="business-profile-header">
       <div className="business-profile-header__identity">
-        <span aria-hidden="true">
-          <BriefcaseBusiness size={23} />
+        <span aria-hidden="true" className={business.logoUrl ? "has-logo" : undefined}>
+          {business.logoUrl ? (
+            <Image alt="" fill sizes="48px" src={business.logoUrl} unoptimized />
+          ) : (
+            <BriefcaseBusiness size={23} />
+          )}
         </span>
         <div>
           <h2>{business.name}</h2>

@@ -6,6 +6,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAuthenticatedUser, requireRouteAccess } from "@/lib/auth/session";
+import {
+  BusinessMediaError,
+  mediaFile,
+  removeBusinessMediaObject,
+  updateBusinessMedia,
+  validateBusinessMediaFile
+} from "@/lib/business-media";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -309,6 +316,9 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
   const priceMznMinor = parseMoneyMinor(field(formData, "priceMzn"));
   const loyaltyDiscountPercent = parsePercentage(field(formData, "loyaltyDiscountPercent"));
   const sortOrder = integerField(formData, "sortOrder", 100);
+  const image = mediaFile(formData, "image");
+  const previousImageUrl = field(formData, "previousImageUrl");
+  const removeImage = field(formData, "removeImage") === "on";
 
   if (
     !businessId ||
@@ -322,8 +332,14 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
     redirectWithResult("catalogo", businessId, "dados-invalidos");
   }
 
+  try {
+    await validateBusinessMediaFile(image);
+  } catch {
+    redirectWithResult("catalogo", businessId, "imagem-invalida");
+  }
+
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("manage_business_catalog_item_checkout", {
+  const { data: itemId, error } = await supabase.rpc("manage_business_catalog_item_checkout", {
     p_business_id: businessId,
     p_item_id: nullableField(formData, "itemId"),
     p_action: action,
@@ -337,6 +353,30 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
     p_sort_order: sortOrder
   });
   if (error) redirectWithResult("catalogo", businessId, operationErrorCode(error.message));
+
+  try {
+    if ((action === "create" || action === "update") && typeof itemId === "string") {
+      await updateBusinessMedia({
+        supabase,
+        businessId,
+        entityType: "catalog",
+        entityId: itemId,
+        file: image,
+        previousUrl: previousImageUrl,
+        remove: removeImage
+      });
+    } else if (action === "delete") {
+      await removeBusinessMediaObject(supabase, previousImageUrl);
+    }
+  } catch (mediaError) {
+    redirectWithResult(
+      "catalogo",
+      businessId,
+      mediaError instanceof BusinessMediaError && mediaError.code === "invalid-file"
+        ? "imagem-invalida"
+        : "imagem-erro"
+    );
+  }
 
   revalidateBusinessPaths();
   redirectWithResult("catalogo", businessId, "guardado");
@@ -423,6 +463,9 @@ export async function manageBusinessOfferAction(formData: FormData): Promise<voi
   const description = field(formData, "description");
   const startsAt = optionalDateTime(formData, "startsAt");
   const endsAt = optionalDateTime(formData, "endsAt");
+  const image = mediaFile(formData, "image");
+  const previousImageUrl = field(formData, "previousImageUrl");
+  const removeImage = field(formData, "removeImage") === "on";
 
   if (
     !businessId ||
@@ -432,8 +475,14 @@ export async function manageBusinessOfferAction(formData: FormData): Promise<voi
     redirectCampaigns(businessId, "dados-invalidos");
   }
 
+  try {
+    await validateBusinessMediaFile(image);
+  } catch {
+    redirectCampaigns(businessId, "imagem-invalida");
+  }
+
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("manage_business_offer", {
+  const { data: offerId, error } = await supabase.rpc("manage_business_offer", {
     p_business_id: businessId,
     p_offer_id: nullableField(formData, "offerId"),
     p_action: action,
@@ -446,6 +495,29 @@ export async function manageBusinessOfferAction(formData: FormData): Promise<voi
     p_is_public: field(formData, "isPublic") === "on"
   });
   if (error) redirectCampaigns(businessId, operationErrorCode(error.message));
+
+  try {
+    if ((action === "create" || action === "update") && typeof offerId === "string") {
+      await updateBusinessMedia({
+        supabase,
+        businessId,
+        entityType: "offer",
+        entityId: offerId,
+        file: image,
+        previousUrl: previousImageUrl,
+        remove: removeImage
+      });
+    } else if (action === "delete") {
+      await removeBusinessMediaObject(supabase, previousImageUrl);
+    }
+  } catch (mediaError) {
+    redirectCampaigns(
+      businessId,
+      mediaError instanceof BusinessMediaError && mediaError.code === "invalid-file"
+        ? "imagem-invalida"
+        : "imagem-erro"
+    );
+  }
 
   revalidateBusinessPaths();
   redirectCampaigns(businessId, "guardado");

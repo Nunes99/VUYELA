@@ -11,6 +11,8 @@ interface BusinessRow {
   phone: string | null;
   email: string | null;
   website_url: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
 }
 
 interface CategoryRow {
@@ -47,6 +49,8 @@ export interface BusinessSettingsViewModel {
     phone: string;
     email: string;
     websiteUrl: string;
+    logoUrl: string | null;
+    coverUrl: string | null;
   };
   program: {
     name: string;
@@ -98,7 +102,9 @@ export async function getBusinessSettings(
   const [{ data: businessData, error: businessError }, { data: categoryData }] = await Promise.all([
     supabase
       .from("businesses")
-      .select("id, category_id, name, description, phone, email, website_url")
+      .select(
+        "id, category_id, name, description, phone, email, website_url, logo_url, cover_url"
+      )
       .in("id", businessIds)
       .order("name"),
     supabase
@@ -155,7 +161,9 @@ export async function getBusinessSettings(
         description: selectedBusiness.description ?? "",
         phone: selectedBusiness.phone ?? "",
         email: selectedBusiness.email ?? "",
-        websiteUrl: selectedBusiness.website_url ?? ""
+        websiteUrl: selectedBusiness.website_url ?? "",
+        logoUrl: selectedBusiness.logo_url,
+        coverUrl: selectedBusiness.cover_url
       },
       program: {
         name: program?.name ?? `YELAS ${selectedBusiness.name}`,

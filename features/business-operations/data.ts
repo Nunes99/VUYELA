@@ -21,8 +21,9 @@ interface BusinessOperationsRpcRow {
   offers: unknown;
 }
 
-interface CatalogDiscountRow {
+interface CatalogMediaRow {
   id: string;
+  image_url: string | null;
   loyalty_discount_percent: number | string;
 }
 
@@ -43,18 +44,18 @@ export async function getBusinessOperations(
   }
 
   const supabase = await createSupabaseServerClient();
-  const [operationsResult, discountsResult] = await Promise.all([
+  const [operationsResult, catalogMediaResult] = await Promise.all([
     supabase.rpc("get_business_operations", {
       p_business_id: businessId
     }),
     supabase
       .from("business_catalog_items")
-      .select("id, loyalty_discount_percent")
+      .select("id, image_url, loyalty_discount_percent")
       .eq("business_id", businessId)
   ]);
   const { data, error } = operationsResult;
 
-  if (error || discountsResult.error) {
+  if (error || catalogMediaResult.error) {
     return { status: "error", message: "Não foi possível carregar a gestão operacional." };
   }
 
@@ -64,17 +65,23 @@ export async function getBusinessOperations(
     return { status: "error", message: "A gestão operacional está temporariamente indisponível." };
   }
 
-  const discounts = new Map(
-    arrayFrom<CatalogDiscountRow>(discountsResult.data).map((item) => [
+  const catalogMedia = new Map(
+    arrayFrom<CatalogMediaRow>(catalogMediaResult.data).map((item) => [
       item.id,
-      Number(item.loyalty_discount_percent)
+      {
+        imageUrl: item.image_url,
+        loyaltyDiscountPercent: Number(item.loyalty_discount_percent)
+      }
     ])
   );
-  const catalogItems = arrayFrom<Omit<BusinessCatalogItem, "loyaltyDiscountPercent">>(
+  const catalogItems = arrayFrom<
+    Omit<BusinessCatalogItem, "imageUrl" | "loyaltyDiscountPercent">
+  >(
     row.catalog_items
   ).map((item) => ({
     ...item,
-    loyaltyDiscountPercent: discounts.get(item.id) ?? 0
+    imageUrl: catalogMedia.get(item.id)?.imageUrl ?? null,
+    loyaltyDiscountPercent: catalogMedia.get(item.id)?.loyaltyDiscountPercent ?? 0
   }));
 
   return {

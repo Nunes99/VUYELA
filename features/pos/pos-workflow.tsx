@@ -24,6 +24,7 @@ import {
   WalletCards,
   X
 } from "lucide-react";
+import Image from "next/image";
 
 import { submitPosAction } from "./actions";
 import type {
@@ -40,7 +41,8 @@ import type {
   PosBusinessContext,
   PosCatalogItemContext,
   PosContextState,
-  PosPaymentChannelContext
+  PosPaymentChannelContext,
+  PosTerminalContext
 } from "./data";
 
 interface PosWorkflowProps {
@@ -228,6 +230,7 @@ export function PosWorkflow({
 
       {activeStep === "success" && state.quote ? (
         <SuccessStep
+          business={selectedBusiness}
           formAction={formAction}
           onReset={() => {
             setCart([]);
@@ -235,6 +238,7 @@ export function PosWorkflow({
             setIdempotencyKey(createBrowserIdempotencyKey());
           }}
           state={{ ...state, quote: state.quote }}
+          terminal={selectedBusiness.terminals.find((terminal) => terminal.id === terminalId) ?? null}
         />
       ) : null}
 
@@ -388,8 +392,10 @@ function SaleStep({
                   onClick={() => updateQuantity(item.id, (quantity ?? 0) + 1)}
                   type="button"
                 >
-                  <span className="pos-sale__item-icon">
-                    {item.kind === "product" ? (
+                  <span className="pos-sale__item-media">
+                    {item.imageUrl ? (
+                      <Image alt="" fill sizes="92px" src={item.imageUrl} unoptimized />
+                    ) : item.kind === "product" ? (
                       <ShoppingBag aria-hidden="true" size={21} />
                     ) : (
                       <ReceiptText aria-hidden="true" size={21} />
@@ -929,13 +935,25 @@ function OrderSummary({ quote, cardName }: { quote: PosQuote; cardName: string |
 
 function SuccessStep({
   state,
+  business,
+  terminal,
   formAction,
   onReset
 }: {
   state: PosActionState & { quote: PosQuote };
+  business: PosBusinessContext;
+  terminal: PosTerminalContext | null;
   formAction: (formData: FormData) => void;
   onReset: () => void;
 }) {
+  const receiptSettings = recordValue(terminal?.settings.configuration.general);
+  const showLogo = receiptSettings.receiptLogoEnabled !== false;
+  const thankYouMessage = stringValue(
+    receiptSettings.thankYouMessage,
+    "Obrigado pela preferência!"
+  );
+  const receiptFooter = stringValue(receiptSettings.receiptFooter, "Comprovativo VUYELA");
+
   return (
     <section className="pos-success">
       <span className="pos-success__icon">
@@ -943,8 +961,20 @@ function SuccessStep({
       </span>
       <span>Pagamento confirmado</span>
       <h1>Venda concluída</h1>
+      <div className="pos-success__receipt-brand">
+        {showLogo && business.logoUrl ? (
+          <span>
+            <Image alt={`Logótipo de ${business.name}`} fill sizes="64px" src={business.logoUrl} unoptimized />
+          </span>
+        ) : null}
+        <div>
+          <strong>{business.name}</strong>
+          <small>{business.phone || business.email || "Comprovativo VUYELA"}</small>
+        </div>
+      </div>
       <strong>{formatMznCompact(state.quote.netAmountMznMinor)}</strong>
       <p>{state.receiptNumber ?? "Comprovativo VUYELA"}</p>
+      <p className="pos-success__thank-you">{thankYouMessage}</p>
 
       <div className="pos-success__facts">
         <div>
@@ -962,7 +992,7 @@ function SuccessStep({
       </div>
 
       <div className="pos-success__actions">
-        <button type="button">
+        <button onClick={() => window.print()} type="button">
           <Printer aria-hidden="true" size={18} /> Imprimir comprovativo
         </button>
         <form action={formAction}>
@@ -972,6 +1002,7 @@ function SuccessStep({
           </button>
         </form>
       </div>
+      <small className="pos-success__footer">{receiptFooter}</small>
     </section>
   );
 }
@@ -1032,6 +1063,16 @@ function ActionMessage({ status, message }: Pick<PosActionState, "status" | "mes
       {message}
     </p>
   );
+}
+
+function recordValue(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function stringValue(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
 
 function resolveCartLines(cart: PosCartItemInput[], catalog: PosCatalogItemContext[]) {

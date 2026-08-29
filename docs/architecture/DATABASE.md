@@ -348,3 +348,22 @@ The campaign-audience insert trigger creates at most one row for each campaign, 
 `claim_notification_deliveries` is executable only by `service_role`. It claims due rows with `FOR UPDATE SKIP LOCKED`, increments the attempt count, and stores a short lease token. Stale leases can be reclaimed after five minutes.
 
 `mark_notification_read` is a `SECURITY INVOKER` function available to authenticated recipients. A column-level grant permits updates only to `read_at`, while a dedicated UPDATE policy limits rows to delivered in-app notifications owned by the current profile or customer card. Existing notification SELECT RLS continues to isolate recipients and business managers.
+
+## Business Media
+
+Public product, service, offer and business identity images live in the public Supabase Storage
+bucket `business-media`. Public delivery is intentional because the same assets appear in the POS,
+customer offer catalogue, marketplace and receipts. Writes remain private: Storage RLS requires an
+authenticated manager of the business UUID stored in the first path segment.
+
+Object paths use the following contract:
+
+- `<business-id>/catalog/<random-id>.<extension>`;
+- `<business-id>/offers/<random-id>.<extension>`;
+- `<business-id>/profile/<random-id>.<extension>`;
+- `<business-id>/logo/<random-id>.<extension>`.
+
+The bucket accepts JPEG, PNG and WebP files up to 5 MB. Unique object names avoid overwrite races
+and stale CDN content. `set_business_media_url` validates tenant ownership and records audited URL
+changes for catalogue items, offers, business covers and business logos. Replacement first commits
+the new URL and only then removes the previous object.

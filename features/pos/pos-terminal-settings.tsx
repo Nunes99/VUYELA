@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Bluetooth, Camera, Check, CircleX, Plus, Printer, QrCode, Wifi } from "lucide-react";
+import Image from "next/image";
 
 import type {
   PosBusinessContext,
@@ -174,11 +175,20 @@ function GeneralSettings({
             name="receiptLogoEnabled"
             type="checkbox"
           />
-          <span>
-            <QrCode aria-hidden="true" size={20} /> Logótipo
+          <span className="pos-figma-logo-control__preview">
+            {business.logoUrl ? (
+              <Image alt="" fill sizes="44px" src={business.logoUrl} unoptimized />
+            ) : (
+              <QrCode aria-hidden="true" size={20} />
+            )}
           </span>
           <strong>Logótipo nos recibos</strong>
-          <small>PNG, JPG. Máx.: 2MB (Recomendado 200x200px)</small>
+          <small>
+            {business.logoUrl
+              ? "Identidade atual do negócio"
+              : "Carregue o logótipo nas definições do negócio"}
+          </small>
+          {business.canManage ? <Link href="/negocio/definicoes">Alterar logótipo</Link> : null}
         </label>
         <div className="pos-figma-grid">
           <Field

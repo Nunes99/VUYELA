@@ -26,6 +26,7 @@ interface OfferRow {
   slug: string;
   title: string;
   description: string;
+  image_url: string | null;
   starts_at: string | null;
   ends_at: string | null;
   is_public: boolean;
@@ -108,7 +109,9 @@ export async function getBusinessCampaigns(
     }),
     supabase
       .from("offers")
-      .select("id, campaign_id, slug, title, description, starts_at, ends_at, is_public, is_active")
+      .select(
+        "id, campaign_id, slug, title, description, image_url, starts_at, ends_at, is_public, is_active"
+      )
       .eq("business_id", selectedBusiness.id)
       .order("created_at", { ascending: false }),
     supabase.from("offer_claims").select("offer_id").eq("business_id", selectedBusiness.id)
@@ -134,6 +137,7 @@ export async function getBusinessCampaigns(
     slug: offer.slug,
     title: offer.title,
     description: offer.description,
+    imageUrl: offer.image_url,
     startsAt: offer.starts_at,
     endsAt: offer.ends_at,
     isPublic: offer.is_public,

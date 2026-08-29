@@ -8,6 +8,8 @@ interface BusinessRow {
   name: string;
   phone: string | null;
   email: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
 }
 
 interface BranchRow {
@@ -28,6 +30,7 @@ interface CatalogRow {
   sku: string | null;
   name: string;
   description: string | null;
+  image_url: string | null;
   price_mzn_minor: number;
   loyalty_discount_percent: number | string;
   sort_order: number;
@@ -100,6 +103,7 @@ export interface PosCatalogItemContext {
   sku: string | null;
   name: string;
   description: string | null;
+  imageUrl: string | null;
   priceMznMinor: number;
   loyaltyDiscountPercent: number;
   sortOrder: number;
@@ -111,6 +115,8 @@ export interface PosBusinessContext {
   nuit: string | null;
   phone: string | null;
   email: string | null;
+  logoUrl: string | null;
+  coverUrl: string | null;
   branches: PosBranchContext[];
   defaultBranchId: string;
   requiresBranch: boolean;
@@ -163,7 +169,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   ] = await Promise.all([
       supabase
         .from("businesses")
-        .select("id, name, phone, email")
+        .select("id, name, phone, email, logo_url, cover_url")
         .in("id", businessIds)
         .eq("status", "active"),
       supabase
@@ -176,7 +182,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
       supabase
         .from("business_catalog_items")
         .select(
-          "id, business_id, branch_id, kind, sku, name, description, price_mzn_minor, loyalty_discount_percent, sort_order"
+          "id, business_id, branch_id, kind, sku, name, description, image_url, price_mzn_minor, loyalty_discount_percent, sort_order"
         )
         .in("business_id", businessIds)
         .eq("is_available", true)
@@ -225,6 +231,8 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
         nuit: null,
         phone: business.phone,
         email: business.email,
+        logoUrl: business.logo_url,
+        coverUrl: business.cover_url,
         branches,
         defaultBranchId,
         requiresBranch: !hasBusinessWideAccess,
@@ -468,6 +476,7 @@ function groupCatalogItems(items: CatalogRow[]) {
         sku: item.sku,
         name: item.name,
         description: item.description,
+        imageUrl: item.image_url,
         priceMznMinor: item.price_mzn_minor,
         loyaltyDiscountPercent: numberValue(item.loyalty_discount_percent, 0),
         sortOrder: item.sort_order

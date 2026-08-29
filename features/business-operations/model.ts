@@ -53,6 +53,7 @@ export interface BusinessCatalogItem {
   sku: string | null;
   name: string;
   description: string | null;
+  imageUrl: string | null;
   priceMznMinor: number;
   loyaltyDiscountPercent: number;
   isAvailable: boolean;
@@ -84,6 +85,7 @@ export interface BusinessOperationOffer {
   slug: string;
   title: string;
   description: string;
+  imageUrl: string | null;
   startsAt: string | null;
   endsAt: string | null;
   isPublic: boolean;

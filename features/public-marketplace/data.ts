@@ -90,6 +90,7 @@ interface OfferRow {
   slug: string;
   title: string;
   description: string;
+  image_url: string | null;
   starts_at: string | null;
   ends_at: string | null;
 }
@@ -149,7 +150,7 @@ export async function getPublicMarketplaceSnapshot(): Promise<PublicMarketplaceS
       .eq("status", "active"),
     supabase
       .from("offers")
-      .select("id, business_id, slug, title, description, starts_at, ends_at")
+      .select("id, business_id, slug, title, description, image_url, starts_at, ends_at")
       .eq("is_public", true)
       .eq("is_active", true)
       .order("ends_at", { ascending: true, nullsFirst: false })
@@ -342,6 +343,7 @@ function mapOffer(row: OfferRow, business: MarketplaceBusiness | null): Marketpl
     slug: row.slug,
     title: row.title,
     description: row.description,
+    imageUrl: row.image_url,
     startsAt: row.starts_at,
     endsAt: row.ends_at,
     businessId: row.business_id,

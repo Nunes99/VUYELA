@@ -46,7 +46,7 @@ export function buildOfferMetadata(viewModel: MarketplaceOfferViewModel): Metada
     description: `${viewModel.offer.description} Oferta pública VUYELA de ${viewModel.business.name}.`,
     canonicalPath: `/ofertas/${viewModel.offer.slug}`,
     indexable: isIndexableOffer(viewModel.offer),
-    imageUrl: viewModel.business.coverUrl ?? viewModel.business.logoUrl
+    imageUrl: viewModel.offer.imageUrl ?? viewModel.business.coverUrl ?? viewModel.business.logoUrl
   });
 }
 
@@ -145,6 +145,7 @@ export function buildOfferJsonLd(
     "@type": "Offer",
     name: offer.title,
     description: offer.description,
+    image: offer.imageUrl ?? undefined,
     url: `${siteUrl}${offer.uniquePublicSlug ? `/ofertas/${offer.slug}` : `/estabelecimentos/${business.slug}`}`,
     validFrom: offer.startsAt ?? undefined,
     validThrough: offer.endsAt ?? undefined,

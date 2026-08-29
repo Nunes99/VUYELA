@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 import { updateBusinessSettingsAction } from "./actions";
 import type { BusinessSettingsState } from "./data";
@@ -34,7 +35,8 @@ export function BusinessSettingsView({
         business={{
           id: settings.business.id,
           name: settings.business.name,
-          status: "active"
+          status: "active",
+          logoUrl: settings.business.logoUrl
         }}
         scopeLabel="Perfil público e configuração operacional"
       />
@@ -74,10 +76,22 @@ export function BusinessSettingsView({
           Não foi possível guardar. Reveja os campos obrigatórios e tente novamente.
         </p>
       ) : null}
+      {saveStatus === "imagem-invalida" ? (
+        <p className="business-settings__message business-settings__message--error" role="alert">
+          Use imagens JPEG, PNG ou WebP com no máximo 5 MB.
+        </p>
+      ) : null}
+      {saveStatus === "imagem-erro" ? (
+        <p className="business-settings__message business-settings__message--error" role="alert">
+          Os dados foram guardados, mas não foi possível atualizar uma das imagens.
+        </p>
+      ) : null}
 
       <form action={updateBusinessSettingsAction} className="business-settings__form">
         <input name="businessId" type="hidden" value={settings.business.id} />
         <input name="branchId" type="hidden" value={settings.branch?.id ?? ""} />
+        <input name="previousLogoUrl" type="hidden" value={settings.business.logoUrl ?? ""} />
+        <input name="previousCoverUrl" type="hidden" value={settings.business.coverUrl ?? ""} />
 
         <section aria-labelledby="business-profile-title" className="business-settings__section">
           <SectionHeading
@@ -86,6 +100,22 @@ export function BusinessSettingsView({
             id="business-profile-title"
             title="Perfil público"
           />
+          <div className="business-settings__media-grid">
+            <ImageUploadField
+              currentUrl={settings.business.coverUrl}
+              label="Fotografia de perfil e capa"
+              name="coverImage"
+              removeName="removeCoverImage"
+            />
+            <ImageUploadField
+              currentUrl={settings.business.logoUrl}
+              hint="JPEG, PNG ou WebP. Recomendado: fundo transparente e formato quadrado."
+              label="Logótipo do negócio e das faturas"
+              name="logoImage"
+              removeName="removeLogoImage"
+              shape="square"
+            />
+          </div>
           <div className="business-settings__grid">
             <Input
               defaultValue={settings.business.name}

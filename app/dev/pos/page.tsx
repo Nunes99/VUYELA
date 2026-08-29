@@ -39,6 +39,8 @@ const previewContext: PosContextState = {
       nuit: "401234567",
       phone: "+258 84 123 4567",
       email: "pos@barbershop21.co.mz",
+      logoUrl: null,
+      coverUrl: null,
       branches: [
         {
           id: "branch-preview",
@@ -262,6 +264,7 @@ const previewContext: PosContextState = {
         sku: `SRV-${index + 1}`,
         name: String(name),
         description: String(description),
+        imageUrl: index < 2 ? "/images/offer-prawns.jpg" : null,
         priceMznMinor: Number(priceMznMinor),
         loyaltyDiscountPercent: index < 3 ? 10 : 0,
         sortOrder: index

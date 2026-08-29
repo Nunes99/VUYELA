@@ -87,6 +87,7 @@ export interface BusinessOffer {
   slug: string;
   title: string;
   description: string;
+  imageUrl: string | null;
   startsAt: string | null;
   endsAt: string | null;
   isPublic: boolean;

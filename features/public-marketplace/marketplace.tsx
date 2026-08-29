@@ -258,7 +258,7 @@ export function OfferDetailPage({ viewModel }: { viewModel: MarketplaceOfferView
         title={viewModel.offer.title}
         description={viewModel.offer.description}
         breadcrumbs={viewModel.breadcrumbs}
-        imageUrl={viewModel.business.coverUrl}
+        imageUrl={viewModel.offer.imageUrl ?? viewModel.business.coverUrl}
       />
       <section className="marketplace-section marketplace-section--detail">
         <div className="vy-container marketplace-detail-layout">
@@ -653,6 +653,11 @@ export function OfferCard({ offer }: { offer: MarketplaceOffer }) {
   return (
     <article className="marketplace-offer-card">
       <Link href={href}>
+        {offer.imageUrl ? (
+          <span className="marketplace-offer-card__media">
+            <Image alt="" fill sizes="(max-width: 760px) 100vw, 32vw" src={offer.imageUrl} unoptimized />
+          </span>
+        ) : null}
         <span>
           <Tag size={16} />
           {offer.categoryName ?? "Oferta VUYELA"}

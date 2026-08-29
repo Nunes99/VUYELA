@@ -18,6 +18,7 @@ export interface CustomerExploreOffer {
   businessName: string;
   title: string;
   description: string;
+  imageUrl: string | null;
   categorySlug?: string | null;
   categoryName?: string | null;
   href?: string;

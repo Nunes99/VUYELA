@@ -15984,6 +15984,7 @@
 }
 
 .business-profile-header__identity > span:first-child {
+  position: relative;
   display: grid;
   width: 3.75rem;
   height: 3.75rem;
@@ -15992,6 +15993,12 @@
   border-radius: 0.5rem;
   background: #e7f7f5;
   color: #0d9488;
+  overflow: hidden;
+}
+
+.business-profile-header__identity > span.has-logo img {
+  object-fit: contain;
+  padding: 0.35rem;
 }
 
 .business-profile-header__identity > div {
@@ -19708,6 +19715,306 @@
   .pos-portal__actions > form button {
     width: 2.75rem;
     padding-inline: 0;
+  }
+}
+
+/* Business media library */
+.business-image-field {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #d8e3e7;
+  border-radius: 0.5rem;
+  background: #f8fafb;
+}
+
+.business-image-field__preview {
+  position: relative;
+  display: grid;
+  aspect-ratio: 16 / 9;
+  min-width: 0;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid #dce6e9;
+  border-radius: 0.375rem;
+  background: #edf4f5;
+}
+
+.business-image-field--square {
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+}
+
+.business-image-field--square .business-image-field__preview {
+  aspect-ratio: 1;
+}
+
+.business-image-field__preview img {
+  object-fit: cover;
+}
+
+.business-image-field--square .business-image-field__preview img {
+  object-fit: contain;
+  padding: 0.5rem;
+}
+
+.business-image-field__preview > span {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  color: #6d858e;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.business-image-field__controls {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.business-image-field__controls > strong {
+  color: #173642;
+  font-size: 0.78rem;
+}
+
+.business-image-field__controls > small {
+  color: #6d858e;
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+.business-image-field__controls > .business-image-field__error {
+  color: #b42b36;
+  font-weight: 750;
+}
+
+.business-image-field__controls > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.3rem;
+}
+
+.business-image-field__controls label,
+.business-image-field__controls button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #c9d9de;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  color: #087f79;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.business-image-field__controls button {
+  color: #b42b36;
+}
+
+.business-image-field__controls label:hover,
+.business-image-field__controls label:focus-within,
+.business-image-field__controls button:hover,
+.business-image-field__controls button:focus-visible {
+  border-color: #0d9488;
+  outline: 3px solid rgb(13 148 136 / 12%);
+}
+
+.business-settings__media-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.9fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.business-operation-card__media {
+  position: relative;
+  display: grid;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 0.375rem;
+  background: #e9f8f6;
+  color: #0d9488;
+}
+
+.business-operation-card__media img,
+.business-offer-management-card__media img {
+  object-fit: cover;
+}
+
+.business-offer-management-card__media {
+  position: relative;
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background: #e9f2f3;
+}
+
+.marketplace-offer-card {
+  overflow: hidden;
+}
+
+.marketplace-offer-card > a {
+  align-content: start;
+  gap: var(--vy-space-3);
+  padding: var(--vy-space-5);
+}
+
+.marketplace-offer-card .marketplace-offer-card__media {
+  position: relative;
+  display: block;
+  width: calc(100% + (2 * var(--vy-space-5)));
+  aspect-ratio: 16 / 8;
+  overflow: hidden;
+  margin: calc(-1 * var(--vy-space-5)) calc(-1 * var(--vy-space-5)) var(--vy-space-2);
+  color: inherit;
+  text-transform: none;
+}
+
+.marketplace-offer-card__media img {
+  object-fit: cover;
+}
+
+.pos-sale__catalog-grid > button {
+  min-height: 14rem;
+}
+
+.pos-sale__item-media {
+  position: relative;
+  display: grid;
+  height: 6.25rem;
+  grid-column: 1 / -1;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 0.375rem;
+  background: #eaf8f7;
+  color: var(--pos-teal-dark);
+}
+
+.pos-sale__item-media img {
+  object-fit: cover;
+}
+
+.pos-success__receipt-brand {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0 0.25rem;
+}
+
+.pos-success__receipt-brand > span {
+  position: relative;
+  width: 3.5rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--pos-line);
+  border-radius: 0.375rem;
+  background: #ffffff;
+}
+
+.pos-success__receipt-brand img,
+.pos-figma-logo-control__preview img {
+  object-fit: contain;
+  padding: 0.3rem;
+}
+
+.pos-success__receipt-brand > div {
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.pos-success__receipt-brand strong {
+  color: var(--pos-ink);
+  font-size: 0.9rem;
+}
+
+.pos-success__receipt-brand small {
+  color: var(--pos-muted);
+  font-size: 0.68rem;
+}
+
+.pos-success .pos-success__thank-you {
+  margin: 0 0 0.9rem;
+  color: var(--pos-ink);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.pos-success__footer {
+  display: block;
+  max-width: 30rem;
+  margin-top: 1rem;
+  color: var(--pos-muted);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.pos-figma-logo-control__preview {
+  position: relative;
+  overflow: hidden;
+}
+
+.pos-figma-logo-control > a {
+  width: fit-content;
+  margin-top: 0.25rem;
+  color: #087f79;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+@media (max-width: 54rem) {
+  .business-settings__media-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 40rem) {
+  .business-image-field,
+  .business-image-field--square {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .business-image-field--square .business-image-field__preview {
+    width: 8rem;
+  }
+
+  .business-operation-card__media {
+    width: 3.75rem;
+  }
+
+  .pos-sale__catalog-grid > button {
+    min-height: 12.5rem;
+  }
+
+  .pos-sale__item-media {
+    height: 5rem;
+  }
+}
+
+@media print {
+  .pos-shell > header,
+  .pos-sale__progress,
+  .pos-success__actions,
+  .pos-sale__message {
+    display: none !important;
+  }
+
+  .pos-success {
+    max-width: 22rem;
+    color: #000000;
   }
 }
 
@@ -23615,5 +23922,16 @@
 
   .pos-payment-tabs a:last-child {
     border-bottom: 0;
+  }
+}
+
+/* Keep photographic POS tiles stable after the legacy settings breakpoints. */
+.pos-sale__catalog-grid > button {
+  min-height: 14rem;
+}
+
+@media (max-width: 40rem) {
+  .pos-sale__catalog-grid > button {
+    min-height: 12.5rem;
   }
 }

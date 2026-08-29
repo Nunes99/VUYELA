@@ -12,9 +12,11 @@ import {
   Users,
   XCircle
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { ImageUploadField } from "@/components/forms/image-upload-field";
 import { formatPercent } from "@/features/business-dashboard/model";
 import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 import {
@@ -383,6 +385,11 @@ function OfferList({
     <div className="business-operation-grid business-offer-management-grid">
       {offers.map((offer) => (
         <article className="business-operation-card" key={offer.id}>
+          {offer.imageUrl ? (
+            <div className="business-offer-management-card__media">
+              <Image alt="" fill sizes="(max-width: 760px) 100vw, 33vw" src={offer.imageUrl} unoptimized />
+            </div>
+          ) : null}
           <header>
             <div>
               <span className="business-dashboard-eyebrow">
@@ -436,6 +443,15 @@ function OfferForm({
       <input name="businessId" type="hidden" value={businessId} />
       <input name="offerId" type="hidden" value={offer?.id ?? ""} />
       <input name="operation" type="hidden" value={operation} />
+      <input name="previousImageUrl" type="hidden" value={offer?.imageUrl ?? ""} />
+      <div className="business-operation-form__wide">
+        <ImageUploadField
+          currentUrl={offer?.imageUrl}
+          label="Fotografia promocional"
+          name="image"
+          removeName="removeImage"
+        />
+      </div>
       <label>
         <span>Título</span>
         <input defaultValue={offer?.title} name="title" required />
@@ -536,6 +552,7 @@ function OfferStatusForm({
         slug: offer.slug,
         title: offer.title,
         description: offer.description,
+        previousImageUrl: offer.imageUrl ?? "",
         startsAt: toMaputoInput(offer.startsAt),
         endsAt: toMaputoInput(offer.endsAt),
         isPublic: offer.isPublic ? "on" : ""

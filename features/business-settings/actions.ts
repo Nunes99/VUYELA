@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import {
+  mediaFile,
+  updateBusinessMedia,
+  validateBusinessMediaFile
+} from "@/lib/business-media";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function value(formData: FormData, key: string): string {
@@ -17,7 +22,10 @@ function numberValue(formData: FormData, key: string): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function settingsPath(businessId: string, status: "guardado" | "erro"): string {
+function settingsPath(
+  businessId: string,
+  status: "guardado" | "erro" | "imagem-invalida" | "imagem-erro"
+): string {
   return `/negocio/definicoes?businessId=${encodeURIComponent(businessId)}&estado=${status}`;
 }
 
@@ -30,6 +38,8 @@ export async function updateBusinessSettingsAction(formData: FormData): Promise<
   const pointValueMzn = numberValue(formData, "pointValueMzn");
   const maximumRedemptionPercent = numberValue(formData, "maximumRedemptionPercent");
   const expiry = numberValue(formData, "pointsExpireAfterDays");
+  const logo = mediaFile(formData, "logoImage");
+  const cover = mediaFile(formData, "coverImage");
 
   if (
     !businessId ||
@@ -53,6 +63,13 @@ export async function updateBusinessSettingsAction(formData: FormData): Promise<
   const websiteUrl = value(formData, "websiteUrl");
   if (websiteUrl && !isHttpUrl(websiteUrl)) {
     redirect(settingsPath(businessId, "erro"));
+  }
+
+  try {
+    await validateBusinessMediaFile(logo);
+    await validateBusinessMediaFile(cover);
+  } catch {
+    redirect(settingsPath(businessId, "imagem-invalida"));
   }
 
   const supabase = await createSupabaseServerClient();
@@ -83,8 +100,34 @@ export async function updateBusinessSettingsAction(formData: FormData): Promise<
     redirect(settingsPath(businessId, "erro"));
   }
 
+  try {
+    await updateBusinessMedia({
+      supabase,
+      businessId,
+      entityType: "business_cover",
+      entityId: businessId,
+      file: cover,
+      previousUrl: value(formData, "previousCoverUrl"),
+      remove: value(formData, "removeCoverImage") === "on"
+    });
+    await updateBusinessMedia({
+      supabase,
+      businessId,
+      entityType: "business_logo",
+      entityId: businessId,
+      file: logo,
+      previousUrl: value(formData, "previousLogoUrl"),
+      remove: value(formData, "removeLogoImage") === "on"
+    });
+  } catch {
+    redirect(settingsPath(businessId, "imagem-erro"));
+  }
+
   revalidatePath("/negocio");
+  revalidatePath("/pos");
+  revalidatePath("/cliente");
   revalidatePath("/estabelecimentos");
+  revalidatePath("/ofertas");
   redirect(settingsPath(businessId, "guardado"));
 }
 

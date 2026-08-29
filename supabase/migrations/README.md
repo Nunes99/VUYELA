@@ -39,5 +39,12 @@ Apply them in this exact order:
 33. `implement_pos_terminal_operations.sql`
 34. `implement_customer_engagement.sql`
 35. `implement_platform_operations.sql`
+36. `separate_customer_business_accounts.sql`
+37. `support_business_team_accounts.sql`
+38. `configure_pos_terminal_and_payment_channels.sql`
+39. `provision_pos_operator_credentials.sql`
+40. `harden_pos_operator_provisioning.sql`
+41. `implement_cart_first_pos_checkout.sql`
+42. `manage_business_media.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

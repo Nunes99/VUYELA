@@ -26,7 +26,7 @@ const posSignIn = readFileSync(join(process.cwd(), "features/auth/portal-sign-in
 
 describe("POS application boundary", () => {
   it("loads only business columns granted to authenticated operators", () => {
-    expect(posData).toContain('.select("id, name, phone, email")');
+    expect(posData).toContain('.select("id, name, phone, email, logo_url, cover_url")');
     expect(posData).not.toContain('.select("id, name, nuit, phone, email")');
   });
 

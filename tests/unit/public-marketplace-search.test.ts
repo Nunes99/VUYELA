@@ -106,6 +106,7 @@ const snapshot = buildMarketplaceSnapshot({
       slug: "almoco",
       title: "Desconto de almoco",
       description: "Oferta pública no restaurante.",
+      imageUrl: null,
       startsAt: null,
       endsAt: null,
       businessId: "business-1",
