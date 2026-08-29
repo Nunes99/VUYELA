@@ -13,6 +13,9 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     await expect(page.getByRole("heading", { name: "Olá, Nunes José" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Seus Cartões" })).toBeVisible();
     await expect(page.getByLabel("Navegação do cliente")).toBeVisible();
+    await expect(
+      page.locator(".customer-home-card-link").first().getByText("Equivale a 345 MZN")
+    ).toBeVisible();
 
     if (viewport.mobile) {
       const customerNavigation = page.getByLabel("Navegação do cliente");
@@ -176,6 +179,12 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await page.goto("/dev/customer?vista=cartoes");
   await expect(page.getByRole("heading", { name: "Gerir Cartões" })).toBeVisible();
   await expect(page.getByText("Adicionar novo cartão digital")).toBeVisible();
+  await expect(
+    page
+      .locator(".customer-card-hub-item__content")
+      .first()
+      .getByText("Equivale a 345 MZN")
+  ).toBeVisible();
   await expect(page.getByLabel("Adicionar cartão")).toHaveAttribute(
     "href",
     "/cliente?vista=negocios"

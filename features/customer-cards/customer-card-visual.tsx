@@ -4,7 +4,7 @@ import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useState } from "react";
 
-import type { DigitalCustomerCard } from "./model";
+import { formatCustomerCardValueMzn, type DigitalCustomerCard } from "./model";
 
 export type CustomerCardFace = "front" | "back";
 
@@ -49,7 +49,7 @@ export function CustomerCardVisual({
           <strong>
             {card.availablePoints.toLocaleString("pt-MZ")} <small>YL</small>
           </strong>
-          <b>Equivale a {card.valueMzn.toLocaleString("pt-MZ")} MZN</b>
+          <b>Equivale a {formatCustomerCardValueMzn(card.valueMzn)}</b>
         </span>
         <span className="customer-digital-card__customer">
           <small>{card.customerName}</small>

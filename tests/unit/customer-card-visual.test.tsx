@@ -36,6 +36,7 @@ describe("customer digital card visual", () => {
     expect(
       screen.getByRole("img", { name: `QR de identificação: ${card.cardNumber}` })
     ).toBeVisible();
+    expect(screen.getByText("Equivale a 250 MZN")).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: "Mostrar o verso do cartão" }));
 

@@ -2,6 +2,7 @@ import { QRDisplay, RewardBadge } from "../../vuyela-design-system/src/component
 
 import type { CustomerCardsState } from "./data";
 import { CustomerCardVisual } from "./customer-card-visual";
+import { formatCustomerCardValueMzn } from "./model";
 
 interface CustomerCardsViewProps {
   state: CustomerCardsState;
@@ -67,7 +68,7 @@ export function CustomerCardsView({ state }: CustomerCardsViewProps) {
                   Nível<strong>{card.currentTierName}</strong>
                 </span>
                 <span>
-                  Valor<strong>{card.valueMzn.toLocaleString("pt-MZ")} MZN</strong>
+                  Valor<strong>{formatCustomerCardValueMzn(card.valueMzn)}</strong>
                 </span>
               </div>
 

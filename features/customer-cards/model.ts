@@ -96,7 +96,24 @@ export function calculatePointsValueMzn(points: number, pointValueMznMinor: numb
   assertNonNegativeInteger("points", points);
   assertPositiveInteger("pointValueMznMinor", pointValueMznMinor);
 
-  return Math.floor((points * pointValueMznMinor) / 100);
+  const valueMznMinor = points * pointValueMznMinor;
+
+  if (!Number.isSafeInteger(valueMznMinor)) {
+    throw new RangeError("points value exceeds the supported monetary range");
+  }
+
+  return valueMznMinor / 100;
+}
+
+export function formatCustomerCardValueMzn(valueMzn: number): string {
+  if (!Number.isFinite(valueMzn) || valueMzn < 0) {
+    throw new RangeError("valueMzn must be a non-negative finite number");
+  }
+
+  return `${new Intl.NumberFormat("pt-MZ", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: Number.isInteger(valueMzn) ? 0 : 2
+  }).format(valueMzn)} MZN`;
 }
 
 export function buildIdentificationQrCode(cardNumber: string): string {

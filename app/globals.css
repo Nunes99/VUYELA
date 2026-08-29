@@ -13896,7 +13896,11 @@
   }
 
   .customer-digital-card__balance > b {
-    display: none;
+    display: block;
+    max-width: calc(100% - 4.75rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .customer-quick-actions {
@@ -15127,6 +15131,15 @@
     margin: 0;
     color: #64748b;
     font-size: 0.7rem;
+  }
+
+  .customer-card-hub-item__content > small {
+    display: block;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    color: #009f9f;
+    font-size: 0.62rem;
+    font-weight: 750;
   }
 
   .customer-card-hub-item > svg {

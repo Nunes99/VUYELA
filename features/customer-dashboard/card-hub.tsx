@@ -5,7 +5,10 @@ import { ChevronRight, Plus } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
-import type { DigitalCustomerCard } from "@/features/customer-cards/model";
+import {
+  formatCustomerCardValueMzn,
+  type DigitalCustomerCard
+} from "@/features/customer-cards/model";
 
 type CardFilter = "all" | "active" | "blocked" | "favorites";
 
@@ -57,6 +60,7 @@ export function CustomerCardHub({ cards }: { cards: DigitalCustomerCard[] }) {
               <span>{card.currentTierName}</span>
               <h3>{card.businessName}</h3>
               <strong>{card.availablePoints.toLocaleString("pt-MZ")} YL</strong>
+              <small>Equivale a {formatCustomerCardValueMzn(card.valueMzn)}</small>
             </div>
             <ChevronRight aria-hidden="true" size={18} />
           </Link>

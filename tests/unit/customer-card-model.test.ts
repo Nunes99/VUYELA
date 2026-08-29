@@ -3,13 +3,17 @@ import { describe, expect, it } from "vitest";
 import {
   buildDigitalCustomerCard,
   buildIdentificationQrCode,
-  calculatePointsValueMzn
+  calculatePointsValueMzn,
+  formatCustomerCardValueMzn
 } from "@/features/customer-cards/model";
 
 describe("customer card model", () => {
   it("calculates MZN equivalent from configurable point value", () => {
     expect(calculatePointsValueMzn(250, 100)).toBe(250);
     expect(calculatePointsValueMzn(250, 50)).toBe(125);
+    expect(calculatePointsValueMzn(1, 50)).toBe(0.5);
+    expect(formatCustomerCardValueMzn(0.5)).toBe("0,50 MZN");
+    expect(formatCustomerCardValueMzn(250)).toBe("250 MZN");
   });
 
   it("builds the digital card view model with tier and expiry labels", () => {

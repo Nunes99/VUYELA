@@ -29,6 +29,7 @@ import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input } from "../../vuyela-design-system/src/components/Field";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
+import { formatCustomerCardValueMzn } from "@/features/customer-cards/model";
 import { markAllNotificationsReadAction } from "@/features/notifications/actions";
 import { OfflineCardSync } from "@/features/pwa/offline-card-sync";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
@@ -212,7 +213,7 @@ function CustomerHome({ dashboard }: { dashboard: CustomerDashboardViewModel }) 
           <CustomerSummaryCard
             icon={Star}
             label="YELAS acumuladas"
-            note={`Equivale a ~ ${dashboard.totalValueMzn.toLocaleString("pt-MZ")} MZN`}
+            note={`Equivale a ~ ${formatCustomerCardValueMzn(dashboard.totalValueMzn)}`}
             tone="points"
             value={`${dashboard.totalPoints.toLocaleString("pt-MZ")} YL`}
           />
@@ -519,7 +520,7 @@ function CustomerCardDetail({
                 <strong>{card.availablePoints.toLocaleString("pt-MZ")} YELAS</strong>
               </span>
               <span>
-                Valor equivalente<strong>{card.valueMzn.toLocaleString("pt-MZ")} MZN</strong>
+                Valor equivalente<strong>{formatCustomerCardValueMzn(card.valueMzn)}</strong>
               </span>
               <span>
                 Validade<strong>{card.expiryLabel}</strong>

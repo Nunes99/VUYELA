@@ -46,6 +46,12 @@ describe("customer card hub", () => {
       />
     );
 
+    expect(
+      screen
+        .getByRole("link", { name: "Abrir cartão MangoShop" })
+        .querySelector(".customer-card-hub-item__content > small")
+    ).toHaveTextContent("Equivale a 120 MZN");
+
     fireEvent.click(screen.getByRole("button", { name: "Ativos" }));
     expect(screen.getByRole("link", { name: "Abrir cartão MangoShop" })).toBeVisible();
     expect(
