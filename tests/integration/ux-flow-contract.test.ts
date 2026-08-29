@@ -60,7 +60,9 @@ describe("professional UX flow contract", () => {
 
     expect(businessShell).not.toContain("business-portal__mobile-context");
     expect(posShell).toContain('className="pos-portal__mobile-symbol" compact');
+    expect(posShell).toContain("pos-portal__terminal-status");
     expect(posSettingsNavigation).toContain('className="pos-figma-mobile-brand"');
+    expect(read("features/pos/pos-workflow.tsx")).toContain("pos-sale__mobile-cart-bar");
     expect(offlinePage).not.toContain("<span>VUYELA by LEMOTE</span>");
   });
 });

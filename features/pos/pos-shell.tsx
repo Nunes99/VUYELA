@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, LogOut } from "lucide-react";
+import { ArrowLeft, CircleCheck, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
@@ -15,6 +15,7 @@ import { posAppRoutes } from "./routes";
 
 export function PosPortalShell({
   principal,
+  context,
   section = "transaction",
   children
 }: {
@@ -24,6 +25,11 @@ export function PosPortalShell({
   children: ReactNode;
 }) {
   const canManageBusiness = canAccessRoute(principal, "/negocio");
+  const terminalReady =
+    context.status === "ready" &&
+    context.businesses.some((business) =>
+      business.terminals.some((terminal) => terminal.status === "active")
+    );
 
   return (
     <div className={`pos-portal pos-portal--${section}`}>
@@ -48,6 +54,13 @@ export function PosPortalShell({
         </div>
 
         <nav aria-label="Navegação do POS" className="pos-portal__actions">
+          <span
+            className={`pos-portal__terminal-status${terminalReady ? " is-ready" : ""}`}
+            title={terminalReady ? "O terminal está pronto para novas vendas" : "Verifique as definições do terminal"}
+          >
+            <CircleCheck aria-hidden="true" size={16} />
+            <span>{terminalReady ? "Terminal pronto" : "Verificar terminal"}</span>
+          </span>
           {canManageBusiness ? (
             <DashboardAreaMenu includePosSettings principal={principal} variant="default" />
           ) : null}

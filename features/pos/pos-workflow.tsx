@@ -306,6 +306,9 @@ function SaleStep({
           <div>
             <span>Nova venda</span>
             <h1 id="pos-sale-title">Catálogo</h1>
+            <p className="pos-sale__heading-note">
+              Selecione os produtos ou serviços para começar a venda.
+            </p>
           </div>
           <div className="pos-sale__context">
             {businesses.length > 1 ? (
@@ -359,22 +362,27 @@ function SaleStep({
               value={query}
             />
           </label>
-          <div className="pos-sale__filters" role="group" aria-label="Filtrar catálogo">
-            {([
-              ["all", "Todos"],
-              ["service", "Serviços"],
-              ["product", "Produtos"]
-            ] as const).map(([value, label]) => (
-              <button
-                aria-pressed={filter === value}
-                className={filter === value ? "is-active" : ""}
-                key={value}
-                onClick={() => setFilter(value)}
-                type="button"
-              >
-                {label}
-              </button>
-            ))}
+          <div className="pos-sale__filter-group">
+            <div className="pos-sale__filters" role="group" aria-label="Filtrar catálogo">
+              {([
+                ["all", "Todos"],
+                ["service", "Serviços"],
+                ["product", "Produtos"]
+              ] as const).map(([value, label]) => (
+                <button
+                  aria-pressed={filter === value}
+                  className={filter === value ? "is-active" : ""}
+                  key={value}
+                  onClick={() => setFilter(value)}
+                  type="button"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <span aria-live="polite" className="pos-sale__result-count">
+              {filteredCatalog.length} {filteredCatalog.length === 1 ? "resultado" : "resultados"}
+            </span>
           </div>
         </div>
 
@@ -425,13 +433,48 @@ function SaleStep({
         )}
       </section>
 
-      <aside className="pos-sale__cart" aria-labelledby="pos-cart-title">
+      {cartLines.length > 0 ? (
+        <div className="pos-sale__mobile-cart-bar" role="status">
+          <div>
+            <span>Venda atual</span>
+            <strong>
+              {cartLines.reduce((total, line) => total + line.quantity, 0)} itens
+            </strong>
+            <small>{formatMznCompact(cartTotal)}</small>
+          </div>
+          <button
+            onClick={() =>
+              document.getElementById("pos-sale-cart")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              })
+            }
+            type="button"
+          >
+            Ver carrinho
+            <ChevronRight aria-hidden="true" size={17} />
+          </button>
+        </div>
+      ) : null}
+
+      <aside className="pos-sale__cart" aria-labelledby="pos-cart-title" id="pos-sale-cart">
         <header>
           <div>
             <span>Venda atual</span>
             <h2 id="pos-cart-title">Carrinho</h2>
           </div>
-          <strong>{cart.reduce((total, item) => total + item.quantity, 0)} itens</strong>
+          <div className="pos-sale__cart-heading-actions">
+            <strong>{cart.reduce((total, item) => total + item.quantity, 0)} itens</strong>
+            <button
+              aria-label="Limpar carrinho"
+              disabled={cart.length === 0}
+              onClick={() => onCartChange([])}
+              title="Limpar carrinho"
+              type="button"
+            >
+              <Trash2 aria-hidden="true" size={16} />
+            </button>
+          </div>
         </header>
 
         <div className="pos-sale__cart-lines">
@@ -476,6 +519,9 @@ function SaleStep({
             <span>Total provisório</span>
             <strong>{formatMznCompact(cartTotal)}</strong>
           </div>
+          <small className="pos-sale__cart-note">
+            O registo só acontece depois da confirmação do pagamento.
+          </small>
           <form action={formAction}>
             <PosContextFields
               branchId={branchId}
@@ -534,6 +580,10 @@ function BenefitsStep({
             <h1>Benefícios do cliente</h1>
           </div>
         </div>
+        <p className="pos-checkout__helper">
+          <BadgeCheck aria-hidden="true" size={17} /> O desconto VUYELA é aplicado no total final
+          depois de rever a venda.
+        </p>
 
         {state.card ? (
           <CustomerBenefits
