@@ -54,6 +54,7 @@ export interface BusinessCatalogItem {
   name: string;
   description: string | null;
   priceMznMinor: number;
+  loyaltyDiscountPercent: number;
   isAvailable: boolean;
   sortOrder: number;
 }

@@ -1,4 +1,9 @@
-import type { PosCustomerCard, PosPaymentMethod, PosQuote } from "./model";
+import type {
+  PosCartItemInput,
+  PosCustomerCard,
+  PosPaymentMethod,
+  PosQuote
+} from "./model";
 
 export interface PosActionState {
   status: "idle" | "error" | "success";
@@ -6,13 +11,11 @@ export interface PosActionState {
   businessId: string;
   branchId: string;
   terminalId: string;
+  cart: PosCartItemInput[];
   card: PosCustomerCard | null;
   quote: PosQuote | null;
-  draftQuote: PosQuote | null;
   transactionId: string | null;
   idempotencyKey: string;
-  serviceDescription: string;
-  catalogItemId: string;
   paymentMethod: PosPaymentMethod | null;
   paymentAttemptId: string | null;
   paymentStatus: string | null;
@@ -26,13 +29,11 @@ export const initialPosActionState: PosActionState = {
   businessId: "",
   branchId: "",
   terminalId: "",
+  cart: [],
   card: null,
   quote: null,
-  draftQuote: null,
   transactionId: null,
   idempotencyKey: "",
-  serviceDescription: "",
-  catalogItemId: "",
   paymentMethod: null,
   paymentAttemptId: null,
   paymentStatus: null,

@@ -300,6 +300,10 @@ export function BusinessCatalogManagementView({
               </header>
               <dl className="business-operation-facts">
                 <Fact label="Preço" value={formatMznMinor(item.priceMznMinor)} />
+                <Fact
+                  label="Desconto VUYELA"
+                  value={`${item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}%`}
+                />
                 <Fact label="Tipo" value={item.kind === "product" ? "Produto" : "Serviço"} />
                 <Fact label="Filial" value={item.branchName || "Todas"} />
                 <Fact label="SKU" value={item.sku || "Automático"} />
@@ -560,6 +564,17 @@ function CatalogItemForm({
         <input defaultValue={item?.sku ?? ""} name="sku" />
       </label>
       <label>
+        <span>Desconto com cartão VUYELA (%)</span>
+        <input
+          defaultValue={item?.loyaltyDiscountPercent ?? 0}
+          max="100"
+          min="0"
+          name="loyaltyDiscountPercent"
+          step="0.01"
+          type="number"
+        />
+      </label>
+      <label>
         <span>Filial</span>
         <select defaultValue={item?.branchId ?? ""} name="branchId">
           <option value="">Todas as filiais</option>
@@ -609,6 +624,7 @@ function CatalogStatusForm({
         name: item.name,
         description: item.description ?? "",
         priceMzn: (item.priceMznMinor / 100).toFixed(2),
+        loyaltyDiscountPercent: String(item.loyaltyDiscountPercent),
         sortOrder: String(item.sortOrder)
       }).map(([name, value]) => (
         <input key={name} name={name} type="hidden" value={value} />

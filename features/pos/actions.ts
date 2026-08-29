@@ -5,13 +5,14 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import {
   buildFallbackIdempotencyKey,
-  buildPosQuote,
-  isPosPaymentMethod,
   isAvailablePosPaymentMethod,
+  isPosPaymentMethod,
   isValidIdempotencyKey,
+  normalizeCartItems,
   normalizePosCustomerLookup,
-  parseMznToMinorUnits
+  parsePosQuote
 } from "./model";
+import type { PosCartItemInput, PosCustomerCard, PosQuote } from "./model";
 import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
 
@@ -33,18 +34,47 @@ interface PosTransactionRow {
   receipt_number: string;
 }
 
+interface PosFormContext {
+  businessId: string;
+  branchId: string;
+  terminalId: string;
+  cart: PosCartItemInput[];
+  pointsToRedeem: number;
+}
+
+type PosServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+
 export async function submitPosAction(
   previousState: PosActionState,
   formData: FormData
 ): Promise<PosActionState> {
   const intent = getFormString(formData, "intent");
 
+  if (intent === "quote") {
+    return quotePosTransactionAction(previousState, formData);
+  }
+
   if (intent === "identify") {
     return identifyPosCustomerAction(previousState, formData);
   }
 
-  if (intent === "quote") {
-    return quotePosTransactionAction(previousState, formData);
+  if (intent === "remove_customer") {
+    return removePosCustomerAction(previousState, formData);
+  }
+
+  if (intent === "edit_cart") {
+    return {
+      ...previousState,
+      status: "idle",
+      message: "Ajuste o carrinho e volte a calcular a venda.",
+      quote: null,
+      transactionId: null,
+      paymentMethod: null,
+      paymentAttemptId: null,
+      paymentStatus: null,
+      receiptNumber: null,
+      completedAt: null
+    };
   }
 
   if (intent === "confirm") {
@@ -55,53 +85,389 @@ export async function submitPosAction(
     return initialPosActionState;
   }
 
-  if (intent === "back_to_identify") {
-    return initialPosActionState;
+  return createErrorState("Ação de POS inválida.", previousState);
+}
+
+export async function quotePosTransactionAction(
+  previousState: PosActionState,
+  formData: FormData
+): Promise<PosActionState> {
+  const context = parsePosFormContext(formData, previousState);
+  if (!context.ok) {
+    return context.state;
   }
 
-  if (intent === "back_to_services") {
-    if (!previousState.card) {
-      return initialPosActionState;
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState(previousState);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const quoteResult = await requestServerQuote(
+    supabase,
+    context.value,
+    previousState.card?.customerCardId ?? null
+  );
+
+  if (!quoteResult.ok) {
+    return createErrorState(quoteResult.message, previousState);
+  }
+
+  return createQuoteState({
+    previousState,
+    context: context.value,
+    card: previousState.card,
+    quote: quoteResult.quote,
+    idempotencyKey: getIdempotencyKey(formData, previousState, context.value, quoteResult.quote),
+    message: previousState.card
+      ? "Benefícios VUYELA aplicados. Reveja a venda antes do pagamento."
+      : "Venda calculada sem cartão. Pode associar um cliente ou avançar para o pagamento."
+  });
+}
+
+export async function identifyPosCustomerAction(
+  previousState: PosActionState,
+  formData: FormData
+): Promise<PosActionState> {
+  const context = parsePosFormContext(formData, previousState);
+  if (!context.ok) {
+    return context.state;
+  }
+
+  const lookupMethod = getFormString(formData, "lookupMethod");
+  if (!isLookupMethod(lookupMethod)) {
+    return createErrorState("Selecione um método de identificação válido.", previousState);
+  }
+
+  const lookupValue = getFormString(formData, "lookupValue");
+  if (!lookupValue) {
+    return createErrorState(
+      lookupMethod === "phone"
+        ? "Introduza o telefone do cliente."
+        : lookupMethod === "card"
+          ? "Introduza o número do cartão."
+          : "Leia ou introduza o QR do cartão.",
+      previousState
+    );
+  }
+
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState(previousState);
+  }
+
+  const normalizedLookup = normalizePosCustomerLookup(lookupMethod, lookupValue);
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("lookup_pos_customer", {
+    p_business_id: context.value.businessId,
+    p_branch_id: context.value.branchId,
+    p_lookup_method: normalizedLookup.method,
+    p_lookup_value: normalizedLookup.value
+  });
+
+  if (error) {
+    return createErrorState("Não foi possível identificar o cliente.", previousState);
+  }
+
+  const row = Array.isArray(data) ? (data[0] as PosLookupRow | undefined) : undefined;
+  if (!row) {
+    return createErrorState(
+      lookupMethod === "phone"
+        ? "Não existe um cartão ativo associado a este telefone neste negócio."
+        : "Cartão ativo não encontrado para este negócio.",
+      previousState
+    );
+  }
+
+  const card: PosCustomerCard = {
+    customerCardId: row.customer_card_id,
+    customerName: row.customer_name,
+    cardNumber: row.card_number,
+    availablePoints: row.available_points,
+    pointValueMznMinor: row.point_value_mzn_minor,
+    maximumRedemptionPercent: String(row.maximum_redemption_percent),
+    earnRate: String(row.earn_rate)
+  };
+  const quoteResult = await requestServerQuote(
+    supabase,
+    context.value,
+    card.customerCardId
+  );
+
+  if (!quoteResult.ok) {
+    return createErrorState(quoteResult.message, previousState);
+  }
+
+  return createQuoteState({
+    previousState,
+    context: context.value,
+    card,
+    quote: quoteResult.quote,
+    idempotencyKey: getIdempotencyKey(formData, previousState, context.value, quoteResult.quote),
+    message: "Cliente identificado e benefícios recalculados."
+  });
+}
+
+async function removePosCustomerAction(
+  previousState: PosActionState,
+  formData: FormData
+): Promise<PosActionState> {
+  const context = parsePosFormContext(formData, previousState);
+  if (!context.ok) {
+    return context.state;
+  }
+
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState(previousState);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const quoteResult = await requestServerQuote(supabase, context.value, null);
+  if (!quoteResult.ok) {
+    return createErrorState(quoteResult.message, previousState);
+  }
+
+  return createQuoteState({
+    previousState,
+    context: context.value,
+    card: null,
+    quote: quoteResult.quote,
+    idempotencyKey: getIdempotencyKey(formData, previousState, context.value, quoteResult.quote),
+    message: "Cartão removido. A venda será concluída sem benefícios VUYELA."
+  });
+}
+
+export async function confirmPosTransactionAction(
+  previousState: PosActionState,
+  formData: FormData
+): Promise<PosActionState> {
+  if (!previousState.quote || previousState.cart.length === 0) {
+    return createErrorState("Calcule o carrinho antes de confirmar.", previousState);
+  }
+
+  const businessId = getFormString(formData, "businessId") || previousState.businessId;
+  const branchId = getFormString(formData, "branchId") || previousState.branchId;
+  const terminalId = getFormString(formData, "terminalId") || previousState.terminalId;
+  if (!businessId || !branchId || !terminalId) {
+    return createErrorState("Selecione um negócio, uma filial e um terminal ativos.", previousState);
+  }
+
+  const customerAuthorized = getFormString(formData, "customerAuthorized") === "on";
+  if (previousState.quote.pointsToRedeem > 0 && !customerAuthorized) {
+    return createErrorState("Confirme a autorização do cliente para utilizar YELAS.", previousState);
+  }
+
+  const paymentMethodValue = getFormString(formData, "paymentMethod");
+  if (!isPosPaymentMethod(paymentMethodValue)) {
+    return createErrorState("Selecione um método de pagamento válido.", previousState);
+  }
+
+  if (!isAvailablePosPaymentMethod(paymentMethodValue)) {
+    return createErrorState(
+      "Este método de pagamento ainda não está configurado para utilização.",
+      previousState
+    );
+  }
+
+  if (previousState.quote.netAmountMznMinor === 0 && paymentMethodValue !== "points") {
+    return createErrorState("Esta compra está totalmente liquidada com YELAS.", previousState);
+  }
+  if (previousState.quote.netAmountMznMinor > 0 && paymentMethodValue === "points") {
+    return createErrorState("Selecione um método para pagar o valor restante.", previousState);
+  }
+
+  const paymentReference = getFormString(formData, "paymentReference");
+  if (paymentMethodValue === "card" && paymentReference.length < 4) {
+    return createErrorState("Indique a referência emitida pelo terminal bancário.", previousState);
+  }
+
+  const idempotencyKey = getIdempotencyKey(
+    formData,
+    previousState,
+    {
+      businessId,
+      branchId,
+      terminalId,
+      cart: previousState.cart,
+      pointsToRedeem: previousState.quote.pointsToRedeem
+    },
+    previousState.quote
+  );
+  if (!isValidIdempotencyKey(idempotencyKey)) {
+    return createErrorState("A chave anti-duplicação é inválida.", previousState);
+  }
+
+  if (!isSupabaseConfigured()) {
+    return getSupabaseNotConfiguredState(previousState);
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("confirm_pos_cart", {
+    p_business_id: businessId,
+    p_branch_id: branchId,
+    p_terminal_id: terminalId,
+    p_customer_card_id: previousState.card?.customerCardId ?? null,
+    p_items: previousState.cart,
+    p_points_to_redeem: previousState.quote.pointsToRedeem,
+    p_expected_gross_amount_mzn_minor: previousState.quote.grossAmountMznMinor,
+    p_expected_discount_amount_mzn_minor: previousState.quote.discountAmountMznMinor,
+    p_expected_net_amount_mzn_minor: previousState.quote.netAmountMznMinor,
+    p_payment_method: paymentMethodValue,
+    p_payment_reference: paymentReference || null,
+    p_idempotency_key: idempotencyKey,
+    p_customer_authorized: customerAuthorized,
+    p_metadata: {
+      source: "pos",
+      cart_line_count: previousState.quote.lines.length,
+      customer_authorized: customerAuthorized
+    }
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      return createErrorState("Esta confirmação já foi recebida. Evite reenviar.", previousState);
     }
 
+    return createErrorState(posConfirmationErrorMessage(error.message), previousState);
+  }
+
+  const row = Array.isArray(data) ? (data[0] as PosTransactionRow | undefined) : undefined;
+  if (!row) {
+    return createErrorState("O servidor não devolveu o comprovativo da venda.", previousState);
+  }
+
+  return {
+    ...previousState,
+    card: previousState.card
+      ? { ...previousState.card, availablePoints: row.available_balance }
+      : null,
+    status: "success",
+    message: "Venda concluída com sucesso.",
+    transactionId: row.transaction_id,
+    idempotencyKey,
+    paymentMethod: paymentMethodValue,
+    paymentAttemptId: row.payment_attempt_id,
+    paymentStatus: row.payment_status,
+    receiptNumber: row.receipt_number,
+    completedAt: new Date().toISOString()
+  };
+}
+
+async function requestServerQuote(
+  supabase: PosServerClient,
+  context: PosFormContext,
+  customerCardId: string | null
+): Promise<{ ok: true; quote: PosQuote } | { ok: false; message: string }> {
+  const { data, error } = await supabase.rpc("quote_pos_cart", {
+    p_business_id: context.businessId,
+    p_branch_id: context.branchId,
+    p_terminal_id: context.terminalId,
+    p_customer_card_id: customerCardId,
+    p_items: context.cart,
+    p_points_to_redeem: context.pointsToRedeem
+  });
+
+  if (error) {
+    const message = error.message.toLowerCase();
+
+    if (message.includes("unavailable")) {
+      return { ok: false, message: "Um item do carrinho deixou de estar disponível nesta filial." };
+    }
+    if (message.includes("maximum redeemable") || message.includes("maximum redeemable balance")) {
+      return { ok: false, message: "A quantidade de YELAS excede o máximo permitido nesta venda." };
+    }
+
+    return { ok: false, message: "Não foi possível calcular o carrinho no servidor." };
+  }
+
+  try {
+    return { ok: true, quote: parsePosQuote(data) };
+  } catch {
+    return { ok: false, message: "O servidor devolveu uma cotação inválida." };
+  }
+}
+
+function createQuoteState({
+  previousState,
+  context,
+  card,
+  quote,
+  idempotencyKey,
+  message
+}: {
+  previousState: PosActionState;
+  context: PosFormContext;
+  card: PosCustomerCard | null;
+  quote: PosQuote;
+  idempotencyKey: string;
+  message: string;
+}): PosActionState {
+  return {
+    ...previousState,
+    status: "success",
+    message,
+    businessId: context.businessId,
+    branchId: context.branchId,
+    terminalId: context.terminalId,
+    cart: context.cart,
+    card: card ? { ...card, availablePoints: quote.availableBalance } : null,
+    quote,
+    transactionId: null,
+    idempotencyKey,
+    paymentMethod: null,
+    paymentAttemptId: null,
+    paymentStatus: null,
+    receiptNumber: null,
+    completedAt: null
+  };
+}
+
+function parsePosFormContext(
+  formData: FormData,
+  previousState: PosActionState
+): { ok: true; value: PosFormContext } | { ok: false; state: PosActionState } {
+  const businessId = getFormString(formData, "businessId") || previousState.businessId;
+  const branchId = getFormString(formData, "branchId") || previousState.branchId;
+  const terminalId = getFormString(formData, "terminalId") || previousState.terminalId;
+
+  if (!businessId || !branchId || !terminalId) {
     return {
-      ...previousState,
-      status: "idle",
-      message: "Pode ajustar os serviços, o valor e as YELAS antes de continuar.",
-      quote: null,
-      transactionId: null,
-      idempotencyKey: "",
-      paymentMethod: null,
-      paymentAttemptId: null,
-      paymentStatus: null,
-      receiptNumber: null,
-      completedAt: null
+      ok: false,
+      state: createErrorState(
+        "Selecione um negócio, uma filial e um terminal ativos.",
+        previousState
+      )
     };
   }
 
-  return createErrorState("Ação de POS inválida.", previousState);
+  const cartValue = getFormString(formData, "cartItems");
+  let cart: PosCartItemInput[];
+  try {
+    cart = normalizeCartItems(cartValue ? JSON.parse(cartValue) : previousState.cart);
+  } catch {
+    return {
+      ok: false,
+      state: createErrorState("Adicione pelo menos um produto ou serviço válido.", previousState)
+    };
+  }
+
+  const pointsValue = getFormString(formData, "pointsToRedeem");
+  const pointsToRedeem = pointsValue ? Number(pointsValue) : 0;
+  if (!Number.isSafeInteger(pointsToRedeem) || pointsToRedeem < 0) {
+    return {
+      ok: false,
+      state: createErrorState("As YELAS a utilizar devem ser um número válido.", previousState)
+    };
+  }
+
+  return {
+    ok: true,
+    value: { businessId, branchId, terminalId, cart, pointsToRedeem }
+  };
 }
 
 function getFormString(formData: FormData, key: string) {
   const value = formData.get(key);
 
   return typeof value === "string" ? value.trim() : "";
-}
-
-function getRequiredFormString(formData: FormData, key: string, label: string) {
-  const value = getFormString(formData, key);
-
-  if (!value) {
-    return {
-      ok: false as const,
-      state: createErrorState(`${label} é obrigatório.`)
-    };
-  }
-
-  return {
-    ok: true as const,
-    value
-  };
 }
 
 function createErrorState(message: string, previousState?: PosActionState): PosActionState {
@@ -114,314 +480,23 @@ function createErrorState(message: string, previousState?: PosActionState): PosA
   };
 }
 
-function getSupabaseNotConfiguredState(): PosActionState {
+function getSupabaseNotConfiguredState(previousState: PosActionState): PosActionState {
   return createErrorState(
-    "Supabase ainda não está configurado neste ambiente. Configure as variáveis antes de usar o POS."
+    "Supabase ainda não está configurado neste ambiente. Configure as variáveis antes de usar o POS.",
+    previousState
   );
-}
-
-export async function identifyPosCustomerAction(
-  previousState: PosActionState,
-  formData: FormData
-): Promise<PosActionState> {
-  const businessId = getRequiredFormString(formData, "businessId", "Negócio");
-  if (!businessId.ok) {
-    return businessId.state;
-  }
-  const branchId = getFormString(formData, "branchId");
-  const terminalId = getRequiredFormString(formData, "terminalId", "Terminal");
-  if (!terminalId.ok) {
-    return terminalId.state;
-  }
-
-  const lookupMethod = getFormString(formData, "lookupMethod");
-  if (!isLookupMethod(lookupMethod)) {
-    return createErrorState("Selecione um método de identificação válido.", previousState);
-  }
-
-  const lookupValue = getRequiredFormString(
-    formData,
-    "lookupValue",
-    lookupMethod === "phone" ? "Telefone" : lookupMethod === "card" ? "Número do cartão" : "QR"
-  );
-  if (!lookupValue.ok) {
-    return lookupValue.state;
-  }
-  const normalizedLookup = normalizePosCustomerLookup(lookupMethod, lookupValue.value);
-
-  if (!isSupabaseConfigured()) {
-    return getSupabaseNotConfiguredState();
-  }
-
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("lookup_pos_customer", {
-    p_business_id: businessId.value,
-    p_branch_id: branchId || null,
-    p_lookup_method: normalizedLookup.method,
-    p_lookup_value: normalizedLookup.value
-  });
-
-  if (error) {
-    return createErrorState("Não foi possível identificar o cliente.", previousState);
-  }
-
-  const row = Array.isArray(data) ? (data[0] as PosLookupRow | undefined) : undefined;
-
-  if (!row) {
-    return createErrorState(
-      lookupMethod === "phone"
-        ? "Não existe um cartão ativo associado a este telefone neste negócio."
-        : "Cartão ativo não encontrado para este negócio.",
-      previousState
-    );
-  }
-
-  return {
-    ...initialPosActionState,
-    status: "success",
-    message: "Cliente identificado. Introduza o valor da compra.",
-    businessId: businessId.value,
-    branchId,
-    terminalId: terminalId.value,
-    card: {
-      customerCardId: row.customer_card_id,
-      customerName: row.customer_name,
-      cardNumber: row.card_number,
-      availablePoints: row.available_points,
-      pointValueMznMinor: row.point_value_mzn_minor,
-      maximumRedemptionPercent: String(row.maximum_redemption_percent),
-      earnRate: String(row.earn_rate)
-    }
-  };
 }
 
 function isLookupMethod(value: string): value is "qr" | "card" | "phone" {
   return value === "qr" || value === "card" || value === "phone";
 }
 
-export async function quotePosTransactionAction(
-  previousState: PosActionState,
-  formData: FormData
-): Promise<PosActionState> {
-  if (!previousState.card) {
-    return createErrorState("Identifique o cliente antes de calcular.", previousState);
-  }
-
-  const grossAmount = parseRequiredMoney(
-    formData,
-    "grossAmountMzn",
-    "Valor da compra",
-    previousState
-  );
-  if (!grossAmount.ok) {
-    return grossAmount.state;
-  }
-
-  if (grossAmount.value <= 0) {
-    return createErrorState("O valor da compra deve ser maior que zero.", previousState);
-  }
-
-  const discountAmount = parseOptionalMoney(formData, "discountAmountMzn", previousState);
-  if (!discountAmount.ok) {
-    return discountAmount.state;
-  }
-
-  const pointsToRedeem = parseOptionalInteger(formData, "pointsToRedeem", previousState);
-  if (!pointsToRedeem.ok) {
-    return pointsToRedeem.state;
-  }
-
-  if (discountAmount.value > grossAmount.value) {
-    return createErrorState("O desconto não pode ser maior que a compra.", previousState);
-  }
-
-  const quote = buildPosQuote({
-    grossAmountMznMinor: grossAmount.value,
-    discountAmountMznMinor: discountAmount.value,
-    requestedPointsToRedeem: pointsToRedeem.value,
-    card: previousState.card
-  });
-  const serviceDescription = getFormString(formData, "serviceDescription").slice(0, 160);
-  const catalogItemId = getFormString(formData, "catalogItemId");
-
-  return {
-    ...previousState,
-    status: "success",
-    message: "Valor calculado. Confirme com o cliente.",
-    quote,
-    draftQuote: quote,
-    serviceDescription,
-    catalogItemId,
-    transactionId: null,
-    idempotencyKey: getIdempotencyKey(formData, { ...previousState, quote })
-  };
-}
-
-export async function confirmPosTransactionAction(
-  previousState: PosActionState,
-  formData: FormData
-): Promise<PosActionState> {
-  if (!previousState.card || !previousState.quote) {
-    return createErrorState("Calcule a transação antes de confirmar.", previousState);
-  }
-
-  const businessId = getFormString(formData, "businessId") || previousState.businessId;
-
-  if (!businessId) {
-    return createErrorState("O negócio é obrigatório.", previousState);
-  }
-
-  if (getFormString(formData, "customerAuthorized") !== "on") {
-    return createErrorState("Confirme a autorização do cliente antes de concluir.", previousState);
-  }
-
-  const branchId = getFormString(formData, "branchId") || previousState.branchId;
-  const terminalId = getFormString(formData, "terminalId") || previousState.terminalId;
-  if (!branchId || !terminalId) {
-    return createErrorState("Selecione uma filial e um terminal ativos.", previousState);
-  }
-  const paymentMethodValue = getFormString(formData, "paymentMethod");
-
-  if (!isPosPaymentMethod(paymentMethodValue)) {
-    return createErrorState("Selecione um método de pagamento válido.", previousState);
-  }
-
-  if (!isAvailablePosPaymentMethod(paymentMethodValue)) {
-    return createErrorState(
-      "Este método de pagamento ainda não está configurado para utilização.",
-      previousState
-    );
-  }
-  if (previousState.quote.netAmountMznMinor === 0 && paymentMethodValue !== "points") {
-    return createErrorState("Esta compra está totalmente liquidada com YELAS.", previousState);
-  }
-  if (previousState.quote.netAmountMznMinor > 0 && paymentMethodValue === "points") {
-    return createErrorState("Selecione um método para pagar o valor restante.", previousState);
-  }
-  const paymentReference = getFormString(formData, "paymentReference");
-  if (paymentMethodValue === "card" && paymentReference.length < 4) {
-    return createErrorState("Indique a referência emitida pelo terminal bancário.", previousState);
-  }
-  const idempotencyKey = getIdempotencyKey(formData, previousState);
-
-  if (!isValidIdempotencyKey(idempotencyKey)) {
-    return createErrorState("A chave anti-duplicação é inválida.", previousState);
-  }
-
-  if (!isSupabaseConfigured()) {
-    return getSupabaseNotConfiguredState();
-  }
-
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("confirm_pos_transaction", {
-    p_business_id: businessId,
-    p_branch_id: branchId,
-    p_terminal_id: terminalId,
-    p_customer_card_id: previousState.card.customerCardId,
-    p_gross_amount_mzn_minor: previousState.quote.grossAmountMznMinor,
-    p_discount_amount_mzn_minor: previousState.quote.discountAmountMznMinor,
-    p_points_to_redeem: previousState.quote.pointsToRedeem,
-    p_expected_net_amount_mzn_minor: previousState.quote.netAmountMznMinor,
-    p_payment_method: paymentMethodValue,
-    p_payment_reference: paymentReference || null,
-    p_idempotency_key: idempotencyKey,
-    p_metadata: {
-      source: "pos",
-      customer_authorized: getFormString(formData, "customerAuthorized") === "on",
-      service_description: previousState.serviceDescription || null,
-      catalog_item_id: previousState.catalogItemId || null
-    }
-  });
-
-  if (error) {
-    if (error.code === "23505") {
-      return createErrorState("Esta confirmação já foi recebida. Evite reenviar.", previousState);
-    }
-
-    return createErrorState("Não foi possível confirmar a transação.", previousState);
-  }
-
-  const row = Array.isArray(data) ? (data[0] as PosTransactionRow | undefined) : undefined;
-
-  return {
-    ...previousState,
-    card: row
-      ? {
-          ...previousState.card,
-          availablePoints: row.available_balance
-        }
-      : previousState.card,
-    status: "success",
-    message: "Transação confirmada com sucesso.",
-    transactionId: row?.transaction_id ?? null,
-    idempotencyKey,
-    paymentMethod: paymentMethodValue,
-    paymentAttemptId: row?.payment_attempt_id ?? null,
-    paymentStatus: row?.payment_status ?? null,
-    receiptNumber: row?.receipt_number ?? null,
-    completedAt: new Date().toISOString()
-  };
-}
-
-function parseRequiredMoney(
+function getIdempotencyKey(
   formData: FormData,
-  key: string,
-  label: string,
-  previousState: PosActionState
-) {
-  const value = getRequiredFormString(formData, key, label);
-
-  if (!value.ok) {
-    return { ok: false as const, state: createErrorState(value.state.message, previousState) };
-  }
-
-  try {
-    return { ok: true as const, value: parseMznToMinorUnits(value.value) };
-  } catch {
-    return {
-      ok: false as const,
-      state: createErrorState(`${label} deve estar em MZN.`, previousState)
-    };
-  }
-}
-
-function parseOptionalMoney(formData: FormData, key: string, previousState: PosActionState) {
-  const value = getFormString(formData, key);
-
-  if (!value) {
-    return { ok: true as const, value: 0 };
-  }
-
-  try {
-    return { ok: true as const, value: parseMznToMinorUnits(value) };
-  } catch {
-    return {
-      ok: false as const,
-      state: createErrorState("O desconto deve estar em MZN.", previousState)
-    };
-  }
-}
-
-function parseOptionalInteger(formData: FormData, key: string, previousState: PosActionState) {
-  const value = getFormString(formData, key);
-
-  if (!value) {
-    return { ok: true as const, value: 0 };
-  }
-
-  const parsed = Number(value);
-
-  if (!Number.isSafeInteger(parsed) || parsed < 0) {
-    return {
-      ok: false as const,
-      state: createErrorState("As YELAS a usar devem ser válidos.", previousState)
-    };
-  }
-
-  return { ok: true as const, value: parsed };
-}
-
-function getIdempotencyKey(formData: FormData, state: PosActionState): string {
+  state: PosActionState,
+  context: PosFormContext,
+  quote: PosQuote
+): string {
   const fromForm = getFormString(formData, "idempotencyKey");
 
   if (fromForm) {
@@ -432,15 +507,32 @@ function getIdempotencyKey(formData: FormData, state: PosActionState): string {
     return state.idempotencyKey;
   }
 
-  if (!state.card || !state.quote) {
-    return "";
+  return buildFallbackIdempotencyKey({
+    businessId: context.businessId,
+    branchId: context.branchId,
+    terminalId: context.terminalId,
+    customerCardId: state.card?.customerCardId ?? null,
+    cart: context.cart,
+    netAmountMznMinor: quote.netAmountMznMinor,
+    pointsToRedeem: quote.pointsToRedeem
+  });
+}
+
+function posConfirmationErrorMessage(message: string): string {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("changed") || normalized.includes("reviewed again")) {
+    return "O carrinho ou os preços mudaram. Volte a rever a venda antes de pagar.";
+  }
+  if (normalized.includes("authorization")) {
+    return "A autorização do cliente é obrigatória para utilizar YELAS.";
+  }
+  if (normalized.includes("payment channel")) {
+    return "O método de pagamento não está ativo para esta filial.";
+  }
+  if (normalized.includes("attempt already exists")) {
+    return "Esta tentativa de pagamento já existe e precisa de revisão.";
   }
 
-  return buildFallbackIdempotencyKey({
-    businessId: getFormString(formData, "businessId") || state.businessId,
-    branchId: getFormString(formData, "branchId") || state.branchId,
-    customerCardId: state.card.customerCardId,
-    grossAmountMznMinor: state.quote.grossAmountMznMinor,
-    pointsToRedeem: state.quote.pointsToRedeem
-  });
+  return "Não foi possível concluir a venda. Nenhum pagamento ou movimento de YELAS foi registado.";
 }

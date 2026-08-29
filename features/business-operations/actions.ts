@@ -307,6 +307,7 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
   const kind = field(formData, "kind");
   const name = field(formData, "name");
   const priceMznMinor = parseMoneyMinor(field(formData, "priceMzn"));
+  const loyaltyDiscountPercent = parsePercentage(field(formData, "loyaltyDiscountPercent"));
   const sortOrder = integerField(formData, "sortOrder", 100);
 
   if (
@@ -314,6 +315,7 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
     !isAllowedAction(action, ["create", "update", "suspend", "activate", "delete"]) ||
     !isCatalogItemKind(kind) ||
     priceMznMinor === null ||
+    loyaltyDiscountPercent === null ||
     sortOrder < 0 ||
     ((action === "create" || action === "update") && name.length < 2)
   ) {
@@ -321,7 +323,7 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("manage_business_catalog_item", {
+  const { error } = await supabase.rpc("manage_business_catalog_item_checkout", {
     p_business_id: businessId,
     p_item_id: nullableField(formData, "itemId"),
     p_action: action,
@@ -331,6 +333,7 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
     p_name: name,
     p_description: field(formData, "description"),
     p_price_mzn_minor: priceMznMinor,
+    p_loyalty_discount_percent: loyaltyDiscountPercent,
     p_sort_order: sortOrder
   });
   if (error) redirectWithResult("catalogo", businessId, operationErrorCode(error.message));
@@ -488,6 +491,13 @@ function parseMoneyMinor(value: string): number | null {
   if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
   const [whole, decimal = ""] = normalized.split(".");
   return Number(whole) * 100 + Number(decimal.padEnd(2, "0"));
+}
+
+function parsePercentage(value: string): number | null {
+  const normalized = value.replace(",", ".");
+  if (!/^\d{1,3}(?:\.\d{1,2})?$/.test(normalized)) return null;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null;
 }
 
 function optionalDateTime(formData: FormData, key: string): string | null {

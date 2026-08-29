@@ -18,10 +18,11 @@ describe("professional UX flow contract", () => {
     const actions = read("features/pos/actions.ts");
     const workflow = read("features/pos/pos-workflow.tsx");
 
-    expect(actions).toContain('intent === "back_to_identify"');
-    expect(actions).toContain('intent === "back_to_services"');
-    expect(workflow).toContain("Cancelar transação");
-    expect(workflow).toContain("Voltar ao pagamento");
+    expect(actions).toContain('intent === "edit_cart"');
+    expect(actions).toContain('intent === "remove_customer"');
+    expect(actions).toContain('intent === "reset"');
+    expect(workflow).toContain("Carrinho");
+    expect(workflow).toContain("Benefícios");
   });
 
   it("makes business onboarding reversible and reviewable", () => {

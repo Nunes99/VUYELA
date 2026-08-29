@@ -20,6 +20,19 @@ interface BranchRow {
   is_primary: boolean;
 }
 
+interface CatalogRow {
+  id: string;
+  business_id: string;
+  branch_id: string | null;
+  kind: "service" | "product";
+  sku: string | null;
+  name: string;
+  description: string | null;
+  price_mzn_minor: number;
+  loyalty_discount_percent: number | string;
+  sort_order: number;
+}
+
 export interface PosBranchContext {
   id: string;
   businessId: string;
@@ -88,6 +101,7 @@ export interface PosCatalogItemContext {
   name: string;
   description: string | null;
   priceMznMinor: number;
+  loyaltyDiscountPercent: number;
   sortOrder: number;
 }
 
@@ -142,8 +156,11 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
 
   const businessIds = uniqueValues(memberships.map((membership) => membership.businessId));
   const supabase = await createSupabaseServerClient();
-  const [{ data: businessData, error: businessError }, { data: branchData, error: branchError }] =
-    await Promise.all([
+  const [
+    { data: businessData, error: businessError },
+    { data: branchData, error: branchError },
+    { data: catalogData, error: catalogError }
+  ] = await Promise.all([
       supabase
         .from("businesses")
         .select("id, name, phone, email")
@@ -155,14 +172,27 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
         .in("business_id", businessIds)
         .eq("is_active", true)
         .order("is_primary", { ascending: false })
+        .order("name", { ascending: true }),
+      supabase
+        .from("business_catalog_items")
+        .select(
+          "id, business_id, branch_id, kind, sku, name, description, price_mzn_minor, loyalty_discount_percent, sort_order"
+        )
+        .in("business_id", businessIds)
+        .eq("is_available", true)
+        .order("sort_order", { ascending: true })
         .order("name", { ascending: true })
     ]);
 
-  if (businessError || branchError) {
-    return { status: "error", message: "Não foi possível carregar negócios e filiais do POS." };
+  if (businessError || branchError || catalogError) {
+    return {
+      status: "error",
+      message: "Não foi possível carregar negócios, filiais e catálogo do POS."
+    };
   }
 
   const branchesByBusinessId = groupBranches(rowsFrom<BranchRow>(branchData));
+  const catalogByBusinessId = groupCatalogItems(rowsFrom<CatalogRow>(catalogData));
   const membershipsByBusinessId = groupMemberships(memberships);
   const businessShells = rowsFrom<BusinessRow>(businessData)
     .map((business): PosBusinessContext | null => {
@@ -201,7 +231,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
         canManage: businessMemberships.some((membership) => businessWideRoles.has(membership.role)),
         terminals: [],
         paymentChannels: [],
-        catalogItems: [],
+        catalogItems: catalogByBusinessId.get(business.id) ?? [],
         roleLabels: uniqueValues(
           businessMemberships.map((membership) => roleLabels[membership.role])
         )
@@ -236,8 +266,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   const businesses = operationResults.map(({ business, row }) => ({
     ...business,
     terminals: parseTerminals(row?.terminals),
-    paymentChannels: parsePaymentChannels(row?.payment_channels),
-    catalogItems: parseCatalogItems(row?.catalog_items)
+    paymentChannels: parsePaymentChannels(row?.payment_channels)
   }));
 
   return { status: "ready", businesses };
@@ -327,19 +356,6 @@ function parsePaymentChannels(value: unknown): PosPaymentChannelContext[] {
   }));
 }
 
-function parseCatalogItems(value: unknown): PosCatalogItemContext[] {
-  return objectRows(value).map((item) => ({
-    id: stringValue(item.id),
-    branchId: nullableString(item.branchId),
-    kind: item.kind === "product" ? "product" : "service",
-    sku: nullableString(item.sku),
-    name: stringValue(item.name),
-    description: nullableString(item.description),
-    priceMznMinor: numberValue(item.priceMznMinor, 0),
-    sortOrder: numberValue(item.sortOrder, 100)
-  }));
-}
-
 function objectRows(value: unknown): Record<string, unknown>[] {
   return Array.isArray(value) ? value.filter(isRecord) : [];
 }
@@ -357,7 +373,9 @@ function nullableString(value: unknown): string | null {
 }
 
 function numberValue(value: unknown, fallback: number): number {
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+  const parsed = typeof value === "number" || typeof value === "string" ? Number(value) : NaN;
+
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function booleanValue(value: unknown, fallback: boolean): boolean {
@@ -430,6 +448,29 @@ function groupBranches(branches: BranchRow[]) {
         city: branch.city,
         phone: branch.phone,
         addressLine: branch.address_line
+      }
+    ]);
+  }
+
+  return groups;
+}
+
+function groupCatalogItems(items: CatalogRow[]) {
+  const groups = new Map<string, PosCatalogItemContext[]>();
+
+  for (const item of items) {
+    groups.set(item.business_id, [
+      ...(groups.get(item.business_id) ?? []),
+      {
+        id: item.id,
+        branchId: item.branch_id,
+        kind: item.kind,
+        sku: item.sku,
+        name: item.name,
+        description: item.description,
+        priceMznMinor: item.price_mzn_minor,
+        loyaltyDiscountPercent: numberValue(item.loyalty_discount_percent, 0),
+        sortOrder: item.sort_order
       }
     ]);
   }

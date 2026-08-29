@@ -2,24 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildFallbackIdempotencyKey,
-  buildPosQuote,
   formatMznCompact,
   formatMznMinor,
   isValidIdempotencyKey,
+  normalizeCartItems,
   normalizePosCustomerLookup,
   parseMznToMinorUnits,
+  parsePosQuote,
   splitVatInclusive
 } from "@/features/pos/model";
-
-const card = {
-  customerCardId: "card-1",
-  customerName: "Ana Mucavele",
-  cardNumber: "VY-8F2K-91M",
-  availablePoints: 120,
-  pointValueMznMinor: 100,
-  maximumRedemptionPercent: "50.00",
-  earnRate: "0.0500"
-};
 
 describe("POS model", () => {
   it("parses and formats MZN minor units", () => {
@@ -37,51 +28,85 @@ describe("POS model", () => {
     });
   });
 
-  it("builds a POS quote with capped redemption and earned points", () => {
+  it("normalizes duplicate cart lines while preserving quantities", () => {
     expect(
-      buildPosQuote({
-        grossAmountMznMinor: 20_000,
-        discountAmountMznMinor: 0,
-        requestedPointsToRedeem: 120,
-        card
-      })
-    ).toEqual({
-      grossAmountMznMinor: 20_000,
-      discountAmountMznMinor: 0,
-      pointsToRedeem: 100,
-      pointsRedeemedValueMznMinor: 10_000,
-      maximumRedeemablePoints: 100,
-      pointsEarned: 5,
-      netAmountMznMinor: 10_000
-    });
+      normalizeCartItems([
+        { catalogItemId: "item-1", quantity: 1 },
+        { catalogItemId: "item-2", quantity: 2 },
+        { catalogItemId: "item-1", quantity: 3 }
+      ])
+    ).toEqual([
+      { catalogItemId: "item-1", quantity: 4 },
+      { catalogItemId: "item-2", quantity: 2 }
+    ]);
+    expect(() => normalizeCartItems([])).toThrow();
+    expect(() => normalizeCartItems([{ catalogItemId: "item-1", quantity: 0 }])).toThrow();
   });
 
-  it("validates and builds duplicate-submission keys", () => {
+  it("validates a server quote and its arithmetic", () => {
+    expect(
+      parsePosQuote({
+        lines: [
+          {
+            catalogItemId: "item-1",
+            sku: "SKU-1",
+            name: "Corte",
+            description: null,
+            quantity: 2,
+            unitPriceMznMinor: 10_000,
+            grossAmountMznMinor: 20_000,
+            loyaltyDiscountPercent: 10,
+            discountAmountMznMinor: 2_000,
+            netAmountMznMinor: 18_000
+          }
+        ],
+        grossAmountMznMinor: 20_000,
+        discountAmountMznMinor: 2_000,
+        availableBalance: 120,
+        maximumRedeemablePoints: 90,
+        pointsToRedeem: 50,
+        pointsRedeemedValueMznMinor: 5_000,
+        pointsEarned: 6,
+        netAmountMznMinor: 13_000
+      })
+    ).toMatchObject({ netAmountMznMinor: 13_000, pointsEarned: 6 });
+
+    expect(() =>
+      parsePosQuote({
+        lines: [],
+        grossAmountMznMinor: 100,
+        discountAmountMznMinor: 0,
+        availableBalance: 0,
+        maximumRedeemablePoints: 0,
+        pointsToRedeem: 0,
+        pointsRedeemedValueMznMinor: 0,
+        pointsEarned: 0,
+        netAmountMznMinor: 100
+      })
+    ).toThrow();
+  });
+
+  it("validates and builds deterministic duplicate-submission keys for a cart", () => {
     expect(isValidIdempotencyKey("pos_1234567890ab")).toBe(true);
     expect(isValidIdempotencyKey("short")).toBe(false);
 
-    const key = buildFallbackIdempotencyKey({
+    const input = {
       businessId: "6ab0d80e-e6f2-4ad2-b747-75876d1c70ba",
       branchId: "0441ff78-b017-4679-846e-08e308623758",
+      terminalId: "0baf4133-c8df-4af0-9ad5-50d1af8bff43",
       customerCardId: "7fd6e6cd-51dd-44cc-9bbe-72a331972c5e",
-      grossAmountMznMinor: 20_000,
+      cart: [{ catalogItemId: "1a9cdb03-8b4a-4c4f-88eb-4723008eeb91", quantity: 2 }],
+      netAmountMznMinor: 20_000,
       pointsToRedeem: 10
-    });
+    };
+    const key = buildFallbackIdempotencyKey(input);
 
     expect(isValidIdempotencyKey(key)).toBe(true);
     expect(key.length).toBeLessThanOrEqual(80);
-    expect(key).toBe(
-      buildFallbackIdempotencyKey({
-        businessId: "6ab0d80e-e6f2-4ad2-b747-75876d1c70ba",
-        branchId: "0441ff78-b017-4679-846e-08e308623758",
-        customerCardId: "7fd6e6cd-51dd-44cc-9bbe-72a331972c5e",
-        grossAmountMznMinor: 20_000,
-        pointsToRedeem: 10
-      })
-    );
+    expect(key).toBe(buildFallbackIdempotencyKey(input));
   });
 
-  it("accepts compact card QR payloads while preserving legacy QR payloads", () => {
+  it("accepts compact card QR payloads while preserving signed QR payloads", () => {
     expect(normalizePosCustomerLookup("qr", " vy-8f2k-91m ")).toEqual({
       method: "card",
       value: "VY-8F2K-91M"

@@ -1,9 +1,3 @@
-import {
-  calculateEarnedPoints,
-  calculateMaximumRedeemablePoints,
-  calculatePointValueMznMinor
-} from "@/lib/loyalty/engine";
-
 export interface PosCustomerCard {
   customerCardId: string;
   customerName: string;
@@ -14,19 +8,32 @@ export interface PosCustomerCard {
   earnRate: string;
 }
 
-export interface PosQuoteInput {
+export interface PosCartItemInput {
+  catalogItemId: string;
+  quantity: number;
+}
+
+export interface PosQuoteLine {
+  catalogItemId: string;
+  sku: string | null;
+  name: string;
+  description: string | null;
+  quantity: number;
+  unitPriceMznMinor: number;
   grossAmountMznMinor: number;
+  loyaltyDiscountPercent: number;
   discountAmountMznMinor: number;
-  requestedPointsToRedeem: number;
-  card: PosCustomerCard;
+  netAmountMznMinor: number;
 }
 
 export interface PosQuote {
+  lines: PosQuoteLine[];
   grossAmountMznMinor: number;
   discountAmountMznMinor: number;
+  availableBalance: number;
+  maximumRedeemablePoints: number;
   pointsToRedeem: number;
   pointsRedeemedValueMznMinor: number;
-  maximumRedeemablePoints: number;
   pointsEarned: number;
   netAmountMznMinor: number;
 }
@@ -39,13 +46,12 @@ export interface NormalizedPosLookup {
   value: string;
 }
 
-export type PosStepId = "identify" | "services" | "authorize" | "confirm" | "success";
+export type PosStepId = "sale" | "benefits" | "payment" | "success";
 
 export const posSteps: ReadonlyArray<{ id: PosStepId; label: string }> = [
-  { id: "identify", label: "Identificar" },
-  { id: "services", label: "Serviços" },
-  { id: "authorize", label: "Autorizar" },
-  { id: "confirm", label: "Confirmar" },
+  { id: "sale", label: "Venda" },
+  { id: "benefits", label: "Benefícios" },
+  { id: "payment", label: "Pagamento" },
   { id: "success", label: "Concluído" }
 ];
 
@@ -143,42 +149,96 @@ export function splitVatInclusive(value: number, vatPercent = 16) {
   };
 }
 
-export function buildPosQuote({
-  grossAmountMznMinor,
-  discountAmountMznMinor,
-  requestedPointsToRedeem,
-  card
-}: PosQuoteInput): PosQuote {
-  const maximumRedeemablePoints = calculateMaximumRedeemablePoints({
-    grossAmountMznMinor,
-    discountAmountMznMinor,
-    availableBalance: card.availablePoints,
-    pointValueMznMinor: card.pointValueMznMinor,
-    maximumRedemptionPercent: card.maximumRedemptionPercent
-  });
-  const pointsToRedeem = Math.min(requestedPointsToRedeem, maximumRedeemablePoints);
-  const pointsRedeemedValueMznMinor = calculatePointValueMznMinor(
-    pointsToRedeem,
-    card.pointValueMznMinor
-  );
-  const netAmountMznMinor =
-    grossAmountMznMinor - discountAmountMznMinor - pointsRedeemedValueMznMinor;
-  const pointsEarned = calculateEarnedPoints({
-    grossAmountMznMinor,
-    discountAmountMznMinor,
-    pointsRedeemedValueMznMinor,
-    earnRate: card.earnRate
-  });
+export function normalizeCartItems(value: unknown): PosCartItemInput[] {
+  if (!Array.isArray(value)) {
+    throw new RangeError("POS cart must be an array");
+  }
 
-  return {
-    grossAmountMznMinor,
-    discountAmountMznMinor,
-    pointsToRedeem,
-    pointsRedeemedValueMznMinor,
-    maximumRedeemablePoints,
-    pointsEarned,
-    netAmountMznMinor
+  const quantities = new Map<string, number>();
+
+  for (const item of value) {
+    if (!isRecord(item)) {
+      throw new RangeError("POS cart line must be an object");
+    }
+
+    const catalogItemId = typeof item.catalogItemId === "string" ? item.catalogItemId.trim() : "";
+    const quantity = Number(item.quantity);
+
+    if (!catalogItemId || !Number.isSafeInteger(quantity) || quantity <= 0 || quantity > 999) {
+      throw new RangeError("POS cart line is invalid");
+    }
+
+    const nextQuantity = (quantities.get(catalogItemId) ?? 0) + quantity;
+    if (nextQuantity > 999) {
+      throw new RangeError("POS cart item quantity is too high");
+    }
+
+    quantities.set(catalogItemId, nextQuantity);
+  }
+
+  if (quantities.size === 0 || quantities.size > 100) {
+    throw new RangeError("POS cart must contain between 1 and 100 items");
+  }
+
+  return [...quantities].map(([catalogItemId, quantity]) => ({ catalogItemId, quantity }));
+}
+
+export function parsePosQuote(value: unknown): PosQuote {
+  if (!isRecord(value) || !Array.isArray(value.lines)) {
+    throw new RangeError("Invalid POS quote");
+  }
+
+  const quote: PosQuote = {
+    lines: value.lines.map(parsePosQuoteLine),
+    grossAmountMznMinor: nonNegativeInteger(value.grossAmountMznMinor),
+    discountAmountMznMinor: nonNegativeInteger(value.discountAmountMznMinor),
+    availableBalance: nonNegativeInteger(value.availableBalance),
+    maximumRedeemablePoints: nonNegativeInteger(value.maximumRedeemablePoints),
+    pointsToRedeem: nonNegativeInteger(value.pointsToRedeem),
+    pointsRedeemedValueMznMinor: nonNegativeInteger(value.pointsRedeemedValueMznMinor),
+    pointsEarned: nonNegativeInteger(value.pointsEarned),
+    netAmountMznMinor: nonNegativeInteger(value.netAmountMznMinor)
   };
+
+  if (
+    quote.lines.length === 0 ||
+    quote.netAmountMznMinor !==
+      quote.grossAmountMznMinor -
+        quote.discountAmountMznMinor -
+        quote.pointsRedeemedValueMznMinor
+  ) {
+    throw new RangeError("Inconsistent POS quote");
+  }
+
+  return quote;
+}
+
+function parsePosQuoteLine(value: unknown): PosQuoteLine {
+  if (!isRecord(value)) {
+    throw new RangeError("Invalid POS quote line");
+  }
+
+  const line: PosQuoteLine = {
+    catalogItemId: requiredString(value.catalogItemId),
+    sku: optionalString(value.sku),
+    name: requiredString(value.name),
+    description: optionalString(value.description),
+    quantity: positiveInteger(value.quantity),
+    unitPriceMznMinor: nonNegativeInteger(value.unitPriceMznMinor),
+    grossAmountMznMinor: nonNegativeInteger(value.grossAmountMznMinor),
+    loyaltyDiscountPercent: percentage(value.loyaltyDiscountPercent),
+    discountAmountMznMinor: nonNegativeInteger(value.discountAmountMznMinor),
+    netAmountMznMinor: nonNegativeInteger(value.netAmountMznMinor)
+  };
+
+  if (
+    line.grossAmountMznMinor !== line.unitPriceMznMinor * line.quantity ||
+    line.netAmountMznMinor !== line.grossAmountMznMinor - line.discountAmountMznMinor
+  ) {
+    throw new RangeError("Inconsistent POS quote line");
+  }
+
+  return line;
 }
 
 export function isValidIdempotencyKey(value: string): boolean {
@@ -188,19 +248,27 @@ export function isValidIdempotencyKey(value: string): boolean {
 export function buildFallbackIdempotencyKey(parts: {
   businessId: string;
   branchId: string;
-  customerCardId: string;
-  grossAmountMznMinor: number;
+  terminalId: string;
+  customerCardId: string | null;
+  cart: PosCartItemInput[];
+  netAmountMznMinor: number;
   pointsToRedeem: number;
 }): string {
+  const cartSignature = [...parts.cart]
+    .sort((left, right) => left.catalogItemId.localeCompare(right.catalogItemId))
+    .map((item) => `${item.catalogItemId}:${item.quantity}`)
+    .join("|");
   const raw = [
     parts.businessId,
-    parts.branchId || "business",
-    parts.customerCardId,
-    parts.grossAmountMznMinor,
+    parts.branchId,
+    parts.terminalId,
+    parts.customerCardId ?? "guest",
+    cartSignature,
+    parts.netAmountMznMinor,
     parts.pointsToRedeem
   ].join(":");
 
-  return `pos_${stableHash(raw)}_${parts.grossAmountMznMinor}_${parts.pointsToRedeem}`;
+  return `pos_${stableHash(raw)}_${parts.netAmountMznMinor}_${parts.pointsToRedeem}`;
 }
 
 function stableHash(value: string): string {
@@ -212,4 +280,50 @@ function stableHash(value: string): string {
   }
 
   return (hash >>> 0).toString(36).padStart(7, "0");
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function nonNegativeInteger(value: unknown): number {
+  const parsed = Number(value);
+
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new RangeError("Expected a non-negative integer");
+  }
+
+  return parsed;
+}
+
+function positiveInteger(value: unknown): number {
+  const parsed = nonNegativeInteger(value);
+
+  if (parsed === 0) {
+    throw new RangeError("Expected a positive integer");
+  }
+
+  return parsed;
+}
+
+function percentage(value: unknown): number {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+    throw new RangeError("Expected a percentage");
+  }
+
+  return parsed;
+}
+
+function requiredString(value: unknown): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new RangeError("Expected a string");
+  }
+
+  return value;
+}
+
+function optionalString(value: unknown): string | null {
+  return typeof value === "string" && value ? value : null;
 }

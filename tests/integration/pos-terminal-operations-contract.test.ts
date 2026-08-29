@@ -11,6 +11,10 @@ const configurationMigration = readFileSync(
   join(process.cwd(), "supabase/migrations/configure_pos_terminal_and_payment_channels.sql"),
   "utf8"
 );
+const checkoutMigration = readFileSync(
+  join(process.cwd(), "supabase/migrations/implement_cart_first_pos_checkout.sql"),
+  "utf8"
+);
 const actions = readFileSync(join(process.cwd(), "features/pos/actions.ts"), "utf8");
 const settingsActions = readFileSync(
   join(process.cwd(), "features/pos/settings-actions.ts"),
@@ -26,19 +30,32 @@ describe("POS terminal operations contract", () => {
     expect(migration).toContain("function public.manage_business_payment_channel");
   });
 
-  it("reconciles one payment attempt with one financial record and loyalty transaction", () => {
-    expect(migration).toContain("function public.confirm_pos_transaction");
-    expect(migration).toContain("insert into public.payment_attempts");
-    expect(migration).toContain("insert into public.transaction_payments");
-    expect(migration).toContain("status = 'reconciled'");
-    expect(migration).toContain("p_idempotency_key");
-    expect(actions).toContain('rpc("confirm_pos_transaction"');
+  it("prices and reconciles one complete cart with immutable line snapshots", () => {
+    expect(checkoutMigration).toContain("create table public.transaction_items");
+    expect(checkoutMigration).toContain("function public.quote_pos_cart");
+    expect(checkoutMigration).toContain("function public.confirm_pos_cart");
+    expect(checkoutMigration).toContain("insert into public.payment_attempts");
+    expect(checkoutMigration).toContain("insert into public.transaction_payments");
+    expect(checkoutMigration).toContain("insert into public.transaction_items");
+    expect(checkoutMigration).toContain("status = 'reconciled'");
+    expect(checkoutMigration).toContain("p_idempotency_key");
+    expect(actions).toContain('rpc("quote_pos_cart"');
+    expect(actions).toContain('rpc("confirm_pos_cart"');
     expect(actions).not.toMatch(/rpc\(rpcName/);
+  });
+
+  it("supports a no-card sale and applies product benefits only after card identification", () => {
+    expect(checkoutMigration).toContain("p_customer_card_id is null");
+    expect(checkoutMigration).toContain("'loyalty_applied', false");
+    expect(checkoutMigration).toContain("loyalty_discount_percent");
+    expect(checkoutMigration).toContain("public.calculate_max_redeemable_points");
+    expect(checkoutMigration).toContain("public.redeem_purchase_points");
+    expect(checkoutMigration).toContain("public.record_purchase_points");
   });
 
   it("keeps provider methods unavailable without server credentials", () => {
     expect(migration).toContain("v_channel.credentials_configured_at is null");
-    expect(migration).toContain("p_payment_method not in ('cash', 'card')");
+    expect(checkoutMigration).toContain("p_payment_method not in ('cash', 'card')");
     expect(actions).toContain(
       "Este método de pagamento ainda não está configurado para utilização."
     );
@@ -46,12 +63,15 @@ describe("POS terminal operations contract", () => {
 
   it("checks authenticated tenant access and removes anonymous execution", () => {
     expect(migration).toContain("not public.can_manage_business(p_business_id)");
-    expect(migration).toContain("not public.can_access_transaction(p_business_id, p_branch_id)");
-    expect(migration).toContain("security definer");
-    expect(migration).toContain("set search_path = ''");
-    expect(migration).toMatch(
-      /revoke all on function public\.confirm_pos_transaction[\s\S]+from public, anon/
+    expect(checkoutMigration).toContain(
+      "not public.can_access_transaction(p_business_id, p_branch_id)"
     );
+    expect(checkoutMigration).toContain("security definer");
+    expect(checkoutMigration).toContain("set search_path = ''");
+    expect(checkoutMigration).toMatch(
+      /revoke all on function public\.confirm_pos_cart[\s\S]+from public, anon/
+    );
+    expect(checkoutMigration).toContain("alter table public.transaction_items enable row level security");
   });
 
   it("routes configuration writes through protected server actions", () => {

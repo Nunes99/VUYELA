@@ -21,6 +21,11 @@ interface BusinessOperationsRpcRow {
   offers: unknown;
 }
 
+interface CatalogDiscountRow {
+  id: string;
+  loyalty_discount_percent: number | string;
+}
+
 export type BusinessOperationsState =
   | { status: "restricted"; message: string }
   | { status: "error"; message: string }
@@ -38,11 +43,18 @@ export async function getBusinessOperations(
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("get_business_operations", {
-    p_business_id: businessId
-  });
+  const [operationsResult, discountsResult] = await Promise.all([
+    supabase.rpc("get_business_operations", {
+      p_business_id: businessId
+    }),
+    supabase
+      .from("business_catalog_items")
+      .select("id, loyalty_discount_percent")
+      .eq("business_id", businessId)
+  ]);
+  const { data, error } = operationsResult;
 
-  if (error) {
+  if (error || discountsResult.error) {
     return { status: "error", message: "Não foi possível carregar a gestão operacional." };
   }
 
@@ -52,13 +64,26 @@ export async function getBusinessOperations(
     return { status: "error", message: "A gestão operacional está temporariamente indisponível." };
   }
 
+  const discounts = new Map(
+    arrayFrom<CatalogDiscountRow>(discountsResult.data).map((item) => [
+      item.id,
+      Number(item.loyalty_discount_percent)
+    ])
+  );
+  const catalogItems = arrayFrom<Omit<BusinessCatalogItem, "loyaltyDiscountPercent">>(
+    row.catalog_items
+  ).map((item) => ({
+    ...item,
+    loyaltyDiscountPercent: discounts.get(item.id) ?? 0
+  }));
+
   return {
     status: "ready",
     operations: {
       branches: arrayFrom<BusinessOperationBranch>(row.branches),
       members: arrayFrom<BusinessOperationMember>(row.members),
       invitations: arrayFrom<BusinessOperationInvitation>(row.invitations),
-      catalogItems: arrayFrom<BusinessCatalogItem>(row.catalog_items),
+      catalogItems,
       cards: arrayFrom<BusinessOperationCard>(row.cards),
       offers: arrayFrom<BusinessOperationOffer>(row.offers)
     }

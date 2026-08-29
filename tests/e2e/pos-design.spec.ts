@@ -4,13 +4,12 @@ import type { Page } from "@playwright/test";
 test.setTimeout(180_000);
 
 const frames = [
-  { step: "identify", heading: "Nova transação", activeLabel: "Identificar" },
-  { step: "services", heading: "Selecione os Serviços", activeLabel: "Serviços" },
-  { step: "authorize", heading: "Autorizar Pagamento", activeLabel: "Autorizar" },
-  { step: "confirm", heading: "Confirmar Transação", activeLabel: "Confirmar" },
+  { step: "sale", heading: "Catálogo", activeLabel: "Venda" },
+  { step: "benefits", heading: "Benefícios do cliente", activeLabel: "Benefícios" },
+  { step: "payment", heading: "Receber pagamento", activeLabel: "Pagamento" },
   {
     step: "success",
-    heading: "Transação concluída com sucesso!",
+    heading: "Venda concluída",
     activeLabel: "Concluído"
   }
 ] as const;
@@ -32,18 +31,15 @@ const paymentFrames = [
   ["cartao", "Cartão — Configuração", "Cartão"]
 ] as const;
 
-test("renders the five approved POS frames without horizontal overflow", async ({ page }) => {
+test("renders the cart-first POS frames without horizontal overflow", async ({ page }) => {
   for (const frame of frames) {
     await page.goto(`/dev/pos?etapa=${frame.step}`);
 
     await expect(page.getByRole("heading", { name: frame.heading })).toBeVisible();
-    await expect(page.locator(".pos-steps li.is-active")).toContainText(frame.activeLabel);
-    await expect(page.locator(".pos-panel")).toBeVisible();
-    await expect(page.locator(".pos-summary")).toBeVisible();
-
-    if (frame.step !== "identify" && frame.step !== "success") {
-      await expect(page.locator(".pos-flow-controls")).toBeVisible();
-    }
+    await expect(page.locator(".pos-sale__progress li.is-active")).toContainText(
+      frame.activeLabel
+    );
+    await expect(page.locator(".pos-sale")).toBeVisible();
 
     const viewport = page.viewportSize();
     const dimensions = await page.evaluate(() => ({
@@ -54,63 +50,62 @@ test("renders the five approved POS frames without horizontal overflow", async (
     expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
 
     if (viewport && viewport.width >= 1080) {
-      const panel = await page.locator(".pos-panel").boundingBox();
-      const summary = await page.locator(".pos-summary").boundingBox();
-
-      expect(panel).not.toBeNull();
-      expect(summary).not.toBeNull();
-      expect(summary?.x ?? 0).toBeGreaterThan((panel?.x ?? 0) + (panel?.width ?? 0));
+      const columns =
+        frame.step === "sale"
+          ? [page.locator(".pos-sale__catalog"), page.locator(".pos-sale__cart")]
+          : frame.step === "success"
+            ? []
+            : [page.locator(".pos-checkout__main"), page.locator(".pos-order")];
+      if (columns.length === 2) {
+        const left = await columns[0]!.boundingBox();
+        const right = await columns[1]!.boundingBox();
+        expect(left).not.toBeNull();
+        expect(right).not.toBeNull();
+        expect(right?.x ?? 0).toBeGreaterThan((left?.x ?? 0) + (left?.width ?? 0));
+      }
     }
   }
 });
 
-test("keeps lookup, catalogue, payment and confirmation controls functional", async ({ page }) => {
-  await page.goto("/dev/pos?etapa=identify");
-  await page.getByRole("radio", { name: "Nº Cartão" }).click();
-  await expect(page.getByLabel("Número do cartão *")).toBeVisible();
-  await expect(page.getByLabel("Pré-visualização da câmara para leitura QR")).toHaveCount(0);
+test("keeps catalogue, loyalty and payment controls functional", async ({ page }) => {
+  await page.goto("/dev/pos?etapa=sale");
+  await expect(
+    page.locator(".pos-sale__catalog-grid").getByRole("button", { name: /Corte de Cabelo/ })
+  ).toHaveClass(/is-selected/);
+  await page
+    .locator(".pos-sale__catalog-grid")
+    .getByRole("button", { name: /Barba Completa/ })
+    .click();
+  await expect(page.locator(".pos-sale__cart")).toContainText("Barba Completa");
+  await page.getByRole("button", { name: "Produtos" }).click();
+  await expect(page.locator(".pos-sale__empty")).toContainText("Nenhum item encontrado");
+  await page.getByRole("button", { name: "Todos" }).click();
+  await expect(page.getByRole("button", { name: "Rever e cobrar" })).toBeEnabled();
 
-  await page.goto("/dev/pos?etapa=services");
-  await expect(page.getByRole("radio", { name: /Corte de Cabelo/ })).toHaveAttribute(
-    "aria-checked",
-    "true"
-  );
-  await page.getByRole("radio", { name: /Barba Completa/ }).click();
-  await expect(page.locator(".pos-summary--services")).toContainText("Barba Completa");
-  const usePoints = page.getByRole("checkbox", {
-    name: /Usar YELAS como parte do pagamento/
-  });
-  await usePoints.check();
+  await page.goto("/dev/pos?etapa=benefits");
+  await expect(page.locator(".pos-customer--identified")).toContainText("Ana Manjate");
   const pointsInput = page.getByRole("spinbutton", { name: "YELAS a utilizar" });
-  await expect(pointsInput).toHaveValue("400");
+  await expect(pointsInput).toHaveValue("300");
   await pointsInput.fill("250");
-  await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("250 MT");
-  await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("550 MT");
-  await expect(page.locator(".pos-loyalty-manager__preview")).toContainText("+55 YL");
-  await expect(page.getByRole("button", { name: "Confirmar Serviços selecionados" })).toBeEnabled();
+  await expect(page.locator(".pos-customer__redemption")).toContainText("250 MT");
+  await expect(page.getByRole("button", { name: "Recalcular" })).toBeEnabled();
+  await expect(page.locator(".pos-order")).toContainText("300 YL utilizados");
 
-  await page.goto("/dev/pos?etapa=authorize");
-  await expect(page.locator(".pos-summary--values")).toContainText("300 YL");
-  await expect(page.locator(".pos-summary--values")).toContainText("1.100 MT");
-  await expect(page.locator(".pos-summary--values")).toContainText("+110 YL");
-  await expect(page.getByRole("radio", { name: /Dinheiro/ })).toHaveAttribute(
+  await page.goto("/dev/pos?etapa=payment");
+  await expect(page.getByRole("radio", { name: /Numerário/ })).toHaveAttribute(
     "aria-checked",
     "true"
   );
-  await page.getByRole("radio", { name: /^Cartão/ }).click();
-  await page.getByRole("button", { name: "Prosseguir para Resumo" }).click();
-  await expect(page.getByRole("heading", { name: "Confirmar Transação" })).toBeVisible();
-  await expect(page.locator(".pos-confirmation-list--review")).toContainText("300 YL");
-  await expect(page.locator(".pos-confirmation-list--review")).toContainText("+110 YL");
+  await page.getByRole("radio", { name: /Cartão bancário/ }).click();
+  await expect(page.getByText("Referência do terminal bancário")).toBeVisible();
 
   const authorization = page.getByRole("checkbox");
-  const confirmButton = page.getByRole("button", { name: "Confirmar Pagamento" });
+  const confirmButton = page.getByRole("button", { name: "Confirmar pagamento" });
   await expect(confirmButton).toBeDisabled();
   await authorization.check();
   await expect(confirmButton).toBeEnabled();
-
-  await page.getByRole("button", { name: "Voltar ao pagamento" }).click();
-  await expect(page.getByRole("heading", { name: "Autorizar Pagamento" })).toBeVisible();
+  await page.getByRole("button", { name: "Benefícios" }).click();
+  await expect(page.getByRole("heading", { name: "Benefícios do cliente" })).toBeVisible();
 });
 
 test("renders every settings and payment frame without horizontal overflow", async ({ page }) => {

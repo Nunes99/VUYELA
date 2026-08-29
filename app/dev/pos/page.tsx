@@ -263,6 +263,7 @@ const previewContext: PosContextState = {
         name: String(name),
         description: String(description),
         priceMznMinor: Number(priceMznMinor),
+        loyaltyDiscountPercent: index < 3 ? 10 : 0,
         sortOrder: index
       }))
     }
@@ -280,13 +281,28 @@ const previewCard = {
 };
 
 const previewQuote = {
+  lines: [
+    {
+      catalogItemId: "item-1",
+      sku: "SRV-1",
+      name: "Corte de Cabelo",
+      description: "Corte clássico ou moderno",
+      quantity: 1,
+      unitPriceMznMinor: 140000,
+      grossAmountMznMinor: 140000,
+      loyaltyDiscountPercent: 10,
+      discountAmountMznMinor: 14000,
+      netAmountMznMinor: 126000
+    }
+  ],
   grossAmountMznMinor: 140000,
-  discountAmountMznMinor: 0,
+  discountAmountMznMinor: 14000,
+  availableBalance: 3450,
   pointsToRedeem: 300,
   pointsRedeemedValueMznMinor: 30000,
-  maximumRedeemablePoints: 700,
-  pointsEarned: 110,
-  netAmountMznMinor: 110000
+  maximumRedeemablePoints: 630,
+  pointsEarned: 96,
+  netAmountMznMinor: 96000
 };
 
 function previewState(step: PosStepId): PosActionState {
@@ -296,17 +312,13 @@ function previewState(step: PosStepId): PosActionState {
     branchId: "branch-preview",
     terminalId: "terminal-preview",
     idempotencyKey: "pos_preview_123456789",
-    catalogItemId: "item-1",
-    serviceDescription: "Corte de Cabelo"
+    cart: [{ catalogItemId: "item-1", quantity: 1 }]
   };
 
-  if (step === "identify") return base;
+  if (step === "sale") return base;
 
-  const withCard = { ...base, card: previewCard };
-  if (step === "services") return withCard;
-
-  const withQuote = { ...withCard, quote: previewQuote };
-  if (step === "authorize" || step === "confirm") return withQuote;
+  const withQuote = { ...base, card: previewCard, quote: previewQuote };
+  if (step === "benefits" || step === "payment") return withQuote;
 
   return {
     ...withQuote,
@@ -326,10 +338,18 @@ function previewState(step: PosStepId): PosActionState {
 }
 
 function stepFrom(value: string | string[] | undefined): PosStepId {
-  return typeof value === "string" &&
-    ["identify", "services", "authorize", "confirm", "success"].includes(value)
-    ? (value as PosStepId)
-    : "identify";
+  if (typeof value !== "string") return "sale";
+  const aliases: Record<string, PosStepId> = {
+    identify: "sale",
+    services: "sale",
+    authorize: "benefits",
+    confirm: "payment",
+    sale: "sale",
+    benefits: "benefits",
+    payment: "payment",
+    success: "success"
+  };
+  return aliases[value] ?? "sale";
 }
 
 export default async function PosPreviewPage({
@@ -341,7 +361,7 @@ export default async function PosPreviewPage({
 
   const params = await searchParams;
   const step = stepFrom(params.etapa);
-  const paymentMethod: PosPaymentMethod | null = step === "confirm" ? "cash" : null;
+  const paymentMethod: PosPaymentMethod | null = step === "payment" ? "cash" : null;
   const screen = typeof params.ecra === "string" ? params.ecra : "transacao";
   const settingsView = parsePosSettingsView(params.vista);
   const paymentView = parsePosPaymentView(params.metodo);
