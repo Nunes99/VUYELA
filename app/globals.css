@@ -24211,3 +24211,28 @@
     min-height: 12.5rem;
   }
 }
+
+/* Shared submit feedback for server actions across business and POS forms. */
+.form-submit-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: vy-spin 0.7s linear infinite;
+}
+
+.business-button[aria-busy="true"],
+.pos-figma-primary-action[aria-busy="true"],
+.pos-figma-save[aria-busy="true"],
+.vy-button[aria-busy="true"] {
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-submit-spinner {
+    animation-duration: 1.4s;
+  }
+}

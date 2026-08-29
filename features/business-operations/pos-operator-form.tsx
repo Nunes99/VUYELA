@@ -4,6 +4,7 @@ import { Check, Copy, KeyRound, UserRoundPlus } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { provisionPosOperatorAction } from "./actions";
 import type { BusinessOperationBranch, PosOperatorProvisionActionState } from "./model";
 
@@ -19,7 +20,7 @@ export function PosOperatorForm({
   businessId: string;
   branches: BusinessOperationBranch[];
 }) {
-  const [state, formAction, pending] = useActionState(provisionPosOperatorAction, initialState);
+  const [state, formAction] = useActionState(provisionPosOperatorAction, initialState);
   const [copied, setCopied] = useState<"login" | "password" | "all" | null>(null);
   const activeBranches = branches.filter((branch) => branch.isActive);
 
@@ -76,10 +77,14 @@ export function PosOperatorForm({
           ))}
         </select>
       </label>
-      <button className="business-button business-button--primary" disabled={pending} type="submit">
-        <UserRoundPlus aria-hidden="true" size={16} />
-        {pending ? "A criar acesso..." : "Criar operador POS"}
-      </button>
+      <PendingSubmitButton
+        className="business-button business-button--primary"
+        leadingIcon={<UserRoundPlus aria-hidden="true" size={16} />}
+        pendingLabel="A criar acesso..."
+        type="submit"
+      >
+        Criar operador POS
+      </PendingSubmitButton>
 
       {state.status !== "idle" ? (
         <div

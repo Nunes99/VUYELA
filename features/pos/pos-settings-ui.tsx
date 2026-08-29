@@ -1,6 +1,8 @@
 import { Check, ChevronDown } from "lucide-react";
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
 
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
+
 export function SettingsCard({
   title,
   description,
@@ -139,10 +141,14 @@ export function SwitchField({
 
 export function SaveButton() {
   return (
-    <button className="pos-figma-save" type="submit">
-      <Check aria-hidden="true" size={16} />
+    <PendingSubmitButton
+      className="pos-figma-save"
+      leadingIcon={<Check aria-hidden="true" size={16} />}
+      pendingLabel="A guardar..."
+      type="submit"
+    >
       Guardar alterações
-    </button>
+    </PendingSubmitButton>
   );
 }
 

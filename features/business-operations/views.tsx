@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 
 import { ImageUploadField } from "@/components/forms/image-upload-field";
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { formatMznMinor } from "@/features/business-dashboard/model";
 
 import {
@@ -434,9 +435,14 @@ function BranchForm({
         <input defaultChecked={branch?.isPrimary} name="isPrimary" type="checkbox" />
         <span>Definir como filial principal</span>
       </label>
-      <button className="business-button business-button--primary" type="submit">
-        <Save aria-hidden="true" size={16} /> Guardar filial
-      </button>
+      <PendingSubmitButton
+        className="business-button business-button--primary"
+        leadingIcon={<Save aria-hidden="true" size={16} />}
+        pendingLabel="A guardar filial..."
+        type="submit"
+      >
+        Guardar filial
+      </PendingSubmitButton>
     </form>
   );
 }
@@ -496,30 +502,33 @@ function MemberRow({
               </select>
             </label>
             <div className="business-operation-actions">
-              <button
+              <PendingSubmitButton
                 className="business-button business-button--primary"
                 name="operation"
+                pendingLabel="A guardar alterações..."
                 type="submit"
                 value="update"
               >
                 Guardar
-              </button>
-              <button
+              </PendingSubmitButton>
+              <PendingSubmitButton
                 className="business-button"
                 name="operation"
+                pendingLabel={member.status === "active" ? "A suspender..." : "A reativar..."}
                 type="submit"
                 value={member.status === "active" ? "suspend" : "activate"}
               >
                 {member.status === "active" ? "Suspender" : "Reativar"}
-              </button>
-              <button
+              </PendingSubmitButton>
+              <PendingSubmitButton
                 className="business-button business-button--danger"
                 name="operation"
+                pendingLabel="A remover..."
                 type="submit"
                 value="remove"
               >
                 Remover
-              </button>
+              </PendingSubmitButton>
             </div>
           </form>
         </details>
@@ -612,9 +621,14 @@ function CatalogItemForm({
         <span>Descrição</span>
         <textarea defaultValue={item?.description ?? ""} name="description" rows={3} />
       </label>
-      <button className="business-button business-button--primary" type="submit">
-        <Save aria-hidden="true" size={16} /> Guardar item
-      </button>
+      <PendingSubmitButton
+        className="business-button business-button--primary"
+        leadingIcon={<Save aria-hidden="true" size={16} />}
+        pendingLabel="A guardar item..."
+        type="submit"
+      >
+        Guardar item
+      </PendingSubmitButton>
     </form>
   );
 }
@@ -647,19 +661,22 @@ function CatalogStatusForm({
       }).map(([name, value]) => (
         <input key={name} name={name} type="hidden" value={value} />
       ))}
-      <button
+      <PendingSubmitButton
         className={`business-button${operation === "delete" ? " business-button--danger" : ""}`}
+        pendingLabel={operation === "delete" ? "A eliminar..." : "A atualizar..."}
+        leadingIcon={
+          operation === "delete" ? (
+            <Trash2 size={15} />
+          ) : item.isAvailable ? (
+            <CirclePause size={15} />
+          ) : (
+            <CheckCircle2 size={15} />
+          )
+        }
         type="submit"
       >
-        {operation === "delete" ? (
-          <Trash2 size={15} />
-        ) : item.isAvailable ? (
-          <CirclePause size={15} />
-        ) : (
-          <CheckCircle2 size={15} />
-        )}
         {operation === "delete" ? "Eliminar" : item.isAvailable ? "Suspender" : "Disponibilizar"}
-      </button>
+      </PendingSubmitButton>
     </form>
   );
 }
@@ -722,28 +739,39 @@ function CustomerCardRow({
           </label>
           <div className="business-operation-actions">
             {card.status === "active" ? (
-              <button className="business-button" name="operation" type="submit" value="block">
-                <Ban size={15} /> Bloquear
-              </button>
-            ) : (
-              <button
-                className="business-button business-button--primary"
+              <PendingSubmitButton
+                className="business-button"
+                leadingIcon={<Ban size={15} />}
                 name="operation"
+                pendingLabel="A bloquear..."
+                type="submit"
+                value="block"
+              >
+                Bloquear
+              </PendingSubmitButton>
+            ) : (
+              <PendingSubmitButton
+                className="business-button business-button--primary"
+                leadingIcon={<CheckCircle2 size={15} />}
+                name="operation"
+                pendingLabel="A reativar..."
                 type="submit"
                 value="activate"
               >
-                <CheckCircle2 size={15} /> Reativar
-              </button>
+                Reativar
+              </PendingSubmitButton>
             )}
             {card.status !== "archived" ? (
-              <button
+              <PendingSubmitButton
                 className="business-button business-button--danger"
+                leadingIcon={<Archive size={15} />}
                 name="operation"
+                pendingLabel="A arquivar..."
                 type="submit"
                 value="archive"
               >
-                <Archive size={15} /> Arquivar
-              </button>
+                Arquivar
+              </PendingSubmitButton>
             ) : null}
           </div>
         </form>
@@ -775,14 +803,15 @@ function OperationForm({
       {Object.entries(fields).map(([name, value]) => (
         <input key={name} name={name} type="hidden" value={value} />
       ))}
-      <button
+      <PendingSubmitButton
         className={`business-button${tone === "danger" ? " business-button--danger" : ""}`}
         disabled={disabled}
+        pendingLabel={`A ${label.toLowerCase()}...`}
+        leadingIcon={icon}
         type="submit"
       >
-        {icon}
         {label}
-      </button>
+      </PendingSubmitButton>
     </form>
   );
 }

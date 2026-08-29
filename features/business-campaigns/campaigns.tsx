@@ -17,6 +17,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { ImageUploadField } from "@/components/forms/image-upload-field";
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { formatPercent } from "@/features/business-dashboard/model";
 import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 import {
@@ -356,9 +357,14 @@ function CampaignList({
                     type="datetime-local"
                   />
                 </label>
-                <button className="business-button business-button--primary" type="submit">
-                  <Save aria-hidden="true" size={15} /> Guardar
-                </button>
+                <PendingSubmitButton
+                  className="business-button business-button--primary"
+                  leadingIcon={<Save aria-hidden="true" size={15} />}
+                  pendingLabel="A guardar..."
+                  type="submit"
+                >
+                  Guardar
+                </PendingSubmitButton>
               </form>
             </details>
           ) : null}
@@ -497,9 +503,14 @@ function OfferForm({
         <input defaultChecked={offer?.isPublic} name="isPublic" type="checkbox" />
         <span>Mostrar no catálogo público</span>
       </label>
-      <button className="business-button business-button--primary" type="submit">
-        <Save aria-hidden="true" size={16} /> Guardar oferta
-      </button>
+      <PendingSubmitButton
+        className="business-button business-button--primary"
+        leadingIcon={<Save aria-hidden="true" size={16} />}
+        pendingLabel="A guardar oferta..."
+        type="submit"
+      >
+        Guardar oferta
+      </PendingSubmitButton>
     </form>
   );
 }
@@ -524,10 +535,14 @@ function CampaignAction({
       <input name="businessId" type="hidden" value={businessId} />
       <input name="campaignId" type="hidden" value={campaignId} />
       <input name="operation" type="hidden" value={operation} />
-      <button className={`business-button${tone ? " business-button--danger" : ""}`} type="submit">
-        {icon}
+      <PendingSubmitButton
+        className={`business-button${tone ? " business-button--danger" : ""}`}
+        leadingIcon={icon}
+        pendingLabel={`A ${label.toLowerCase()}...`}
+        type="submit"
+      >
         {label}
-      </button>
+      </PendingSubmitButton>
     </form>
   );
 }
@@ -559,19 +574,24 @@ function OfferStatusForm({
       }).map(([name, value]) => (
         <input key={name} name={name} type="hidden" value={value} />
       ))}
-      <button
+      <PendingSubmitButton
         className={`business-button${operation ? " business-button--danger" : ""}`}
+        leadingIcon={
+          operation ? (
+            <Trash2 size={15} />
+          ) : offer.isActive ? (
+            <CirclePause size={15} />
+          ) : (
+            <CheckCircle2 size={15} />
+          )
+        }
+        pendingLabel={
+          operation ? "A eliminar..." : offer.isActive ? "A suspender..." : "A ativar..."
+        }
         type="submit"
       >
-        {operation ? (
-          <Trash2 size={15} />
-        ) : offer.isActive ? (
-          <CirclePause size={15} />
-        ) : (
-          <CheckCircle2 size={15} />
-        )}
         {operation ? "Eliminar" : offer.isActive ? "Suspender" : "Ativar"}
-      </button>
+      </PendingSubmitButton>
     </form>
   );
 }

@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Building2, Gift, MapPin, Save, Store } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
 import { ImageUploadField } from "@/components/forms/image-upload-field";
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 import { updateBusinessSettingsAction } from "./actions";
 import type { BusinessSettingsState } from "./data";
@@ -306,14 +306,14 @@ export function BusinessSettingsView({
 
         <div className="business-settings__save">
           <p>As alterações ficam registadas no histórico de auditoria do negócio.</p>
-          <Button
+          <PendingSubmitButton
+            className="vy-button vy-button--lg"
             leadingIcon={<Save aria-hidden="true" size={19} />}
-            size="lg"
+            pendingLabel="A guardar definições..."
             type="submit"
-            variant="primary"
           >
             Guardar definições
-          </Button>
+          </PendingSubmitButton>
         </div>
       </form>
     </div>

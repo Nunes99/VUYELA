@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Bluetooth, Camera, Check, CircleX, Plus, Printer, QrCode, Wifi } from "lucide-react";
 import Image from "next/image";
 
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
+
 import type {
   PosBusinessContext,
   PosContextState,
@@ -768,9 +770,13 @@ function DeviceCreator({
         <input name="deviceType" type="hidden" value={type} />
         <Field label="Nome" name="label" required />
         <Field label="Referência do dispositivo" minLength={8} name="deviceReference" required />
-        <button className="pos-figma-primary-action" type="submit">
+        <PendingSubmitButton
+          className="pos-figma-primary-action"
+          pendingLabel="A adicionar..."
+          type="submit"
+        >
           Adicionar
-        </button>
+        </PendingSubmitButton>
       </form>
     </details>
   );
@@ -822,9 +828,13 @@ function DeviceRow({
             type="hidden"
             value={device.status === "active" ? "revoke" : "activate"}
           />
-          <button className={device.status === "active" ? "is-danger" : ""} type="submit">
+          <PendingSubmitButton
+            className={device.status === "active" ? "is-danger" : ""}
+            pendingLabel={device.status === "active" ? "A desligar..." : "A ativar..."}
+            type="submit"
+          >
             {device.status === "active" ? "Desconectar" : "Ativar"}
-          </button>
+          </PendingSubmitButton>
         </form>
       ) : null}
     </article>

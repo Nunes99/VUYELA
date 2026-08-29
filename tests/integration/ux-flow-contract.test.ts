@@ -65,4 +65,19 @@ describe("professional UX flow contract", () => {
     expect(read("features/pos/pos-workflow.tsx")).toContain("pos-sale__mobile-cart-bar");
     expect(offlinePage).not.toContain("<span>VUYELA by LEMOTE</span>");
   });
+
+  it("gives business creation and management forms explicit pending feedback", () => {
+    const pendingButton = read("components/forms/pending-submit-button.tsx");
+    const operations = read("features/business-operations/views.tsx");
+    const campaigns = read("features/business-campaigns/campaigns.tsx");
+    const teamInvite = read("features/business-operations/team-invite-form.tsx");
+    const posOperator = read("features/business-operations/pos-operator-form.tsx");
+
+    expect(pendingButton).toContain("useFormStatus");
+    expect(pendingButton).toContain("form-submit-spinner");
+    expect(operations).toContain("PendingSubmitButton");
+    expect(campaigns).toContain("PendingSubmitButton");
+    expect(teamInvite).toContain('pendingLabel="A criar convite..."');
+    expect(posOperator).toContain('pendingLabel="A criar acesso..."');
+  });
 });

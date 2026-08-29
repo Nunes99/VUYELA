@@ -3,6 +3,7 @@
 import { Copy, Send } from "lucide-react";
 import { useActionState, useState } from "react";
 
+import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { inviteBusinessMemberAction } from "./actions";
 import type { BusinessOperationBranch } from "./model";
 
@@ -15,7 +16,7 @@ export function TeamInviteForm({
   businessId: string;
   branches: BusinessOperationBranch[];
 }) {
-  const [state, formAction, pending] = useActionState(inviteBusinessMemberAction, initialState);
+  const [state, formAction] = useActionState(inviteBusinessMemberAction, initialState);
   const [copied, setCopied] = useState(false);
 
   async function copyInvite() {
@@ -56,10 +57,14 @@ export function TeamInviteForm({
             ))}
         </select>
       </label>
-      <button className="business-button business-button--primary" disabled={pending} type="submit">
-        <Send aria-hidden="true" size={16} />
-        {pending ? "A criar..." : "Criar convite"}
-      </button>
+      <PendingSubmitButton
+        className="business-button business-button--primary"
+        leadingIcon={<Send aria-hidden="true" size={16} />}
+        pendingLabel="A criar convite..."
+        type="submit"
+      >
+        Criar convite
+      </PendingSubmitButton>
 
       {state.status !== "idle" ? (
         <div
