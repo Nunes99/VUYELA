@@ -80,4 +80,15 @@ describe("professional UX flow contract", () => {
     expect(teamInvite).toContain('pendingLabel="A criar convite..."');
     expect(posOperator).toContain('pendingLabel="A criar acesso..."');
   });
+
+  it("keeps the POS catalog hierarchy aligned with the approved service catalog frame", () => {
+    const workflow = read("features/pos/pos-workflow.tsx");
+    const shell = read("features/pos/pos-shell.tsx");
+
+    expect(workflow).toContain("Catálogo de Serviços");
+    expect(workflow).toContain("pos-sale__item-details");
+    expect(workflow).toContain("Carrinho de Vendas");
+    expect(workflow).toContain("pos-sale__benefit-zone");
+    expect(shell).not.toContain("FlowBreadcrumbs");
+  });
 });

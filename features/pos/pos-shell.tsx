@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 
 import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
-import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import { canAccessRoute } from "@/lib/auth/rbac";
@@ -54,13 +53,15 @@ export function PosPortalShell({
         </div>
 
         <nav aria-label="Navegação do POS" className="pos-portal__actions">
-          <span
-            className={`pos-portal__terminal-status${terminalReady ? " is-ready" : ""}`}
-            title={terminalReady ? "O terminal está pronto para novas vendas" : "Verifique as definições do terminal"}
-          >
-            <CircleCheck aria-hidden="true" size={16} />
-            <span>{terminalReady ? "Terminal pronto" : "Verificar terminal"}</span>
-          </span>
+          {!terminalReady ? (
+            <span
+              className="pos-portal__terminal-status"
+              title="Verifique as definições do terminal antes de iniciar uma venda"
+            >
+              <CircleCheck aria-hidden="true" size={16} />
+              <span>Verificar terminal</span>
+            </span>
+          ) : null}
           {canManageBusiness ? (
             <DashboardAreaMenu includePosSettings principal={principal} variant="default" />
           ) : null}
@@ -75,16 +76,6 @@ export function PosPortalShell({
         </nav>
       </header>
       <div className="pos-portal__content">
-        {section === "transaction" ? (
-          <FlowBreadcrumbs
-            className="pos-portal__breadcrumbs"
-            items={
-              canManageBusiness
-                ? [{ label: "Negócio", href: "/negocio" }, { label: "POS" }]
-                : [{ label: "POS" }]
-            }
-          />
-        ) : null}
         {children}
       </div>
     </div>

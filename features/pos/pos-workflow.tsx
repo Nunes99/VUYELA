@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   ChevronRight,
   CreditCard,
+  Gift,
   Minus,
   PackageSearch,
   Plus,
@@ -305,26 +306,25 @@ function SaleStep({
         <header className="pos-sale__heading">
           <div>
             <span>Nova venda</span>
-            <h1 id="pos-sale-title">Catálogo</h1>
-            <p className="pos-sale__heading-note">
-              Selecione os produtos ou serviços para começar a venda.
-            </p>
+            <h1 id="pos-sale-title">Catálogo de Serviços</h1>
           </div>
           <div className="pos-sale__context">
-            {businesses.length > 1 ? (
-              <label>
-                <span>Negócio</span>
-                <select value={businessId} onChange={(event) => onBusinessChange(event.target.value)}>
-                  {businesses.map((business) => (
-                    <option key={business.id} value={business.id}>
-                      {business.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
             <label>
-              <span>Filial</span>
+              <span className="sr-only">Negócio</span>
+              <select
+                aria-label="Negócio"
+                value={businessId}
+                onChange={(event) => onBusinessChange(event.target.value)}
+              >
+                {businesses.map((business) => (
+                  <option key={business.id} value={business.id}>
+                    {business.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">Filial</span>
               <select value={branchId} onChange={(event) => onBranchChange(event.target.value)}>
                 {selectedBusiness.branches.map((branch) => (
                   <option key={branch.id} value={branch.id}>
@@ -333,21 +333,24 @@ function SaleStep({
                 ))}
               </select>
             </label>
-            <label>
-              <span>Terminal</span>
-              <select
-                disabled={terminals.length === 0}
-                value={terminalId}
-                onChange={(event) => onTerminalChange(event.target.value)}
-              >
-                {terminals.length === 0 ? <option value="">Sem terminal ativo</option> : null}
-                {terminals.map((terminal) => (
-                  <option key={terminal.id} value={terminal.id}>
-                    {terminal.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {terminals.length > 1 || terminals.length === 0 ? (
+              <label>
+                <span className="sr-only">Terminal</span>
+                <select
+                  aria-label="Terminal"
+                  disabled={terminals.length === 0}
+                  value={terminalId}
+                  onChange={(event) => onTerminalChange(event.target.value)}
+                >
+                  {terminals.length === 0 ? <option value="">Sem terminal ativo</option> : null}
+                  {terminals.map((terminal) => (
+                    <option key={terminal.id} value={terminal.id}>
+                      {terminal.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
           </div>
         </header>
 
@@ -380,7 +383,7 @@ function SaleStep({
                 </button>
               ))}
             </div>
-            <span aria-live="polite" className="pos-sale__result-count">
+            <span aria-live="polite" className="pos-sale__result-count sr-only">
               {filteredCatalog.length} {filteredCatalog.length === 1 ? "resultado" : "resultados"}
             </span>
           </div>
@@ -409,17 +412,21 @@ function SaleStep({
                       <ReceiptText aria-hidden="true" size={21} />
                     )}
                   </span>
-                  <span className="pos-sale__item-copy">
-                    <strong>{item.name}</strong>
-                    <small>{item.description || item.sku || "Item do catálogo"}</small>
-                  </span>
-                  {item.loyaltyDiscountPercent > 0 ? (
-                    <span className="pos-sale__discount">
-                      -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
+                  <span className="pos-sale__item-details">
+                    <span className="pos-sale__item-copy">
+                      <strong>{item.name}</strong>
+                      <small>{item.description || item.sku || "Item do catálogo"}</small>
                     </span>
-                  ) : null}
-                  <b>{formatMznCompact(item.priceMznMinor)}</b>
-                  {quantity ? <i>{quantity}</i> : <Plus aria-hidden="true" size={18} />}
+                    {item.loyaltyDiscountPercent > 0 ? (
+                      <span className="pos-sale__discount">
+                        -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
+                      </span>
+                    ) : null}
+                    <span className="pos-sale__item-price-action">
+                      <b>{formatMznCompact(item.priceMznMinor)}</b>
+                      {quantity ? <i>{quantity}</i> : <Plus aria-hidden="true" size={18} />}
+                    </span>
+                  </span>
                 </button>
               );
             })}
@@ -459,12 +466,8 @@ function SaleStep({
 
       <aside className="pos-sale__cart" aria-labelledby="pos-cart-title" id="pos-sale-cart">
         <header>
-          <div>
-            <span>Venda atual</span>
-            <h2 id="pos-cart-title">Carrinho</h2>
-          </div>
+          <h2 id="pos-cart-title">Carrinho de Vendas</h2>
           <div className="pos-sale__cart-heading-actions">
-            <strong>{cart.reduce((total, item) => total + item.quantity, 0)} itens</strong>
             <button
               aria-label="Limpar carrinho"
               disabled={cart.length === 0}
@@ -473,6 +476,7 @@ function SaleStep({
               type="button"
             >
               <Trash2 aria-hidden="true" size={16} />
+              <span>Limpar</span>
             </button>
           </div>
         </header>
@@ -513,6 +517,31 @@ function SaleStep({
             ))
           )}
         </div>
+
+        <section className="pos-sale__benefit-zone" aria-labelledby="pos-benefit-title">
+          <header>
+            <div>
+              <Gift aria-hidden="true" size={16} />
+              <h3 id="pos-benefit-title">Fidelização &amp; Desconto</h3>
+            </div>
+            <span>Disponível</span>
+          </header>
+          <div className="pos-sale__benefit-callout">
+            <div>
+              <strong>Aplicar benefícios VUYELA</strong>
+              <small>Identifique o cliente no passo seguinte para aplicar o desconto.</small>
+            </div>
+            <span aria-hidden="true" className="pos-sale__benefit-toggle">
+              <span />
+            </span>
+          </div>
+          <div className="pos-sale__promo-field">
+            <span>Inserir código promocional</span>
+            <button disabled type="button">
+              Validar
+            </button>
+          </div>
+        </section>
 
         <footer>
           <div className="pos-sale__cart-total">
