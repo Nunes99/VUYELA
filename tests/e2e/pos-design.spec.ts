@@ -67,6 +67,26 @@ test("renders the cart-first POS frames without horizontal overflow", async ({ p
 
 test("keeps catalogue, loyalty and payment controls functional", async ({ page }) => {
   await page.goto("/dev/pos?etapa=sale");
+  const catalogueCards = page.locator(".pos-catalog-item");
+  await expect(catalogueCards).toHaveCount(6);
+  await expect(catalogueCards.first().locator(".pos-sale__item-media")).toBeVisible();
+  await expect(catalogueCards.nth(1).locator(".pos-sale__item-add")).toBeVisible();
+  await expect(catalogueCards.first().locator(".pos-sale__item-quantity")).toHaveText("1");
+
+  const addControlShape = await catalogueCards
+    .nth(1)
+    .locator(".pos-sale__item-add")
+    .evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        borderRadius: style.borderRadius,
+        height: element.getBoundingClientRect().height,
+        width: element.getBoundingClientRect().width
+      };
+    });
+  expect(addControlShape.width).toBe(addControlShape.height);
+  expect(addControlShape.borderRadius).not.toBe("0px");
+
   await expect(
     page.locator(".pos-sale__catalog-grid").getByRole("button", { name: /Corte de Cabelo/ })
   ).toHaveClass(/is-selected/);
@@ -115,6 +135,15 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   await page.goto("/dev/pos?etapa=sale");
   await expect(page.locator(".pos-sale__catalog-grid")).toBeVisible();
   await expect(page.locator(".pos-sale__cart")).toBeHidden();
+
+  const cards = page.locator(".pos-catalog-item");
+  const firstCard = await cards.first().boundingBox();
+  const secondCard = await cards.nth(1).boundingBox();
+  expect(firstCard).not.toBeNull();
+  expect(secondCard).not.toBeNull();
+  expect(secondCard?.y).toBe(firstCard?.y);
+  expect(secondCard?.x ?? 0).toBeGreaterThan((firstCard?.x ?? 0) + (firstCard?.width ?? 0));
+  expect(Math.abs((secondCard?.height ?? 0) - (firstCard?.height ?? 0))).toBeLessThanOrEqual(1);
 
   const cartButton = page.getByRole("button", { name: /Carrinho/ });
   await expect(cartButton).toBeVisible();

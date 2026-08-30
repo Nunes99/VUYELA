@@ -425,18 +425,27 @@ function SaleStep({
 
               return (
                 <button
-                  className={quantity ? "is-selected" : ""}
+                  aria-label={`Adicionar ${item.name} ao carrinho por ${formatMznCompact(item.priceMznMinor)}`}
+                  aria-pressed={Boolean(quantity)}
+                  className={`pos-catalog-item${quantity ? " is-selected" : ""}`}
+                  data-kind={item.kind}
                   key={item.id}
                   onClick={() => updateQuantity(item.id, (quantity ?? 0) + 1)}
                   type="button"
                 >
                   <span className="pos-sale__item-media">
                     {item.imageUrl ? (
-                      <Image alt="" fill sizes="92px" src={item.imageUrl} unoptimized />
+                      <Image
+                        alt=""
+                        fill
+                        sizes="(max-width: 480px) 50vw, (max-width: 1248px) 25vw, 220px"
+                        src={item.imageUrl}
+                        unoptimized
+                      />
                     ) : item.kind === "product" ? (
-                      <ShoppingBag aria-hidden="true" size={21} />
+                      <ShoppingBag aria-hidden="true" size={28} strokeWidth={1.7} />
                     ) : (
-                      <ReceiptText aria-hidden="true" size={21} />
+                      <ReceiptText aria-hidden="true" size={28} strokeWidth={1.7} />
                     )}
                   </span>
                   <span className="pos-sale__item-details">
@@ -451,7 +460,18 @@ function SaleStep({
                     ) : null}
                     <span className="pos-sale__item-price-action">
                       <b>{formatMznCompact(item.priceMznMinor)}</b>
-                      {quantity ? <i>{quantity}</i> : <Plus aria-hidden="true" size={18} />}
+                      {quantity ? (
+                        <span
+                          aria-label={`${quantity} ${quantity === 1 ? "unidade" : "unidades"} no carrinho`}
+                          className="pos-sale__item-quantity"
+                        >
+                          {quantity}
+                        </span>
+                      ) : (
+                        <span aria-hidden="true" className="pos-sale__item-add">
+                          <Plus size={18} strokeWidth={2.2} />
+                        </span>
+                      )}
                     </span>
                   </span>
                 </button>

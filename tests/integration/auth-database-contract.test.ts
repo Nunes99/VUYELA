@@ -19,10 +19,7 @@ const businessTeamMigration = readFileSync(
   "utf8"
 );
 const businessRegistrationMigration = readFileSync(
-  join(
-    process.cwd(),
-    "supabase/migrations/20260830044740_persist_business_signup_branch_details.sql"
-  ),
+  join(process.cwd(), "supabase/migrations/persist_business_signup_branch_details.sql"),
   "utf8"
 );
 const actions = readFileSync(join(process.cwd(), "features/auth/actions.ts"), "utf8");
