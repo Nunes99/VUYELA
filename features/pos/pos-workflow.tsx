@@ -29,12 +29,7 @@ import {
 import Image from "next/image";
 
 import { submitPosAction } from "./actions";
-import type {
-  PosCartItemInput,
-  PosLookupMethod,
-  PosPaymentMethod,
-  PosQuote
-} from "./model";
+import type { PosCartItemInput, PosLookupMethod, PosPaymentMethod, PosQuote } from "./model";
 import { formatMznCompact, posSteps, splitVatInclusive } from "./model";
 import { PosQrScanner } from "./pos-qr-scanner";
 import { initialPosActionState } from "./state";
@@ -66,9 +61,7 @@ export function PosWorkflow({
     [context]
   );
   const firstBusiness = readyBusinesses[0] ?? null;
-  const [businessId, setBusinessId] = useState(
-    initialState.businessId || firstBusiness?.id || ""
-  );
+  const [businessId, setBusinessId] = useState(initialState.businessId || firstBusiness?.id || "");
   const selectedBusiness = useMemo(
     () => readyBusinesses.find((business) => business.id === businessId) ?? firstBusiness,
     [businessId, firstBusiness, readyBusinesses]
@@ -83,13 +76,9 @@ export function PosWorkflow({
       ) ?? [],
     [branchId, selectedBusiness]
   );
-  const [terminalId, setTerminalId] = useState(
-    initialState.terminalId || terminals[0]?.id || ""
-  );
+  const [terminalId, setTerminalId] = useState(initialState.terminalId || terminals[0]?.id || "");
   const [cart, setCart] = useState<PosCartItemInput[]>(initialCart(initialState));
-  const [paymentMethod, setPaymentMethod] = useState<PosPaymentMethod | null>(
-    initialPaymentMethod
-  );
+  const [paymentMethod, setPaymentMethod] = useState<PosPaymentMethod | null>(initialPaymentMethod);
   const [idempotencyKey, setIdempotencyKey] = useState(
     initialState.idempotencyKey || createBrowserIdempotencyKey()
   );
@@ -191,9 +180,7 @@ export function PosWorkflow({
             setIdempotencyKey(createBrowserIdempotencyKey());
           }}
           onBusinessChange={(nextBusinessId) => {
-            const nextBusiness = readyBusinesses.find(
-              (business) => business.id === nextBusinessId
-            );
+            const nextBusiness = readyBusinesses.find((business) => business.id === nextBusinessId);
             setBusinessId(nextBusinessId);
             setBranchId(nextBusiness?.defaultBranchId ?? "");
             setTerminalId("");
@@ -257,7 +244,9 @@ export function PosWorkflow({
             setIdempotencyKey(createBrowserIdempotencyKey());
           }}
           state={{ ...state, quote: state.quote }}
-          terminal={selectedBusiness.terminals.find((terminal) => terminal.id === terminalId) ?? null}
+          terminal={
+            selectedBusiness.terminals.find((terminal) => terminal.id === terminalId) ?? null
+          }
         />
       ) : null}
 
@@ -301,6 +290,7 @@ function SaleStep({
 }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<CatalogFilter>("all");
+  const [mobileCartOpen, setMobileCartOpen] = useState(false);
   const filteredCatalog = catalog.filter((item) => {
     const matchesFilter = filter === "all" || item.kind === filter;
     const haystack = `${item.name} ${item.description ?? ""} ${item.sku ?? ""}`.toLowerCase();
@@ -317,6 +307,23 @@ function SaleStep({
     if (quantity > 0) nextCart.push({ catalogItemId, quantity });
     onCartChange(nextCart);
   };
+
+  useEffect(() => {
+    if (!mobileCartOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileCartOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileCartOpen]);
 
   return (
     <div className="pos-sale__workspace">
@@ -385,11 +392,13 @@ function SaleStep({
           </label>
           <div className="pos-sale__filter-group">
             <div className="pos-sale__filters" role="group" aria-label="Filtrar catálogo">
-              {([
-                ["all", "Todos"],
-                ["service", "Serviços"],
-                ["product", "Produtos"]
-              ] as const).map(([value, label]) => (
+              {(
+                [
+                  ["all", "Todos"],
+                  ["service", "Serviços"],
+                  ["product", "Produtos"]
+                ] as const
+              ).map(([value, label]) => (
                 <button
                   aria-pressed={filter === value}
                   className={filter === value ? "is-active" : ""}
@@ -459,25 +468,11 @@ function SaleStep({
       </section>
 
       {cartLines.length > 0 ? (
-        <div className="pos-sale__mobile-cart-bar" role="status">
-          <div>
-            <span>Venda atual</span>
-            <strong>
-              {cartLines.reduce((total, line) => total + line.quantity, 0)} itens
-            </strong>
-            <small>{formatMznCompact(cartTotal)}</small>
-          </div>
-          <button
-            onClick={() =>
-              document.getElementById("pos-sale-cart")?.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-              })
-            }
-            type="button"
-          >
-            Ver carrinho
-            <ChevronRight aria-hidden="true" size={17} />
+        <div className="pos-sale__mobile-cart-bar">
+          <button aria-haspopup="dialog" onClick={() => setMobileCartOpen(true)} type="button">
+            <ShoppingBag aria-hidden="true" size={18} />
+            <span>Carrinho</span>
+            <strong>{cartLines.reduce((total, line) => total + line.quantity, 0)}</strong>
           </button>
         </div>
       ) : null}
@@ -507,32 +502,7 @@ function SaleStep({
               <span>Selecione os itens no catálogo.</span>
             </div>
           ) : (
-            cartLines.map(({ item, quantity }) => (
-              <div className="pos-sale__cart-line" key={item.id}>
-                <div>
-                  <strong>{item.name}</strong>
-                  <small>{formatMznCompact(item.priceMznMinor)} cada</small>
-                </div>
-                <div className="pos-sale__quantity">
-                  <button
-                    aria-label={`Retirar uma unidade de ${item.name}`}
-                    onClick={() => updateQuantity(item.id, quantity - 1)}
-                    type="button"
-                  >
-                    {quantity === 1 ? <Trash2 size={16} /> : <Minus size={16} />}
-                  </button>
-                  <span>{quantity}</span>
-                  <button
-                    aria-label={`Adicionar uma unidade de ${item.name}`}
-                    onClick={() => updateQuantity(item.id, quantity + 1)}
-                    type="button"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-                <b>{formatMznCompact(item.priceMznMinor * quantity)}</b>
-              </div>
-            ))
+            <CartLines lines={cartLines} onQuantityChange={updateQuantity} />
           )}
         </div>
 
@@ -569,28 +539,147 @@ function SaleStep({
           <small className="pos-sale__cart-note">
             O registo só acontece depois da confirmação do pagamento.
           </small>
-          <form action={formAction}>
-            <PosContextFields
+          <CartSubmitForm
+            branchId={branchId}
+            businessId={businessId}
+            cart={cart}
+            formAction={formAction}
+            idempotencyKey={idempotencyKey}
+            pending={pending}
+            terminalId={terminalId}
+          />
+        </footer>
+      </aside>
+
+      {mobileCartOpen ? (
+        <section
+          aria-labelledby="pos-mobile-cart-title"
+          aria-modal="true"
+          className="pos-mobile-cart"
+          role="dialog"
+        >
+          <header>
+            <button
+              aria-label="Voltar ao catálogo"
+              onClick={() => setMobileCartOpen(false)}
+              type="button"
+            >
+              <ArrowLeft aria-hidden="true" size={20} />
+            </button>
+            <h2 id="pos-mobile-cart-title">Carrinho de Vendas</h2>
+            <button disabled={cart.length === 0} onClick={() => onCartChange([])} type="button">
+              Limpar
+            </button>
+          </header>
+
+          <div className="pos-mobile-cart__lines">
+            <CartLines lines={cartLines} onQuantityChange={updateQuantity} />
+          </div>
+
+          <footer>
+            <dl>
+              <div>
+                <dt>Subtotal</dt>
+                <dd>{formatMznCompact(cartTotal)}</dd>
+              </div>
+              <div>
+                <dt>Desconto VUYELA</dt>
+                <dd>A calcular</dd>
+              </div>
+              <div>
+                <dt>Total a cobrar</dt>
+                <dd>{formatMznCompact(cartTotal)}</dd>
+              </div>
+            </dl>
+            <CartSubmitForm
               branchId={branchId}
               businessId={businessId}
               cart={cart}
+              formAction={formAction}
               idempotencyKey={idempotencyKey}
+              pending={pending}
               terminalId={terminalId}
             />
-            <input name="intent" type="hidden" value="quote" />
-            <input name="pointsToRedeem" type="hidden" value="0" />
-            <button
-              className="pos-sale__primary"
-              disabled={pending || cart.length === 0 || !terminalId}
-              type="submit"
-            >
-              Rever e cobrar
-              <ChevronRight aria-hidden="true" size={19} />
-            </button>
-          </form>
-        </footer>
-      </aside>
+          </footer>
+        </section>
+      ) : null}
     </div>
+  );
+}
+
+type CartLine = ReturnType<typeof resolveCartLines>[number];
+
+function CartLines({
+  lines,
+  onQuantityChange
+}: {
+  lines: CartLine[];
+  onQuantityChange: (catalogItemId: string, quantity: number) => void;
+}) {
+  return lines.map(({ item, quantity }) => (
+    <div className="pos-sale__cart-line" key={item.id}>
+      <div>
+        <strong>{item.name}</strong>
+        <small>{formatMznCompact(item.priceMznMinor)} cada</small>
+      </div>
+      <div className="pos-sale__quantity">
+        <button
+          aria-label={`Retirar uma unidade de ${item.name}`}
+          onClick={() => onQuantityChange(item.id, quantity - 1)}
+          type="button"
+        >
+          {quantity === 1 ? (
+            <Trash2 aria-hidden="true" size={16} />
+          ) : (
+            <Minus aria-hidden="true" size={16} />
+          )}
+        </button>
+        <span>{quantity}</span>
+        <button
+          aria-label={`Adicionar uma unidade de ${item.name}`}
+          onClick={() => onQuantityChange(item.id, quantity + 1)}
+          type="button"
+        >
+          <Plus aria-hidden="true" size={16} />
+        </button>
+      </div>
+      <b>{formatMznCompact(item.priceMznMinor * quantity)}</b>
+    </div>
+  ));
+}
+
+function CartSubmitForm({
+  branchId,
+  businessId,
+  cart,
+  formAction,
+  idempotencyKey,
+  pending,
+  terminalId
+}: FormContext & {
+  formAction: (formData: FormData) => void;
+  pending: boolean;
+}) {
+  return (
+    <form action={formAction}>
+      <PosContextFields
+        branchId={branchId}
+        businessId={businessId}
+        cart={cart}
+        idempotencyKey={idempotencyKey}
+        terminalId={terminalId}
+      />
+      <input name="intent" type="hidden" value="quote" />
+      <input name="pointsToRedeem" type="hidden" value="0" />
+      <button
+        className="pos-sale__primary"
+        disabled={pending || cart.length === 0 || !terminalId}
+        type="submit"
+      >
+        Avançar para pagamento
+        <ChevronRight aria-hidden="true" size={19} />
+      </button>
+    </form>
   );
 }
 
@@ -640,11 +729,7 @@ function BenefitsStep({
             state={state}
           />
         ) : (
-          <CustomerLookup
-            formAction={formAction}
-            formContext={formContext}
-            pending={pending}
-          />
+          <CustomerLookup formAction={formAction} formContext={formContext} pending={pending} />
         )}
 
         <div className="pos-checkout__continue">
@@ -689,11 +774,13 @@ function CustomerLookup({
       </header>
 
       <div className="pos-customer__methods" role="tablist" aria-label="Identificar cliente">
-        {([
-          ["qr", "QR Code", QrCode],
-          ["card", "Número", CreditCard],
-          ["phone", "Telefone", Smartphone]
-        ] as const).map(([value, label, Icon]) => (
+        {(
+          [
+            ["qr", "QR Code", QrCode],
+            ["card", "Número", CreditCard],
+            ["phone", "Telefone", Smartphone]
+          ] as const
+        ).map(([value, label, Icon]) => (
           <button
             aria-selected={method === value}
             className={method === value ? "is-active" : ""}
@@ -874,9 +961,7 @@ function PaymentStep({
 }) {
   const [authorized, setAuthorized] = useState(false);
   const availableMethods: PosPaymentMethod[] =
-    state.quote.netAmountMznMinor === 0
-      ? ["points"]
-      : ["cash", "card", "mpesa", "emola", "mkesh"];
+    state.quote.netAmountMznMinor === 0 ? ["points"] : ["cash", "card", "mpesa", "emola", "mkesh"];
   const awaitingMpesa =
     paymentMethod === "mpesa" &&
     Boolean(state.paymentAttemptId) &&
@@ -1112,7 +1197,13 @@ function SuccessStep({
       <div className="pos-success__receipt-brand">
         {showLogo && business.logoUrl ? (
           <span>
-            <Image alt={`Logótipo de ${business.name}`} fill sizes="64px" src={business.logoUrl} unoptimized />
+            <Image
+              alt={`Logótipo de ${business.name}`}
+              fill
+              sizes="64px"
+              src={business.logoUrl}
+              unoptimized
+            />
           </span>
         ) : null}
         <div>
@@ -1182,13 +1273,7 @@ type FormContext = {
   idempotencyKey: string;
 };
 
-function PosContextFields({
-  businessId,
-  branchId,
-  terminalId,
-  cart,
-  idempotencyKey
-}: FormContext) {
+function PosContextFields({ businessId, branchId, terminalId, cart, idempotencyKey }: FormContext) {
   return (
     <>
       <input name="businessId" type="hidden" value={businessId} />
@@ -1273,8 +1358,7 @@ function availablePaymentSummary(channels: PosPaymentChannelContext[], quote: Po
   if (quote.netAmountMznMinor === 0) return "YELAS";
   const labels = channels
     .filter(
-      (channel) =>
-        channel.status === "active" && ["cash", "card", "mpesa"].includes(channel.method)
+      (channel) => channel.status === "active" && ["cash", "card", "mpesa"].includes(channel.method)
     )
     .map((channel) => paymentLabel(channel.method));
   return labels.length > 0 ? labels.join(" · ") : "Nenhum canal ativo";

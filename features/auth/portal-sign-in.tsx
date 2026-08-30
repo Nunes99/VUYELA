@@ -69,22 +69,23 @@ export function BusinessSignInView({ nextPath }: { nextPath: string }) {
   return (
     <AuthShell
       compact
-      description="Aceda à equipa, clientes, catálogo e desempenho do seu programa de fidelização."
-      eyebrow="Portal de Negócio"
-      formDescription="Utilize a conta empresarial atribuída ao seu negócio."
-      formTitle="Dados de acesso"
+      description="Gerencie as suas filiais, campanhas, cartões emitidos e muito mais num único local seguro."
+      eyebrow="Conta de negócio"
+      formDescription="Introduza as suas credenciais para aceder ao portal."
+      formTitle="Entrar no portal"
       homeHref="/"
       id="business-signin-title"
-      title="Entre no Portal de Negócio."
+      title="Aceda ao seu portal."
       variant="business"
     >
       <EmailSignInForm
+        cancelHref="/"
         nextPath={nextPath}
         portal="business"
         recoveryHref={getPasswordRecoveryPath("business", nextPath)}
       />
       <p className="auth-footnote">
-        Ainda não tem credenciais? <Link href="/cadastrar/negocio">Registar negócio</Link>.
+        Ainda não tem conta? <Link href="/cadastrar/negocio">Criar conta de negócio</Link>.
       </p>
     </AuthShell>
   );

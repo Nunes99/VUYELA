@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowLeft, CircleCheck, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { DashboardAreaMenu } from "@/components/auth/protected-route-state";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
@@ -10,6 +9,7 @@ import { canAccessRoute } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
 
 import type { PosContextState } from "./data";
+import { PosNavigationDrawer } from "./pos-navigation-drawer";
 import { posAppRoutes } from "./routes";
 
 export function PosPortalShell({
@@ -29,6 +29,10 @@ export function PosPortalShell({
     context.businesses.some((business) =>
       business.terminals.some((terminal) => terminal.status === "active")
     );
+  const primaryBusiness = context.status === "ready" ? context.businesses[0] : null;
+  const primaryBranch = primaryBusiness?.branches.find(
+    (branch) => branch.id === primaryBusiness.defaultBranchId
+  );
 
   return (
     <div className={`pos-portal pos-portal--${section}`}>
@@ -53,6 +57,12 @@ export function PosPortalShell({
         </div>
 
         <nav aria-label="Navegação do POS" className="pos-portal__actions">
+          <PosNavigationDrawer
+            branchName={primaryBranch?.name ?? "Filial principal"}
+            businessName={primaryBusiness?.name ?? "Negócio VUYELA"}
+            canManageBusiness={canManageBusiness}
+            roleLabel={primaryBusiness?.roleLabels[0] ?? "Operador POS"}
+          />
           {!terminalReady ? (
             <span
               className="pos-portal__terminal-status"
@@ -61,9 +71,6 @@ export function PosPortalShell({
               <CircleCheck aria-hidden="true" size={16} />
               <span>Verificar terminal</span>
             </span>
-          ) : null}
-          {canManageBusiness ? (
-            <DashboardAreaMenu includePosSettings principal={principal} variant="default" />
           ) : null}
           <PwaInstallAction area="pos" />
           <form action={signOutAction}>
@@ -75,9 +82,7 @@ export function PosPortalShell({
           </form>
         </nav>
       </header>
-      <div className="pos-portal__content">
-        {children}
-      </div>
+      <div className="pos-portal__content">{children}</div>
     </div>
   );
 }

@@ -13,6 +13,7 @@ interface AuthShellProps {
   title: string;
   variant?: "customer" | "business" | "pos" | "admin";
   compact?: boolean;
+  securityNote?: string;
 }
 
 export function AuthShell({
@@ -25,7 +26,8 @@ export function AuthShell({
   id,
   title,
   variant = "customer",
-  compact = false
+  compact = false,
+  securityNote
 }: AuthShellProps) {
   return (
     <main className={`auth-page auth-page--${variant}`}>
@@ -40,6 +42,12 @@ export function AuthShell({
             <h1 id={id}>{title}</h1>
             <p>{description}</p>
           </div>
+          {securityNote || variant === "business" ? (
+            <small className="auth-security-note">
+              <span aria-hidden="true" />
+              {securityNote ?? "Sessão segura e encriptada de ponta a ponta."}
+            </small>
+          ) : null}
         </div>
 
         <div className="auth-panel auth-panel--forms">

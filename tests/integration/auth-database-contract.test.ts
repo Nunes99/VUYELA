@@ -18,6 +18,13 @@ const businessTeamMigration = readFileSync(
   join(process.cwd(), "supabase/migrations/support_business_team_accounts.sql"),
   "utf8"
 );
+const businessRegistrationMigration = readFileSync(
+  join(
+    process.cwd(),
+    "supabase/migrations/20260830044740_persist_business_signup_branch_details.sql"
+  ),
+  "utf8"
+);
 const actions = readFileSync(join(process.cwd(), "features/auth/actions.ts"), "utf8");
 const forms = readFileSync(join(process.cwd(), "features/auth/forms.tsx"), "utf8");
 const callback = readFileSync(join(process.cwd(), "app/(auth)/auth/callback/route.ts"), "utf8");
@@ -57,6 +64,20 @@ describe("authentication database contract", () => {
     expect(actions).toContain("signUpBusinessMemberWithEmailAction");
     expect(actions).toContain('account_type: "business"');
     expect(actions).toContain("validate_business_member_invitation");
+  });
+
+  it("persists the complete first branch during business signup", () => {
+    expect(businessRegistrationMigration).toContain(
+      "create or replace function public.handle_new_auth_user()"
+    );
+    expect(businessRegistrationMigration).toContain("v_registration ->> 'branch_name'");
+    expect(businessRegistrationMigration).toContain("v_registration ->> 'branch_phone'");
+    expect(businessRegistrationMigration).toContain("v_registration ->> 'address_line'");
+    expect(businessRegistrationMigration).toContain("opening_hours");
+    expect(businessRegistrationMigration).toContain("'Africa/Maputo'");
+    expect(businessRegistrationMigration).toContain(
+      "revoke all on function public.handle_new_auth_user()"
+    );
   });
 
   it("validates the NUIT before business onboarding reaches PostgreSQL", () => {

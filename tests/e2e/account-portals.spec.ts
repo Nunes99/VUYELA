@@ -77,6 +77,9 @@ test("keeps customer and business registration as distinct responsive flows", as
   await expect(page.getByRole("heading", { name: "Registe o seu negócio." })).toBeVisible();
   await expect(page.getByLabel("Nome do responsável")).toBeVisible();
   await expect(page.getByLabel("E-mail de acesso")).toBeVisible();
+  await expect(
+    page.getByLabel("Progresso do registo do negócio").getByRole("listitem")
+  ).toHaveCount(4);
   await expect(page.locator('input[name="portal"]')).toHaveCount(0);
 
   const dimensions = await page.evaluate(() => ({
@@ -95,6 +98,7 @@ test("keeps customer and business registration as distinct responsive flows", as
 
   await page.goto("/negocio/entrar");
   await expect(page.locator('input[name="portal"]')).toHaveValue("business");
+  await expect(page.getByRole("link", { name: "Cancelar" })).toHaveAttribute("href", "/");
   await expect(page).toHaveURL(/\/negocio\/entrar$/);
 
   await page.goto("/pos/entrar");

@@ -5,10 +5,7 @@ import { redirect } from "next/navigation";
 import { getDefinePasswordPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
 import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isPhoneAuthEnabled, isSupabaseConfigured } from "@/lib/env";
-import {
-  clearSupabaseAuthCookies,
-  createSupabaseServerClient
-} from "@/lib/supabase/server";
+import { clearSupabaseAuthCookies, createSupabaseServerClient } from "@/lib/supabase/server";
 
 function getFormString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -77,7 +74,7 @@ function getOptionalNuit(formData: FormData) {
       ok: false as const,
       state: {
         status: "error" as const,
-        message: "O NUIT deve ter entre 9 e 12 algarismos, sem letras ou simbolos."
+        message: "O NUIT deve ter entre 9 e 12 algarismos, sem letras ou símbolos."
       }
     };
   }
@@ -122,11 +119,7 @@ export async function signInWithEmailAction(
   const portal = getFormString(formData, "portal");
   if (portal === "customer" || portal === "business" || portal === "pos" || portal === "admin") {
     const [profileResult, membershipResult] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("account_type")
-        .eq("id", data.user.id)
-        .maybeSingle(),
+      supabase.from("profiles").select("account_type").eq("id", data.user.id).maybeSingle(),
       portal === "pos"
         ? supabase
             .from("business_members")
@@ -320,8 +313,57 @@ export async function signUpBusinessWithEmailAction(
   const businessName = getRequiredFormString(formData, "businessName", "Nome do negócio");
   if (!businessName.ok) return businessName.state;
 
-  const city = getRequiredFormString(formData, "city", "Cidade");
+  const representativePhone = getRequiredFormString(
+    formData,
+    "representativePhone",
+    "Número de telefone"
+  );
+  if (!representativePhone.ok) return representativePhone.state;
+
+  const businessType = getRequiredFormString(formData, "businessType", "Tipo de negócio");
+  if (!businessType.ok) return businessType.state;
+
+  const businessSector = getRequiredFormString(formData, "businessSector", "Sector de atividade");
+  if (!businessSector.ok) return businessSector.state;
+
+  const branchName = getRequiredFormString(formData, "branchName", "Nome da filial");
+  if (!branchName.ok) return branchName.state;
+
+  const province = getRequiredFormString(formData, "province", "Província");
+  if (!province.ok) return province.state;
+
+  const city = getRequiredFormString(formData, "city", "Distrito");
   if (!city.ok) return city.state;
+
+  const branchPhone = getRequiredFormString(formData, "branchPhone", "Telefone da filial");
+  if (!branchPhone.ok) return branchPhone.state;
+
+  const addressLine = getRequiredFormString(formData, "addressLine", "Endereço completo");
+  if (!addressLine.ok) return addressLine.state;
+
+  const openingTime = getRequiredFormString(formData, "openingTime", "Hora de abertura");
+  if (!openingTime.ok) return openingTime.state;
+
+  const closingTime = getRequiredFormString(formData, "closingTime", "Hora de encerramento");
+  if (!closingTime.ok) return closingTime.state;
+
+  const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+  if (!timePattern.test(openingTime.value) || !timePattern.test(closingTime.value)) {
+    return { status: "error", message: "Indique um horário válido para a filial." };
+  }
+  if (openingTime.value >= closingTime.value) {
+    return {
+      status: "error",
+      message: "A hora de encerramento deve ser posterior à hora de abertura."
+    };
+  }
+
+  if (getFormString(formData, "termsAccepted") !== "on") {
+    return {
+      status: "error",
+      message: "Aceite os Termos e Condições e a Política de Privacidade para continuar."
+    };
+  }
 
   const email = getRequiredFormString(formData, "email", "E-mail de acesso");
   if (!email.ok) return email.state;
@@ -354,17 +396,25 @@ export async function signUpBusinessWithEmailAction(
       emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/negocio")}`,
       data: {
         display_name: representativeName.value,
+        phone: representativePhone.value,
         account_type: "business",
         business_registration: {
           slug,
           name: businessName.value,
-          legal_name: getFormString(formData, "legalName") || null,
+          legal_name: getFormString(formData, "legalName") || businessName.value,
           nuit: nuit.value,
           description: getFormString(formData, "description") || null,
-          phone: getFormString(formData, "phone") || null,
+          phone: branchPhone.value,
           email: email.value,
+          business_type: businessType.value,
+          business_sector: businessSector.value,
+          branch_name: branchName.value,
+          branch_phone: branchPhone.value,
+          address_line: addressLine.value,
           city: city.value,
-          province: getFormString(formData, "province") || null
+          province: province.value,
+          opening_time: openingTime.value,
+          closing_time: closingTime.value
         }
       }
     }

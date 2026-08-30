@@ -28,8 +28,9 @@ describe("professional UX flow contract", () => {
   it("makes business onboarding reversible and reviewable", () => {
     const forms = read("features/auth/forms.tsx");
 
-    expect(forms).toContain('const steps = ["Acesso", "Negócio", "Revisão"]');
-    expect(forms).toContain("Pode voltar às etapas anteriores sem perder");
+    expect(forms).toContain('const steps = ["Acesso", "Negócio", "Filial", "Revisão"]');
+    expect(forms).toContain("goToStep(step - 1)");
+    expect(forms).toContain("auth-wizard__review-section");
     expect(forms).toContain("continueToNextStep");
   });
 

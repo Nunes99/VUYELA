@@ -9,6 +9,7 @@ import {
   KeyRound,
   LogIn,
   Mail,
+  PencilLine,
   Phone,
   Save,
   Store,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "../../vuyela-design-system/src/components/Button";
-import { Input, Textarea } from "../../vuyela-design-system/src/components/Field";
+import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
 import {
   requestPasswordResetAction,
   requestPhoneOtpAction,
@@ -32,6 +33,7 @@ import type { AuthPortal } from "@/features/auth/portal";
 import { initialAuthActionState } from "@/features/auth/state";
 
 interface FormProps {
+  cancelHref?: string | undefined;
   nextPath?: string | undefined;
   portal?: "customer" | "business" | "pos" | "admin" | undefined;
   recoveryHref?: string | undefined;
@@ -53,6 +55,7 @@ function ActionMessage({ status, message }: { status: string; message: string })
 }
 
 export function EmailSignInForm({
+  cancelHref,
   nextPath = "/cliente",
   portal = "customer",
   recoveryHref
@@ -81,15 +84,29 @@ export function EmailSignInForm({
         </div>
       ) : null}
       <ActionMessage status={state.status} message={state.message} />
-      <Button
-        type="submit"
-        variant="primary"
-        fullWidth
-        loading={pending}
-        leadingIcon={<LogIn size={18} />}
-      >
-        Entrar
-      </Button>
+      {cancelHref ? (
+        <div className="auth-form__submit-row">
+          <Link href={cancelHref}>Cancelar</Link>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={pending}
+            leadingIcon={<LogIn size={18} />}
+          >
+            Entrar
+          </Button>
+        </div>
+      ) : (
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          loading={pending}
+          leadingIcon={<LogIn size={18} />}
+        >
+          Entrar
+        </Button>
+      )}
     </form>
   );
 }
@@ -270,28 +287,41 @@ export function CustomerOnboardingForm() {
   );
 }
 
-export function BusinessSignUpForm() {
+export type BusinessSignUpStep = 0 | 1 | 2 | 3;
+
+export function BusinessSignUpForm({
+  onStepChange
+}: {
+  onStepChange?: (step: BusinessSignUpStep) => void;
+} = {}) {
   const [state, formAction, pending] = useActionState(
     signUpBusinessWithEmailAction,
     initialAuthActionState
   );
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState<BusinessSignUpStep>(0);
   const formRef = useRef<HTMLFormElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [values, setValues] = useState({
     representativeName: "",
+    representativePhone: "",
     email: "",
     password: "",
     passwordConfirmation: "",
     businessName: "",
-    legalName: "",
     nuit: "",
+    businessType: "",
+    businessSector: "",
+    branchName: "",
     city: "",
     province: "",
-    phone: "",
-    description: ""
+    branchPhone: "",
+    addressLine: "",
+    openingTime: "08:00",
+    closingTime: "20:00",
+    description: "",
+    termsAccepted: false
   });
-  const steps = ["Acesso", "Negócio", "Revisão"];
+  const steps = ["Acesso", "Negócio", "Filial", "Revisão"] as const;
 
   const updateValue = (field: keyof typeof values, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
@@ -302,16 +332,30 @@ export function BusinessSignUpForm() {
   };
 
   const goToStep = (nextStep: number) => {
-    setStep(Math.max(0, Math.min(nextStep, steps.length - 1)));
+    const boundedStep = Math.max(0, Math.min(nextStep, steps.length - 1)) as BusinessSignUpStep;
+    setStep(boundedStep);
+    onStepChange?.(boundedStep);
     focusStep();
   };
 
   const continueToNextStep = () => {
     const currentPanel = formRef.current?.querySelector<HTMLElement>(`[data-step="${step}"]`);
     const controls = Array.from(
-      currentPanel?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea") ??
-        []
+      currentPanel?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+        "input, textarea, select"
+      ) ?? []
     );
+    const passwordConfirmation = formRef.current?.elements.namedItem(
+      "passwordConfirmation"
+    ) as HTMLInputElement | null;
+
+    if (step === 0 && passwordConfirmation) {
+      passwordConfirmation.setCustomValidity(
+        values.password === values.passwordConfirmation
+          ? ""
+          : "As palavras-passe introduzidas não coincidem."
+      );
+    }
     const firstInvalid = controls.find((control) => !control.checkValidity());
 
     if (firstInvalid) {
@@ -369,27 +413,43 @@ export function BusinessSignUpForm() {
           value={values.email}
         />
         <Input
-          label="Palavra-passe"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          onChange={(event) => updateValue("password", event.currentTarget.value)}
+          label="Número de telefone"
+          name="representativePhone"
+          type="tel"
+          autoComplete="tel"
+          onChange={(event) => updateValue("representativePhone", event.currentTarget.value)}
+          placeholder="Ex.: +258 84 123 4567"
           requiredMark
           required
-          value={values.password}
+          value={values.representativePhone}
         />
-        <Input
-          label="Confirmar palavra-passe"
-          name="passwordConfirmation"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          onChange={(event) => updateValue("passwordConfirmation", event.currentTarget.value)}
-          requiredMark
-          required
-          value={values.passwordConfirmation}
-        />
+        <div className="auth-wizard__grid auth-wizard__grid--credentials">
+          <Input
+            label="Palavra-passe"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            onChange={(event) => updateValue("password", event.currentTarget.value)}
+            requiredMark
+            required
+            value={values.password}
+          />
+          <Input
+            label="Confirmar palavra-passe"
+            name="passwordConfirmation"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            onChange={(event) => {
+              event.currentTarget.setCustomValidity("");
+              updateValue("passwordConfirmation", event.currentTarget.value);
+            }}
+            requiredMark
+            required
+            value={values.passwordConfirmation}
+          />
+        </div>
       </fieldset>
 
       <fieldset className="auth-wizard__panel" data-step="1" hidden={step !== 1}>
@@ -403,54 +463,56 @@ export function BusinessSignUpForm() {
           required
           value={values.businessName}
         />
-        <Input
-          label="Nome legal"
-          name="legalName"
-          autoComplete="organization"
-          onChange={(event) => updateValue("legalName", event.currentTarget.value)}
-          value={values.legalName}
-        />
-        <Input
-          label="NUIT"
-          name="nuit"
-          inputMode="numeric"
-          autoComplete="off"
-          minLength={9}
-          maxLength={12}
-          onChange={(event) => updateValue("nuit", event.currentTarget.value)}
-          pattern="[0-9]{9,12}"
-          hint="Opcional. Introduza entre 9 e 12 algarismos, sem espaços."
-          title="Introduza entre 9 e 12 algarismos."
-          value={values.nuit}
-        />
+        <input name="legalName" type="hidden" value={values.businessName} />
         <div className="auth-wizard__grid">
           <Input
-            label="Cidade"
-            name="city"
-            autoComplete="address-level2"
-            onChange={(event) => updateValue("city", event.currentTarget.value)}
+            label="NUIT (Identificação Tributária)"
+            name="nuit"
+            inputMode="numeric"
+            autoComplete="off"
+            minLength={9}
+            maxLength={12}
+            onChange={(event) => updateValue("nuit", event.currentTarget.value)}
+            pattern="[0-9]{9,12}"
+            hint="Opcional. Introduza entre 9 e 12 algarismos, sem espaços."
+            title="Introduza entre 9 e 12 algarismos."
+            value={values.nuit}
+          />
+          <Select
+            label="Tipo de negócio"
+            name="businessType"
+            onChange={(event) => updateValue("businessType", event.currentTarget.value)}
             requiredMark
             required
-            value={values.city}
-          />
-          <Input
-            label="Província"
-            name="province"
-            autoComplete="address-level1"
-            onChange={(event) => updateValue("province", event.currentTarget.value)}
-            value={values.province}
-          />
-          <Input
-            label="Telefone"
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            onChange={(event) => updateValue("phone", event.currentTarget.value)}
-            value={values.phone}
-          />
+            value={values.businessType}
+          >
+            <option value="">Selecione uma opção</option>
+            <option value="empresario-individual">Empresário em nome individual</option>
+            <option value="sociedade-por-quotas">Sociedade por quotas</option>
+            <option value="sociedade-anonima">Sociedade anónima</option>
+            <option value="associacao">Associação ou cooperativa</option>
+            <option value="outra">Outra entidade</option>
+          </Select>
         </div>
+        <Select
+          label="Sector de atividade"
+          name="businessSector"
+          onChange={(event) => updateValue("businessSector", event.currentTarget.value)}
+          requiredMark
+          required
+          value={values.businessSector}
+        >
+          <option value="">Selecione o sector</option>
+          <option value="alimentacao-bebidas">Alimentação e bebidas</option>
+          <option value="beleza-bem-estar">Beleza e bem-estar</option>
+          <option value="comercio-retalho">Comércio e retalho</option>
+          <option value="saude">Saúde</option>
+          <option value="servicos-profissionais">Serviços profissionais</option>
+          <option value="turismo-hotelaria">Turismo e hotelaria</option>
+          <option value="outro">Outro</option>
+        </Select>
         <Textarea
-          label="Descrição"
+          label="Descrição breve do negócio (opcional)"
           name="description"
           onChange={(event) => updateValue("description", event.currentTarget.value)}
           rows={4}
@@ -459,33 +521,156 @@ export function BusinessSignUpForm() {
       </fieldset>
 
       <fieldset className="auth-wizard__panel" data-step="2" hidden={step !== 2}>
+        <legend className="sr-only">Dados da primeira filial</legend>
+        <div className="auth-wizard__grid">
+          <Input
+            label="Nome da filial"
+            name="branchName"
+            onChange={(event) => updateValue("branchName", event.currentTarget.value)}
+            placeholder="Ex.: Filial Maputo Centro"
+            requiredMark
+            required
+            value={values.branchName}
+          />
+          <Select
+            label="Província"
+            name="province"
+            autoComplete="address-level1"
+            onChange={(event) => updateValue("province", event.currentTarget.value)}
+            requiredMark
+            required
+            value={values.province}
+          >
+            <option value="">Selecione a província</option>
+            {mozambiqueProvinces.map((province) => (
+              <option key={province} value={province}>
+                {province}
+              </option>
+            ))}
+          </Select>
+          <Input
+            label="Distrito"
+            name="city"
+            autoComplete="address-level2"
+            onChange={(event) => updateValue("city", event.currentTarget.value)}
+            placeholder="Ex.: KaMpfumo"
+            requiredMark
+            required
+            value={values.city}
+          />
+          <Input
+            label="Telefone da filial"
+            name="branchPhone"
+            type="tel"
+            autoComplete="tel"
+            onChange={(event) => updateValue("branchPhone", event.currentTarget.value)}
+            placeholder="Ex.: +258 21 300 400"
+            requiredMark
+            required
+            value={values.branchPhone}
+          />
+        </div>
+        <Input
+          label="Endereço completo"
+          name="addressLine"
+          autoComplete="street-address"
+          onChange={(event) => updateValue("addressLine", event.currentTarget.value)}
+          placeholder="Ex.: Avenida Mao Tse Tung, n.º 450"
+          requiredMark
+          required
+          value={values.addressLine}
+        />
+        <div className="auth-wizard__grid">
+          <Input
+            label="Abertura"
+            name="openingTime"
+            type="time"
+            onChange={(event) => updateValue("openingTime", event.currentTarget.value)}
+            requiredMark
+            required
+            value={values.openingTime}
+          />
+          <Input
+            label="Encerramento"
+            name="closingTime"
+            type="time"
+            onChange={(event) => updateValue("closingTime", event.currentTarget.value)}
+            requiredMark
+            required
+            value={values.closingTime}
+          />
+        </div>
+      </fieldset>
+
+      <fieldset className="auth-wizard__panel" data-step="3" hidden={step !== 3}>
         <legend className="sr-only">Revisão do registo</legend>
         <dl className="auth-wizard__review">
-          <div>
-            <dt>Responsável e acesso</dt>
-            <dd>{[values.representativeName, values.email].filter(Boolean).join(" · ")}</dd>
+          <div className="auth-wizard__review-section">
+            <div>
+              <dt>1. Acesso</dt>
+              <button onClick={() => goToStep(0)} type="button">
+                <PencilLine aria-hidden="true" size={14} /> Editar
+              </button>
+            </div>
+            <dd>
+              <span>Nome do responsável</span>
+              <strong>{values.representativeName}</strong>
+              <span>E-mail de acesso</span>
+              <strong>{values.email}</strong>
+            </dd>
           </div>
-          <div>
-            <dt>Negócio</dt>
-            <dd>{values.businessName}</dd>
+          <div className="auth-wizard__review-section">
+            <div>
+              <dt>2. Negócio</dt>
+              <button onClick={() => goToStep(1)} type="button">
+                <PencilLine aria-hidden="true" size={14} /> Editar
+              </button>
+            </div>
+            <dd>
+              <span>Nome do negócio</span>
+              <strong>{values.businessName}</strong>
+              <span>NUIT</span>
+              <strong>{values.nuit || "Não indicado"}</strong>
+              <span>Tipo / Sector</span>
+              <strong>{humanizeOption(values.businessType, values.businessSector)}</strong>
+            </dd>
           </div>
-          <div>
-            <dt>Nome legal / NUIT</dt>
-            <dd>{[values.legalName, values.nuit].filter(Boolean).join(" · ") || "Não indicado"}</dd>
-          </div>
-          <div>
-            <dt>Localização</dt>
-            <dd>{[values.city, values.province].filter(Boolean).join(", ")}</dd>
-          </div>
-          <div>
-            <dt>Contactos</dt>
-            <dd>{values.phone || "Não indicado"}</dd>
+          <div className="auth-wizard__review-section">
+            <div>
+              <dt>3. Filial</dt>
+              <button onClick={() => goToStep(2)} type="button">
+                <PencilLine aria-hidden="true" size={14} /> Editar
+              </button>
+            </div>
+            <dd>
+              <span>Filial principal</span>
+              <strong>{values.branchName}</strong>
+              <span>Localização</span>
+              <strong>
+                {[values.addressLine, values.city, values.province].filter(Boolean).join(", ")}
+              </strong>
+              <span>Contacto / Horário</span>
+              <strong>
+                {values.branchPhone} · {values.openingTime}–{values.closingTime}
+              </strong>
+            </dd>
           </div>
         </dl>
-        <p className="auth-wizard__hint">
-          Confirme os dados antes de enviar. Pode voltar às etapas anteriores sem perder o que já
-          preencheu.
-        </p>
+        <label className="auth-wizard__consent">
+          <input
+            checked={values.termsAccepted}
+            name="termsAccepted"
+            onChange={(event) =>
+              setValues((current) => ({ ...current, termsAccepted: event.currentTarget.checked }))
+            }
+            required
+            type="checkbox"
+          />
+          <span>
+            Li e aceito os <Link href="/termos">Termos e Condições</Link> e a{" "}
+            <Link href="/privacidade">Política de Privacidade</Link> da plataforma.
+          </span>
+        </label>
       </fieldset>
 
       <ActionMessage status={state.status} message={state.message} />
@@ -499,7 +684,7 @@ export function BusinessSignUpForm() {
             <Link href="/">Cancelar</Link>
           )}
         </span>
-        {step < steps.length - 1 ? (
+        {step < 3 ? (
           <Button
             onClick={continueToNextStep}
             trailingIcon={<ArrowRight aria-hidden="true" size={18} />}
@@ -511,16 +696,37 @@ export function BusinessSignUpForm() {
         ) : (
           <Button
             type="submit"
-            variant="reward"
+            variant="primary"
             loading={pending}
-            leadingIcon={<Store size={18} />}
+            leadingIcon={<Store aria-hidden="true" size={18} />}
           >
-            Criar conta de negócio
+            Submeter pedido
           </Button>
         )}
       </div>
     </form>
   );
+}
+
+const mozambiqueProvinces = [
+  "Cabo Delgado",
+  "Gaza",
+  "Inhambane",
+  "Manica",
+  "Maputo Cidade",
+  "Maputo Província",
+  "Nampula",
+  "Niassa",
+  "Sofala",
+  "Tete",
+  "Zambézia"
+] as const;
+
+function humanizeOption(...values: string[]) {
+  return values
+    .filter(Boolean)
+    .map((value) => value.replaceAll("-", " ").replace(/^./, (letter) => letter.toUpperCase()))
+    .join(" · ");
 }
 
 export function BusinessTeamSignUpForm({

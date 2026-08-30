@@ -36,9 +36,7 @@ test("renders the cart-first POS frames without horizontal overflow", async ({ p
     await page.goto(`/dev/pos?etapa=${frame.step}`);
 
     await expect(page.getByRole("heading", { name: frame.heading })).toBeVisible();
-    await expect(page.locator(".pos-sale__progress li.is-active")).toContainText(
-      frame.activeLabel
-    );
+    await expect(page.locator(".pos-sale__progress li.is-active")).toContainText(frame.activeLabel);
     await expect(page.locator(".pos-sale")).toBeVisible();
 
     const viewport = page.viewportSize();
@@ -80,7 +78,10 @@ test("keeps catalogue, loyalty and payment controls functional", async ({ page }
   await page.getByRole("button", { name: "Produtos" }).click();
   await expect(page.locator(".pos-sale__empty")).toContainText("Nenhum item encontrado");
   await page.getByRole("button", { name: "Todos" }).click();
-  await expect(page.getByRole("button", { name: "Rever e cobrar" })).toBeEnabled();
+  if ((page.viewportSize()?.width ?? 1280) <= 760) {
+    await page.getByRole("button", { name: /Carrinho/ }).click();
+  }
+  await expect(page.getByRole("button", { name: "Avançar para pagamento" })).toBeEnabled();
 
   await page.goto("/dev/pos?etapa=benefits");
   await expect(page.locator(".pos-customer--identified")).toContainText("Ana Manjate");
@@ -106,6 +107,30 @@ test("keeps catalogue, loyalty and payment controls functional", async ({ page }
   await expect(confirmButton).toBeEnabled();
   await page.getByRole("button", { name: "Benefícios" }).click();
   await expect(page.getByRole("heading", { name: "Benefícios do cliente" })).toBeVisible();
+});
+
+test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chrome", "Mobile POS contract");
+
+  await page.goto("/dev/pos?etapa=sale");
+  await expect(page.locator(".pos-sale__catalog-grid")).toBeVisible();
+  await expect(page.locator(".pos-sale__cart")).toBeHidden();
+
+  const cartButton = page.getByRole("button", { name: /Carrinho/ });
+  await expect(cartButton).toBeVisible();
+  await cartButton.click();
+  await expect(page.getByRole("dialog", { name: "Carrinho de Vendas" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Avançar para pagamento" })).toBeEnabled();
+  await page.getByRole("button", { name: "Voltar ao catálogo" }).click();
+
+  await page.getByRole("button", { name: "Abrir menu do POS" }).click();
+  const drawer = page.getByRole("dialog", { name: "Menu do POS" });
+  await expect(drawer).toBeVisible();
+  await expect(drawer.getByRole("link", { name: "Catálogo de Serviços" })).toHaveAttribute(
+    "aria-current",
+    "page"
+  );
+  await expectNoHorizontalOverflow(page);
 });
 
 test("renders every settings and payment frame without horizontal overflow", async ({ page }) => {
