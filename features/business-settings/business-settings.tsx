@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Building2, Gift, MapPin, Save, Store } from "lucide-react";
+import { Building2, CreditCard, Gift, MapPin, Save, Store } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Input, Select, Textarea } from "../../vuyela-design-system/src/components/Field";
@@ -8,6 +8,7 @@ import { PendingSubmitButton } from "@/components/forms/pending-submit-button";
 import { BusinessProfileHeader } from "@/features/business-dashboard/dashboard";
 import { updateBusinessSettingsAction } from "./actions";
 import type { BusinessSettingsState } from "./data";
+import { businessSettingsRoutes } from "./routes";
 
 export function BusinessSettingsView({
   state,
@@ -46,9 +47,18 @@ export function BusinessSettingsView({
           <h2>Definições do negócio</h2>
           <p>Atualize o perfil público, as regras de YELAS e os dados da filial principal.</p>
         </div>
-        <Link href={`/negocio?businessId=${encodeURIComponent(settings.business.id)}`}>
-          Voltar ao painel
-        </Link>
+        <div className="business-settings__header-actions">
+          <Link
+            className="business-settings__payment-link"
+            href={`${businessSettingsRoutes.payments}?businessId=${encodeURIComponent(settings.business.id)}`}
+          >
+            <CreditCard aria-hidden="true" size={18} />
+            Métodos de pagamento
+          </Link>
+          <Link href={`/negocio?businessId=${encodeURIComponent(settings.business.id)}`}>
+            Voltar ao painel
+          </Link>
+        </div>
       </header>
 
       {settings.businesses.length > 1 ? (

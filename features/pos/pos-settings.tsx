@@ -55,11 +55,29 @@ export function PosSettingsView({
 export function PosPaymentSettingsView({
   context,
   method,
-  result
+  result,
+  businessId,
+  branchId,
+  basePath,
+  returnHref
 }: {
   context: PosContextState;
   method: PosPaymentViewId;
   result?: string;
+  businessId?: string;
+  branchId?: string;
+  basePath?: string;
+  returnHref?: string;
 }) {
-  return <PosPaymentSettingsScreen context={context} method={method} result={result} />;
+  return (
+    <PosPaymentSettingsScreen
+      basePath={basePath}
+      branchId={branchId}
+      businessId={businessId}
+      context={context}
+      method={method}
+      result={result}
+      returnHref={returnHref}
+    />
+  );
 }

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { businessSettingsRoutes } from "@/features/business-settings/routes";
 
 import type { PosPaymentViewId, PosSettingsViewId } from "./pos-settings";
 import { posAppRoutes } from "./routes";
@@ -68,12 +69,24 @@ export function PosSettingsNavigation({
   );
 }
 
-export function PosPaymentNavigation({ method }: { method: PosPaymentViewId }) {
+export function PosPaymentNavigation({
+  method,
+  basePath = businessSettingsRoutes.payments,
+  returnHref = businessSettingsRoutes.root,
+  businessId,
+  branchId
+}: {
+  method: PosPaymentViewId;
+  basePath?: string;
+  returnHref?: string;
+  businessId?: string;
+  branchId?: string;
+}) {
   return (
     <SettingsNavigationFrame payments>
-      <Link className="pos-figma-side-return" href={posAppRoutes.settings}>
+      <Link className="pos-figma-side-return" href={returnHref}>
         <ArrowLeft aria-hidden="true" size={16} />
-        Voltar às Configurações
+        Voltar às definições
       </Link>
       <div className="pos-figma-side-title">Métodos de Pagamento</div>
       <nav aria-label="Métodos de pagamento" className="pos-figma-side-links">
@@ -83,7 +96,7 @@ export function PosPaymentNavigation({ method }: { method: PosPaymentViewId }) {
             <Link
               aria-current={method === item.id ? "page" : undefined}
               className={method === item.id ? "is-active" : undefined}
-              href={`${posAppRoutes.payments}?metodo=${item.id}`}
+              href={paymentSettingsHref(basePath, item.id, businessId, branchId)}
               key={item.id}
             >
               <Icon aria-hidden="true" size={18} />
@@ -93,7 +106,12 @@ export function PosPaymentNavigation({ method }: { method: PosPaymentViewId }) {
           );
         })}
       </nav>
-      <MobilePaymentNav active={method} />
+      <MobilePaymentNav
+        active={method}
+        basePath={basePath}
+        branchId={branchId}
+        businessId={businessId}
+      />
     </SettingsNavigationFrame>
   );
 }
@@ -124,7 +142,7 @@ function MobileSettingsNav({
   terminalId?: string;
 }) {
   return (
-    <MobileNavFooter>
+    <MobileNavFooter brandHref={posAppRoutes.root}>
       {settingsItems.map((item) => {
         const Icon = item.icon;
         return (
@@ -143,16 +161,26 @@ function MobileSettingsNav({
   );
 }
 
-function MobilePaymentNav({ active }: { active: PosPaymentViewId }) {
+function MobilePaymentNav({
+  active,
+  basePath,
+  businessId,
+  branchId
+}: {
+  active: PosPaymentViewId;
+  basePath: string;
+  businessId?: string;
+  branchId?: string;
+}) {
   return (
-    <MobileNavFooter>
+    <MobileNavFooter brandHref="/negocio">
       {paymentItems.map((item) => {
         const Icon = item.icon;
         return (
           <Link
             aria-current={active === item.id ? "page" : undefined}
             className={active === item.id ? "is-active" : undefined}
-            href={`${posAppRoutes.payments}?metodo=${item.id}`}
+            href={paymentSettingsHref(basePath, item.id, businessId, branchId)}
             key={item.id}
           >
             <Icon aria-hidden="true" size={18} />
@@ -164,13 +192,25 @@ function MobilePaymentNav({ active }: { active: PosPaymentViewId }) {
   );
 }
 
-function MobileNavFooter({ children }: { children: ReactNode }) {
+function paymentSettingsHref(
+  basePath: string,
+  method: PosPaymentViewId,
+  businessId?: string,
+  branchId?: string
+): string {
+  const params = new URLSearchParams({ metodo: method });
+  if (businessId) params.set("businessId", businessId);
+  if (branchId) params.set("branchId", branchId);
+  return `${basePath}${basePath.includes("?") ? "&" : "?"}${params.toString()}`;
+}
+
+function MobileNavFooter({ children, brandHref }: { children: ReactNode; brandHref: string }) {
   return (
     <div className="pos-figma-mobile-nav">
       <nav>{children}</nav>
       <footer>
         <span>v2.4.12-Stable</span>
-        <VuyelaLogo className="pos-figma-mobile-brand" href={posAppRoutes.root} inverse />
+        <VuyelaLogo className="pos-figma-mobile-brand" href={brandHref} inverse />
       </footer>
       <i aria-hidden="true" />
     </div>

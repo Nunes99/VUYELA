@@ -1,5 +1,6 @@
 import type { PosBusinessContext, PosContextState, PosPaymentChannelContext } from "./data";
 import type { PosPaymentViewId } from "./pos-settings";
+import { businessSettingsRoutes } from "@/features/business-settings/routes";
 import { PosPaymentNavigation } from "./pos-settings-navigation";
 import {
   Field,
@@ -16,7 +17,7 @@ import {
   StatusBadge,
   SwitchField
 } from "./pos-settings-ui";
-import { configurePosPaymentChannelAction } from "./settings-actions";
+import { configureBusinessPaymentChannelAction } from "./settings-actions";
 
 const methodConfig: Record<
   PosPaymentViewId,
@@ -32,36 +33,65 @@ const methodConfig: Record<
 export function PosPaymentSettingsScreen({
   context,
   method,
-  result
+  result,
+  businessId,
+  branchId,
+  basePath = businessSettingsRoutes.payments,
+  returnHref = businessSettingsRoutes.root
 }: {
   context: PosContextState;
   method: PosPaymentViewId;
   result?: string;
+  businessId?: string;
+  branchId?: string;
+  basePath?: string;
+  returnHref?: string;
 }) {
   if (context.status !== "ready") return <SettingsUnavailable message={context.message} />;
 
-  const business = context.businesses[0];
+  const manageableBusinesses = context.businesses.filter((item) => item.canManage);
+  const business =
+    manageableBusinesses.find((item) => item.id === businessId) ?? manageableBusinesses[0];
   const config = methodConfig[method];
-  const branchId = business?.defaultBranchId;
+  const selectedBranchId =
+    business?.branches.find((branch) => branch.id === branchId)?.id ?? business?.defaultBranchId;
   const channel = business?.paymentChannels.find(
     (item) =>
       item.method === config.databaseMethod &&
-      (item.branchId === branchId || item.branchId === null)
+      (item.branchId === selectedBranchId || item.branchId === null)
   );
 
-  if (!business || !channel) {
+  if (!business) {
+    return (
+      <SettingsUnavailable message="Apenas proprietários e administradores podem configurar pagamentos." />
+    );
+  }
+
+  if (!selectedBranchId || !channel) {
     return <SettingsUnavailable message="Este método ainda não foi provisionado para a filial." />;
   }
 
   return (
     <div className="pos-figma-settings-layout">
-      <PosPaymentNavigation method={method} />
+      <PosPaymentNavigation
+        basePath={basePath}
+        branchId={selectedBranchId}
+        businessId={business.id}
+        method={method}
+        returnHref={returnHref}
+      />
       <main className="pos-figma-settings-main pos-figma-settings-main--payment">
         <MobileBreadcrumb label={config.label} />
         <ResultMessage result={result} />
         <SettingsHeader eyebrow="Métodos de pagamento" title={`${config.label} — Configuração`} />
-        <form action={configurePosPaymentChannelAction} className="pos-figma-settings-form">
-          <PaymentFormIdentity business={business} channel={channel} />
+        <PaymentScopeSelector
+          branchId={selectedBranchId}
+          business={business}
+          businesses={manageableBusinesses}
+          method={method}
+        />
+        <form action={configureBusinessPaymentChannelAction} className="pos-figma-settings-form">
+          <PaymentFormIdentity branchId={selectedBranchId} business={business} channel={channel} />
           <fieldset disabled={!business.canManage}>
             {method === "mpesa" ? <MpesaSettings business={business} channel={channel} /> : null}
             {method === "emola" ? <EmolaSettings channel={channel} /> : null}
@@ -73,6 +103,54 @@ export function PosPaymentSettingsScreen({
         </form>
       </main>
     </div>
+  );
+}
+
+function PaymentScopeSelector({
+  business,
+  businesses,
+  branchId,
+  method
+}: {
+  business: PosBusinessContext;
+  businesses: PosBusinessContext[];
+  branchId: string;
+  method: PosPaymentViewId;
+}) {
+  if (businesses.length === 1 && business.branches.length === 1) return null;
+
+  return (
+    <form
+      action={businessSettingsRoutes.payments}
+      aria-label="Selecionar âmbito da configuração"
+      className="business-payment-scope"
+      method="get"
+    >
+      <input name="metodo" type="hidden" value={method} />
+      {businesses.length > 1 ? (
+        <SelectField defaultValue={business.id} label="Negócio" name="businessId">
+          {businesses.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </SelectField>
+      ) : (
+        <input name="businessId" type="hidden" value={business.id} />
+      )}
+      {business.branches.length > 1 ? (
+        <SelectField defaultValue={branchId} label="Filial" name="branchId">
+          {business.branches.map((branch) => (
+            <option key={branch.id} value={branch.id}>
+              {branch.name}
+            </option>
+          ))}
+        </SelectField>
+      ) : (
+        <input name="branchId" type="hidden" value={branchId} />
+      )}
+      <button type="submit">Aplicar âmbito</button>
+    </form>
   );
 }
 
@@ -612,14 +690,17 @@ function CardSettings({ channel }: { channel: PosPaymentChannelContext }) {
 
 function PaymentFormIdentity({
   business,
-  channel
+  channel,
+  branchId
 }: {
   business: PosBusinessContext;
   channel: PosPaymentChannelContext;
+  branchId: string;
 }) {
   return (
     <>
       <input name="businessId" type="hidden" value={business.id} />
+      <input name="branchId" type="hidden" value={branchId} />
       <input name="channelId" type="hidden" value={channel.id} />
       <input name="method" type="hidden" value={channel.method} />
     </>

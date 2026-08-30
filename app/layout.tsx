@@ -52,7 +52,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="pt-MZ">
+    <html data-scroll-behavior="smooth" lang="pt-MZ">
       <body>
         <Suspense fallback={null}>
           <NavigationProgress />

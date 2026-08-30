@@ -38,7 +38,9 @@ Cada tentativa financeira usa uma chave de idempotência por negócio e percorre
 autorizada e reconciliada poderá originar um `transaction_payments` nas fases transacionais
 seguintes.
 
-M-Pesa fica disponível por filial depois da configuração e ativação explícita do canal C2B. A
+M-Pesa fica disponível por filial depois da configuração e ativação explícita do canal C2B por um
+proprietário ou administrador na área de negócio. O POS consulta apenas os canais ativos e não
+permite editar credenciais ou regras administrativas. A
 venda permanece pendente até a resposta síncrona ou callback autenticado ser reconciliado; uma
 resposta repetida reutiliza a mesma tentativa. e-Mola e mKesh permanecem indisponíveis até terem
 adaptadores próprios. O dinheiro usa confirmação manual no balcão. O cartão usa confirmação

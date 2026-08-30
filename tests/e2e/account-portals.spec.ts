@@ -15,6 +15,10 @@ test("keeps every authentication surface readable and inside the viewport", asyn
 
   for (const route of authenticationRoutes) {
     await page.goto(route);
+    await page
+      .locator('.auth-page input:not([type="hidden"]), .auth-page button')
+      .first()
+      .waitFor({ state: "visible" });
 
     const layout = await page.evaluate(() => {
       const shell = document.querySelector<HTMLElement>(".auth-shell");
@@ -25,7 +29,7 @@ test("keeps every authentication surface readable and inside the viewport", asyn
         document.querySelectorAll<HTMLElement>(
           '.auth-page input:not([type="hidden"]), .auth-page button'
         )
-      );
+      ).filter((control) => control.getClientRects().length > 0);
       const shellRect = shell?.getBoundingClientRect();
       const formRect = formPanel?.getBoundingClientRect();
       const headingRect = heading?.getBoundingClientRect();

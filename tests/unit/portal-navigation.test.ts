@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseBusinessDashboardView } from "@/features/business-dashboard/dashboard";
+import { businessSettingsRoutes } from "@/features/business-settings/routes";
 import { parsePosPaymentView, parsePosSettingsView } from "@/features/pos/pos-settings";
 import { posAppRoutes } from "@/features/pos/routes";
 
@@ -20,8 +21,11 @@ describe("portal navigation", () => {
       root: "/pos",
       signIn: "/pos/entrar",
       invitation: "/pos/convite",
-      settings: "/pos/definicoes",
-      payments: "/pos/definicoes/pagamentos"
+      settings: "/pos/definicoes"
+    });
+    expect(businessSettingsRoutes).toEqual({
+      root: "/negocio/definicoes",
+      payments: "/negocio/definicoes/pagamentos"
     });
   });
 });

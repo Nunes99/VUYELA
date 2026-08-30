@@ -78,11 +78,16 @@ describe("POS terminal operations contract", () => {
     expect(checkoutMigration).toMatch(
       /revoke all on function public\.confirm_pos_cart[\s\S]+from public, anon/
     );
-    expect(checkoutMigration).toContain("alter table public.transaction_items enable row level security");
+    expect(checkoutMigration).toContain(
+      "alter table public.transaction_items enable row level security"
+    );
   });
 
   it("routes configuration writes through protected server actions", () => {
     expect(settingsActions).toContain('requireRouteAccess("/pos"');
+    expect(settingsActions).toContain(
+      'requireRouteAccess("/negocio", businessSettingsRoutes.payments)'
+    );
     expect(settingsActions).toContain('rpc("configure_pos_terminal_section"');
     expect(settingsActions).toContain('"configure_business_payment_channel"');
     expect(settingsActions).toContain('"configure_mpesa_payment_channel"');

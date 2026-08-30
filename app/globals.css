@@ -5863,11 +5863,43 @@
   color: var(--vy-text-muted);
 }
 
-.business-settings__header > a,
+.business-settings__header-actions > a,
 .business-settings-notice a {
   color: var(--vy-color-teal-700);
   font-size: var(--vy-text-sm);
   font-weight: 800;
+}
+
+.business-settings__header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--vy-space-3);
+}
+
+.business-settings__header-actions > a {
+  display: inline-flex;
+  min-height: var(--vy-touch-target);
+  align-items: center;
+  justify-content: center;
+  gap: var(--vy-space-2);
+  border-radius: var(--vy-radius-xs);
+  padding: var(--vy-space-3) var(--vy-space-4);
+  text-decoration: none;
+}
+
+.business-settings__header-actions > .business-settings__payment-link {
+  border: 1px solid var(--vy-color-teal-700);
+  background: var(--vy-color-teal-700);
+  color: #ffffff;
+}
+
+.business-settings__header-actions > .business-settings__payment-link:hover,
+.business-settings__header-actions > .business-settings__payment-link:focus-visible {
+  border-color: var(--vy-color-indigo);
+  background: var(--vy-color-indigo);
+  outline: 3px solid rgb(13 148 136 / 18%);
+  outline-offset: 2px;
 }
 
 .business-settings__switcher {
@@ -7850,6 +7882,16 @@
 
   .business-settings__header h2 {
     font-size: var(--vy-text-2xl);
+  }
+
+  .business-settings__header-actions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .business-settings__header-actions > a {
+    width: 100%;
   }
 
   .business-settings__section {
@@ -17629,6 +17671,30 @@
   gap: 0.45rem;
 }
 
+.business-payment-portal__settings-link {
+  display: inline-flex;
+  min-height: 2.85rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d5dfe5;
+  border-radius: 0.375rem;
+  color: #132d3e;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.business-payment-portal__settings-link:hover,
+.business-payment-portal__settings-link:focus-visible {
+  border-color: #cfe0e4;
+  background: #edf6f6;
+  color: #0d9488;
+  outline: 2px solid rgb(13 148 136 / 18%);
+  outline-offset: 2px;
+}
+
 .pos-portal__actions .dashboard-area-menu summary,
 .pos-portal__actions > form button {
   display: inline-flex;
@@ -22059,6 +22125,38 @@
   padding: 1.5rem 2rem 3rem;
 }
 
+.business-payment-scope {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 0.9rem;
+  padding: 1rem;
+  border: 1px solid #d8e2e7;
+  border-radius: 0.45rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(9 40 52 / 3%);
+}
+
+.business-payment-scope > button {
+  min-height: 2.7rem;
+  border: 1px solid #198f86;
+  border-radius: 0.375rem;
+  padding: 0.65rem 1rem;
+  background: #198f86;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.business-payment-scope > button:hover,
+.business-payment-scope > button:focus-visible {
+  background: #126f69;
+  outline: 3px solid rgb(45 152 142 / 18%);
+  outline-offset: 2px;
+}
+
 .pos-figma-page-heading span {
   color: #188f85;
   font-size: 0.65rem;
@@ -22894,6 +22992,10 @@
     display: none;
   }
 
+  .business-payment-portal__settings-link {
+    display: none;
+  }
+
   .pos-portal--settings .pos-portal__actions > form button {
     width: 1.9rem;
     min-height: 1.9rem;
@@ -22963,9 +23065,20 @@
   }
 
   .pos-figma-result,
+  .business-payment-scope,
   .pos-figma-settings-form,
   .pos-figma-page-stack {
     margin-inline: 0.75rem;
+  }
+
+  .business-payment-scope {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+
+  .business-payment-scope > button {
+    width: 100%;
   }
 
   .pos-figma-settings-form,

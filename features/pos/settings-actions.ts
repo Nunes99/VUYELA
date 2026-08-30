@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { businessSettingsRoutes } from "@/features/business-settings/routes";
 import { posAppRoutes } from "@/features/pos/routes";
 import { requireRouteAccess } from "@/lib/auth/session";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -40,23 +41,23 @@ export async function updatePosTerminalSectionAction(formData: FormData): Promis
   redirectToSettings(view, terminalId, "guardado");
 }
 
-export async function configurePosPaymentChannelAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/pos", posAppRoutes.payments);
+export async function configureBusinessPaymentChannelAction(formData: FormData): Promise<void> {
+  await requireRouteAccess("/negocio", businessSettingsRoutes.payments);
   const businessId = field(formData, "businessId");
+  const branchId = field(formData, "branchId");
   const channelId = field(formData, "channelId");
   const method = field(formData, "method");
 
-  if (!businessId || !channelId || !paymentMethods.has(method)) {
-    redirectToPayments(method, "dados-invalidos");
+  if (!businessId || !branchId || !channelId || !paymentMethods.has(method)) {
+    redirectToPayments(method, "dados-invalidos", businessId, branchId);
   }
 
   const payload = paymentConfigurationPayload(method, formData);
-  if (!payload) redirectToPayments(method, "dados-invalidos");
+  if (!payload) redirectToPayments(method, "dados-invalidos", businessId, branchId);
 
   const supabase = await createSupabaseServerClient();
-  const rpcName = method === "mpesa"
-    ? "configure_mpesa_payment_channel"
-    : "configure_business_payment_channel";
+  const rpcName =
+    method === "mpesa" ? "configure_mpesa_payment_channel" : "configure_business_payment_channel";
   const { data, error } = await supabase.rpc(rpcName, {
     p_business_id: businessId,
     p_channel_id: channelId,
@@ -64,14 +65,16 @@ export async function configurePosPaymentChannelAction(formData: FormData): Prom
     p_credentials: payload.credentials
   });
 
-  if (error) redirectToPayments(method, "erro");
+  if (error) redirectToPayments(method, "erro", businessId, branchId);
   if (method === "mpesa" && checked(formData, "activateAfterSave")) {
     const { error: activationError } = await supabase.rpc("manage_business_payment_channel", {
       p_business_id: businessId,
       p_channel_id: channelId,
       p_action: "activate"
     });
-    if (activationError) redirectToPayments(method, "nao-configurado");
+    if (activationError) {
+      redirectToPayments(method, "nao-configurado", businessId, branchId);
+    }
   }
   revalidatePos();
   redirectToPayments(
@@ -80,7 +83,9 @@ export async function configurePosPaymentChannelAction(formData: FormData): Prom
       ? "guardado"
       : data === "testing"
         ? "aguarda-teste"
-        : "guardado"
+        : "guardado",
+    businessId,
+    branchId
   );
 }
 
@@ -182,29 +187,6 @@ export async function managePosTerminalDeviceAction(formData: FormData): Promise
   if (error) redirectToSettings("dispositivos", terminalId, "erro");
   revalidatePos();
   redirectToSettings("dispositivos", terminalId, "guardado");
-}
-
-export async function managePosPaymentChannelAction(formData: FormData): Promise<void> {
-  await requireRouteAccess("/pos", posAppRoutes.payments);
-  const businessId = field(formData, "businessId");
-  const channelId = field(formData, "channelId");
-  const operation = field(formData, "operation");
-  const method = field(formData, "method");
-
-  if (!businessId || !channelId || (operation !== "activate" && operation !== "suspend")) {
-    redirectToPayments(method, "erro");
-  }
-
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.rpc("manage_business_payment_channel", {
-    p_business_id: businessId,
-    p_channel_id: channelId,
-    p_action: operation
-  });
-
-  if (error) redirectToPayments(method, "nao-configurado");
-  revalidatePos();
-  redirectToPayments(method, "guardado");
 }
 
 function field(formData: FormData, name: string): string {
@@ -495,10 +477,10 @@ function nullableField(formData: FormData, name: string): string | null {
 function revalidatePos() {
   revalidatePath("/pos");
   revalidatePath("/pos/definicoes");
-  revalidatePath("/pos/definicoes/pagamentos");
+  revalidatePath("/negocio/definicoes");
+  revalidatePath(businessSettingsRoutes.payments);
   revalidatePath(posAppRoutes.root);
   revalidatePath(posAppRoutes.settings);
-  revalidatePath(posAppRoutes.payments);
 }
 
 function redirectToSettings(view: string, terminalId: string, result: string): never {
@@ -507,7 +489,12 @@ function redirectToSettings(view: string, terminalId: string, result: string): n
   redirect(`${posAppRoutes.settings}?${params.toString()}`);
 }
 
-function redirectToPayments(method: string, result: string): never {
+function redirectToPayments(
+  method: string,
+  result: string,
+  businessId: string,
+  branchId: string
+): never {
   const methodMap: Record<string, string> = {
     cash: "dinheiro",
     card: "cartao",
@@ -519,5 +506,7 @@ function redirectToPayments(method: string, result: string): never {
     metodo: methodMap[method] ?? "mpesa",
     resultado: result
   });
-  redirect(`${posAppRoutes.payments}?${params.toString()}`);
+  if (businessId) params.set("businessId", businessId);
+  if (branchId) params.set("branchId", branchId);
+  redirect(`${businessSettingsRoutes.payments}?${params.toString()}`);
 }

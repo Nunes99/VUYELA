@@ -53,10 +53,12 @@ The accompanying security migration enables RLS, keeps sensitive writes server-s
 only a sanitized, tenant-checked POS configuration RPC.
 
 The POS configuration extension persists the Figma terminal sections inside
-`pos_terminal_settings.settings` through a validated, tenant-scoped RPC. Non-secret payment fields
-remain in `business_payment_channels.public_settings`; M-Pesa, e-Mola, and mKesh credentials are
-stored as encrypted Supabase Vault secrets. Saving provider credentials moves a channel to
-`testing`, while activation remains dependent on a verified provider adapter.
+`pos_terminal_settings.settings` through a validated, tenant-scoped RPC. Payment configuration is
+owned by the business administration surface and scoped by branch; the POS only reads active
+channels. Non-secret payment fields remain in `business_payment_channels.public_settings`; M-Pesa,
+e-Mola, and mKesh credentials are stored as encrypted Supabase Vault secrets. Saving provider
+credentials moves a channel to `testing`, while activation remains dependent on a verified provider
+adapter.
 
 The M-Pesa extension adds private `payment_provider_contexts` and idempotent
 `payment_provider_events`. Browser roles receive no grants on either table. A pending C2B sale

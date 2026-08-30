@@ -17,16 +17,17 @@ As vistas são selecionadas por parâmetros validados no servidor. Não devem se
 - O POS identifica clientes por QR Code, cartão ou telefone e mantém as operações de saldo nas funções transacionais PostgreSQL.
 - A descrição do serviço e o método de pagamento são registados nos metadados da transação.
 
-## Segurança das definições POS
+## Segurança das definições de pagamento
 
-As páginas de definições representam o estado persistido do terminal. Credenciais privadas dos provedores de pagamento não são enviadas para o navegador nem guardadas em estado de cliente. `configure_business_payment_channel` cobre os canais genéricos e `configure_mpesa_payment_channel` valida a API key, a chave pública RSA e o endpoint C2B antes de guardar os segredos no Supabase Vault. Ambas validam a propriedade do negócio e registam auditoria sem incluir os valores secretos.
+As definições dos métodos de pagamento pertencem à área de gestão do negócio e representam o estado persistido por filial. Credenciais privadas dos provedores de pagamento não são enviadas para o navegador nem guardadas em estado de cliente. `configure_business_payment_channel` cobre os canais genéricos e `configure_mpesa_payment_channel` valida a API key, a chave pública RSA e o endpoint C2B antes de guardar os segredos no Supabase Vault. Ambas validam a propriedade do negócio e registam auditoria sem incluir os valores secretos.
 
 Os campos não secretos são apresentados a partir de `business_payment_channels.public_settings`. Identificadores privados permanecem mascarados. Os canais de fornecedor ficam no estado `testing` depois de receberem credenciais e só devem passar a `active` após validação pelo adaptador oficial do fornecedor.
 
 ## Definições e pagamentos
 
 - As seis vistas de definições usam `/pos/definicoes?vista=...` e o mesmo componente responsivo.
-- Os cinco métodos de pagamento usam `/pos/definicoes/pagamentos?metodo=...` e partilham a mesma fronteira de segurança.
+- Os cinco métodos de pagamento usam `/negocio/definicoes/pagamentos?metodo=...`, estão disponíveis apenas para proprietários e administradores e conservam o negócio e a filial selecionados.
+- `/pos/definicoes/pagamentos` existe apenas como redirecionamento de compatibilidade para a área de negócio. O POS lê os canais ativos da filial durante a venda e não expõe credenciais nem controlos administrativos.
 - O POS tem manifesto, início de sessão e âmbito instalável próprios em `/pos`; `/negocio/pos`
   existe apenas como redirecionamento de compatibilidade.
 - A ação de instalação também está disponível em `/pos/entrar`, para permitir fixar a aplicação
@@ -42,4 +43,4 @@ Os campos não secretos são apresentados a partir de `business_payment_channels
 
 ## Responsividade
 
-No desktop, o portal de negócio e as definições do POS usam navegação lateral, enquanto o POS mantém o cabeçalho operacional. Em ecrãs pequenos, as grelhas convertem-se numa coluna e as definições usam uma barra inferior fixa: seis secções nas definições e cinco métodos nos pagamentos. Todas as opções cabem na largura disponível, sem menu paralelo nem deslocação horizontal.
+No desktop, o portal de negócio e as definições do POS usam navegação lateral, enquanto o POS mantém o cabeçalho operacional. Em ecrãs pequenos, as grelhas convertem-se numa coluna e as definições usam uma barra inferior fixa: seis secções nas definições do terminal e cinco métodos na gestão de pagamentos do negócio. Todas as opções cabem na largura disponível, sem menu paralelo nem deslocação horizontal.

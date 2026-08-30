@@ -384,7 +384,12 @@ export default async function PosPreviewPage({
         {screen === "definicoes" ? (
           <PosSettingsView context={previewContext} view={settingsView} />
         ) : screen === "pagamentos" ? (
-          <PosPaymentSettingsView context={previewContext} method={paymentView} />
+          <PosPaymentSettingsView
+            basePath="/dev/pos?ecra=pagamentos"
+            context={previewContext}
+            method={paymentView}
+            returnHref="/dev/pos?ecra=definicoes"
+          />
         ) : (
           <PosWorkflow
             context={previewContext}

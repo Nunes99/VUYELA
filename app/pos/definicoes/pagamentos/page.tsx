@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { ProtectedRouteStateView } from "@/components/auth/protected-route-state";
-import { getPosContext } from "@/features/pos/data";
-import { PosPortalShell } from "@/features/pos/pos-shell";
-import { parsePosPaymentView, PosPaymentSettingsView } from "@/features/pos/pos-settings";
-import { posAppRoutes } from "@/features/pos/routes";
-import { getProtectedRouteState } from "@/lib/auth/session";
+import { businessSettingsRoutes } from "@/features/business-settings/routes";
 
 export const metadata: Metadata = {
   title: "Pagamentos do POS",
@@ -13,25 +9,21 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-export default async function PosPaymentSettingsPage({
+export default async function LegacyPosPaymentSettingsPage({
   searchParams
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const state = await getProtectedRouteState("/pos", posAppRoutes.payments);
-  const context = state.status === "authorized" ? await getPosContext(state.principal) : null;
   const params = await searchParams;
-  const method = parsePosPaymentView(params?.metodo);
-  const result = singleParam(params?.resultado);
+  const targetParams = new URLSearchParams();
 
-  return (
-    <ProtectedRouteStateView state={state} title="Pagamentos do POS" variant="pos">
-      {state.status === "authorized" && context ? (
-        <PosPortalShell context={context} principal={state.principal} section="settings">
-          <PosPaymentSettingsView context={context} method={method} result={result} />
-        </PosPortalShell>
-      ) : null}
-    </ProtectedRouteStateView>
+  for (const key of ["metodo", "businessId", "branchId", "resultado"] as const) {
+    const value = singleParam(params?.[key]);
+    if (value) targetParams.set(key, value);
+  }
+
+  redirect(
+    `${businessSettingsRoutes.payments}${targetParams.size ? `?${targetParams.toString()}` : ""}`
   );
 }
 

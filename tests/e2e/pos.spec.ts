@@ -9,12 +9,15 @@ const protectedPosRoutes = [
   "/pos/definicoes?vista=impressora",
   "/pos/definicoes?vista=rede",
   "/pos/definicoes?vista=utilizadores",
-  "/pos/definicoes?vista=seguranca",
-  "/pos/definicoes/pagamentos?metodo=mpesa",
-  "/pos/definicoes/pagamentos?metodo=emola",
-  "/pos/definicoes/pagamentos?metodo=mkesh",
-  "/pos/definicoes/pagamentos?metodo=dinheiro",
-  "/pos/definicoes/pagamentos?metodo=cartao"
+  "/pos/definicoes?vista=seguranca"
+];
+
+const protectedBusinessPaymentRoutes = [
+  "/negocio/definicoes/pagamentos?metodo=mpesa",
+  "/negocio/definicoes/pagamentos?metodo=emola",
+  "/negocio/definicoes/pagamentos?metodo=mkesh",
+  "/negocio/definicoes/pagamentos?metodo=dinheiro",
+  "/negocio/definicoes/pagamentos?metodo=cartao"
 ];
 
 test("protects the POS transaction and settings routes", async ({ page }) => {
@@ -26,4 +29,21 @@ test("protects the POS transaction and settings routes", async ({ page }) => {
     ).toBeVisible();
     await expect(page.getByText("Serviço indisponível")).toBeVisible();
   }
+});
+
+test("protects payment configuration in the business application", async ({ page }) => {
+  for (const route of protectedBusinessPaymentRoutes) {
+    await page.goto(route);
+
+    await expect(
+      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
+    ).toBeVisible();
+    await expect(page.getByText("Serviço indisponível")).toBeVisible();
+  }
+});
+
+test("redirects the legacy POS payment address to business settings", async ({ page }) => {
+  await page.goto("/pos/definicoes/pagamentos?metodo=mpesa");
+
+  await expect(page).toHaveURL(/\/negocio\/definicoes\/pagamentos\?metodo=mpesa$/);
 });
