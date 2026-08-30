@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  CirclePlus,
   CreditCard,
   Gift,
   ListFilter,
@@ -23,6 +22,7 @@ import { signOutAction } from "@/features/auth/actions";
 import { posAppRoutes } from "@/features/pos/routes";
 
 interface PosNavigationDrawerProps {
+  activeArea: "catalog" | "settings";
   branchName: string;
   businessName: string;
   canManageBusiness: boolean;
@@ -30,9 +30,8 @@ interface PosNavigationDrawerProps {
 }
 
 const posNavigation = [
-  { href: posAppRoutes.root, label: "Catálogo de Serviços", icon: ListFilter },
-  { href: posAppRoutes.root, label: "Nova Transação", icon: CirclePlus },
-  { href: posAppRoutes.settings, label: "Terminal POS", icon: MonitorCog }
+  { id: "catalog", href: posAppRoutes.root, label: "Catálogo de Serviços", icon: ListFilter },
+  { id: "settings", href: posAppRoutes.settings, label: "Terminal POS", icon: MonitorCog }
 ] as const;
 
 const businessNavigation = [
@@ -44,6 +43,7 @@ const businessNavigation = [
 ] as const;
 
 export function PosNavigationDrawer({
+  activeArea,
   branchName,
   businessName,
   canManageBusiness,
@@ -115,19 +115,20 @@ export function PosNavigationDrawer({
                 </div>
 
                 <nav aria-label="Navegação principal do POS" className="pos-drawer__navigation">
-                  {posNavigation.map((item, index) => {
+                  {posNavigation.map((item) => {
                     const Icon = item.icon;
+                    const isActive = item.id === activeArea;
                     return (
                       <Link
-                        aria-current={index === 0 ? "page" : undefined}
-                        className={index === 0 ? "is-active" : undefined}
+                        aria-current={isActive ? "page" : undefined}
+                        className={isActive ? "is-active" : undefined}
                         href={item.href}
                         key={`${item.href}-${item.label}`}
                         onClick={() => setOpen(false)}
                       >
                         <Icon aria-hidden="true" size={19} />
                         <span>{item.label}</span>
-                        {index === 0 ? <i aria-hidden="true" /> : null}
+                        {isActive ? <i aria-hidden="true" /> : null}
                       </Link>
                     );
                   })}

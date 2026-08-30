@@ -159,7 +159,25 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
     "aria-current",
     "page"
   );
+  await expect(drawer.getByRole("link", { name: "Nova Transação" })).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
+});
+
+test("keeps the terminal area active in the POS menu", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chrome", "Mobile POS contract");
+
+  await page.goto("/dev/pos?ecra=definicoes&vista=geral");
+  await page.getByRole("button", { name: "Abrir menu do POS" }).click();
+
+  const drawer = page.getByRole("dialog", { name: "Menu do POS" });
+  await expect(drawer.getByRole("link", { name: "Terminal POS" })).toHaveAttribute(
+    "aria-current",
+    "page"
+  );
+  await expect(drawer.getByRole("link", { name: "Catálogo de Serviços" })).not.toHaveAttribute(
+    "aria-current",
+    "page"
+  );
 });
 
 test("renders every settings and payment frame without horizontal overflow", async ({ page }) => {

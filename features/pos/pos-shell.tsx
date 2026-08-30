@@ -58,6 +58,7 @@ export function PosPortalShell({
 
         <nav aria-label="Navegação do POS" className="pos-portal__actions">
           <PosNavigationDrawer
+            activeArea={section === "settings" ? "settings" : "catalog"}
             branchName={primaryBranch?.name ?? "Filial principal"}
             businessName={primaryBusiness?.name ?? "Negócio VUYELA"}
             canManageBusiness={canManageBusiness}
