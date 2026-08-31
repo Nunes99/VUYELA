@@ -129,7 +129,7 @@ export function formatMznCompact(value: number): string {
   const major = String(Math.floor(value / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   const minor = value % 100;
 
-  return `${major}${minor === 0 ? "" : `,${String(minor).padStart(2, "0")}`} MT`;
+  return `${major}${minor === 0 ? "" : `,${String(minor).padStart(2, "0")}`} MZN`;
 }
 
 export function splitVatInclusive(value: number, vatPercent = 16) {
@@ -203,9 +203,7 @@ export function parsePosQuote(value: unknown): PosQuote {
   if (
     quote.lines.length === 0 ||
     quote.netAmountMznMinor !==
-      quote.grossAmountMznMinor -
-        quote.discountAmountMznMinor -
-        quote.pointsRedeemedValueMznMinor
+      quote.grossAmountMznMinor - quote.discountAmountMznMinor - quote.pointsRedeemedValueMznMinor
   ) {
     throw new RangeError("Inconsistent POS quote");
   }

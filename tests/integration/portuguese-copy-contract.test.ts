@@ -74,4 +74,16 @@ describe("Portuguese interface copy", () => {
 
     expect(failures).toEqual([]);
   });
+
+  it("uses MZN as the only visible currency abbreviation", () => {
+    const failures = sourceRoots.flatMap((root) =>
+      collectSourceFiles(join(process.cwd(), root)).flatMap((file) =>
+        collectVisibleCopy(file)
+          .filter((copy) => /\bMT\b/.test(copy))
+          .map((copy) => `${file}: ${copy}`)
+      )
+    );
+
+    expect(failures).toEqual([]);
+  });
 });

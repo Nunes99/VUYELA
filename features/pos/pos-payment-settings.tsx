@@ -517,9 +517,9 @@ function CashSettings({ channel }: { channel: PosPaymentChannelContext }) {
             label="Arredondar para"
             name="roundingUnit"
           >
-            <option value="1">1 MT</option>
-            <option value="5">5 MT</option>
-            <option value="10">10 MT</option>
+            <option value="1">1 MZN</option>
+            <option value="5">5 MZN</option>
+            <option value="10">10 MZN</option>
           </SelectField>
           <SwitchField
             defaultChecked={settingBoolean(settings, "logChange", true)}
@@ -747,7 +747,7 @@ function MoneyField({
       label={label}
       min={0}
       name={name}
-      suffix="MT"
+      suffix="MZN"
       type="number"
     />
   );

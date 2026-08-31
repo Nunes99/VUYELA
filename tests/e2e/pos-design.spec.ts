@@ -107,7 +107,7 @@ test("keeps catalogue, loyalty and payment controls functional", async ({ page }
   const pointsInput = page.getByRole("spinbutton", { name: "YELAS a utilizar" });
   await expect(pointsInput).toHaveValue("300");
   await pointsInput.fill("250");
-  await expect(page.locator(".pos-customer__redemption")).toContainText("250 MT");
+  await expect(page.locator(".pos-customer__redemption")).toContainText("250 MZN");
   await expect(page.getByRole("button", { name: "Recalcular" })).toBeEnabled();
   await expect(page.locator(".pos-order")).toContainText("300 YL utilizados");
 
@@ -134,6 +134,31 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   await page.goto("/dev/pos?etapa=sale");
   await expect(page.locator(".pos-sale__catalog-grid")).toBeVisible();
   await expect(page.locator(".pos-sale__cart")).toBeHidden();
+  await expect(page.getByText("Nova venda")).toHaveCount(0);
+  await expect(page.getByText("Meu salão")).toHaveCount(0);
+
+  const brand = page.locator(".pos-portal__brand");
+  const brandBox = await brand.boundingBox();
+  const headerBox = await page.locator(".pos-portal__header").boundingBox();
+  const brandLayout = await brand.evaluate((element) => ({
+    scrollWidth: element.scrollWidth,
+    whiteSpace: getComputedStyle(element).whiteSpace
+  }));
+  expect(brandBox).not.toBeNull();
+  expect(headerBox).not.toBeNull();
+  expect((brandBox?.y ?? 0) + (brandBox?.height ?? 0)).toBeLessThanOrEqual(
+    (headerBox?.y ?? 0) + (headerBox?.height ?? 0)
+  );
+  expect(brandLayout.whiteSpace).toBe("nowrap");
+  expect(brandLayout.scrollWidth).toBeLessThanOrEqual(Math.ceil(brandBox?.width ?? 0));
+
+  const mobileProgressLabels = page.locator(".pos-sale__progress-label--mobile");
+  await expect(mobileProgressLabels.nth(0)).toHaveText("Venda");
+  await expect(mobileProgressLabels.nth(1)).toHaveText("Benefício");
+  await expect(mobileProgressLabels.nth(2)).toHaveText("Pagar");
+  for (let index = 0; index < 3; index += 1) {
+    await expect(mobileProgressLabels.nth(index)).toBeVisible();
+  }
 
   const cards = page.locator(".pos-catalog-item");
   const firstCard = await cards.first().boundingBox();
@@ -144,11 +169,36 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   expect(secondCard?.x ?? 0).toBeGreaterThan((firstCard?.x ?? 0) + (firstCard?.width ?? 0));
   expect(Math.abs((secondCard?.height ?? 0) - (firstCard?.height ?? 0))).toBeLessThanOrEqual(1);
 
+  const priceBox = await cards.first().locator(".pos-sale__item-price-action > b").boundingBox();
+  const quantityBox = await cards.first().locator(".pos-sale__item-quantity-control").boundingBox();
+  expect(priceBox).not.toBeNull();
+  expect(quantityBox).not.toBeNull();
+  expect(quantityBox?.y ?? 0).toBeGreaterThanOrEqual((priceBox?.y ?? 0) + (priceBox?.height ?? 0));
+  await expect(cards.first()).toContainText("MZN");
+
+  await cards.nth(1).getByRole("button", { name: "Retirar uma unidade de Barba Completa" }).click();
+
   const cartButton = page.getByRole("button", { name: /Carrinho/ });
   await expect(cartButton).toBeVisible();
+  await expect(cartButton).toContainText("1");
   await cartButton.click();
-  await expect(page.getByRole("dialog", { name: "Carrinho de Vendas" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Avançar para Pagamento" })).toBeEnabled();
+  const mobileCart = page.getByRole("dialog", { name: "Carrinho de Vendas" });
+  await expect(mobileCart).toBeVisible();
+  const checkoutButton = page.getByRole("button", { name: "Avançar para Pagamento" });
+  await expect(checkoutButton).toBeEnabled();
+  const checkoutBox = await checkoutButton.boundingBox();
+  const viewport = page.viewportSize();
+  expect(checkoutBox).not.toBeNull();
+  expect((checkoutBox?.y ?? 0) + (checkoutBox?.height ?? 0)).toBeLessThanOrEqual(
+    viewport?.height ?? 0
+  );
+  const cartLinesLayout = await mobileCart
+    .locator(".pos-mobile-cart__lines")
+    .evaluate((element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight
+    }));
+  expect(cartLinesLayout.scrollHeight).toBeLessThanOrEqual(cartLinesLayout.clientHeight);
   await page.getByRole("button", { name: "Voltar ao catálogo" }).click();
 
   await page.getByRole("button", { name: "Abrir menu do POS" }).click();
@@ -159,6 +209,22 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
     "page"
   );
   await expect(drawer.getByRole("link", { name: "Nova Transação" })).toHaveCount(0);
+  const drawerLinks = drawer.getByRole("link");
+  const drawerLinkCount = await drawerLinks.count();
+  for (let index = 0; index < drawerLinkCount; index += 1) {
+    await expect(drawerLinks.nth(index)).toBeVisible();
+  }
+  const drawerLayout = await drawer.evaluate((element) => {
+    const footer = element.querySelector(".pos-drawer__footer");
+    const footerBox = footer?.getBoundingClientRect();
+    return {
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+      footerBottom: footerBox?.bottom ?? Number.POSITIVE_INFINITY
+    };
+  });
+  expect(drawerLayout.scrollHeight).toBeLessThanOrEqual(drawerLayout.clientHeight);
+  expect(drawerLayout.footerBottom).toBeLessThanOrEqual(viewport?.height ?? 0);
   await expectNoHorizontalOverflow(page);
 });
 

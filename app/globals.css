@@ -8072,8 +8072,10 @@
 
 .vuyela-logo__wordmark {
   display: grid;
+  flex: 0 0 auto;
   gap: 0.08rem;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .vuyela-logo__wordmark strong {
@@ -24776,7 +24778,8 @@
   z-index: 90;
   inset: 0;
   display: none;
-  min-height: 100svh;
+  height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
   background: #f4f7f8;
   color: var(--pos-ink);
@@ -24794,38 +24797,38 @@
 
   .pos-mobile-cart > header {
     display: grid;
-    min-height: 4.8rem;
-    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    min-height: 3.75rem;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.4rem;
     border-bottom: 1px solid #e2e7ea;
-    padding: max(0.65rem, env(safe-area-inset-top)) 1rem 0.65rem;
+    padding: max(0.45rem, env(safe-area-inset-top)) 0.75rem 0.45rem;
     background: #ffffff;
   }
 
   .pos-mobile-cart > header h2 {
     overflow: hidden;
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .pos-mobile-cart > header button {
-    min-height: 2.75rem;
+    min-height: 2.5rem;
     border: 0;
     background: transparent;
     color: #4f626b;
     cursor: pointer;
     font: inherit;
-    font-size: 0.76rem;
+    font-size: 0.7rem;
     font-weight: 800;
   }
 
   .pos-mobile-cart > header button:first-child {
     display: grid;
-    width: 2.75rem;
+    width: 2.5rem;
     place-items: center;
   }
 
@@ -24836,12 +24839,13 @@
   .pos-mobile-cart__lines {
     min-height: 0;
     overflow-y: auto;
-    padding: 0.5rem 1rem 2rem;
+    padding: 0.25rem 0.75rem 0.75rem;
   }
 
   .pos-mobile-cart .pos-sale__cart-line {
     grid-template-columns: minmax(0, 1fr) auto;
-    padding: 1rem 0;
+    min-height: 3.5rem;
+    padding: 0.65rem 0;
   }
 
   .pos-mobile-cart .pos-sale__cart-line > b {
@@ -24858,15 +24862,15 @@
 
   .pos-mobile-cart > footer {
     border-top: 1px solid #e0e6e9;
-    padding: 1rem 1rem max(1rem, env(safe-area-inset-bottom));
+    padding: 0.75rem 0.75rem max(0.75rem, env(safe-area-inset-bottom));
     background: #ffffff;
     box-shadow: 0 -0.5rem 1.5rem rgb(13 44 54 / 7%);
   }
 
   .pos-mobile-cart > footer dl {
     display: grid;
-    gap: 0.55rem;
-    margin: 0 0 1rem;
+    gap: 0.35rem;
+    margin: 0 0 0.65rem;
   }
 
   .pos-mobile-cart > footer dl > div {
@@ -24879,7 +24883,7 @@
   .pos-mobile-cart > footer dt,
   .pos-mobile-cart > footer dd {
     margin: 0;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
   }
 
   .pos-mobile-cart > footer dt {
@@ -24891,16 +24895,90 @@
   }
 
   .pos-mobile-cart > footer dl > div:last-child {
-    margin-top: 0.25rem;
+    margin-top: 0.15rem;
     border-top: 1px solid #edf0f2;
-    padding-top: 0.8rem;
+    padding-top: 0.55rem;
   }
 
   .pos-mobile-cart > footer dl > div:last-child dt,
   .pos-mobile-cart > footer dl > div:last-child dd {
     color: #19877f;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 850;
+  }
+
+  .pos-mobile-cart .pos-sale__primary {
+    min-height: 2.75rem;
+    font-size: 0.85rem;
+  }
+
+  .pos-drawer__panel {
+    width: min(21rem, calc(100vw - 1.5rem));
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .pos-drawer__header {
+    min-height: 3.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .pos-drawer__brand {
+    width: auto;
+  }
+
+  .pos-drawer__brand img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .pos-drawer__brand .vuyela-logo__wordmark strong {
+    font-size: 0.85rem;
+  }
+
+  .pos-drawer__brand .vuyela-logo__wordmark small {
+    font-size: 0.5rem;
+  }
+
+  .pos-drawer__header > button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .pos-drawer__scope {
+    gap: 0.55rem;
+    margin: 0 1rem 0.5rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .pos-drawer__scope > span {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.68rem;
+  }
+
+  .pos-drawer__navigation {
+    min-height: 0;
+    gap: 0;
+    padding: 0.35rem 1rem 0.5rem;
+  }
+
+  .pos-drawer__navigation a {
+    min-height: 2.5rem;
+    gap: 0.6rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.76rem;
+  }
+
+  .pos-drawer__footer {
+    gap: 0.35rem;
+    padding: 0.45rem 1rem max(0.45rem, env(safe-area-inset-bottom));
+  }
+
+  .pos-drawer__footer form button {
+    min-height: 2.25rem;
+    padding: 0.2rem 0;
   }
 }
 
@@ -24911,7 +24989,6 @@
 }
 
 /* POS catalogue: canonical desktop and mobile implementation (Figma 694/725). */
-.pos-portal--transaction .pos-sale__heading .pos-sale__eyebrow--mobile,
 .pos-portal--transaction .pos-sale__progress-label--mobile,
 .pos-portal--transaction .pos-portal__title-mobile {
   display: none;
@@ -25093,16 +25170,8 @@
   min-width: 0;
 }
 
-.pos-portal--transaction .pos-sale__eyebrow {
-  color: #178f86;
-  font-size: 0.6875rem;
-  font-weight: 800;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
 .pos-portal--transaction .pos-sale__heading h1 {
-  margin-top: 0.3rem;
+  margin-top: 0;
   color: #1f2a37;
   font-size: 1.5rem;
   line-height: 1.1;
@@ -25578,12 +25647,33 @@
   }
 
   .pos-portal--transaction .pos-portal__brand-area {
-    gap: 0.65rem;
+    min-width: 0;
+    gap: 0.5rem;
   }
 
   .pos-portal--transaction .pos-portal__brand {
-    display: block;
-    width: 5.375rem;
+    display: inline-flex;
+    width: auto;
+    max-width: 7rem;
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
+
+  .pos-portal--transaction .pos-portal__brand img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .pos-portal--transaction .pos-portal__brand .vuyela-logo__wordmark strong {
+    font-size: 0.78rem;
+  }
+
+  .pos-portal--transaction .pos-portal__brand .vuyela-logo__wordmark small {
+    font-size: 0.48rem;
+  }
+
+  .pos-portal--transaction .pos-portal__mobile-symbol {
+    display: none;
   }
 
   .pos-portal--transaction .pos-portal__brand-area > span[aria-hidden="true"] {
@@ -25642,9 +25732,11 @@
   }
 
   .pos-portal--transaction .pos-sale__progress li {
-    justify-content: flex-start;
-    gap: 0.4rem;
-    font-size: 0.6875rem;
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+    justify-content: stretch;
+    gap: 0.3rem;
+    font-size: 0.625rem;
   }
 
   .pos-portal--transaction .pos-sale__progress li:last-child {
@@ -25660,14 +25752,17 @@
 
   .pos-portal--transaction .pos-sale__progress li strong {
     display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
+    overflow: visible;
+    font-size: 0.625rem;
+    text-overflow: clip;
+    white-space: nowrap;
   }
 
   .pos-portal--transaction .pos-sale__progress li:not(:last-child)::after {
     height: auto;
-    margin-left: auto;
-    padding-left: 0.35rem;
+    margin-left: 0;
+    padding-left: 0.15rem;
     background: transparent;
     color: #667085;
     content: "\203A";
@@ -25701,16 +25796,8 @@
     margin-bottom: 1rem;
   }
 
-  .pos-portal--transaction .pos-sale__heading .pos-sale__eyebrow--desktop {
-    display: none;
-  }
-
-  .pos-portal--transaction .pos-sale__heading .pos-sale__eyebrow--mobile {
-    display: block;
-  }
-
   .pos-portal--transaction .pos-sale__heading h1 {
-    margin-top: 0.25rem;
+    margin-top: 0;
     font-size: 1.25rem;
   }
 
@@ -25775,7 +25862,7 @@
   }
 
   .pos-portal--transaction .pos-catalog-item {
-    min-height: 11.5rem;
+    min-height: 12.75rem;
     grid-template-rows: 5.625rem minmax(0, 1fr);
     border-radius: 0.75rem;
   }
@@ -25793,7 +25880,7 @@
   }
 
   .pos-portal--transaction .pos-sale__item-details {
-    gap: 0.35rem;
+    gap: 0.4rem;
     padding: 0.45rem 0.625rem 0.5rem;
   }
 
@@ -25807,7 +25894,10 @@
   }
 
   .pos-portal--transaction .pos-sale__item-price-action {
-    gap: 0.3rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.45rem;
   }
 
   .pos-portal--transaction .pos-sale__item-price-action b {
@@ -25815,7 +25905,9 @@
   }
 
   .pos-portal--transaction .pos-sale__item-quantity-control {
+    width: 100%;
     grid-template-columns: repeat(3, 1.75rem);
+    justify-content: space-between;
     gap: 0.3rem;
   }
 

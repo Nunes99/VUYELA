@@ -355,8 +355,6 @@ function SaleStep({
       <section className="pos-sale__catalog" aria-labelledby="pos-sale-title">
         <header className="pos-sale__heading">
           <div>
-            <span className="pos-sale__eyebrow pos-sale__eyebrow--desktop">Nova venda</span>
-            <span className="pos-sale__eyebrow pos-sale__eyebrow--mobile">Meu salão</span>
             <h1 id="pos-sale-title">Catálogo de Serviços</h1>
           </div>
           <div className="pos-sale__context">

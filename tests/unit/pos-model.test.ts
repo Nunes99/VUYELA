@@ -25,7 +25,7 @@ describe("POS model", () => {
     expect(parseMznToMinorUnits("125,50")).toBe(12_550);
     expect(parseMznToMinorUnits("125.05")).toBe(12_505);
     expect(formatMznMinor(12_505)).toBe("125,05 MZN");
-    expect(formatMznCompact(140_000)).toBe("1.400 MT");
+    expect(formatMznCompact(140_000)).toBe("1.400 MZN");
   });
 
   it("splits an IVA-inclusive total without losing minor units", () => {
