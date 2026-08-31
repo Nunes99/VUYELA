@@ -3,6 +3,7 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import type {
+  BusinessCatalogCategory,
   BusinessCatalogItem,
   BusinessOperationBranch,
   BusinessOperationCard,
@@ -23,8 +24,18 @@ interface BusinessOperationsRpcRow {
 
 interface CatalogMediaRow {
   id: string;
+  category_id: string | null;
   image_url: string | null;
   loyalty_discount_percent: number | string;
+}
+
+interface CatalogCategoryRow {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  is_active: boolean;
+  sort_order: number;
 }
 
 export type BusinessOperationsState =
@@ -44,18 +55,24 @@ export async function getBusinessOperations(
   }
 
   const supabase = await createSupabaseServerClient();
-  const [operationsResult, catalogMediaResult] = await Promise.all([
+  const [operationsResult, catalogMediaResult, catalogCategoriesResult] = await Promise.all([
     supabase.rpc("get_business_operations", {
       p_business_id: businessId
     }),
     supabase
       .from("business_catalog_items")
-      .select("id, image_url, loyalty_discount_percent")
+      .select("id, category_id, image_url, loyalty_discount_percent")
+      .eq("business_id", businessId),
+    supabase
+      .from("business_catalog_categories")
+      .select("id, name, slug, description, is_active, sort_order")
       .eq("business_id", businessId)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true })
   ]);
   const { data, error } = operationsResult;
 
-  if (error || catalogMediaResult.error) {
+  if (error || catalogMediaResult.error || catalogCategoriesResult.error) {
     return { status: "error", message: "Não foi possível carregar a gestão operacional." };
   }
 
@@ -69,19 +86,35 @@ export async function getBusinessOperations(
     arrayFrom<CatalogMediaRow>(catalogMediaResult.data).map((item) => [
       item.id,
       {
+        categoryId: item.category_id,
         imageUrl: item.image_url,
         loyaltyDiscountPercent: Number(item.loyalty_discount_percent)
       }
     ])
   );
   const catalogItems = arrayFrom<
-    Omit<BusinessCatalogItem, "imageUrl" | "loyaltyDiscountPercent">
-  >(
-    row.catalog_items
-  ).map((item) => ({
+    Omit<BusinessCatalogItem, "categoryId" | "categoryName" | "imageUrl" | "loyaltyDiscountPercent">
+  >(row.catalog_items).map((item) => ({
     ...item,
+    categoryId: catalogMedia.get(item.id)?.categoryId ?? null,
+    categoryName: null,
     imageUrl: catalogMedia.get(item.id)?.imageUrl ?? null,
     loyaltyDiscountPercent: catalogMedia.get(item.id)?.loyaltyDiscountPercent ?? 0
+  }));
+  const categoryRows = arrayFrom<CatalogCategoryRow>(catalogCategoriesResult.data);
+  const categoryNames = new Map(categoryRows.map((category) => [category.id, category.name]));
+  const resolvedCatalogItems = catalogItems.map((item) => ({
+    ...item,
+    categoryName: item.categoryId ? (categoryNames.get(item.categoryId) ?? null) : null
+  }));
+  const catalogCategories: BusinessCatalogCategory[] = categoryRows.map((category) => ({
+    id: category.id,
+    name: category.name,
+    slug: category.slug,
+    description: category.description,
+    isActive: category.is_active,
+    sortOrder: category.sort_order,
+    itemCount: resolvedCatalogItems.filter((item) => item.categoryId === category.id).length
   }));
 
   return {
@@ -90,7 +123,8 @@ export async function getBusinessOperations(
       branches: arrayFrom<BusinessOperationBranch>(row.branches),
       members: arrayFrom<BusinessOperationMember>(row.members),
       invitations: arrayFrom<BusinessOperationInvitation>(row.invitations),
-      catalogItems,
+      catalogCategories,
+      catalogItems: resolvedCatalogItems,
       cards: arrayFrom<BusinessOperationCard>(row.cards),
       offers: arrayFrom<BusinessOperationOffer>(row.offers)
     }

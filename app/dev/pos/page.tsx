@@ -250,6 +250,38 @@ const previewContext: PosContextState = {
           }
         }
       ],
+      catalogCategories: [
+        { id: "category-cortes", name: "Cortes", slug: "cortes", description: null, sortOrder: 10 },
+        { id: "category-barba", name: "Barba", slug: "barba", description: null, sortOrder: 20 },
+        {
+          id: "category-tratamentos",
+          name: "Tratamentos",
+          slug: "tratamentos",
+          description: null,
+          sortOrder: 30
+        },
+        {
+          id: "category-combos",
+          name: "Combos",
+          slug: "combos",
+          description: null,
+          sortOrder: 40
+        },
+        {
+          id: "category-coloracao",
+          name: "Coloração",
+          slug: "coloracao",
+          description: null,
+          sortOrder: 50
+        },
+        {
+          id: "category-cuidados",
+          name: "Cuidados Premium",
+          slug: "cuidados-premium",
+          description: null,
+          sortOrder: 60
+        }
+      ],
       catalogItems: [
         ["item-1", "Corte Americano (Fade)", "Serviço profissional de alta qualidade", 25000],
         ["item-2", "Barba Completa", "Serviço profissional de alta qualidade", 20000],
@@ -258,6 +290,12 @@ const previewContext: PosContextState = {
       ].map(([id, name, description, priceMznMinor], index) => ({
         id: String(id),
         branchId: null,
+        categoryId: [
+          "category-cortes",
+          "category-barba",
+          "category-tratamentos",
+          "category-combos"
+        ][index]!,
         kind: "service" as const,
         sku: `SRV-${index + 1}`,
         name: String(name),

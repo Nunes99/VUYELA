@@ -50,6 +50,21 @@ export function PosNavigationDrawer({
   roleLabel
 }: PosNavigationDrawerProps) {
   const [open, setOpen] = useState(false);
+  const [scope, setScope] = useState({ businessName, branchName, roleLabel });
+
+  useEffect(() => {
+    setScope({ businessName, branchName, roleLabel });
+  }, [branchName, businessName, roleLabel]);
+
+  useEffect(() => {
+    const handleScopeChange = (event: Event) => {
+      const detail = (event as CustomEvent<Partial<typeof scope>>).detail;
+      setScope((current) => ({ ...current, ...detail }));
+    };
+
+    window.addEventListener("vuyela:pos-scope-change", handleScopeChange);
+    return () => window.removeEventListener("vuyela:pos-scope-change", handleScopeChange);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -105,11 +120,11 @@ export function PosNavigationDrawer({
                 </header>
 
                 <div className="pos-drawer__scope">
-                  <span aria-hidden="true">{initials(businessName)}</span>
+                  <span aria-hidden="true">{initials(scope.businessName)}</span>
                   <div>
-                    <strong>{businessName}</strong>
+                    <strong>{scope.businessName}</strong>
                     <small>
-                      {branchName} · {roleLabel}
+                      {scope.branchName} · {scope.roleLabel}
                     </small>
                   </div>
                 </div>

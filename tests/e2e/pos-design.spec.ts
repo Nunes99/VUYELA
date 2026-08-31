@@ -94,9 +94,11 @@ test("keeps catalogue, loyalty and payment controls functional", async ({ page }
     .getByRole("button", { name: "Adicionar uma unidade de Lavagem Capilar" })
     .click();
   await expect(page.locator(".pos-sale__cart")).toContainText("Lavagem Capilar");
-  await page.getByRole("button", { name: "Produtos" }).click();
-  await expect(page.locator(".pos-sale__empty")).toContainText("Nenhum item encontrado");
+  await page.getByRole("button", { name: "Tratamentos" }).click();
+  await expect(page.locator(".pos-catalog-item")).toHaveCount(1);
+  await expect(page.locator(".pos-catalog-item")).toContainText("Lavagem Capilar");
   await page.getByRole("button", { name: "Todos" }).click();
+  await expect(page.locator(".pos-sale__category-heading")).toHaveCount(4);
   if ((page.viewportSize()?.width ?? 1280) <= 760) {
     await page.getByRole("button", { name: /Carrinho/ }).click();
   }
@@ -132,7 +134,8 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   test.skip(testInfo.project.name !== "mobile-chrome", "Mobile POS contract");
 
   await page.goto("/dev/pos?etapa=sale");
-  await expect(page.locator(".pos-sale__catalog-grid")).toBeVisible();
+  const viewport = page.viewportSize();
+  await expect(page.locator(".pos-sale__catalog-grid").first()).toBeVisible();
   await expect(page.locator(".pos-sale__cart")).toBeHidden();
   await expect(page.getByText("Nova venda")).toHaveCount(0);
   await expect(page.getByText("Meu salão")).toHaveCount(0);
@@ -160,13 +163,33 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
     await expect(mobileProgressLabels.nth(index)).toBeVisible();
   }
 
+  const categoryNavigation = page.getByRole("navigation", { name: "Categorias do catálogo" });
+  await expect(categoryNavigation.getByRole("button")).toHaveCount(7);
+  const categoryOverflow = await categoryNavigation.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    overflowX: getComputedStyle(element).overflowX,
+    scrollWidth: element.scrollWidth
+  }));
+  expect(categoryOverflow.overflowX).toBe("auto");
+  expect(categoryOverflow.scrollWidth).toBeGreaterThan(categoryOverflow.clientWidth);
+
+  await categoryNavigation.getByRole("button", { name: "Barba" }).click();
+  await expect(page.locator(".pos-catalog-item")).toHaveCount(1);
+  await expect(page.locator(".pos-catalog-item")).toContainText("Barba Completa");
+  await categoryNavigation.getByRole("button", { name: "Todos" }).click();
+
   const cards = page.locator(".pos-catalog-item");
   const firstCard = await cards.first().boundingBox();
   const secondCard = await cards.nth(1).boundingBox();
   expect(firstCard).not.toBeNull();
   expect(secondCard).not.toBeNull();
-  expect(secondCard?.y).toBe(firstCard?.y);
-  expect(secondCard?.x ?? 0).toBeGreaterThan((firstCard?.x ?? 0) + (firstCard?.width ?? 0));
+  const mobileGridColumns = await page
+    .locator(".pos-sale__catalog-grid")
+    .first()
+    .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+  expect(mobileGridColumns).toBe(2);
+  expect(firstCard?.width ?? Number.POSITIVE_INFINITY).toBeLessThan((viewport?.width ?? 393) / 2);
+  expect(secondCard?.y ?? 0).toBeGreaterThan(firstCard?.y ?? 0);
   expect(Math.abs((secondCard?.height ?? 0) - (firstCard?.height ?? 0))).toBeLessThanOrEqual(1);
 
   const priceBox = await cards.first().locator(".pos-sale__item-price-action > b").boundingBox();
@@ -184,10 +207,13 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   await cartButton.click();
   const mobileCart = page.getByRole("dialog", { name: "Carrinho de Vendas" });
   await expect(mobileCart).toBeVisible();
+  await expect(
+    mobileCart.getByRole("button", { name: "Voltar ao catálogo" }).locator(".lucide-chevron-left")
+  ).toBeVisible();
   const checkoutButton = page.getByRole("button", { name: "Avançar para Pagamento" });
   await expect(checkoutButton).toBeEnabled();
+  await expect(checkoutButton.locator(".lucide-arrow-right")).toBeVisible();
   const checkoutBox = await checkoutButton.boundingBox();
-  const viewport = page.viewportSize();
   expect(checkoutBox).not.toBeNull();
   expect((checkoutBox?.y ?? 0) + (checkoutBox?.height ?? 0)).toBeLessThanOrEqual(
     viewport?.height ?? 0
@@ -199,11 +225,34 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
       scrollHeight: element.scrollHeight
     }));
   expect(cartLinesLayout.scrollHeight).toBeLessThanOrEqual(cartLinesLayout.clientHeight);
+  const cartLineLayout = await mobileCart.locator(".pos-sale__cart-line").evaluate((element) => {
+    const line = element.getBoundingClientRect();
+    const copy = element.children[0]?.getBoundingClientRect();
+    const quantity = element.children[1]?.getBoundingClientRect();
+    const total = element.children[2]?.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return {
+      backgroundColor: style.backgroundColor,
+      borderRadius: style.borderRadius,
+      copyCenter: copy ? copy.y + copy.height / 2 : 0,
+      lineCenter: line.y + line.height / 2,
+      quantityCenter: quantity ? quantity.y + quantity.height / 2 : 0,
+      totalCenter: total ? total.y + total.height / 2 : 0
+    };
+  });
+  expect(cartLineLayout.backgroundColor).toBe("rgb(255, 255, 255)");
+  expect(cartLineLayout.borderRadius).toBe("12px");
+  expect(Math.abs(cartLineLayout.copyCenter - cartLineLayout.lineCenter)).toBeLessThanOrEqual(8);
+  expect(Math.abs(cartLineLayout.quantityCenter - cartLineLayout.lineCenter)).toBeLessThanOrEqual(
+    8
+  );
+  expect(Math.abs(cartLineLayout.totalCenter - cartLineLayout.lineCenter)).toBeLessThanOrEqual(8);
   await page.getByRole("button", { name: "Voltar ao catálogo" }).click();
 
   await page.getByRole("button", { name: "Abrir menu do POS" }).click();
   const drawer = page.getByRole("dialog", { name: "Menu do POS" });
   await expect(drawer).toBeVisible();
+  await expect(drawer).toContainText("Barbershop 21");
   await expect(drawer.getByRole("link", { name: "Catálogo de Serviços" })).toHaveAttribute(
     "aria-current",
     "page"

@@ -72,7 +72,8 @@ describe("business operations contract", () => {
     expect(actions).toContain('"use server"');
     expect(actions).toContain('requireRouteAccess("/negocio"');
     expect(actions).toContain('rpc("manage_business_branch"');
-    expect(actions).toContain('rpc("manage_business_catalog_item_checkout"');
+    expect(actions).toContain('rpc("manage_business_catalog_item_with_category"');
+    expect(actions).toContain('rpc("manage_business_catalog_category"');
     expect(actions).toContain('rpc("manage_customer_card_status"');
     expect(actions).toContain('rpc("manage_campaign_state"');
     expect(actions).toContain('rpc("update_business_campaign"');

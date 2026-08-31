@@ -339,11 +339,12 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data: itemId, error } = await supabase.rpc("manage_business_catalog_item_checkout", {
+  const { data: itemId, error } = await supabase.rpc("manage_business_catalog_item_with_category", {
     p_business_id: businessId,
     p_item_id: nullableField(formData, "itemId"),
     p_action: action,
     p_branch_id: nullableField(formData, "branchId"),
+    p_category_id: nullableField(formData, "categoryId"),
     p_kind: kind,
     p_sku: field(formData, "sku"),
     p_name: name,
@@ -377,6 +378,40 @@ export async function manageBusinessCatalogItemAction(formData: FormData): Promi
         : "imagem-erro"
     );
   }
+
+  revalidateBusinessPaths();
+  redirectWithResult("catalogo", businessId, "guardado");
+}
+
+export async function manageBusinessCatalogCategoryAction(formData: FormData): Promise<void> {
+  await requireRouteAccess("/negocio", "/negocio");
+  const businessId = field(formData, "businessId");
+  const action = field(formData, "operation");
+  const name = field(formData, "name");
+  const slug = field(formData, "slug") || slugify(name);
+  const sortOrder = integerField(formData, "sortOrder", 100);
+
+  if (
+    !businessId ||
+    !isAllowedAction(action, ["create", "update", "suspend", "activate", "delete"]) ||
+    sortOrder < 0 ||
+    ((action === "create" || action === "update") && name.length < 2)
+  ) {
+    redirectWithResult("catalogo", businessId, "dados-invalidos");
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("manage_business_catalog_category", {
+    p_business_id: businessId,
+    p_category_id: nullableField(formData, "categoryId"),
+    p_action: action,
+    p_name: name,
+    p_slug: slug,
+    p_description: field(formData, "description"),
+    p_sort_order: sortOrder
+  });
+
+  if (error) redirectWithResult("catalogo", businessId, operationErrorCode(error.message));
 
   revalidateBusinessPaths();
   redirectWithResult("catalogo", businessId, "guardado");
@@ -617,6 +652,7 @@ function operationErrorMessage(message: string): string {
 
 function operationErrorCode(message: string): string {
   if (message.includes("limit")) return "limite-atingido";
+  if (message.includes("Catalog category has items")) return "categoria-em-uso";
   if (message.includes("cannot be deleted") || message.includes("cannot be suspended")) {
     return "operacao-bloqueada";
   }

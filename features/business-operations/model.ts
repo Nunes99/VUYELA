@@ -45,10 +45,22 @@ export interface BusinessOperationInvitation {
   createdAt: string;
 }
 
+export interface BusinessCatalogCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  itemCount: number;
+}
+
 export interface BusinessCatalogItem {
   id: string;
   branchId: string | null;
   branchName: string | null;
+  categoryId: string | null;
+  categoryName: string | null;
   kind: CatalogItemKind;
   sku: string | null;
   name: string;
@@ -97,6 +109,7 @@ export interface BusinessOperations {
   branches: BusinessOperationBranch[];
   members: BusinessOperationMember[];
   invitations: BusinessOperationInvitation[];
+  catalogCategories: BusinessCatalogCategory[];
   catalogItems: BusinessCatalogItem[];
   cards: BusinessOperationCard[];
   offers: BusinessOperationOffer[];

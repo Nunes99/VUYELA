@@ -26,6 +26,7 @@ interface CatalogRow {
   id: string;
   business_id: string;
   branch_id: string | null;
+  category_id: string | null;
   kind: "service" | "product";
   sku: string | null;
   name: string;
@@ -33,6 +34,15 @@ interface CatalogRow {
   image_url: string | null;
   price_mzn_minor: number;
   loyalty_discount_percent: number | string;
+  sort_order: number;
+}
+
+interface CatalogCategoryRow {
+  id: string;
+  business_id: string;
+  name: string;
+  slug: string;
+  description: string | null;
   sort_order: number;
 }
 
@@ -99,6 +109,7 @@ export interface PosPaymentChannelContext {
 export interface PosCatalogItemContext {
   id: string;
   branchId: string | null;
+  categoryId: string | null;
   kind: "service" | "product";
   sku: string | null;
   name: string;
@@ -106,6 +117,14 @@ export interface PosCatalogItemContext {
   imageUrl: string | null;
   priceMznMinor: number;
   loyaltyDiscountPercent: number;
+  sortOrder: number;
+}
+
+export interface PosCatalogCategoryContext {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
   sortOrder: number;
 }
 
@@ -124,6 +143,7 @@ export interface PosBusinessContext {
   canManage: boolean;
   terminals: PosTerminalContext[];
   paymentChannels: PosPaymentChannelContext[];
+  catalogCategories: PosCatalogCategoryContext[];
   catalogItems: PosCatalogItemContext[];
 }
 
@@ -165,32 +185,40 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   const [
     { data: businessData, error: businessError },
     { data: branchData, error: branchError },
+    { data: categoryData, error: categoryError },
     { data: catalogData, error: catalogError }
   ] = await Promise.all([
-      supabase
-        .from("businesses")
-        .select("id, name, phone, email, logo_url, cover_url")
-        .in("id", businessIds)
-        .eq("status", "active"),
-      supabase
-        .from("branches")
-        .select("id, business_id, name, city, phone, address_line, is_primary")
-        .in("business_id", businessIds)
-        .eq("is_active", true)
-        .order("is_primary", { ascending: false })
-        .order("name", { ascending: true }),
-      supabase
-        .from("business_catalog_items")
-        .select(
-          "id, business_id, branch_id, kind, sku, name, description, image_url, price_mzn_minor, loyalty_discount_percent, sort_order"
-        )
-        .in("business_id", businessIds)
-        .eq("is_available", true)
-        .order("sort_order", { ascending: true })
-        .order("name", { ascending: true })
-    ]);
+    supabase
+      .from("businesses")
+      .select("id, name, phone, email, logo_url, cover_url")
+      .in("id", businessIds)
+      .eq("status", "active"),
+    supabase
+      .from("branches")
+      .select("id, business_id, name, city, phone, address_line, is_primary")
+      .in("business_id", businessIds)
+      .eq("is_active", true)
+      .order("is_primary", { ascending: false })
+      .order("name", { ascending: true }),
+    supabase
+      .from("business_catalog_categories")
+      .select("id, business_id, name, slug, description, sort_order")
+      .in("business_id", businessIds)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true }),
+    supabase
+      .from("business_catalog_items")
+      .select(
+        "id, business_id, branch_id, category_id, kind, sku, name, description, image_url, price_mzn_minor, loyalty_discount_percent, sort_order"
+      )
+      .in("business_id", businessIds)
+      .eq("is_available", true)
+      .order("sort_order", { ascending: true })
+      .order("name", { ascending: true })
+  ]);
 
-  if (businessError || branchError || catalogError) {
+  if (businessError || branchError || categoryError || catalogError) {
     return {
       status: "error",
       message: "Não foi possível carregar negócios, filiais e catálogo do POS."
@@ -198,6 +226,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
   }
 
   const branchesByBusinessId = groupBranches(rowsFrom<BranchRow>(branchData));
+  const categoriesByBusinessId = groupCatalogCategories(rowsFrom<CatalogCategoryRow>(categoryData));
   const catalogByBusinessId = groupCatalogItems(rowsFrom<CatalogRow>(catalogData));
   const membershipsByBusinessId = groupMemberships(memberships);
   const businessShells = rowsFrom<BusinessRow>(businessData)
@@ -239,6 +268,7 @@ export async function getPosContext(principal: AuthPrincipal): Promise<PosContex
         canManage: businessMemberships.some((membership) => businessWideRoles.has(membership.role)),
         terminals: [],
         paymentChannels: [],
+        catalogCategories: categoriesByBusinessId.get(business.id) ?? [],
         catalogItems: catalogByBusinessId.get(business.id) ?? [],
         roleLabels: uniqueValues(
           businessMemberships.map((membership) => roleLabels[membership.role])
@@ -472,6 +502,7 @@ function groupCatalogItems(items: CatalogRow[]) {
       {
         id: item.id,
         branchId: item.branch_id,
+        categoryId: item.category_id,
         kind: item.kind,
         sku: item.sku,
         name: item.name,
@@ -480,6 +511,25 @@ function groupCatalogItems(items: CatalogRow[]) {
         priceMznMinor: item.price_mzn_minor,
         loyaltyDiscountPercent: numberValue(item.loyalty_discount_percent, 0),
         sortOrder: item.sort_order
+      }
+    ]);
+  }
+
+  return groups;
+}
+
+function groupCatalogCategories(categories: CatalogCategoryRow[]) {
+  const groups = new Map<string, PosCatalogCategoryContext[]>();
+
+  for (const category of categories) {
+    groups.set(category.business_id, [
+      ...(groups.get(category.business_id) ?? []),
+      {
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        sortOrder: category.sort_order
       }
     ]);
   }

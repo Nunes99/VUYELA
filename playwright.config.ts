@@ -16,7 +16,7 @@ export default defineConfig({
   },
   webServer: {
     command: `pnpm dev --turbopack --hostname 127.0.0.1 --port ${port}`,
-    url: baseURL,
+    url: `${baseURL}/dev/pos?etapa=sale`,
     timeout: 180_000,
     reuseExistingServer: !process.env.CI,
     env: {

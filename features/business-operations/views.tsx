@@ -5,11 +5,13 @@ import {
   Building2,
   CheckCircle2,
   CirclePause,
+  FolderTree,
   PackagePlus,
   Pencil,
   Plus,
   Save,
   ShieldCheck,
+  Tags,
   Trash2,
   UserRoundCog
 } from "lucide-react";
@@ -21,6 +23,7 @@ import { formatMznMinor } from "@/features/business-dashboard/model";
 
 import {
   manageBusinessBranchAction,
+  manageBusinessCatalogCategoryAction,
   manageBusinessCatalogItemAction,
   manageBusinessMemberAction,
   manageCustomerCardAction,
@@ -30,6 +33,7 @@ import type { BusinessOperationsState } from "./data";
 import {
   getBusinessMemberRoleLabel,
   getMembershipStatusLabel,
+  type BusinessCatalogCategory,
   type BusinessCatalogItem,
   type BusinessOperationBranch,
   type BusinessOperationCard,
@@ -46,6 +50,8 @@ export function BusinessOperationResult({ result }: { result?: string | undefine
     "dados-invalidos": "Existem dados inválidos ou incompletos.",
     "imagem-invalida": "Use uma imagem JPEG, PNG ou WebP com no máximo 5 MB.",
     "imagem-erro": "Os dados foram guardados, mas não foi possível atualizar a imagem.",
+    "categoria-em-uso":
+      "Esta categoria ainda tem produtos ou serviços associados. Reatribua-os antes de a eliminar.",
     "limite-atingido": "O limite definido pelo plano atual foi atingido.",
     "operacao-bloqueada": "Esta operação está bloqueada porque existem registos associados.",
     erro: "Não foi possível concluir a operação. Confirme as permissões e tente novamente."
@@ -275,11 +281,65 @@ export function BusinessCatalogManagementView({
 
       <details className="business-operation-editor business-operation-editor--create">
         <summary>
+          <Tags aria-hidden="true" size={18} /> Gerir categorias do catálogo
+        </summary>
+        <div className="business-catalog-category-manager">
+          <CatalogCategoryForm businessId={businessId} operation="create" />
+          {state.operations.catalogCategories.length > 0 ? (
+            <div className="business-catalog-category-list">
+              {state.operations.catalogCategories.map((category) => (
+                <article className="business-catalog-category" key={category.id}>
+                  <header>
+                    <span aria-hidden="true">
+                      <FolderTree size={17} />
+                    </span>
+                    <div>
+                      <strong>{category.name}</strong>
+                      <small>
+                        {category.itemCount} {category.itemCount === 1 ? "item" : "itens"} · ordem{" "}
+                        {category.sortOrder}
+                      </small>
+                    </div>
+                    <OperationStatus active={category.isActive} />
+                  </header>
+                  <p>{category.description || "Sem descrição"}</p>
+                  <details className="business-operation-editor">
+                    <summary>
+                      <Pencil aria-hidden="true" size={15} /> Editar categoria
+                    </summary>
+                    <CatalogCategoryForm
+                      businessId={businessId}
+                      category={category}
+                      operation="update"
+                    />
+                  </details>
+                  <div className="business-operation-actions">
+                    <CatalogCategoryStatusForm businessId={businessId} category={category} />
+                    <CatalogCategoryStatusForm
+                      businessId={businessId}
+                      category={category}
+                      operation="delete"
+                    />
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="business-catalog-category-empty">
+              Crie categorias para organizar o catálogo apresentado no POS.
+            </p>
+          )}
+        </div>
+      </details>
+
+      <details className="business-operation-editor business-operation-editor--create">
+        <summary>
           <PackagePlus aria-hidden="true" size={18} /> Adicionar produto ou serviço
         </summary>
         <CatalogItemForm
           branches={state.operations.branches}
           businessId={businessId}
+          categories={state.operations.catalogCategories}
           operation="create"
         />
       </details>
@@ -314,6 +374,7 @@ export function BusinessCatalogManagementView({
                   value={`${item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}%`}
                 />
                 <Fact label="Tipo" value={item.kind === "product" ? "Produto" : "Serviço"} />
+                <Fact label="Categoria" value={item.categoryName || "Sem categoria"} />
                 <Fact label="Filial" value={item.branchName || "Todas"} />
                 <Fact label="SKU" value={item.sku || "Automático"} />
               </dl>
@@ -324,6 +385,7 @@ export function BusinessCatalogManagementView({
                 <CatalogItemForm
                   branches={state.operations.branches}
                   businessId={businessId}
+                  categories={state.operations.catalogCategories}
                   item={item}
                   operation="update"
                 />
@@ -542,11 +604,13 @@ function MemberRow({
 function CatalogItemForm({
   branches,
   businessId,
+  categories,
   operation,
   item
 }: {
   branches: BusinessOperationBranch[];
   businessId: string;
+  categories: BusinessCatalogCategory[];
   operation: "create" | "update";
   item?: BusinessCatalogItem | undefined;
 }) {
@@ -573,6 +637,18 @@ function CatalogItemForm({
         <select defaultValue={item?.kind ?? "service"} name="kind">
           <option value="service">Serviço</option>
           <option value="product">Produto</option>
+        </select>
+      </label>
+      <label>
+        <span>Categoria no POS</span>
+        <select defaultValue={item?.categoryId ?? ""} name="categoryId">
+          <option value="">Sem categoria</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+              {category.isActive ? "" : " (suspensa)"}
+            </option>
+          ))}
         </select>
       </label>
       <label>
@@ -633,6 +709,99 @@ function CatalogItemForm({
   );
 }
 
+function CatalogCategoryForm({
+  businessId,
+  operation,
+  category
+}: {
+  businessId: string;
+  operation: "create" | "update";
+  category?: BusinessCatalogCategory | undefined;
+}) {
+  return (
+    <form
+      action={manageBusinessCatalogCategoryAction}
+      className="business-operation-form business-catalog-category-form"
+    >
+      <input name="businessId" type="hidden" value={businessId} />
+      <input name="categoryId" type="hidden" value={category?.id ?? ""} />
+      <input name="operation" type="hidden" value={operation} />
+      <label>
+        <span>Nome da categoria</span>
+        <input defaultValue={category?.name} name="name" required />
+      </label>
+      <label>
+        <span>Identificador</span>
+        <input
+          defaultValue={category?.slug}
+          name="slug"
+          pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+          placeholder="Gerado pelo nome"
+        />
+      </label>
+      <label>
+        <span>Ordem</span>
+        <input defaultValue={category?.sortOrder ?? 100} min="0" name="sortOrder" type="number" />
+      </label>
+      <label className="business-operation-form__wide">
+        <span>Descrição</span>
+        <input defaultValue={category?.description ?? ""} maxLength={240} name="description" />
+      </label>
+      <PendingSubmitButton
+        className="business-button business-button--primary"
+        leadingIcon={<Save aria-hidden="true" size={16} />}
+        pendingLabel="A guardar categoria..."
+        type="submit"
+      >
+        Guardar categoria
+      </PendingSubmitButton>
+    </form>
+  );
+}
+
+function CatalogCategoryStatusForm({
+  businessId,
+  category,
+  operation
+}: {
+  businessId: string;
+  category: BusinessCatalogCategory;
+  operation?: "delete" | undefined;
+}) {
+  const action = operation ?? (category.isActive ? "suspend" : "activate");
+  const deleting = action === "delete";
+
+  return (
+    <form action={manageBusinessCatalogCategoryAction}>
+      <input name="businessId" type="hidden" value={businessId} />
+      <input name="categoryId" type="hidden" value={category.id} />
+      <input name="operation" type="hidden" value={action} />
+      <PendingSubmitButton
+        className={`business-button${deleting ? " business-button--danger" : ""}`}
+        disabled={deleting && category.itemCount > 0}
+        leadingIcon={
+          deleting ? (
+            <Trash2 aria-hidden="true" size={15} />
+          ) : category.isActive ? (
+            <CirclePause aria-hidden="true" size={15} />
+          ) : (
+            <CheckCircle2 aria-hidden="true" size={15} />
+          )
+        }
+        pendingLabel={deleting ? "A eliminar..." : "A atualizar..."}
+        title={
+          deleting && category.itemCount > 0
+            ? "Reatribua os itens antes de eliminar esta categoria"
+            : undefined
+        }
+        type="submit"
+      >
+        {deleting ? "Eliminar" : category.isActive ? "Suspender" : "Reativar"}
+      </PendingSubmitButton>
+    </form>
+  );
+}
+
 function CatalogStatusForm({
   businessId,
   item,
@@ -650,6 +819,7 @@ function CatalogStatusForm({
         itemId: item.id,
         operation: action,
         branchId: item.branchId ?? "",
+        categoryId: item.categoryId ?? "",
         kind: item.kind,
         sku: item.sku ?? "",
         name: item.name,

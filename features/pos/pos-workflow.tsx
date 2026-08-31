@@ -2,12 +2,12 @@
 
 import { useActionState, useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft,
+  ArrowRight,
   BadgeCheck,
   Banknote,
   Check,
   CheckCircle2,
-  ChevronRight,
+  ChevronLeft,
   CreditCard,
   Minus,
   PackageSearch,
@@ -35,6 +35,7 @@ import { initialPosActionState } from "./state";
 import type { PosActionState } from "./state";
 import type {
   PosBusinessContext,
+  PosCatalogCategoryContext,
   PosCatalogItemContext,
   PosContextState,
   PosPaymentChannelContext,
@@ -46,8 +47,6 @@ interface PosWorkflowProps {
   initialPaymentMethod?: PosPaymentMethod | null;
   initialState?: PosActionState;
 }
-
-type CatalogFilter = "all" | "service" | "product";
 
 export function PosWorkflow({
   context,
@@ -112,6 +111,21 @@ export function PosWorkflow({
     }
   }, [terminalId, terminals]);
 
+  useEffect(() => {
+    if (!selectedBusiness) return;
+    const selectedBranch = selectedBusiness.branches.find((branch) => branch.id === branchId);
+
+    window.dispatchEvent(
+      new CustomEvent("vuyela:pos-scope-change", {
+        detail: {
+          businessName: selectedBusiness.name,
+          branchName: selectedBranch?.name ?? "Filial principal",
+          roleLabel: selectedBusiness.roleLabels[0] ?? "Operador POS"
+        }
+      })
+    );
+  }, [branchId, selectedBusiness]);
+
   const availableCatalog = useMemo(
     () =>
       selectedBusiness?.catalogItems.filter(
@@ -171,6 +185,7 @@ export function PosWorkflow({
           branchId={branchId}
           cart={cart}
           catalog={availableCatalog}
+          categories={selectedBusiness.catalogCategories}
           formAction={formAction}
           idempotencyKey={idempotencyKey}
           onBranchChange={(nextBranchId) => {
@@ -262,6 +277,7 @@ function SaleStep({
   terminalId,
   terminals,
   catalog,
+  categories,
   cart,
   idempotencyKey,
   formAction,
@@ -278,6 +294,7 @@ function SaleStep({
   terminalId: string;
   terminals: PosBusinessContext["terminals"];
   catalog: PosCatalogItemContext[];
+  categories: PosCatalogCategoryContext[];
   cart: PosCartItemInput[];
   idempotencyKey: string;
   formAction: (formData: FormData) => void;
@@ -288,17 +305,27 @@ function SaleStep({
   onCartChange: (cart: PosCartItemInput[]) => void;
 }) {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<CatalogFilter>("all");
+  const [categoryId, setCategoryId] = useState("all");
   const [mobileCartOpen, setMobileCartOpen] = useState(false);
-  const filteredCatalog = useMemo(() => {
+  const matchingCatalog = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return catalog.filter((item) => {
-      const matchesFilter = filter === "all" || item.kind === filter;
       const haystack = `${item.name} ${item.description ?? ""} ${item.sku ?? ""}`.toLowerCase();
-      return matchesFilter && haystack.includes(normalizedQuery);
+      return haystack.includes(normalizedQuery);
     });
-  }, [catalog, filter, query]);
+  }, [catalog, query]);
+  const filteredCatalog = useMemo(
+    () =>
+      categoryId === "all"
+        ? matchingCatalog
+        : matchingCatalog.filter((item) => item.categoryId === categoryId),
+    [categoryId, matchingCatalog]
+  );
+  const catalogGroups = useMemo(
+    () => buildCatalogGroups(filteredCatalog, categories, categoryId),
+    [categories, categoryId, filteredCatalog]
+  );
   const cartLines = useMemo(() => resolveCartLines(cart, catalog), [cart, catalog]);
   const quantityByItem = useMemo(
     () => new Map(cart.map((item) => [item.catalogItemId, item.quantity])),
@@ -334,6 +361,12 @@ function SaleStep({
   };
 
   useEffect(() => {
+    if (categoryId !== "all" && !categories.some((category) => category.id === categoryId)) {
+      setCategoryId("all");
+    }
+  }, [categories, categoryId]);
+
+  useEffect(() => {
     if (!mobileCartOpen) return;
 
     const previousOverflow = document.body.style.overflow;
@@ -355,7 +388,7 @@ function SaleStep({
       <section className="pos-sale__catalog" aria-labelledby="pos-sale-title">
         <header className="pos-sale__heading">
           <div>
-            <h1 id="pos-sale-title">Catálogo de Serviços</h1>
+            <h1 id="pos-sale-title">Catálogo</h1>
           </div>
           <div className="pos-sale__context">
             <label>
@@ -414,26 +447,28 @@ function SaleStep({
               value={query}
             />
           </label>
-          <div className="pos-sale__filter-group">
-            <div className="pos-sale__filters" role="group" aria-label="Filtrar catálogo">
-              {(
-                [
-                  ["all", "Todos"],
-                  ["service", "Serviços"],
-                  ["product", "Produtos"]
-                ] as const
-              ).map(([value, label]) => (
+          <div className="pos-sale__category-filter">
+            <nav aria-label="Categorias do catálogo" className="pos-sale__categories">
+              <button
+                aria-current={categoryId === "all" ? "page" : undefined}
+                className={categoryId === "all" ? "is-active" : ""}
+                onClick={() => setCategoryId("all")}
+                type="button"
+              >
+                Todos
+              </button>
+              {categories.map((category) => (
                 <button
-                  aria-pressed={filter === value}
-                  className={filter === value ? "is-active" : ""}
-                  key={value}
-                  onClick={() => setFilter(value)}
+                  aria-current={categoryId === category.id ? "page" : undefined}
+                  className={categoryId === category.id ? "is-active" : ""}
+                  key={category.id}
+                  onClick={() => setCategoryId(category.id)}
                   type="button"
                 >
-                  {label}
+                  {category.name}
                 </button>
               ))}
-            </div>
+            </nav>
             <span aria-live="polite" className="pos-sale__result-count sr-only">
               {filteredCatalog.length} {filteredCatalog.length === 1 ? "resultado" : "resultados"}
             </span>
@@ -441,72 +476,29 @@ function SaleStep({
         </div>
 
         {filteredCatalog.length > 0 ? (
-          <div className="pos-sale__catalog-grid">
-            {filteredCatalog.map((item) => {
-              const quantity = quantityByItem.get(item.id);
-
-              return (
-                <article
-                  className={`pos-catalog-item${quantity ? " is-selected" : ""}`}
-                  data-kind={item.kind}
-                  key={item.id}
-                >
-                  <span className="pos-sale__item-media">
-                    {item.imageUrl ? (
-                      <Image
-                        alt=""
-                        fill
-                        sizes="(max-width: 480px) 50vw, (max-width: 1248px) 25vw, 220px"
-                        src={item.imageUrl}
-                        unoptimized
-                      />
-                    ) : item.kind === "product" ? (
-                      <ShoppingBag aria-hidden="true" size={28} strokeWidth={1.7} />
-                    ) : (
-                      <ReceiptText aria-hidden="true" size={28} strokeWidth={1.7} />
-                    )}
-                  </span>
-                  {item.loyaltyDiscountPercent > 0 ? (
-                    <span className="pos-sale__discount">
-                      -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
+          <div className="pos-sale__catalog-sections">
+            {catalogGroups.map((group) => (
+              <section aria-labelledby={`pos-category-${group.id}`} key={group.id}>
+                {categoryId === "all" ? (
+                  <header className="pos-sale__category-heading">
+                    <h2 id={`pos-category-${group.id}`}>{group.name}</h2>
+                    <span>
+                      {group.items.length} {group.items.length === 1 ? "item" : "itens"}
                     </span>
-                  ) : null}
-                  <span className="pos-sale__item-details">
-                    <span className="pos-sale__item-copy">
-                      <strong>{item.name}</strong>
-                      <small>{item.description || item.sku || "Item do catálogo"}</small>
-                    </span>
-                    <span className="pos-sale__item-price-action">
-                      <b>{formatMznCompact(item.priceMznMinor)}</b>
-                      <span className="pos-sale__item-quantity-control">
-                        <button
-                          aria-label={`Retirar uma unidade de ${item.name}`}
-                          disabled={!quantity}
-                          onClick={() => updateQuantity(item.id, Math.max(0, (quantity ?? 0) - 1))}
-                          type="button"
-                        >
-                          <Minus aria-hidden="true" size={15} />
-                        </button>
-                        <span
-                          aria-label={`${quantity ?? 0} ${(quantity ?? 0) === 1 ? "unidade" : "unidades"} no carrinho`}
-                          aria-live="polite"
-                          className="pos-sale__item-count"
-                        >
-                          {quantity ?? 0}
-                        </span>
-                        <button
-                          aria-label={`Adicionar uma unidade de ${item.name}`}
-                          onClick={() => updateQuantity(item.id, (quantity ?? 0) + 1)}
-                          type="button"
-                        >
-                          <Plus aria-hidden="true" size={15} />
-                        </button>
-                      </span>
-                    </span>
-                  </span>
-                </article>
-              );
-            })}
+                  </header>
+                ) : null}
+                <div className="pos-sale__catalog-grid">
+                  {group.items.map((item) => (
+                    <CatalogItemCard
+                      item={item}
+                      key={item.id}
+                      onQuantityChange={updateQuantity}
+                      quantity={quantityByItem.get(item.id) ?? 0}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
           </div>
         ) : (
           <div className="pos-sale__empty">
@@ -596,7 +588,7 @@ function SaleStep({
               onClick={() => setMobileCartOpen(false)}
               type="button"
             >
-              <ArrowLeft aria-hidden="true" size={20} />
+              <ChevronLeft aria-hidden="true" size={22} strokeWidth={2.25} />
             </button>
             <h2 id="pos-mobile-cart-title">Carrinho de Vendas</h2>
             <button disabled={cart.length === 0} onClick={() => onCartChange([])} type="button">
@@ -636,6 +628,74 @@ function SaleStep({
         </section>
       ) : null}
     </div>
+  );
+}
+
+function CatalogItemCard({
+  item,
+  quantity,
+  onQuantityChange
+}: {
+  item: PosCatalogItemContext;
+  quantity: number;
+  onQuantityChange: (catalogItemId: string, quantity: number) => void;
+}) {
+  return (
+    <article className={`pos-catalog-item${quantity ? " is-selected" : ""}`} data-kind={item.kind}>
+      <span className="pos-sale__item-media">
+        {item.imageUrl ? (
+          <Image
+            alt=""
+            fill
+            sizes="(max-width: 480px) 50vw, (max-width: 1248px) 25vw, 220px"
+            src={item.imageUrl}
+            unoptimized
+          />
+        ) : item.kind === "product" ? (
+          <ShoppingBag aria-hidden="true" size={28} strokeWidth={1.7} />
+        ) : (
+          <ReceiptText aria-hidden="true" size={28} strokeWidth={1.7} />
+        )}
+      </span>
+      {item.loyaltyDiscountPercent > 0 ? (
+        <span className="pos-sale__discount">
+          -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
+        </span>
+      ) : null}
+      <span className="pos-sale__item-details">
+        <span className="pos-sale__item-copy">
+          <strong>{item.name}</strong>
+          <small>{item.description || item.sku || "Item do catálogo"}</small>
+        </span>
+        <span className="pos-sale__item-price-action">
+          <b>{formatMznCompact(item.priceMznMinor)}</b>
+          <span className="pos-sale__item-quantity-control">
+            <button
+              aria-label={`Retirar uma unidade de ${item.name}`}
+              disabled={!quantity}
+              onClick={() => onQuantityChange(item.id, Math.max(0, quantity - 1))}
+              type="button"
+            >
+              <Minus aria-hidden="true" size={15} />
+            </button>
+            <span
+              aria-label={`${quantity} ${quantity === 1 ? "unidade" : "unidades"} no carrinho`}
+              aria-live="polite"
+              className="pos-sale__item-count"
+            >
+              {quantity}
+            </span>
+            <button
+              aria-label={`Adicionar uma unidade de ${item.name}`}
+              onClick={() => onQuantityChange(item.id, quantity + 1)}
+              type="button"
+            >
+              <Plus aria-hidden="true" size={15} />
+            </button>
+          </span>
+        </span>
+      </span>
+    </article>
   );
 }
 
@@ -705,7 +765,7 @@ function CartSubmitForm({
         type="submit"
       >
         Avançar para Pagamento
-        <ChevronRight aria-hidden="true" size={19} />
+        <ArrowRight aria-hidden="true" size={18} />
       </button>
     </form>
   );
@@ -735,7 +795,7 @@ function BenefitsStep({
           <form action={formAction}>
             <input name="intent" type="hidden" value="edit_cart" />
             <button onClick={onEdit} type="submit">
-              <ArrowLeft aria-hidden="true" size={18} />
+              <ChevronLeft aria-hidden="true" size={19} />
               Carrinho
             </button>
           </form>
@@ -767,7 +827,7 @@ function BenefitsStep({
           </div>
           <button className="pos-sale__primary" onClick={onContinue} type="button">
             Continuar para pagamento
-            <ChevronRight aria-hidden="true" size={19} />
+            <ArrowRight aria-hidden="true" size={18} />
           </button>
         </div>
       </section>
@@ -1000,7 +1060,7 @@ function PaymentStep({
       <section className="pos-checkout__main">
         <div className="pos-checkout__titlebar">
           <button onClick={onBack} type="button">
-            <ArrowLeft aria-hidden="true" size={18} />
+            <ChevronLeft aria-hidden="true" size={19} />
             Benefícios
           </button>
           <div>
@@ -1346,6 +1406,38 @@ function recordValue(value: unknown): Record<string, unknown> {
 
 function stringValue(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+function buildCatalogGroups(
+  items: PosCatalogItemContext[],
+  categories: PosCatalogCategoryContext[],
+  categoryId: string
+) {
+  if (categoryId !== "all") {
+    const category = categories.find((candidate) => candidate.id === categoryId);
+    return [
+      {
+        id: categoryId,
+        name: category?.name ?? "Categoria",
+        items
+      }
+    ];
+  }
+
+  const categoryIds = new Set(categories.map((category) => category.id));
+  const groups = categories.flatMap((category) => {
+    const categoryItems = items.filter((item) => item.categoryId === category.id);
+    return categoryItems.length
+      ? [{ id: category.id, name: category.name, items: categoryItems }]
+      : [];
+  });
+  const uncategorizedItems = items.filter(
+    (item) => !item.categoryId || !categoryIds.has(item.categoryId)
+  );
+
+  return uncategorizedItems.length
+    ? [...groups, { id: "outros", name: "Outros", items: uncategorizedItems }]
+    : groups;
 }
 
 function resolveCartLines(cart: PosCartItemInput[], catalog: PosCatalogItemContext[]) {

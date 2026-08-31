@@ -49,6 +49,13 @@ manual depois da aprovação no terminal bancário externo.
 ## Catálogo, equipa e cliente
 
 - serviços e produtos pertencem ao negócio e podem ser limitados a uma filial;
+- cada negócio gere as suas próprias categorias de catálogo, com nome, ordem e estado ativo;
+- a associação entre item e categoria é validada pelo par negócio/categoria, impedindo referências
+  entre tenants;
+- o POS apresenta apenas categorias ativas, mantém a ordem configurada e permite filtrar por uma
+  categoria ou ver o catálogo agrupado por todas as categorias;
+- itens sem categoria continuam disponíveis no grupo `Outros`, evitando que dados existentes
+  desapareçam durante a adoção da nova organização;
 - convites de equipa guardam apenas o hash do token, nunca o token original;
 - preferências e favoritos pertencem ao próprio cliente e exigem um cartão ativo no negócio;
 - uma oferta ativada mantém estado e vínculo ao cliente, cartão, negócio e eventual transação;

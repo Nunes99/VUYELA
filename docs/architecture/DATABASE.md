@@ -98,6 +98,7 @@ Transactions:
 
 Operational management:
 
+- `business_catalog_categories`
 - `business_catalog_items`
 - `pos_terminals`
 - `pos_terminal_settings`
@@ -108,6 +109,12 @@ Operational management:
 - `offer_claims`
 - `support_ticket_messages`
 - `platform_settings`
+
+`business_catalog_categories` organiza o catálogo por negócio. A chave estrangeira composta
+`business_catalog_items(category_id, business_id)` garante que um item nunca referencia uma
+categoria de outro tenant. As alterações são executadas por RPCs `security definer`, validadas
+contra `can_manage_business` e registadas em `audit_logs`; os membros autenticados têm apenas
+leitura direta protegida por RLS.
 
 Growth and communication:
 

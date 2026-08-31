@@ -86,7 +86,9 @@ describe("professional UX flow contract", () => {
     const workflow = read("features/pos/pos-workflow.tsx");
     const shell = read("features/pos/pos-shell.tsx");
 
-    expect(workflow).toContain("Catálogo de Serviços");
+    expect(workflow).toContain('<h1 id="pos-sale-title">Catálogo</h1>');
+    expect(workflow).toContain('aria-label="Categorias do catálogo"');
+    expect(workflow).toContain("buildCatalogGroups");
     expect(workflow).toContain("pos-sale__item-details");
     expect(workflow).toContain("pos-sale__item-quantity-control");
     expect(workflow).toContain("Carrinho de Vendas");
