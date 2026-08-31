@@ -88,8 +88,10 @@ describe("professional UX flow contract", () => {
 
     expect(workflow).toContain("Catálogo de Serviços");
     expect(workflow).toContain("pos-sale__item-details");
+    expect(workflow).toContain("pos-sale__item-quantity-control");
     expect(workflow).toContain("Carrinho de Vendas");
-    expect(workflow).toContain("pos-sale__benefit-zone");
+    expect(workflow).toContain("pos-sale__cart-summary");
+    expect(workflow).not.toContain("pos-sale__benefit-zone");
     expect(shell).not.toContain("FlowBreadcrumbs");
   });
 });

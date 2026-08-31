@@ -52,7 +52,10 @@ export function PosPortalShell({
           <span aria-hidden="true" />
           <span className="pos-portal__protected-title">
             <small>Área protegida</small>
-            <strong>POS VUYELA</strong>
+            <strong>
+              <span className="pos-portal__title-desktop">POS VUYELA</span>
+              <span className="pos-portal__title-mobile">POS</span>
+            </strong>
           </span>
         </div>
 

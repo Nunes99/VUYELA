@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   ChevronRight,
   CreditCard,
-  Gift,
   Minus,
   PackageSearch,
   Plus,
@@ -291,16 +290,42 @@ function SaleStep({
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<CatalogFilter>("all");
   const [mobileCartOpen, setMobileCartOpen] = useState(false);
-  const filteredCatalog = catalog.filter((item) => {
-    const matchesFilter = filter === "all" || item.kind === filter;
-    const haystack = `${item.name} ${item.description ?? ""} ${item.sku ?? ""}`.toLowerCase();
-    return matchesFilter && haystack.includes(query.trim().toLowerCase());
-  });
-  const cartLines = resolveCartLines(cart, catalog);
+  const filteredCatalog = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return catalog.filter((item) => {
+      const matchesFilter = filter === "all" || item.kind === filter;
+      const haystack = `${item.name} ${item.description ?? ""} ${item.sku ?? ""}`.toLowerCase();
+      return matchesFilter && haystack.includes(normalizedQuery);
+    });
+  }, [catalog, filter, query]);
+  const cartLines = useMemo(() => resolveCartLines(cart, catalog), [cart, catalog]);
+  const quantityByItem = useMemo(
+    () => new Map(cart.map((item) => [item.catalogItemId, item.quantity])),
+    [cart]
+  );
   const cartTotal = cartLines.reduce(
     (total, line) => total + line.item.priceMznMinor * line.quantity,
     0
   );
+  const cartDiscount = cartLines.reduce(
+    (total, line) =>
+      total +
+      Math.round(
+        (line.item.priceMznMinor * line.quantity * line.item.loyaltyDiscountPercent) / 100
+      ),
+    0
+  );
+  const cartNetTotal = Math.max(0, cartTotal - cartDiscount);
+  const discountPercents = Array.from(
+    new Set(
+      cartLines.map((line) => line.item.loyaltyDiscountPercent).filter((percent) => percent > 0)
+    )
+  );
+  const discountLabel =
+    discountPercents.length === 1
+      ? `Desconto (${discountPercents[0]!.toLocaleString("pt-MZ")}%)`
+      : "Desconto VUYELA";
 
   const updateQuantity = (catalogItemId: string, quantity: number) => {
     const nextCart = cart.filter((item) => item.catalogItemId !== catalogItemId);
@@ -330,7 +355,8 @@ function SaleStep({
       <section className="pos-sale__catalog" aria-labelledby="pos-sale-title">
         <header className="pos-sale__heading">
           <div>
-            <span>Nova venda</span>
+            <span className="pos-sale__eyebrow pos-sale__eyebrow--desktop">Nova venda</span>
+            <span className="pos-sale__eyebrow pos-sale__eyebrow--mobile">Meu salão</span>
             <h1 id="pos-sale-title">Catálogo de Serviços</h1>
           </div>
           <div className="pos-sale__context">
@@ -385,7 +411,7 @@ function SaleStep({
             <span className="sr-only">Pesquisar catálogo</span>
             <input
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Pesquisar produto, serviço ou SKU"
+              placeholder="Pesquisar serviços ou produtos..."
               type="search"
               value={query}
             />
@@ -419,19 +445,13 @@ function SaleStep({
         {filteredCatalog.length > 0 ? (
           <div className="pos-sale__catalog-grid">
             {filteredCatalog.map((item) => {
-              const quantity = cart.find(
-                (cartItem) => cartItem.catalogItemId === item.id
-              )?.quantity;
+              const quantity = quantityByItem.get(item.id);
 
               return (
-                <button
-                  aria-label={`Adicionar ${item.name} ao carrinho por ${formatMznCompact(item.priceMznMinor)}`}
-                  aria-pressed={Boolean(quantity)}
+                <article
                   className={`pos-catalog-item${quantity ? " is-selected" : ""}`}
                   data-kind={item.kind}
                   key={item.id}
-                  onClick={() => updateQuantity(item.id, (quantity ?? 0) + 1)}
-                  type="button"
                 >
                   <span className="pos-sale__item-media">
                     {item.imageUrl ? (
@@ -448,33 +468,45 @@ function SaleStep({
                       <ReceiptText aria-hidden="true" size={28} strokeWidth={1.7} />
                     )}
                   </span>
+                  {item.loyaltyDiscountPercent > 0 ? (
+                    <span className="pos-sale__discount">
+                      -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
+                    </span>
+                  ) : null}
                   <span className="pos-sale__item-details">
                     <span className="pos-sale__item-copy">
                       <strong>{item.name}</strong>
                       <small>{item.description || item.sku || "Item do catálogo"}</small>
                     </span>
-                    {item.loyaltyDiscountPercent > 0 ? (
-                      <span className="pos-sale__discount">
-                        -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
-                      </span>
-                    ) : null}
                     <span className="pos-sale__item-price-action">
                       <b>{formatMznCompact(item.priceMznMinor)}</b>
-                      {quantity ? (
-                        <span
-                          aria-label={`${quantity} ${quantity === 1 ? "unidade" : "unidades"} no carrinho`}
-                          className="pos-sale__item-quantity"
+                      <span className="pos-sale__item-quantity-control">
+                        <button
+                          aria-label={`Retirar uma unidade de ${item.name}`}
+                          disabled={!quantity}
+                          onClick={() => updateQuantity(item.id, Math.max(0, (quantity ?? 0) - 1))}
+                          type="button"
                         >
-                          {quantity}
+                          <Minus aria-hidden="true" size={15} />
+                        </button>
+                        <span
+                          aria-label={`${quantity ?? 0} ${(quantity ?? 0) === 1 ? "unidade" : "unidades"} no carrinho`}
+                          aria-live="polite"
+                          className="pos-sale__item-count"
+                        >
+                          {quantity ?? 0}
                         </span>
-                      ) : (
-                        <span aria-hidden="true" className="pos-sale__item-add">
-                          <Plus size={18} strokeWidth={2.2} />
-                        </span>
-                      )}
+                        <button
+                          aria-label={`Adicionar uma unidade de ${item.name}`}
+                          onClick={() => updateQuantity(item.id, (quantity ?? 0) + 1)}
+                          type="button"
+                        >
+                          <Plus aria-hidden="true" size={15} />
+                        </button>
+                      </span>
                     </span>
                   </span>
-                </button>
+                </article>
               );
             })}
           </div>
@@ -526,39 +558,21 @@ function SaleStep({
           )}
         </div>
 
-        <section className="pos-sale__benefit-zone" aria-labelledby="pos-benefit-title">
-          <header>
-            <div>
-              <Gift aria-hidden="true" size={16} />
-              <h3 id="pos-benefit-title">Fidelização &amp; Desconto</h3>
-            </div>
-            <span>Disponível</span>
-          </header>
-          <div className="pos-sale__benefit-callout">
-            <div>
-              <strong>Aplicar benefícios VUYELA</strong>
-              <small>Identifique o cliente no passo seguinte para aplicar o desconto.</small>
-            </div>
-            <span aria-hidden="true" className="pos-sale__benefit-toggle">
-              <span />
-            </span>
-          </div>
-          <div className="pos-sale__promo-field">
-            <span>Inserir código promocional</span>
-            <button disabled type="button">
-              Validar
-            </button>
-          </div>
-        </section>
-
         <footer>
-          <div className="pos-sale__cart-total">
-            <span>Total provisório</span>
-            <strong>{formatMznCompact(cartTotal)}</strong>
-          </div>
-          <small className="pos-sale__cart-note">
-            O registo só acontece depois da confirmação do pagamento.
-          </small>
+          <dl className="pos-sale__cart-summary">
+            <div>
+              <dt>Subtotal</dt>
+              <dd>{formatMznCompact(cartTotal)}</dd>
+            </div>
+            <div>
+              <dt>{discountLabel}</dt>
+              <dd>-{formatMznCompact(cartDiscount)}</dd>
+            </div>
+            <div>
+              <dt>Total a cobrar</dt>
+              <dd>{formatMznCompact(cartNetTotal)}</dd>
+            </div>
+          </dl>
           <CartSubmitForm
             branchId={branchId}
             businessId={businessId}
@@ -603,12 +617,12 @@ function SaleStep({
                 <dd>{formatMznCompact(cartTotal)}</dd>
               </div>
               <div>
-                <dt>Desconto VUYELA</dt>
-                <dd>A calcular</dd>
+                <dt>{discountLabel}</dt>
+                <dd>-{formatMznCompact(cartDiscount)}</dd>
               </div>
               <div>
                 <dt>Total a cobrar</dt>
-                <dd>{formatMznCompact(cartTotal)}</dd>
+                <dd>{formatMznCompact(cartNetTotal)}</dd>
               </div>
             </dl>
             <CartSubmitForm
@@ -648,11 +662,7 @@ function CartLines({
           onClick={() => onQuantityChange(item.id, quantity - 1)}
           type="button"
         >
-          {quantity === 1 ? (
-            <Trash2 aria-hidden="true" size={16} />
-          ) : (
-            <Minus aria-hidden="true" size={16} />
-          )}
+          <Minus aria-hidden="true" size={16} />
         </button>
         <span>{quantity}</span>
         <button
@@ -696,7 +706,7 @@ function CartSubmitForm({
         disabled={pending || cart.length === 0 || !terminalId}
         type="submit"
       >
-        Avançar para pagamento
+        Avançar para Pagamento
         <ChevronRight aria-hidden="true" size={19} />
       </button>
     </form>
@@ -1267,18 +1277,30 @@ function SuccessStep({
 }
 
 function PosProgress({ activeStep }: { activeStep: (typeof posSteps)[number]["id"] }) {
-  const activeIndex = posSteps.findIndex((step) => step.id === activeStep);
+  const workflowIndex = posSteps.findIndex((step) => step.id === activeStep);
+  const activeIndex = activeStep === "sale" ? 1 : workflowIndex;
 
   return (
     <ol className="pos-sale__progress" aria-label="Progresso da venda">
       {posSteps.map((step, index) => (
         <li
-          aria-current={step.id === activeStep ? "step" : undefined}
-          className={step.id === activeStep ? "is-active" : index < activeIndex ? "is-done" : ""}
+          aria-current={index === activeIndex ? "step" : undefined}
+          className={index === activeIndex ? "is-active" : index < activeIndex ? "is-done" : ""}
           key={step.id}
         >
           <span>{index < activeIndex ? <Check size={14} /> : index + 1}</span>
-          <strong>{step.label}</strong>
+          <strong>
+            <span className="pos-sale__progress-label--desktop">
+              {step.id === "benefits"
+                ? "Benefício"
+                : step.id === "success"
+                  ? "Conclusão"
+                  : step.label}
+            </span>
+            <span className="pos-sale__progress-label--mobile">
+              {step.id === "payment" ? "Pagar" : step.id === "benefits" ? "Benefício" : step.label}
+            </span>
+          </strong>
         </li>
       ))}
     </ol>

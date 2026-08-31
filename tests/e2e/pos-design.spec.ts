@@ -4,13 +4,13 @@ import type { Page } from "@playwright/test";
 test.setTimeout(180_000);
 
 const frames = [
-  { step: "sale", heading: "Catálogo", activeLabel: "Venda" },
-  { step: "benefits", heading: "Benefícios do cliente", activeLabel: "Benefícios" },
+  { step: "sale", heading: "Catálogo", activeLabel: "Benefício" },
+  { step: "benefits", heading: "Benefícios do cliente", activeLabel: "Benefício" },
   { step: "payment", heading: "Receber pagamento", activeLabel: "Pagamento" },
   {
     step: "success",
     heading: "Venda concluída",
-    activeLabel: "Concluído"
+    activeLabel: "Conclusão"
   }
 ] as const;
 
@@ -68,14 +68,15 @@ test("renders the cart-first POS frames without horizontal overflow", async ({ p
 test("keeps catalogue, loyalty and payment controls functional", async ({ page }) => {
   await page.goto("/dev/pos?etapa=sale");
   const catalogueCards = page.locator(".pos-catalog-item");
-  await expect(catalogueCards).toHaveCount(6);
+  await expect(catalogueCards).toHaveCount(4);
   await expect(catalogueCards.first().locator(".pos-sale__item-media")).toBeVisible();
-  await expect(catalogueCards.nth(1).locator(".pos-sale__item-add")).toBeVisible();
-  await expect(catalogueCards.first().locator(".pos-sale__item-quantity")).toHaveText("1");
+  await expect(catalogueCards.nth(1).locator(".pos-sale__item-count")).toHaveText("1");
+  await expect(catalogueCards.nth(2).locator(".pos-sale__item-count")).toHaveText("0");
+  await expect(catalogueCards.first().locator(".pos-sale__item-count")).toHaveText("1");
 
   const addControlShape = await catalogueCards
-    .nth(1)
-    .locator(".pos-sale__item-add")
+    .nth(2)
+    .getByRole("button", { name: "Adicionar uma unidade de Lavagem Capilar" })
     .evaluate((element) => {
       const style = getComputedStyle(element);
       return {
@@ -87,21 +88,19 @@ test("keeps catalogue, loyalty and payment controls functional", async ({ page }
   expect(addControlShape.width).toBe(addControlShape.height);
   expect(addControlShape.borderRadius).not.toBe("0px");
 
-  await expect(
-    page.locator(".pos-sale__catalog-grid").getByRole("button", { name: /Corte de Cabelo/ })
-  ).toHaveClass(/is-selected/);
-  await page
-    .locator(".pos-sale__catalog-grid")
-    .getByRole("button", { name: /Barba Completa/ })
+  await expect(catalogueCards.first()).toHaveClass(/is-selected/);
+  await catalogueCards
+    .nth(2)
+    .getByRole("button", { name: "Adicionar uma unidade de Lavagem Capilar" })
     .click();
-  await expect(page.locator(".pos-sale__cart")).toContainText("Barba Completa");
+  await expect(page.locator(".pos-sale__cart")).toContainText("Lavagem Capilar");
   await page.getByRole("button", { name: "Produtos" }).click();
   await expect(page.locator(".pos-sale__empty")).toContainText("Nenhum item encontrado");
   await page.getByRole("button", { name: "Todos" }).click();
   if ((page.viewportSize()?.width ?? 1280) <= 760) {
     await page.getByRole("button", { name: /Carrinho/ }).click();
   }
-  await expect(page.getByRole("button", { name: "Avançar para pagamento" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Avançar para Pagamento" })).toBeEnabled();
 
   await page.goto("/dev/pos?etapa=benefits");
   await expect(page.locator(".pos-customer--identified")).toContainText("Ana Manjate");
@@ -149,7 +148,7 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   await expect(cartButton).toBeVisible();
   await cartButton.click();
   await expect(page.getByRole("dialog", { name: "Carrinho de Vendas" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Avançar para pagamento" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Avançar para Pagamento" })).toBeEnabled();
   await page.getByRole("button", { name: "Voltar ao catálogo" }).click();
 
   await page.getByRole("button", { name: "Abrir menu do POS" }).click();

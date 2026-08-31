@@ -251,12 +251,10 @@ const previewContext: PosContextState = {
         }
       ],
       catalogItems: [
-        ["item-1", "Corte de Cabelo", "Corte clássico ou moderno", 140000],
-        ["item-2", "Barba Completa", "Aparar, desenhar e finalizar", 80000],
-        ["item-3", "Corte + Barba", "Serviço combinado", 200000],
-        ["item-4", "Lavagem Premium", "Lavagem e tratamento", 60000],
-        ["item-5", "Tratamento Capilar", "Cuidado intensivo", 120000],
-        ["item-6", "Acabamento", "Detalhes e finalização", 40000]
+        ["item-1", "Corte Americano (Fade)", "Serviço profissional de alta qualidade", 25000],
+        ["item-2", "Barba Completa", "Serviço profissional de alta qualidade", 20000],
+        ["item-3", "Lavagem Capilar", "Serviço profissional de alta qualidade", 15000],
+        ["item-4", "Corte + Barba Combo", "Serviço profissional de alta qualidade", 40000]
       ].map(([id, name, description, priceMznMinor], index) => ({
         id: String(id),
         branchId: null,
@@ -264,9 +262,9 @@ const previewContext: PosContextState = {
         sku: `SRV-${index + 1}`,
         name: String(name),
         description: String(description),
-        imageUrl: index < 2 ? "/images/offer-prawns.jpg" : null,
+        imageUrl: `/images/pos/catalog-service-${index + 1}.png`,
         priceMznMinor: Number(priceMznMinor),
-        loyaltyDiscountPercent: index < 3 ? 10 : 0,
+        loyaltyDiscountPercent: index < 2 ? 20 : 0,
         sortOrder: index
       }))
     }
@@ -315,7 +313,10 @@ function previewState(step: PosStepId): PosActionState {
     branchId: "branch-preview",
     terminalId: "terminal-preview",
     idempotencyKey: "pos_preview_123456789",
-    cart: [{ catalogItemId: "item-1", quantity: 1 }]
+    cart: [
+      { catalogItemId: "item-1", quantity: 1 },
+      { catalogItemId: "item-2", quantity: 1 }
+    ]
   };
 
   if (step === "sale") return base;
