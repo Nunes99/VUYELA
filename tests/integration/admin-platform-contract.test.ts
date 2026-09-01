@@ -14,6 +14,7 @@ const hardeningMigration = readFileSync(
 const actions = readFileSync(join(process.cwd(), "features/admin/actions.ts"), "utf8");
 const actionState = readFileSync(join(process.cwd(), "features/admin/state.ts"), "utf8");
 const data = readFileSync(join(process.cwd(), "features/admin/data.ts"), "utf8");
+const views = readFileSync(join(process.cwd(), "features/admin/admin-views.tsx"), "utf8");
 const page = readFileSync(join(process.cwd(), "app/admin/page.tsx"), "utf8");
 
 function getFunctionBlock(functionName: string): string {
@@ -93,5 +94,17 @@ describe("platform administration contract", () => {
     expect(page).toContain("getAdminDashboardState");
     expect(actions).not.toContain("export const initialAdminActionState");
     expect(actionState).toContain("export const initialAdminActionState");
+  });
+
+  it("builds the overview from operational records and labels unavailable external telemetry", () => {
+    expect(data).toContain('from("transactions")');
+    expect(data).toContain('from("transaction_payments")');
+    expect(data).toContain('from("business_payment_channels")');
+    expect(data).toContain('from("pos_terminals")');
+    expect(data).toContain('from("support_tickets")');
+    expect(data).toContain("buildHourlyHeatmap(transactions)");
+    expect(views).toContain("Mapa de calor - transações por hora");
+    expect(views).toContain("Registo de acesso & conversão");
+    expect(views).toContain("Telemetria externa");
   });
 });

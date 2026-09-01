@@ -1,4 +1,4 @@
-import type { AdminAnalyticsPoint, AdminAnalyticsShare } from "./model";
+import type { AdminAnalyticsPoint, AdminAnalyticsShare, AdminHeatmapPoint } from "./model";
 
 export function AdminLineChart({
   data,
@@ -78,13 +78,12 @@ export function AdminShareBars({
   );
 }
 
-export function AdminDonut({ data }: { data: AdminAnalyticsShare[] }) {
-  const palette = ["#0d9488", "#f59e0b", "#64748b", "#2dd4bf", "#94a3b8"];
+export function AdminDonut({ data, total }: { data: AdminAnalyticsShare[]; total?: number }) {
   let cursor = 0;
   const stops = data.map((item, index) => {
     const start = cursor;
     cursor += item.percentage;
-    return `${palette[index % palette.length]} ${start}% ${cursor}%`;
+    return `${donutColor(item.label, index)} ${start}% ${cursor}%`;
   });
 
   return (
@@ -101,13 +100,108 @@ export function AdminDonut({ data }: { data: AdminAnalyticsShare[] }) {
         }}
       >
         <span>
+          {typeof total === "number" ? (
+            <small>{total.toLocaleString("pt-MZ")} transações</small>
+          ) : null}
           <strong>100%</strong>
-          <small>Distribuição</small>
         </span>
       </div>
-      <AdminShareBars data={data} />
+      <div className="admin-donut-legend">
+        {data.length > 0 ? (
+          data.map((item, index) => (
+            <div key={item.label}>
+              <i aria-hidden="true" style={{ backgroundColor: donutColor(item.label, index) }} />
+              <span>{item.label}</span>
+              <strong>{item.percentage}%</strong>
+            </div>
+          ))
+        ) : (
+          <p className="admin-empty-copy">Sem pagamentos no período.</p>
+        )}
+      </div>
     </div>
   );
+}
+
+export function AdminHeatmap({ data }: { data: AdminHeatmapPoint[] }) {
+  const days = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+  const hours = [0, 3, 6, 9, 12, 15, 18, 21];
+  const maximum = Math.max(...data.map((item) => item.transactions), 1);
+  const byKey = new Map(data.map((item) => [`${item.day}-${item.hour}`, item.transactions]));
+
+  return (
+    <div
+      className="admin-hourly-heatmap"
+      role="img"
+      aria-label="Transações por dia da semana e hora"
+    >
+      <span aria-hidden="true" />
+      {days.map((day) => (
+        <strong key={day}>{day}</strong>
+      ))}
+      {hours.map((hour) => (
+        <div className="admin-hourly-heatmap__row" key={hour}>
+          <span>{hour}</span>
+          {days.map((day) => {
+            const value = byKey.get(`${day}-${hour}`) ?? 0;
+            return (
+              <i
+                aria-label={`${day}, ${hour} horas: ${value} transações`}
+                key={day}
+                style={{ opacity: value === 0 ? 0.12 : 0.28 + (value / maximum) * 0.72 }}
+                title={`${value} transações`}
+              />
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function AdminMiniAreaChart({ data }: { data: AdminAnalyticsPoint[] }) {
+  const values = data.map((point) => point.transactions);
+  const maximum = Math.max(...values, 1);
+  const points = values
+    .map((value, index) => {
+      const x = data.length === 1 ? 50 : (index / Math.max(data.length - 1, 1)) * 100;
+      const y = 92 - (value / maximum) * 76;
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  return (
+    <div className="admin-mini-area-chart">
+      <svg
+        aria-label="Registos diários"
+        preserveAspectRatio="none"
+        role="img"
+        viewBox="0 0 100 100"
+      >
+        <path d="M0 16 H100 M0 54 H100 M0 92 H100" />
+        <polygon points={`0,100 ${points} 100,100`} />
+        <polyline points={points} />
+      </svg>
+      <div>
+        <span>Há 30 dias</span>
+        <span>Há 15 dias</span>
+        <span>Hoje</span>
+      </div>
+    </div>
+  );
+}
+
+function donutColor(label: string, index: number): string {
+  const colors: Record<string, string> = {
+    "M-Pesa": "#ef4444",
+    "e-Mola": "#f59e0b",
+    Dinheiro: "#10b981",
+    mKesh: "#2563eb",
+    Cartão: "#7c3aed",
+    Transferência: "#64748b"
+  };
+  const fallback = ["#0d9488", "#f59e0b", "#ef4444", "#2563eb", "#7c3aed"];
+  return colors[label] ?? fallback[index % fallback.length];
 }
 
 function formatCompactMzn(value: number): string {

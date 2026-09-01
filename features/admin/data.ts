@@ -81,6 +81,7 @@ interface BusinessRow {
 interface AnalyticsTransactionRow {
   id: string;
   business_id: string;
+  customer_card_id: string | null;
   gross_amount_mzn_minor: number;
   points_earned: number;
   points_redeemed: number;
@@ -90,6 +91,32 @@ interface AnalyticsTransactionRow {
 interface AnalyticsPaymentRow {
   method: string;
   amount_mzn_minor: number;
+}
+
+interface AnalyticsProfileRow {
+  id: string;
+  role: string;
+  created_at: string;
+}
+
+interface AnalyticsCardRow {
+  id: string;
+  created_at: string;
+}
+
+interface AnalyticsPaymentChannelRow {
+  method: string;
+  status: string;
+}
+
+interface AnalyticsTerminalRow {
+  status: string;
+  last_seen_at: string | null;
+}
+
+interface AnalyticsSupportRow {
+  created_at: string;
+  resolved_at: string | null;
 }
 
 interface CustomerCardRow {
@@ -398,11 +425,27 @@ async function loadAnalytics(
   const firstDay = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - (windowDays - 1))
   );
-  const [transactionResult, paymentResult, businessResult, categoryResult] = await Promise.all([
+  const first30Days = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 29)
+  );
+  const first60Days = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 59)
+  );
+  const [
+    transactionResult,
+    paymentResult,
+    businessResult,
+    categoryResult,
+    profileResult,
+    cardResult,
+    paymentChannelResult,
+    terminalResult,
+    supportResult
+  ] = await Promise.all([
     supabase
       .from("transactions")
       .select(
-        "id, business_id, gross_amount_mzn_minor, points_earned, points_redeemed, occurred_at"
+        "id, business_id, customer_card_id, gross_amount_mzn_minor, points_earned, points_redeemed, occurred_at"
       )
       .eq("status", "completed")
       .gte("occurred_at", firstMonth.toISOString())
@@ -414,17 +457,43 @@ async function loadAnalytics(
       .gte("created_at", firstMonth.toISOString())
       .limit(5000),
     supabase.from("businesses").select("id, name, category_id"),
-    supabase.from("business_categories").select("id, name")
+    supabase.from("business_categories").select("id, name"),
+    supabase.from("profiles").select("id, role, created_at").limit(5000),
+    supabase
+      .from("customer_cards")
+      .select("id, created_at")
+      .gte("created_at", first30Days.toISOString())
+      .limit(5000),
+    supabase.from("business_payment_channels").select("method, status").limit(5000),
+    supabase.from("pos_terminals").select("status, last_seen_at").limit(5000),
+    supabase
+      .from("support_tickets")
+      .select("created_at, resolved_at")
+      .gte("created_at", firstMonth.toISOString())
+      .limit(5000)
   ]);
 
   const error =
-    transactionResult.error ?? paymentResult.error ?? businessResult.error ?? categoryResult.error;
+    transactionResult.error ??
+    paymentResult.error ??
+    businessResult.error ??
+    categoryResult.error ??
+    profileResult.error ??
+    cardResult.error ??
+    paymentChannelResult.error ??
+    terminalResult.error ??
+    supportResult.error;
   if (error) {
     throw error;
   }
 
   const transactions = (transactionResult.data ?? []) as AnalyticsTransactionRow[];
   const payments = (paymentResult.data ?? []) as AnalyticsPaymentRow[];
+  const profiles = (profileResult.data ?? []) as AnalyticsProfileRow[];
+  const cards = (cardResult.data ?? []) as AnalyticsCardRow[];
+  const paymentChannels = (paymentChannelResult.data ?? []) as AnalyticsPaymentChannelRow[];
+  const terminals = (terminalResult.data ?? []) as AnalyticsTerminalRow[];
+  const supportTickets = (supportResult.data ?? []) as AnalyticsSupportRow[];
   const businesses = (businessResult.data ?? []) as Array<{
     id: string;
     name: string;
@@ -439,10 +508,15 @@ async function loadAnalytics(
   const businessMap = new Map(businesses.map((row) => [row.id, row]));
   const monthly = createAnalyticsBuckets(firstMonth, 6, "month");
   const daily = createAnalyticsBuckets(firstDay, windowDays, "day");
+  const dailyRegistrations = createAnalyticsBuckets(first30Days, 30, "day");
 
   for (const transaction of transactions) {
     addToAnalyticsBucket(monthly, transaction, "month");
     addToAnalyticsBucket(daily, transaction, "day");
+  }
+
+  for (const profile of profiles) {
+    addDateToAnalyticsBucket(dailyRegistrations, profile.created_at, "day");
   }
 
   const paymentMethods = buildShares(
@@ -492,12 +566,110 @@ async function loadAnalytics(
     .sort((left, right) => right.volumeMznMinor - left.volumeMznMinor)
     .slice(0, 5);
 
+  const current30Transactions = transactions.filter(
+    (transaction) => new Date(transaction.occurred_at) >= first30Days
+  );
+  const previous30Transactions = transactions.filter((transaction) => {
+    const occurredAt = new Date(transaction.occurred_at);
+    return occurredAt >= first60Days && occurredAt < first30Days;
+  });
+  const profilesCreatedLast30Days = profiles.filter(
+    (profile) => new Date(profile.created_at) >= first30Days
+  ).length;
+  const cardsCreatedLast30Days = cards.length;
+  const firstPurchasesLast30Days = new Set(
+    current30Transactions.flatMap((transaction) =>
+      transaction.customer_card_id ? [transaction.customer_card_id] : []
+    )
+  ).size;
+  const resolvedSupportTickets = supportTickets.filter((ticket) => ticket.resolved_at !== null);
+  const averageSupportResolutionHours = average(
+    resolvedSupportTickets.flatMap((ticket) =>
+      ticket.resolved_at
+        ? [
+            Math.max(
+              0,
+              (new Date(ticket.resolved_at).getTime() - new Date(ticket.created_at).getTime()) /
+                3_600_000
+            )
+          ]
+        : []
+    )
+  );
+  const activeChannels = (method: string) =>
+    paymentChannels.filter((channel) => channel.method === method && channel.status === "active")
+      .length;
+  const activeTerminals = terminals.filter((terminal) => terminal.status === "active").length;
+  const recentTerminals = terminals.filter(
+    (terminal) =>
+      terminal.status === "active" &&
+      terminal.last_seen_at !== null &&
+      now.getTime() - new Date(terminal.last_seen_at).getTime() <= 86_400_000
+  ).length;
+  const funnelBase = Math.max(profilesCreatedLast30Days, 1);
+
   return {
     monthly,
     daily,
+    dailyRegistrations,
+    hourly: buildHourlyHeatmap(transactions),
     paymentMethods,
     categories: buildShares(categoryTotals),
     topBusinesses,
+    services: [
+      { label: "API e base de dados", status: "Online", tone: "active" },
+      {
+        label: "Processamento M-Pesa",
+        status: serviceCountLabel(activeChannels("mpesa"), "canal ativo", "canais ativos"),
+        tone: activeChannels("mpesa") > 0 ? "active" : "pending"
+      },
+      {
+        label: "Processamento e-Mola",
+        status: serviceCountLabel(activeChannels("emola"), "canal ativo", "canais ativos"),
+        tone: activeChannels("emola") > 0 ? "active" : "pending"
+      },
+      {
+        label: "Sincronização POS",
+        status:
+          activeTerminals === 0
+            ? "Sem terminais"
+            : `${recentTerminals}/${activeTerminals} recentes`,
+        tone: recentTerminals > 0 ? "active" : "pending"
+      },
+      { label: "Backups", status: "Geridos pelo Supabase", tone: "neutral" }
+    ],
+    conversionFunnel: [
+      {
+        label: "Registos iniciados",
+        value: profilesCreatedLast30Days,
+        percentage: profilesCreatedLast30Days > 0 ? 100 : 0
+      },
+      {
+        label: "Cartões emitidos",
+        value: cardsCreatedLast30Days,
+        percentage: Math.min(100, Math.round((cardsCreatedLast30Days / funnelBase) * 100))
+      },
+      {
+        label: "Primeira transação",
+        value: firstPurchasesLast30Days,
+        percentage: Math.min(100, Math.round((firstPurchasesLast30Days / funnelBase) * 100))
+      }
+    ],
+    snapshot: {
+      transactionsCurrent30Days: current30Transactions.length,
+      transactionsPrevious30Days: previous30Transactions.length,
+      volumeCurrent30DaysMznMinor: sumTransactionVolume(current30Transactions),
+      volumePrevious30DaysMznMinor: sumTransactionVolume(previous30Transactions),
+      customerProfiles: profiles.filter((profile) => profile.role === "customer").length,
+      administratorProfiles: profiles.filter((profile) =>
+        ["support_agent", "platform_admin", "super_admin"].includes(profile.role)
+      ).length,
+      profilesCreatedLast30Days,
+      cardsCreatedLast30Days,
+      firstPurchasesLast30Days,
+      resolvedSupportTickets: resolvedSupportTickets.length,
+      averageSupportResolutionHours
+    },
     redemptionRate: issued + redeemed === 0 ? 0 : Math.round((redeemed / (issued + redeemed)) * 100)
   };
 }
@@ -554,6 +726,60 @@ function addToAnalyticsBucket(
     bucket.volumeMznMinor += transaction.gross_amount_mzn_minor;
     bucket.pointsIssued += transaction.points_earned;
   }
+}
+
+function addDateToAnalyticsBucket(buckets: AdminAnalyticsPoint[], occurredAt: string, unit: "day") {
+  const eventDate = new Date(occurredAt);
+  const bucket = buckets.find((_, index) => {
+    const expected = new Date();
+    expected.setUTCDate(expected.getUTCDate() - (buckets.length - 1 - index));
+    return expected.toISOString().slice(0, 10) === eventDate.toISOString().slice(0, 10);
+  });
+
+  if (bucket && unit === "day") {
+    bucket.transactions += 1;
+  }
+}
+
+function buildHourlyHeatmap(transactions: AnalyticsTransactionRow[]) {
+  const days = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+  const hours = [0, 3, 6, 9, 12, 15, 18, 21];
+  const totals = new Map<string, number>();
+  const cutoff = Date.now() - 7 * 86_400_000;
+
+  for (const transaction of transactions) {
+    const occurredAt = new Date(transaction.occurred_at);
+    if (occurredAt.getTime() < cutoff) continue;
+
+    const maputoTime = new Date(occurredAt.getTime() + 2 * 3_600_000);
+    const jsDay = maputoTime.getUTCDay();
+    const day = days[jsDay === 0 ? 6 : jsDay - 1];
+    const hour = Math.floor(maputoTime.getUTCHours() / 3) * 3;
+    const key = `${day}-${hour}`;
+    totals.set(key, (totals.get(key) ?? 0) + 1);
+  }
+
+  return hours.flatMap((hour) =>
+    days.map((day) => ({
+      day,
+      hour,
+      transactions: totals.get(`${day}-${hour}`) ?? 0
+    }))
+  );
+}
+
+function sumTransactionVolume(transactions: AnalyticsTransactionRow[]): number {
+  return transactions.reduce((total, transaction) => total + transaction.gross_amount_mzn_minor, 0);
+}
+
+function average(values: number[]): number | null {
+  if (values.length === 0) return null;
+  return values.reduce((total, value) => total + value, 0) / values.length;
+}
+
+function serviceCountLabel(count: number, singular: string, plural: string): string {
+  if (count === 0) return "Sem canais ativos";
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 function buildShares(

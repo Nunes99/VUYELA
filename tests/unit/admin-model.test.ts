@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   describeAuditChange,
+  formatMznMinor,
   normalizeAdminId,
   normalizeAdminQuery,
   parseAdminView,
@@ -32,5 +33,10 @@ describe("admin view model", () => {
       "status: draft -> active"
     );
     expect(describeAuditChange(null, null)).toBe("Registo criado ou atualizado");
+  });
+
+  it("uses the canonical MZN abbreviation for administrative values", () => {
+    expect(formatMznMinor(4_580_000).replace(/\s/g, " ")).toBe("45 800,00 MZN");
+    expect(formatMznMinor(0)).toBe("0,00 MZN");
   });
 });

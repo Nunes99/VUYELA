@@ -59,12 +59,49 @@ export interface AdminTopBusiness {
   pointsIssued: number;
 }
 
+export interface AdminHeatmapPoint {
+  day: string;
+  hour: number;
+  transactions: number;
+}
+
+export interface AdminServiceStatus {
+  label: string;
+  status: string;
+  tone: "active" | "neutral" | "pending";
+}
+
+export interface AdminConversionStage {
+  label: string;
+  value: number;
+  percentage: number;
+}
+
+export interface AdminAnalyticsSnapshot {
+  transactionsCurrent30Days: number;
+  transactionsPrevious30Days: number;
+  volumeCurrent30DaysMznMinor: number;
+  volumePrevious30DaysMznMinor: number;
+  customerProfiles: number;
+  administratorProfiles: number;
+  profilesCreatedLast30Days: number;
+  cardsCreatedLast30Days: number;
+  firstPurchasesLast30Days: number;
+  resolvedSupportTickets: number;
+  averageSupportResolutionHours: number | null;
+}
+
 export interface AdminAnalyticsData {
   monthly: AdminAnalyticsPoint[];
   daily: AdminAnalyticsPoint[];
+  dailyRegistrations: AdminAnalyticsPoint[];
+  hourly: AdminHeatmapPoint[];
   paymentMethods: AdminAnalyticsShare[];
   categories: AdminAnalyticsShare[];
   topBusinesses: AdminTopBusiness[];
+  services: AdminServiceStatus[];
+  conversionFunnel: AdminConversionStage[];
+  snapshot: AdminAnalyticsSnapshot;
   redemptionRate: number;
 }
 
@@ -320,11 +357,12 @@ export function normalizeAdminPage(value: string | string[] | undefined): number
 }
 
 export function formatMznMinor(value: number): string {
-  return new Intl.NumberFormat("pt-MZ", {
-    style: "currency",
-    currency: "MZN",
+  const amount = new Intl.NumberFormat("pt-MZ", {
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(value / 100);
+
+  return `${amount} MZN`;
 }
 
 export function formatAdminDate(value: string | null): string {

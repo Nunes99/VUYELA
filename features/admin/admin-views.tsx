@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowDownRight,
   ArrowRight,
-  ArrowUpRight,
   Building2,
   CheckCircle2,
   CreditCard,
@@ -38,7 +37,13 @@ import {
   UserAccountStatusForm,
   UserRoleForm
 } from "./action-forms";
-import { AdminDonut, AdminLineChart, AdminShareBars } from "./admin-charts";
+import {
+  AdminDonut,
+  AdminHeatmap,
+  AdminLineChart,
+  AdminMiniAreaChart,
+  AdminShareBars
+} from "./admin-charts";
 import { AdminDownloadButton } from "./admin-download-button";
 import { formatAdminDate, formatMznMinor } from "./model";
 import type {
@@ -47,6 +52,7 @@ import type {
   AdminBusiness,
   AdminBusinessDetail,
   AdminCategory,
+  AdminConversionStage,
   AdminDashboardReadyState,
   AdminFraudEvent,
   AdminPlan,
@@ -68,7 +74,12 @@ export function AdminViewContent({
 }) {
   return (
     <section className="admin-view">
-      <AdminBreadcrumb view={state.view} />
+      <div className={state.view === "overview" ? "admin-overview-topline" : undefined}>
+        <AdminBreadcrumb view={state.view} />
+        {state.view === "overview" ? (
+          <StatusBadge value="active" label="Sistema operacional" />
+        ) : null}
+      </div>
       <AdminCollectionControls state={state} />
       {state.view === "overview" && state.metrics && state.analytics ? (
         <Overview
@@ -143,63 +154,89 @@ function Overview({
   analytics: AdminAnalyticsData;
   entries: AdminAuditEntry[];
 }) {
+  const snapshot = analytics.snapshot;
+  const monthlyAverage = Math.round(
+    analytics.monthly.reduce((total, point) => total + point.volumeMznMinor, 0) /
+      Math.max(analytics.monthly.length, 1)
+  );
+  const firstPurchaseRate = percentage(
+    snapshot.firstPurchasesLast30Days,
+    snapshot.profilesCreatedLast30Days
+  );
+  const inactiveBusinesses = Math.max(
+    0,
+    metrics.totalBusinesses - metrics.activeBusinesses - metrics.pendingBusinesses
+  );
+  const averageRegistrations =
+    analytics.dailyRegistrations.reduce((total, point) => total + point.transactions, 0) /
+    Math.max(analytics.dailyRegistrations.length, 1);
+
   return (
     <div className="admin-overview">
-      <div className="admin-section-heading">
-        <div>
-          <span>Sistema operacional</span>
-          <h2>Indicadores da plataforma</h2>
-        </div>
-        <StatusBadge value="active" label="Operação em tempo real" />
-      </div>
-
       <div className="admin-metric-grid">
-        <MetricCard
+        <OverviewMetricCard
+          badge={`${percentage(metrics.activeBusinesses, metrics.totalBusinesses)} ativos`}
+          change={signedValue(metrics.businessesCreatedLast30Days)}
           icon={Building2}
           label="Negócios ativos"
-          meta={`${metrics.pendingBusinesses} em aprovação`}
+          meta="Este mês"
           value={metrics.activeBusinesses.toLocaleString("pt-MZ")}
         />
-        <MetricCard
+        <OverviewMetricCard
+          badge={`${snapshot.customerProfiles} clientes, ${snapshot.administratorProfiles} admin`}
+          change={signedValue(snapshot.profilesCreatedLast30Days)}
           icon={Users}
           label="Utilizadores"
-          meta="Perfis registados"
+          meta="Últimos 30 dias"
           value={metrics.totalProfiles.toLocaleString("pt-MZ")}
         />
-        <MetricCard
+        <OverviewMetricCard
+          badge={changePercentageLabel(
+            snapshot.transactionsCurrent30Days,
+            snapshot.transactionsPrevious30Days
+          )}
           icon={Activity}
           label="Transações (30 dias)"
-          meta="Concluídas no período"
+          meta="vs mês anterior"
           value={metrics.transactionsLast30Days.toLocaleString("pt-MZ")}
         />
-        <MetricCard
+        <OverviewMetricCard
+          badge={changePercentageLabel(
+            snapshot.volumeCurrent30DaysMznMinor,
+            snapshot.volumePrevious30DaysMznMinor
+          )}
           icon={Landmark}
           label="Volume processado"
-          meta="Volume bruto acumulado"
-          value={formatMznMinor(metrics.grossVolumeMznMinor)}
+          meta="Últimos 30 dias"
+          value={formatMznMinor(snapshot.volumeCurrent30DaysMznMinor)}
         />
-        <MetricCard
+        <OverviewMetricCard
+          badge="Planos em vigor"
           icon={CreditCard}
           label="Subscrições ativas"
-          meta="Em teste ou ativas"
+          meta="Ativas ou em teste"
           value={metrics.activeSubscriptions.toLocaleString("pt-MZ")}
         />
-        <MetricCard
+        <OverviewMetricCard
+          badge={`${metrics.pendingBusinesses} pendentes`}
           icon={CheckCircle2}
           label="Taxa de aprovação"
-          meta="Negócios ativos"
+          meta="Estado atual"
           value={percentage(metrics.activeBusinesses, metrics.totalBusinesses)}
         />
       </div>
 
       <div className="admin-data-grid admin-data-grid--charts">
         <section className="admin-panel admin-panel--wide">
-          <PanelHeading meta="Últimos seis meses" title="Volume transacional" />
+          <PanelHeading
+            meta={`Média: ${formatMznMinor(monthlyAverage)}/mês`}
+            title="Volume transacional (6 meses)"
+          />
           <AdminLineChart data={analytics.monthly} />
         </section>
         <section className="admin-panel">
-          <PanelHeading meta="Volume liquidado" title="Métodos de pagamento" />
-          <AdminDonut data={analytics.paymentMethods} />
+          <PanelHeading meta="Últimos 30 dias" title="Distribuição por método de pagamento" />
+          <AdminDonut data={analytics.paymentMethods} total={snapshot.transactionsCurrent30Days} />
         </section>
       </div>
 
@@ -220,23 +257,22 @@ function Overview({
               label="YELAS emitidas"
               value={`${metrics.pointsIssued.toLocaleString("pt-MZ")} YL`}
             />
+            <Fact
+              label="Taxa de retenção"
+              value={percentage(metrics.activeBusinesses, metrics.totalBusinesses)}
+            />
           </dl>
         </section>
         <section className="admin-panel">
-          <PanelHeading meta="Todos online" title="Estado dos serviços" />
+          <PanelHeading meta="Verificação atual" title="Estado dos serviços" />
           <div className="admin-service-list">
-            {[
-              ["API e base de dados", "Online"],
-              ["Processamento M-Pesa", "Operacional"],
-              ["Processamento e-Mola", "Operacional"],
-              ["Sincronização POS", "Operacional"]
-            ].map(([label, status]) => (
-              <div key={label}>
+            {analytics.services.map((service) => (
+              <div key={service.label}>
                 <span>
                   <CheckCircle2 aria-hidden="true" size={16} />
-                  {label}
+                  {service.label}
                 </span>
-                <strong>{status}</strong>
+                <strong className={`is-${service.tone}`}>{service.status}</strong>
               </div>
             ))}
           </div>
@@ -256,42 +292,81 @@ function Overview({
 
       <div className="admin-health-grid">
         <HealthCard
-          direction="down"
-          label="Alertas por rever"
-          meta="Risco operacional"
-          value={metrics.unresolvedFraudEvents.toLocaleString("pt-MZ")}
+          badge={`${inactiveBusinesses.toLocaleString("pt-MZ")} negócios inativos`}
+          label="Taxa de churn"
+          meta="Estado atual"
+          tone="positive"
+          value={percentage(inactiveBusinesses, metrics.totalBusinesses)}
         />
         <HealthCard
-          direction="up"
-          label="Tempo de resposta"
-          meta="Pedidos em aberto"
-          value={`${metrics.openSupportTickets.toLocaleString("pt-MZ")} tickets`}
+          badge={`${snapshot.resolvedSupportTickets} resolvidos`}
+          label="Tempo médio de resposta"
+          meta="Tickets resolvidos"
+          tone="positive"
+          value={formatHours(snapshot.averageSupportResolutionHours)}
         />
         <HealthCard
-          direction="up"
-          label="Cobertura de subscrição"
-          meta="Negócios com plano ativo"
-          value={percentage(metrics.activeSubscriptions, metrics.activeBusinesses)}
+          badge="Verificação em tempo real"
+          label="Estado do sistema"
+          meta="API e base de dados"
+          tone="positive"
+          value="Online"
         />
       </div>
 
       <section className="admin-panel">
-        <PanelHeading meta="Últimos sete dias" title="Mapa de atividade transacional" />
-        <div className="admin-heatmap" aria-label="Intensidade de transações por dia">
-          {analytics.daily.map((day) => (
-            <div key={day.label}>
-              <span>{day.label}</span>
-              {Array.from({ length: 6 }, (_, index) => (
-                <i
-                  aria-hidden="true"
-                  key={index}
-                  style={{ opacity: Math.max(0.16, Math.min(1, (day.transactions + index) / 12)) }}
-                />
-              ))}
-            </div>
-          ))}
+        <PanelHeading
+          meta={heatmapPeakLabel(analytics)}
+          title="Mapa de calor - transações por hora"
+        />
+        <AdminHeatmap data={analytics.hourly} />
+      </section>
+
+      <section className="admin-panel admin-engagement-panel">
+        <PanelHeading meta="Últimos 30 dias" title="Registo de acesso & conversão" />
+        <div className="admin-engagement-metrics">
+          <CompactMetric
+            label="Novos utilizadores"
+            value={snapshot.profilesCreatedLast30Days.toLocaleString("pt-MZ")}
+          />
+          <CompactMetric
+            label="Cartões emitidos"
+            value={snapshot.cardsCreatedLast30Days.toLocaleString("pt-MZ")}
+          />
+          <CompactMetric label="Taxa de primeira compra" value={firstPurchaseRate} />
+          <CompactMetric
+            label="Transações por novo perfil"
+            value={ratioLabel(
+              snapshot.transactionsCurrent30Days,
+              snapshot.profilesCreatedLast30Days
+            )}
+          />
+        </div>
+        <div className="admin-engagement-grid">
+          <article className="admin-inner-panel">
+            <PanelHeading
+              meta={`Média: ${averageRegistrations.toLocaleString("pt-MZ", { maximumFractionDigits: 1 })}/dia`}
+              title="Registos por dia (últimos 30 dias)"
+            />
+            <AdminMiniAreaChart data={analytics.dailyRegistrations} />
+          </article>
+          <article className="admin-inner-panel">
+            <PanelHeading meta="Conversão de novos perfis" title="Funil de conversão" />
+            <ConversionFunnel stages={analytics.conversionFunnel} />
+          </article>
         </div>
       </section>
+
+      <div className="admin-data-grid">
+        <UnavailableInsight
+          description="A origem das visitas será apresentada quando a telemetria web consentida estiver ligada."
+          title="Origem do tráfego"
+        />
+        <UnavailableInsight
+          description="As pesquisas externas aparecerão depois da integração com a ferramenta de analítica SEO."
+          title="Palavras-chave - top pesquisas"
+        />
+      </div>
 
       <section className="admin-panel">
         <PanelHeading meta="Registos imutáveis" title="Atividade de operações recentes" />
@@ -1409,27 +1484,110 @@ function MetricCard({
   );
 }
 
+function OverviewMetricCard({
+  icon: Icon,
+  label,
+  value,
+  meta,
+  badge,
+  change
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  meta: string;
+  badge: string;
+  change?: string;
+}) {
+  return (
+    <article className="admin-overview-metric">
+      <div className="admin-overview-metric__heading">
+        <span>
+          <Icon aria-hidden="true" size={18} />
+          {label}
+        </span>
+        <small>{badge}</small>
+      </div>
+      <strong>{value}</strong>
+      <footer>
+        <span>{meta}</span>
+        {change ? (
+          <b className={change.startsWith("-") ? "is-negative" : "is-positive"}>{change}</b>
+        ) : null}
+      </footer>
+    </article>
+  );
+}
+
 function HealthCard({
   label,
   value,
   meta,
-  direction
+  badge,
+  tone
 }: {
   label: string;
   value: string;
   meta: string;
-  direction: "up" | "down";
+  badge: string;
+  tone: "positive" | "negative" | "neutral";
 }) {
-  const Icon = direction === "up" ? ArrowUpRight : ArrowDownRight;
+  return (
+    <article>
+      <header>
+        <span>{label}</span>
+        <small>{meta}</small>
+      </header>
+      <strong>{value}</strong>
+      <b className={`admin-health-badge admin-health-badge--${tone}`}>{badge}</b>
+    </article>
+  );
+}
+
+function CompactMetric({ label, value }: { label: string; value: string }) {
   return (
     <article>
       <span>{label}</span>
       <strong>{value}</strong>
-      <small>
-        <Icon aria-hidden="true" size={15} />
-        {meta}
-      </small>
     </article>
+  );
+}
+
+function ConversionFunnel({ stages }: { stages: AdminConversionStage[] }) {
+  if (stages.length === 0) {
+    return <p className="admin-empty-copy">Sem registos no período.</p>;
+  }
+
+  return (
+    <div className="admin-conversion-funnel">
+      {stages.map((stage) => (
+        <div key={stage.label}>
+          <p>
+            <span>{stage.label}</span>
+            <strong>{stage.value.toLocaleString("pt-MZ")}</strong>
+            <small>{stage.percentage}%</small>
+          </p>
+          <i aria-hidden="true">
+            <span style={{ width: `${Math.max(stage.percentage, 2)}%` }} />
+          </i>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function UnavailableInsight({ title, description }: { title: string; description: string }) {
+  return (
+    <section className="admin-panel admin-insight-unavailable">
+      <PanelHeading meta="Telemetria externa" title={title} />
+      <div>
+        <Globe2 aria-hidden="true" size={20} />
+        <p>{description}</p>
+      </div>
+      {Array.from({ length: 5 }, (_, index) => (
+        <span aria-hidden="true" key={index} />
+      ))}
+    </section>
   );
 }
 
@@ -1530,6 +1688,37 @@ function percentage(value: number, total: number): string {
   return total === 0
     ? "0%"
     : `${new Intl.NumberFormat("pt-MZ", { maximumFractionDigits: 1 }).format((value / total) * 100)}%`;
+}
+
+function signedValue(value: number): string {
+  return value > 0 ? `+${value.toLocaleString("pt-MZ")}` : value.toLocaleString("pt-MZ");
+}
+
+function changePercentageLabel(current: number, previous: number): string {
+  if (previous === 0) return current > 0 ? "+100%" : "0%";
+  const change = ((current - previous) / previous) * 100;
+  const formatted = new Intl.NumberFormat("pt-MZ", { maximumFractionDigits: 1 }).format(change);
+  return `${change > 0 ? "+" : ""}${formatted}%`;
+}
+
+function formatHours(value: number | null): string {
+  if (value === null) return "Não medido";
+  if (value < 1) return `${Math.round(value * 60)} min`;
+  return `${new Intl.NumberFormat("pt-MZ", { maximumFractionDigits: 1 }).format(value)} h`;
+}
+
+function ratioLabel(value: number, total: number): string {
+  if (total === 0) return "0";
+  return new Intl.NumberFormat("pt-MZ", { maximumFractionDigits: 1 }).format(value / total);
+}
+
+function heatmapPeakLabel(analytics: AdminAnalyticsData): string {
+  const peak = analytics.hourly.reduce<(typeof analytics.hourly)[number] | null>(
+    (current, item) => (!current || item.transactions > current.transactions ? item : current),
+    null
+  );
+  if (!peak || peak.transactions === 0) return "Sem transações nos últimos 7 dias";
+  return `Pico: ${peak.day} ${peak.hour}h–${Math.min(24, peak.hour + 3)}h`;
 }
 
 function formatLimit(limit: number | null): string {

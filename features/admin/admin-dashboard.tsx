@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   AlertTriangle,
-  BarChart3,
   Bell,
   Building2,
   CreditCard,
@@ -10,7 +9,6 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
-  Settings,
   ShieldCheck,
   Users
 } from "lucide-react";
@@ -48,14 +46,7 @@ const adminNavigation: Array<{
   },
   { view: "support", label: "Suporte", icon: MessageSquare, capability: "support_manage" },
   { view: "fraud", label: "Fraude", icon: AlertTriangle, capability: "fraud_review" },
-  { view: "audit", label: "Auditoria", icon: FileClock, capability: "audit_read" },
-  {
-    view: "analytics",
-    label: "Analítica",
-    icon: BarChart3,
-    capability: "platform_metrics_read"
-  },
-  { view: "settings", label: "Configurações", icon: Settings, capability: "users_manage" }
+  { view: "audit", label: "Auditoria", icon: FileClock, capability: "audit_read" }
 ];
 
 export function AdminDashboard({
