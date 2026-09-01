@@ -110,6 +110,7 @@ export function AdminDashboard({
 
       <div className="admin-console__main">
         <header className="admin-console__bar">
+          <VuyelaLogo className="admin-console__mobile-logo" href="/admin" />
           <div className="admin-console__title">
             <div>
               <h1>{viewTitle(state.view)}</h1>

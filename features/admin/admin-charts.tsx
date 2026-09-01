@@ -47,6 +47,19 @@ export function AdminLineChart({
           <span key={point.label}>{point.label}</span>
         ))}
       </div>
+      <div
+        aria-label="Evolução dos indicadores no período"
+        className="admin-bar-chart"
+        role="img"
+        style={{ gridTemplateColumns: `repeat(${data.length}, minmax(0, 1fr))` }}
+      >
+        {data.map((point, index) => (
+          <span aria-hidden="true" key={`${point.label}-${index}`}>
+            <i style={{ height: `${Math.max((point[value] / max) * 100, 8)}%` }} />
+            <small>{point.label}</small>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -113,6 +126,14 @@ export function AdminDonut({ data, total }: { data: AdminAnalyticsShare[]; total
               <i aria-hidden="true" style={{ backgroundColor: donutColor(item.label, index) }} />
               <span>{item.label}</span>
               <strong>{item.percentage}%</strong>
+              <span aria-hidden="true" className="admin-donut-legend__track">
+                <span
+                  style={{
+                    backgroundColor: donutColor(item.label, index),
+                    width: `${Math.max(item.percentage, 2)}%`
+                  }}
+                />
+              </span>
             </div>
           ))
         ) : (

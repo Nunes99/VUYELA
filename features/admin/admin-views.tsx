@@ -75,7 +75,10 @@ export function AdminViewContent({
   return (
     <section className="admin-view">
       <div className={state.view === "overview" ? "admin-overview-topline" : undefined}>
-        <AdminBreadcrumb view={state.view} />
+        <div className={state.view === "overview" ? "admin-overview-topline__copy" : undefined}>
+          <AdminBreadcrumb view={state.view} />
+          {state.view === "overview" ? <h1>Visão Geral</h1> : null}
+        </div>
         {state.view === "overview" ? (
           <StatusBadge value="active" label="Sistema operacional" />
         ) : null}
@@ -240,8 +243,8 @@ function Overview({
         </section>
       </div>
 
-      <div className="admin-data-grid">
-        <section className="admin-panel">
+      <div className="admin-priority-grid">
+        <section className="admin-panel admin-priority-grid__operation">
           <PanelHeading meta="Desde o arranque" title="Operação acumulada" />
           <dl className="admin-stat-list">
             <Fact
@@ -263,7 +266,7 @@ function Overview({
             />
           </dl>
         </section>
-        <section className="admin-panel">
+        <section className="admin-panel admin-priority-grid__services">
           <PanelHeading meta="Verificação atual" title="Estado dos serviços" />
           <div className="admin-service-list">
             {analytics.services.map((service) => (
@@ -277,16 +280,34 @@ function Overview({
             ))}
           </div>
         </section>
-      </div>
-
-      <div className="admin-data-grid">
-        <section className="admin-panel">
+        <section className="admin-panel admin-priority-grid__businesses">
           <PanelHeading meta="Por volume processado" title="Top negócios" />
           <TopBusinessList analytics={analytics} />
         </section>
-        <section className="admin-panel">
+        <section className="admin-panel admin-priority-grid__categories">
           <PanelHeading meta="Distribuição do volume" title="Receita por categoria" />
           <AdminShareBars data={analytics.categories} money />
+        </section>
+        <section className="admin-panel admin-priority-grid__activity">
+          <PanelHeading meta="Registos imutáveis" title="Atividade de operações recentes" />
+          {entries.length > 0 ? (
+            <div className="admin-activity-list">
+              {entries.map((entry) => (
+                <div key={entry.id}>
+                  <span>
+                    <FileClock aria-hidden="true" size={17} />
+                  </span>
+                  <p>
+                    <strong>{humanize(entry.operation)}</strong>
+                    {entry.changeSummary}
+                  </p>
+                  <time>{formatAdminDate(entry.createdAt)}</time>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState label="Ainda não existem operações recentes." />
+          )}
         </section>
       </div>
 
@@ -314,7 +335,7 @@ function Overview({
         />
       </div>
 
-      <section className="admin-panel">
+      <section className="admin-panel admin-overview__advanced">
         <PanelHeading
           meta={heatmapPeakLabel(analytics)}
           title="Mapa de calor - transações por hora"
@@ -322,7 +343,7 @@ function Overview({
         <AdminHeatmap data={analytics.hourly} />
       </section>
 
-      <section className="admin-panel admin-engagement-panel">
+      <section className="admin-panel admin-engagement-panel admin-overview__advanced">
         <PanelHeading meta="Últimos 30 dias" title="Registo de acesso & conversão" />
         <div className="admin-engagement-metrics">
           <CompactMetric
@@ -357,7 +378,7 @@ function Overview({
         </div>
       </section>
 
-      <div className="admin-data-grid">
+      <div className="admin-data-grid admin-overview__advanced-grid">
         <UnavailableInsight
           description="A origem das visitas será apresentada quando a telemetria web consentida estiver ligada."
           title="Origem do tráfego"
@@ -367,28 +388,6 @@ function Overview({
           title="Palavras-chave - top pesquisas"
         />
       </div>
-
-      <section className="admin-panel">
-        <PanelHeading meta="Registos imutáveis" title="Atividade de operações recentes" />
-        {entries.length > 0 ? (
-          <div className="admin-activity-list">
-            {entries.map((entry) => (
-              <div key={entry.id}>
-                <span>
-                  <FileClock aria-hidden="true" size={17} />
-                </span>
-                <p>
-                  <strong>{humanize(entry.operation)}</strong>
-                  {entry.changeSummary}
-                </p>
-                <time>{formatAdminDate(entry.createdAt)}</time>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptyState label="Ainda não existem operações recentes." />
-        )}
-      </section>
     </div>
   );
 }

@@ -74,6 +74,18 @@ test("keeps catalogue, loyalty and payment controls functional", async ({ page }
   await expect(catalogueCards.nth(2).locator(".pos-sale__item-count")).toHaveText("0");
   await expect(catalogueCards.first().locator(".pos-sale__item-count")).toHaveText("1");
 
+  await catalogueCards
+    .first()
+    .getByRole("button", { name: "Ver detalhes de Corte Americano (Fade)" })
+    .click();
+  const itemDialog = page.getByRole("dialog", { name: "Corte Americano (Fade)" });
+  await expect(itemDialog).toBeVisible();
+  await expect(itemDialog).toContainText("Serviço · Cortes");
+  await expect(itemDialog).toContainText("MZN");
+  await expect(itemDialog.getByRole("button", { name: "Atualizar Carrinho" })).toBeVisible();
+  await itemDialog.getByRole("button", { name: "Fechar detalhes" }).click();
+  await expect(itemDialog).toBeHidden();
+
   const addControlShape = await catalogueCards
     .nth(2)
     .getByRole("button", { name: "Adicionar uma unidade de Lavagem Capilar" })
@@ -191,6 +203,26 @@ test("uses the Figma mobile catalogue, cart and navigation drawer", async ({ pag
   expect(firstCard?.width ?? Number.POSITIVE_INFINITY).toBeLessThan((viewport?.width ?? 393) / 2);
   expect(secondCard?.y ?? 0).toBeGreaterThan(firstCard?.y ?? 0);
   expect(Math.abs((secondCard?.height ?? 0) - (firstCard?.height ?? 0))).toBeLessThanOrEqual(1);
+
+  await cards
+    .first()
+    .getByRole("button", { name: "Ver detalhes de Corte Americano (Fade)" })
+    .click();
+  const itemDialog = page.getByRole("dialog", { name: "Corte Americano (Fade)" });
+  await expect(itemDialog).toBeVisible();
+  const itemDialogBox = await itemDialog.boundingBox();
+  const itemDialogStyle = await itemDialog.evaluate((element) => ({
+    animationName: getComputedStyle(element).animationName,
+    borderRadius: getComputedStyle(element).borderRadius
+  }));
+  expect(itemDialogBox).not.toBeNull();
+  expect((itemDialogBox?.y ?? 0) + (itemDialogBox?.height ?? 0)).toBeGreaterThanOrEqual(
+    (viewport?.height ?? 0) - 1
+  );
+  expect(itemDialogStyle.animationName).toBe("pos-item-sheet-in");
+  expect(itemDialogStyle.borderRadius).toContain("24px");
+  await itemDialog.getByRole("button", { name: "Fechar detalhes" }).click();
+  await expect(itemDialog).toBeHidden();
 
   const priceBox = await cards.first().locator(".pos-sale__item-price-action > b").boundingBox();
   const quantityBox = await cards.first().locator(".pos-sale__item-quantity-control").boundingBox();

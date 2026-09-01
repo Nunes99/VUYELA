@@ -307,6 +307,9 @@ function SaleStep({
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [mobileCartOpen, setMobileCartOpen] = useState(false);
+  const [selectedCatalogItem, setSelectedCatalogItem] = useState<PosCatalogItemContext | null>(
+    null
+  );
   const matchingCatalog = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -382,6 +385,23 @@ function SaleStep({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [mobileCartOpen]);
+
+  useEffect(() => {
+    if (!selectedCatalogItem) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedCatalogItem(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedCatalogItem]);
 
   return (
     <div className="pos-sale__workspace">
@@ -492,6 +512,7 @@ function SaleStep({
                     <CatalogItemCard
                       item={item}
                       key={item.id}
+                      onOpenDetails={setSelectedCatalogItem}
                       onQuantityChange={updateQuantity}
                       quantity={quantityByItem.get(item.id) ?? 0}
                     />
@@ -627,6 +648,19 @@ function SaleStep({
           </footer>
         </section>
       ) : null}
+
+      {selectedCatalogItem ? (
+        <CatalogItemDialog
+          categoryName={
+            categories.find((category) => category.id === selectedCatalogItem.categoryId)?.name ??
+            (selectedCatalogItem.kind === "service" ? "Serviços" : "Produtos")
+          }
+          item={selectedCatalogItem}
+          onClose={() => setSelectedCatalogItem(null)}
+          onQuantityChange={updateQuantity}
+          quantity={quantityByItem.get(selectedCatalogItem.id) ?? 0}
+        />
+      ) : null}
     </div>
   );
 }
@@ -634,14 +668,22 @@ function SaleStep({
 function CatalogItemCard({
   item,
   quantity,
+  onOpenDetails,
   onQuantityChange
 }: {
   item: PosCatalogItemContext;
   quantity: number;
+  onOpenDetails: (item: PosCatalogItemContext) => void;
   onQuantityChange: (catalogItemId: string, quantity: number) => void;
 }) {
   return (
     <article className={`pos-catalog-item${quantity ? " is-selected" : ""}`} data-kind={item.kind}>
+      <button
+        aria-label={`Ver detalhes de ${item.name}`}
+        className="pos-catalog-item__open"
+        onClick={() => onOpenDetails(item)}
+        type="button"
+      />
       <span className="pos-sale__item-media">
         {item.imageUrl ? (
           <Image
@@ -696,6 +738,120 @@ function CatalogItemCard({
         </span>
       </span>
     </article>
+  );
+}
+
+function CatalogItemDialog({
+  item,
+  categoryName,
+  quantity,
+  onClose,
+  onQuantityChange
+}: {
+  item: PosCatalogItemContext;
+  categoryName: string;
+  quantity: number;
+  onClose: () => void;
+  onQuantityChange: (catalogItemId: string, quantity: number) => void;
+}) {
+  const [draftQuantity, setDraftQuantity] = useState(Math.max(1, quantity));
+  const discountedPrice = Math.max(
+    0,
+    item.priceMznMinor - Math.round((item.priceMznMinor * item.loyaltyDiscountPercent) / 100)
+  );
+
+  return (
+    <div
+      className="pos-item-dialog-backdrop"
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+      role="presentation"
+    >
+      <section
+        aria-labelledby="pos-item-dialog-title"
+        aria-modal="true"
+        className="pos-item-dialog"
+        role="dialog"
+      >
+        <span aria-hidden="true" className="pos-item-dialog__handle" />
+        <div className="pos-item-dialog__media">
+          {item.imageUrl ? (
+            <Image
+              alt={item.name}
+              fill
+              sizes="(max-width: 760px) 100vw, 46rem"
+              src={item.imageUrl}
+              unoptimized
+            />
+          ) : item.kind === "product" ? (
+            <ShoppingBag aria-hidden="true" size={52} strokeWidth={1.5} />
+          ) : (
+            <ReceiptText aria-hidden="true" size={52} strokeWidth={1.5} />
+          )}
+          {item.loyaltyDiscountPercent > 0 ? (
+            <span className="pos-item-dialog__discount">
+              -{item.loyaltyDiscountPercent.toLocaleString("pt-MZ")}% VUYELA
+            </span>
+          ) : null}
+          <button aria-label="Fechar detalhes" onClick={onClose} type="button">
+            <X aria-hidden="true" size={25} />
+          </button>
+        </div>
+
+        <div className="pos-item-dialog__content">
+          <header>
+            <h2 id="pos-item-dialog-title">{item.name}</h2>
+            <p>
+              {item.kind === "service" ? "Serviço" : "Produto"} · {categoryName}
+            </p>
+          </header>
+          <p className="pos-item-dialog__description">
+            {item.description || "Item disponível neste estabelecimento."}
+          </p>
+          <div className="pos-item-dialog__price">
+            <strong>{formatMznCompact(discountedPrice)}</strong>
+            {item.loyaltyDiscountPercent > 0 ? (
+              <del>{formatMznCompact(item.priceMznMinor)}</del>
+            ) : null}
+          </div>
+          <div className="pos-item-dialog__actions">
+            <div className="pos-item-dialog__quantity">
+              <span>Quantidade</span>
+              <div>
+                <button
+                  aria-label={`Retirar uma unidade de ${item.name}`}
+                  disabled={draftQuantity <= 1}
+                  onClick={() => setDraftQuantity((current) => Math.max(1, current - 1))}
+                  type="button"
+                >
+                  <Minus aria-hidden="true" size={17} />
+                </button>
+                <strong aria-live="polite">{draftQuantity}</strong>
+                <button
+                  aria-label={`Adicionar uma unidade de ${item.name}`}
+                  onClick={() => setDraftQuantity((current) => Math.min(99, current + 1))}
+                  type="button"
+                >
+                  <Plus aria-hidden="true" size={17} />
+                </button>
+              </div>
+            </div>
+            <button
+              className="pos-item-dialog__submit"
+              onClick={() => {
+                onQuantityChange(item.id, draftQuantity);
+                onClose();
+              }}
+              type="button"
+            >
+              <ShoppingBag aria-hidden="true" size={19} />
+              {quantity > 0 ? "Atualizar Carrinho" : "Adicionar ao Carrinho"}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
 
