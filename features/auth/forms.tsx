@@ -414,11 +414,13 @@ export function BusinessSignUpForm({
         />
         <Input
           label="Número de telefone"
+          maxLength={24}
           name="representativePhone"
           type="tel"
           autoComplete="tel"
           onChange={(event) => updateValue("representativePhone", event.currentTarget.value)}
           placeholder="Ex.: +258 84 123 4567"
+          title="Use apenas algarismos, espaços, parênteses, pontos ou hífenes."
           requiredMark
           required
           value={values.representativePhone}
@@ -560,11 +562,13 @@ export function BusinessSignUpForm({
           />
           <Input
             label="Telefone da filial"
+            maxLength={24}
             name="branchPhone"
             type="tel"
             autoComplete="tel"
             onChange={(event) => updateValue("branchPhone", event.currentTarget.value)}
             placeholder="Ex.: +258 21 300 400"
+            title="Use apenas algarismos, espaços, parênteses, pontos ou hífenes."
             requiredMark
             required
             value={values.branchPhone}

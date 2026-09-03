@@ -92,6 +92,10 @@ pending business, primary branch, and owner membership in the Auth trigger trans
 type never grants tenant access by itself: business and POS authorization still requires an active
 `business_members` row. User-editable Auth metadata is not referenced by RLS policies.
 
+Business registration normalizes representative and branch contacts to an E.164-compatible value
+before sending metadata to Auth. The server maps stable Auth error codes to corrective Portuguese
+messages and logs the structured failure without recording submitted credentials or contact data.
+
 Installed applications also use dedicated account entry points: `/cliente/entrar` accepts only
 customer identities, `/negocio/entrar` accepts only business identities with dashboard roles,
 `/pos/entrar` additionally requires an active POS membership, and `/admin/entrar` accepts only

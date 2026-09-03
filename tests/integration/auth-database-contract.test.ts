@@ -85,6 +85,13 @@ describe("authentication database contract", () => {
     expect(actions).toContain("Já existe um pedido para este negócio nesta conta");
   });
 
+  it("normalizes business contacts and surfaces actionable Auth failures", () => {
+    expect(actions).toContain("normalizeBusinessPhone");
+    expect(actions).toContain("businessSignUpErrorMessage(error)");
+    expect(actions).toContain("data.user.identities?.length === 0");
+    expect(forms).toContain('maxLength={24}');
+  });
+
   it("hardens automatic RLS and prepares relational access paths", () => {
     expect(migration).toContain("revoke all on function public.rls_auto_enable() from anon");
     expect(migration).toContain("alter extension citext set schema extensions");

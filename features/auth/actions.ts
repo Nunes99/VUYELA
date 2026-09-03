@@ -2,6 +2,11 @@
 
 import { redirect } from "next/navigation";
 
+import {
+  businessSignUpErrorMessage,
+  businessSignUpExistingIdentityMessage,
+  normalizeBusinessPhone
+} from "@/features/auth/business-registration";
 import { getDefinePasswordPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
 import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isPhoneAuthEnabled, isSupabaseConfigured } from "@/lib/env";
@@ -319,6 +324,13 @@ export async function signUpBusinessWithEmailAction(
     "Número de telefone"
   );
   if (!representativePhone.ok) return representativePhone.state;
+  const normalizedRepresentativePhone = normalizeBusinessPhone(
+    representativePhone.value,
+    "O número de telefone"
+  );
+  if (!normalizedRepresentativePhone.ok) {
+    return { status: "error", message: normalizedRepresentativePhone.message };
+  }
 
   const businessType = getRequiredFormString(formData, "businessType", "Tipo de negócio");
   if (!businessType.ok) return businessType.state;
@@ -337,6 +349,13 @@ export async function signUpBusinessWithEmailAction(
 
   const branchPhone = getRequiredFormString(formData, "branchPhone", "Telefone da filial");
   if (!branchPhone.ok) return branchPhone.state;
+  const normalizedBranchPhone = normalizeBusinessPhone(
+    branchPhone.value,
+    "O telefone da filial"
+  );
+  if (!normalizedBranchPhone.ok) {
+    return { status: "error", message: normalizedBranchPhone.message };
+  }
 
   const addressLine = getRequiredFormString(formData, "addressLine", "Endereço completo");
   if (!addressLine.ok) return addressLine.state;
@@ -396,7 +415,7 @@ export async function signUpBusinessWithEmailAction(
       emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/negocio")}`,
       data: {
         display_name: representativeName.value,
-        phone: representativePhone.value,
+        phone: normalizedRepresentativePhone.value,
         account_type: "business",
         business_registration: {
           slug,
@@ -404,12 +423,12 @@ export async function signUpBusinessWithEmailAction(
           legal_name: getFormString(formData, "legalName") || businessName.value,
           nuit: nuit.value,
           description: getFormString(formData, "description") || null,
-          phone: branchPhone.value,
+          phone: normalizedBranchPhone.value,
           email: email.value,
           business_type: businessType.value,
           business_sector: businessSector.value,
           branch_name: branchName.value,
-          branch_phone: branchPhone.value,
+          branch_phone: normalizedBranchPhone.value,
           address_line: addressLine.value,
           city: city.value,
           province: province.value,
@@ -421,9 +440,22 @@ export async function signUpBusinessWithEmailAction(
   });
 
   if (error) {
+    console.error("Business account sign-up failed", {
+      code: error.code,
+      message: error.message,
+      name: error.name,
+      status: error.status
+    });
     return {
       status: "error",
-      message: "Não foi possível criar a conta de negócio. Reveja os dados e tente novamente."
+      message: businessSignUpErrorMessage(error)
+    };
+  }
+
+  if (!data.user || data.user.identities?.length === 0) {
+    return {
+      status: "error",
+      message: businessSignUpExistingIdentityMessage()
     };
   }
 
