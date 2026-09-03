@@ -3,12 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import {
-  mediaFile,
-  updateBusinessMedia,
-  validateBusinessMediaFile
-} from "@/lib/business-media";
+import { mediaFile, updateBusinessMedia, validateBusinessMediaFile } from "@/lib/business-media";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { revalidatePublicMarketplacePaths } from "@/features/public-marketplace/revalidation";
 
 function value(formData: FormData, key: string): string {
   const raw = formData.get(key);
@@ -126,8 +123,7 @@ export async function updateBusinessSettingsAction(formData: FormData): Promise<
   revalidatePath("/negocio");
   revalidatePath("/pos");
   revalidatePath("/cliente");
-  revalidatePath("/estabelecimentos");
-  revalidatePath("/ofertas");
+  revalidatePublicMarketplacePaths();
   redirect(settingsPath(businessId, "guardado"));
 }
 

@@ -119,9 +119,11 @@ export interface PublicMarketplaceSnapshot {
 }
 
 export type MarketplaceListKind = "all" | "category" | "city" | "city-category";
+export type MarketplaceListFocus = "establishments" | "categories" | "cities" | "offers";
 
 export interface MarketplaceListViewModel {
   kind: MarketplaceListKind;
+  focus: MarketplaceListFocus;
   title: string;
   description: string;
   canonicalPath: string;
@@ -206,6 +208,7 @@ export function buildEstablishmentsList(
 ): MarketplaceListViewModel {
   return {
     kind: "all",
+    focus: "establishments",
     title: "Estabelecimentos com benefícios VUYELA",
     description:
       "Descubra negócios ativos em Moçambique com programas de YELAS, benefícios e ofertas públicas.",
@@ -239,6 +242,7 @@ export function buildCategoryList(
 
   return {
     kind: "category",
+    focus: "establishments",
     title: `${category.name} com YELAS VUYELA`,
     description: category.description
       ? `${category.description} Veja estabelecimentos com benefícios e ofertas ativas.`
@@ -262,6 +266,7 @@ export function buildCategoriesIndex(
 ): MarketplaceListViewModel {
   return {
     kind: "all",
+    focus: "categories",
     title: "Categorias com benefícios VUYELA",
     description:
       "Explore categorias de negócios com programas de YELAS, ofertas públicas e benefícios claros.",
@@ -293,6 +298,7 @@ export function buildCityList(
 
   return {
     kind: "city",
+    focus: "establishments",
     title: `Estabelecimentos VUYELA em ${city.name}`,
     description: `Descubra negócios em ${city.name} com YELAS, benefícios promocionais e ofertas ativas.`,
     canonicalPath: `/locais/${city.slug}`,
@@ -332,6 +338,7 @@ export function buildCityCategoryList(
 
   return {
     kind: "city-category",
+    focus: "establishments",
     title: `${item.category.name} com benefícios em ${item.city.name}`,
     description: `Veja ${item.category.name.toLocaleLowerCase("pt-MZ")} em ${item.city.name} com YELAS VUYELA, benefícios e ofertas ativas.`,
     canonicalPath: `/locais/${item.city.slug}/${item.category.slug}`,
@@ -385,6 +392,7 @@ export function buildBusinessDetail(
 export function buildOffersIndex(snapshot: PublicMarketplaceSnapshot): MarketplaceListViewModel {
   return {
     kind: "all",
+    focus: "offers",
     title: "Ofertas ativas VUYELA",
     description:
       "Encontre ofertas públicas ativas em negócios VUYELA e veja onde pode acumular ou usar YELAS.",
@@ -404,6 +412,7 @@ export function buildOffersIndex(snapshot: PublicMarketplaceSnapshot): Marketpla
 export function buildCitiesIndex(snapshot: PublicMarketplaceSnapshot): MarketplaceListViewModel {
   return {
     kind: "all",
+    focus: "cities",
     title: "Locais com estabelecimentos VUYELA",
     description:
       "Veja cidades com negócios ativos na VUYELA e descubra categorias, benefícios e ofertas por local.",
@@ -512,6 +521,10 @@ export function cityNameToSlug(city: string): string {
 
 export function normalizeCityName(city: string): string {
   return city.trim().replace(/\s+/g, " ");
+}
+
+export function normalizePublicCurrencyCopy(value: string): string {
+  return value.trim().replace(/\bMT\b/g, "MZN");
 }
 
 export function normalizeSlug(value: string): string {

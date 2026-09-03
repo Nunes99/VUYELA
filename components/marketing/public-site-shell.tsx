@@ -2,19 +2,27 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
+  BadgePercent,
   BriefcaseBusiness,
   CircleUserRound,
   FileText,
   Home,
   Info,
+  MapPin,
   Menu,
+  Search,
+  Shapes,
+  Store,
   Tag,
   X
 } from "lucide-react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 
-export type PublicNavigationKey = "home" | "how" | "customers" | "business" | "pricing" | "help";
+export type PublicNavigationKey =
+  "home" | "how" | "customers" | "business" | "pricing" | "discover" | "help";
+
+export type PublicDiscoveryKey = "establishments" | "categories" | "cities" | "offers" | "search";
 
 const publicNavigation: Array<{
   href: string;
@@ -27,19 +35,63 @@ const publicNavigation: Array<{
   { href: "/clientes", icon: CircleUserRound, key: "customers", label: "Para clientes" },
   { href: "/negocios", icon: BriefcaseBusiness, key: "business", label: "Para negócios" },
   { href: "/precos", icon: Tag, key: "pricing", label: "Preços" },
+  { href: "/estabelecimentos", icon: Store, key: "discover", label: "Descobrir" },
   { href: "/ajuda", icon: FileText, key: "help", label: "Ajuda" }
+];
+
+const discoveryNavigation: Array<{
+  href: string;
+  icon: typeof Store;
+  key: PublicDiscoveryKey;
+  label: string;
+  mobileLabel: string;
+}> = [
+  {
+    href: "/estabelecimentos",
+    icon: Store,
+    key: "establishments",
+    label: "Estabelecimentos",
+    mobileLabel: "Negócios"
+  },
+  {
+    href: "/categorias",
+    icon: Shapes,
+    key: "categories",
+    label: "Categorias",
+    mobileLabel: "Categorias"
+  },
+  { href: "/locais", icon: MapPin, key: "cities", label: "Locais", mobileLabel: "Locais" },
+  {
+    href: "/ofertas",
+    icon: BadgePercent,
+    key: "offers",
+    label: "Ofertas",
+    mobileLabel: "Ofertas"
+  },
+  {
+    href: "/pesquisar",
+    icon: Search,
+    key: "search",
+    label: "Pesquisar",
+    mobileLabel: "Pesquisar"
+  }
 ];
 
 interface PublicSiteShellProps {
   active: PublicNavigationKey;
   children: ReactNode;
+  discoveryActive?: PublicDiscoveryKey;
 }
 
-export function PublicSiteShell({ active, children }: PublicSiteShellProps) {
+export function PublicSiteShell({ active, children, discoveryActive }: PublicSiteShellProps) {
   return (
     <div className={`marketing-site marketing-site--${active}`}>
+      <a className="marketing-skip-link" href="#conteudo-principal">
+        Saltar para o conteúdo
+      </a>
       <PublicHeader active={active} />
-      <main>{children}</main>
+      {active === "discover" ? <PublicDiscoveryBar active={discoveryActive} /> : null}
+      <main id="conteudo-principal">{children}</main>
       <PublicFooter />
     </div>
   );
@@ -89,6 +141,14 @@ function PublicHeader({ active }: { active: PublicNavigationKey }) {
                 {item.label}
               </Link>
             ))}
+            <div className="marketing-menu__discovery" aria-label="Descobrir na VUYELA">
+              {discoveryNavigation.slice(1).map((item) => (
+                <Link href={item.href} key={item.key}>
+                  <item.icon aria-hidden="true" size={18} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
             <div className="marketing-menu__actions">
               <Link className="marketing-menu__register" href="/cadastrar">
                 Registar
@@ -106,6 +166,26 @@ function PublicHeader({ active }: { active: PublicNavigationKey }) {
         </details>
       </div>
     </header>
+  );
+}
+
+function PublicDiscoveryBar({ active }: { active?: PublicDiscoveryKey }) {
+  return (
+    <nav className="marketing-discovery" aria-label="Descobrir negócios e ofertas">
+      <div className="marketing-container marketing-discovery__inner">
+        {discoveryNavigation.map((item) => (
+          <Link
+            aria-current={item.key === active ? "page" : undefined}
+            href={item.href}
+            key={item.key}
+          >
+            <item.icon aria-hidden="true" size={16} />
+            <span className="marketing-discovery__label">{item.label}</span>
+            <span className="marketing-discovery__mobile-label">{item.mobileLabel}</span>
+          </Link>
+        ))}
+      </div>
+    </nav>
   );
 }
 
@@ -127,7 +207,7 @@ function PublicFooter() {
             <strong>Soluções</strong>
             <Link href="/clientes">Para clientes</Link>
             <Link href="/negocios">Para negócios</Link>
-            <Link href="/negocio/pos">Integração POS</Link>
+            <Link href="/pos/entrar">Aceder ao POS</Link>
           </nav>
           <nav aria-label="Empresa">
             <strong>Empresa</strong>
@@ -138,6 +218,7 @@ function PublicFooter() {
           <nav aria-label="Recursos">
             <strong>Recursos</strong>
             <Link href="/ajuda">Ajuda e FAQ</Link>
+            <Link href="/estabelecimentos">Estabelecimentos</Link>
             <Link href="/ofertas">Ofertas</Link>
             <Link href="/pesquisar">Pesquisar</Link>
           </nav>

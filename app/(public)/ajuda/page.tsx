@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, Clock3, FileText, Mail, MessageSquareText, ShieldCheck } from "lucide-react";
+import { BadgePercent, BookOpen, Clock3, Mail, MessageSquareText, Store } from "lucide-react";
 
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
 import { FaqExplorer, type MarketingFaqItem } from "@/features/marketing/faq-explorer";
@@ -92,20 +92,20 @@ export default function HelpPage() {
       >
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--center">
-            <h2 id="resources-title">Recursos para programadores</h2>
+            <h2 id="resources-title">Recursos úteis</h2>
           </div>
           <div className="marketing-resource-links">
             <Link href="/como-funciona">
               <BookOpen size={19} />
-              Documentação da API
+              Guia de utilização
             </Link>
             <Link href="/precos">
-              <FileText size={19} />
-              Termos e condições
+              <BadgePercent size={19} />
+              Planos para negócios
             </Link>
             <Link href="/estabelecimentos">
-              <ShieldCheck size={19} />
-              Políticas de privacidade
+              <Store size={19} />
+              Diretório de estabelecimentos
             </Link>
           </div>
         </div>

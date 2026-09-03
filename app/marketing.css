@@ -2063,6 +2063,341 @@
   }
 }
 
+/* Unified public navigation and marketplace experience. */
+.marketing-skip-link {
+  position: fixed;
+  z-index: 200;
+  top: 0.75rem;
+  left: 0.75rem;
+  transform: translateY(-200%);
+  border-radius: 0.375rem;
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  color: #0f2832;
+  font-weight: 750;
+}
+
+.marketing-skip-link:focus {
+  transform: translateY(0);
+}
+
+.marketing-header__nav {
+  gap: clamp(0.65rem, 1.25vw, 1.35rem);
+}
+
+.marketing-discovery {
+  position: relative;
+  z-index: 40;
+  border-bottom: 1px solid #dce5e7;
+  background: #ffffff;
+}
+
+.marketing-discovery__inner {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.marketing-discovery a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  padding-inline: 0.9rem;
+  color: #526573;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.marketing-discovery a:hover,
+.marketing-discovery a:focus-visible,
+.marketing-discovery a[aria-current="page"] {
+  background: #e9f6f4;
+  color: #176f68;
+}
+
+.marketing-discovery__mobile-label {
+  display: none;
+}
+
+.marketing-menu__discovery {
+  display: none;
+}
+
+.marketing-site .marketplace-page {
+  background: #f4f7f8;
+  color: #1e293b;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.marketing-site .marketplace-hero {
+  min-height: 21rem;
+  background: #021e28;
+}
+
+.marketing-site .marketplace-hero::before {
+  background-image: url("/brand/textures/capulana-primary.jpg");
+  background-position: center;
+  background-size: cover;
+  opacity: 0.12;
+}
+
+.marketing-site .marketplace-hero__image {
+  opacity: 0.2;
+}
+
+.marketing-site .marketplace-hero__inner {
+  min-height: 21rem;
+  align-content: center;
+  padding-block: 3.5rem 4rem;
+}
+
+.marketing-site .marketplace-hero h1 {
+  max-width: 20ch;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 750;
+  line-height: 1.02;
+}
+
+.marketing-site .marketplace-hero p {
+  max-width: 44rem;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.marketplace-discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.marketplace-discovery-card {
+  display: grid;
+  min-height: 7rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #dce5e7;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  padding: 1.25rem;
+  color: #0f2832;
+  box-shadow: 0 0.25rem 1rem rgba(15, 40, 50, 0.05);
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.marketplace-discovery-card:hover,
+.marketplace-discovery-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #2c8b82;
+}
+
+.marketplace-discovery-card > svg:first-child {
+  color: #2c8b82;
+}
+
+.marketplace-discovery-card > svg:last-child {
+  color: #94a3b8;
+}
+
+.marketplace-discovery-card span {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.marketplace-discovery-card strong {
+  font-size: 1rem;
+}
+
+.marketplace-discovery-card small {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.marketing-public-offers__grid {
+  margin-top: 2.5rem;
+}
+
+.marketing-public-offers .marketing-centered-action {
+  margin-top: 2rem;
+}
+
+.marketing-centered-action--inverse .marketing-text-link {
+  color: #ffffff;
+}
+
+.marketing-site .marketplace-offer-card {
+  border-color: #dce5e7;
+  background: #ffffff;
+  box-shadow: 0 0.5rem 1.5rem rgba(15, 40, 50, 0.08);
+}
+
+.marketing-site .marketplace-offer-card__placeholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-content: center;
+  gap: 0.65rem;
+  background-image:
+    linear-gradient(rgba(2, 30, 40, 0.88), rgba(2, 30, 40, 0.88)),
+    url("/brand/textures/capulana-primary.jpg");
+  background-position: center;
+  background-size: cover;
+  color: #ffffff;
+  font-family: "Outfit", Arial, sans-serif;
+  font-weight: 800;
+  text-align: center;
+}
+
+.marketing-site .marketplace-offer-card__category {
+  color: #176f68;
+}
+
+.marketing-site .marketplace-offer-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.marketing-site .marketplace-offer-card p {
+  white-space: pre-line;
+}
+
+@media (max-width: 67.5rem) {
+  .marketing-header__nav {
+    gap: 0.55rem;
+  }
+
+  .marketing-header__nav a {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 50rem) {
+  .marketing-discovery {
+    position: sticky;
+    top: 4.5rem;
+  }
+
+  .marketing-discovery__inner {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    padding-inline: 0.5rem;
+  }
+
+  .marketing-discovery a {
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-inline: 0.2rem;
+    font-size: 0.65rem;
+  }
+
+  .marketing-discovery__label {
+    display: none;
+  }
+
+  .marketing-discovery__mobile-label {
+    display: inline;
+  }
+
+  .marketing-menu__discovery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+
+  .marketing-menu nav .marketing-menu__discovery a {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.375rem;
+    padding-inline: 0.75rem;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 0.75rem;
+  }
+
+  .marketplace-discovery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-site .marketplace-results,
+  .marketing-site .marketplace-detail-layout,
+  .marketing-site .marketplace-search-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-site .marketplace-sidebar,
+  .marketing-site .marketplace-search-panel,
+  .marketing-site .marketplace-detail-aside {
+    position: static;
+  }
+}
+
+@media (max-width: 39.9375rem) {
+  .marketing-discovery {
+    top: 3.75rem;
+  }
+
+  .marketing-discovery__inner {
+    min-height: 3.25rem;
+  }
+
+  .marketing-discovery a {
+    min-height: 3rem;
+    font-size: 0.58rem;
+  }
+
+  .marketing-site .marketplace-hero,
+  .marketing-site .marketplace-hero__inner {
+    min-height: 17rem;
+  }
+
+  .marketing-site .marketplace-hero__inner {
+    padding: 2.25rem 1.25rem 2.75rem;
+  }
+
+  .marketing-site .marketplace-hero h1 {
+    max-width: 22ch;
+    font-size: 2rem;
+  }
+
+  .marketing-site .marketplace-hero p {
+    font-size: 0.78rem;
+  }
+
+  .marketing-site .marketplace-section {
+    padding-block: 2.75rem;
+  }
+
+  .marketing-site .marketplace-section-header h2 {
+    font-size: 1.55rem;
+  }
+
+  .marketing-site .marketplace-business-grid,
+  .marketing-site .marketplace-offer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-site .marketplace-business-card p,
+  .marketing-site .marketplace-offer-card p {
+    min-height: 0;
+  }
+
+  .marketing-footer__links nav:nth-child(3) {
+    display: grid;
+  }
+}
+
 @media (max-width: 22rem) {
   .marketing-container {
     width: min(calc(100% - 1.5rem), 21rem);

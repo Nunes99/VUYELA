@@ -73,24 +73,23 @@ export function buildItemListJsonLd(
   }
 
   const siteUrl = getSiteUrl();
-  const businesses = viewModel.businesses.map((business, index) => ({
+  const businesses = viewModel.businesses.map((business) => ({
     "@type": "ListItem",
-    position: index + 1,
     url: `${siteUrl}/estabelecimentos/${business.slug}`,
     name: business.name
   }));
-  const offers = viewModel.offers.slice(0, 12).map((offer, index) => ({
+  const offers = viewModel.offers.slice(0, 12).map((offer) => ({
     "@type": "ListItem",
-    position: businesses.length + index + 1,
     url: `${siteUrl}${offer.uniquePublicSlug ? `/ofertas/${offer.slug}` : `/estabelecimentos/${offer.businessSlug}`}`,
     name: offer.title
   }));
+  const prioritizedItems = viewModel.focus === "offers" ? offers : businesses.concat(offers);
 
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: viewModel.title,
-    itemListElement: [...businesses, ...offers]
+    itemListElement: prioritizedItems.map((item, index) => ({ ...item, position: index + 1 }))
   };
 }
 
@@ -172,7 +171,7 @@ export function buildBusinessFaqJsonLd(business: MarketplaceBusiness): Record<st
       },
       {
         "@type": "Question",
-        name: "As YELAS VUYELA podem ser levantados em dinheiro?",
+        name: "As YELAS VUYELA podem ser levantadas em dinheiro?",
         acceptedAnswer: {
           "@type": "Answer",
           text: "Não. As YELAS são benefícios promocionais do negócio emissor e não representam dinheiro, saldo bancário ou valor transferível."

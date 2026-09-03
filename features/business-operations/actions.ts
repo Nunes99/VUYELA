@@ -15,6 +15,7 @@ import {
 } from "@/lib/business-media";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { revalidatePublicMarketplacePaths } from "@/features/public-marketplace/revalidation";
 
 import {
   isCatalogItemKind,
@@ -563,8 +564,7 @@ function revalidateBusinessPaths() {
   revalidatePath("/pos");
   revalidatePath("/negocio/campanhas");
   revalidatePath("/cliente");
-  revalidatePath("/estabelecimentos");
-  revalidatePath("/ofertas");
+  revalidatePublicMarketplacePaths();
 }
 
 function redirectWithResult(view: string, businessId: string, result: string): never {

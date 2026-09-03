@@ -24,6 +24,7 @@ import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
 import { PricingSelector } from "@/features/marketing/pricing-selector";
 import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
+import { OfferCard } from "@/features/public-marketplace/marketplace";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
 import { getSiteUrl } from "@/lib/env";
 import { serializeJsonLd } from "@/lib/seo/json-ld";
@@ -108,6 +109,27 @@ export default async function HomePage() {
     getPublicMarketplaceSnapshot()
   ]);
   const businesses = marketplace.snapshot.businesses.slice(0, 6);
+  const offers = marketplace.snapshot.offers.slice(0, 3);
+  const publicMetric = (value: number) =>
+    marketplace.status === "error" ? "-" : value.toLocaleString("pt-MZ");
+  const publicFacts = [
+    {
+      value: publicMetric(marketplace.snapshot.businesses.length),
+      label: "Negócios publicados"
+    },
+    {
+      value: publicMetric(marketplace.snapshot.offers.length),
+      label: "Ofertas ativas"
+    },
+    {
+      value: publicMetric(marketplace.snapshot.categories.length),
+      label: "Categorias disponíveis"
+    },
+    {
+      value: publicMetric(marketplace.snapshot.cities.length),
+      label: "Locais abrangidos"
+    }
+  ];
 
   return (
     <PublicSiteShell active="home">
@@ -164,24 +186,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="marketing-facts" aria-label="Princípios VUYELA">
+      <section className="marketing-facts" aria-label="Diretório VUYELA em números">
         <div className="marketing-container marketing-facts__grid">
-          <div>
-            <strong>500+</strong>
-            <span>Clientes ativos</span>
-          </div>
-          <div>
-            <strong>50+</strong>
-            <span>Negócios registados</span>
-          </div>
-          <div>
-            <strong>15.000+</strong>
-            <span>Transações</span>
-          </div>
-          <div>
-            <strong>2M+ MZN</strong>
-            <span>Poupados em YELAS</span>
-          </div>
+          {publicFacts.map((fact) => (
+            <div key={fact.label}>
+              <strong>{fact.value}</strong>
+              <span>{fact.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -254,8 +266,46 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <p>O diretório de parceiros será apresentado quando existirem negócios publicados.</p>
+            <p>
+              {marketplace.status === "error"
+                ? "O diretório está temporariamente indisponível. Tente novamente dentro de alguns instantes."
+                : "O diretório de parceiros será apresentado quando existirem negócios publicados."}
+            </p>
           )}
+        </div>
+      </section>
+
+      <section
+        className="marketing-section marketing-section--light marketing-public-offers"
+        aria-labelledby="public-offers-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-heading marketing-heading--center">
+            <span>Ofertas públicas</span>
+            <h2 id="public-offers-title">Benefícios preparados pelos negócios para si.</h2>
+            <p>Consulte promoções ativas, o estabelecimento responsável e a respetiva validade.</p>
+          </div>
+          {offers.length > 0 ? (
+            <div className="marketplace-offer-grid marketing-public-offers__grid">
+              {offers.map((offer) => (
+                <OfferCard offer={offer} key={offer.id} />
+              ))}
+            </div>
+          ) : (
+            <div className="marketing-empty-state">
+              <strong>
+                {marketplace.status === "error"
+                  ? "Não foi possível carregar as ofertas neste momento."
+                  : "Ainda não existem ofertas públicas ativas."}
+              </strong>
+              <p>Entretanto, pode conhecer os estabelecimentos já publicados.</p>
+            </div>
+          )}
+          <div className="marketing-centered-action">
+            <Link className="marketing-text-link" href="/ofertas">
+              Ver todas as ofertas <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 

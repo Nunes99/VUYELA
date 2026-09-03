@@ -4538,71 +4538,12 @@
   color: var(--vy-text);
 }
 
-.marketplace-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--vy-z-header);
-  border-bottom: 1px solid var(--vy-border);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-}
-
-.marketplace-header__inner {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--vy-space-5);
-  align-items: center;
-  min-height: 4.5rem;
-}
-
-.marketplace-logo {
-  display: grid;
-  gap: 0.1rem;
-  color: var(--vy-color-indigo);
-  line-height: 1;
-}
-
-.marketplace-logo span {
-  font-family: var(--vy-font-display);
-  font-size: var(--vy-text-xl);
-  font-weight: 850;
-}
-
-.marketplace-logo small {
-  color: var(--vy-text-muted);
-  font-size: var(--vy-text-xs);
-  font-weight: 750;
-  text-transform: uppercase;
-}
-
-.marketplace-header nav,
 .marketplace-hero__links {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--vy-space-3);
-}
-
-.marketplace-header nav a,
-.marketplace-header__cta {
-  display: inline-flex;
-  min-height: 2.5rem;
-  align-items: center;
-  border-radius: var(--vy-radius-xs);
-  padding-inline: var(--vy-space-3);
-  color: var(--vy-color-indigo);
-  font-size: var(--vy-text-sm);
-  font-weight: 850;
-}
-
-.marketplace-header nav a:hover,
-.marketplace-header__cta:hover {
-  background: var(--vy-surface-subtle);
-}
-
-.marketplace-header__cta {
-  border: 1px solid var(--vy-border);
 }
 
 .marketplace-hero {
@@ -5245,16 +5186,6 @@
 }
 
 @media (max-width: 67.5rem) {
-  .marketplace-header__inner {
-    grid-template-columns: 1fr auto;
-  }
-
-  .marketplace-header nav {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-    padding-bottom: var(--vy-space-3);
-  }
-
   .marketplace-hero h1 {
     font-size: var(--vy-text-4xl);
   }
@@ -5279,28 +5210,6 @@
 }
 
 @media (max-width: 47.5rem) {
-  .marketplace-header__inner {
-    gap: var(--vy-space-2);
-    min-height: auto;
-    padding-block: var(--vy-space-3);
-  }
-
-  .marketplace-header__cta {
-    min-height: 2.25rem;
-  }
-
-  .marketplace-header nav {
-    gap: var(--vy-space-2);
-    overflow-x: auto;
-  }
-
-  .marketplace-header nav a {
-    flex: 0 0 auto;
-    min-height: 2.25rem;
-    padding-inline: var(--vy-space-2);
-    font-size: var(--vy-text-xs);
-  }
-
   .marketplace-hero__inner {
     min-height: calc(100svh - 7.25rem);
     padding-block: var(--vy-space-6);
@@ -9048,18 +8957,6 @@
   text-align: end;
 }
 
-.marketplace-header__inner {
-  min-height: 4.75rem;
-}
-
-.marketplace-logo {
-  min-width: 9.5rem;
-}
-
-.marketplace-mobile-menu {
-  display: none;
-}
-
 .marketplace-hero {
   min-height: 25rem;
 }
@@ -9520,70 +9417,6 @@
 
   .home-footer small {
     text-align: start;
-  }
-
-  .marketplace-header__inner {
-    align-items: center;
-  }
-
-  .marketplace-logo {
-    min-width: 0;
-  }
-
-  .marketplace-desktop-nav,
-  .marketplace-header__cta {
-    display: none !important;
-  }
-
-  .marketplace-mobile-menu {
-    position: relative;
-    display: block;
-    margin-left: auto;
-  }
-
-  .marketplace-mobile-menu summary {
-    display: grid;
-    width: var(--vy-touch-target);
-    height: var(--vy-touch-target);
-    place-items: center;
-    border: 1px solid var(--vy-border);
-    border-radius: var(--vy-radius-xs);
-    color: var(--vy-color-indigo);
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .marketplace-mobile-menu summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .marketplace-mobile-menu nav {
-    position: absolute;
-    top: calc(100% + var(--vy-space-2));
-    right: 0;
-    z-index: var(--vy-z-header);
-    display: grid;
-    width: min(18rem, calc(100vw - 1.75rem));
-    overflow: hidden;
-    border: 1px solid var(--vy-border);
-    border-radius: var(--vy-radius-xs);
-    background: #ffffff;
-    box-shadow: var(--vy-shadow-md);
-  }
-
-  .marketplace-mobile-menu nav a {
-    display: flex;
-    min-height: var(--vy-touch-target);
-    align-items: center;
-    border-bottom: 1px solid var(--vy-border);
-    padding-inline: var(--vy-space-4);
-    font-weight: 750;
-  }
-
-  .marketplace-mobile-menu nav a:last-child {
-    border-bottom: 0;
-    background: var(--vy-color-indigo);
-    color: #ffffff;
   }
 
   .auth-shell,

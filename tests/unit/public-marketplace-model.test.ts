@@ -2,14 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildBusinessDetail,
+  buildCategoriesIndex,
   buildCategoryList,
   buildCityCategoryList,
+  buildCitiesIndex,
   buildEstablishmentsList,
   buildMarketplaceSnapshot,
   buildOfferDetail,
+  buildOffersIndex,
   cityNameToSlug,
   getPointValueLabel,
-  isIndexableOffer
+  isIndexableOffer,
+  normalizePublicCurrencyCopy
 } from "@/features/public-marketplace/model";
 import type { MarketplaceBusiness, MarketplaceOffer } from "@/features/public-marketplace/model";
 
@@ -140,6 +144,7 @@ describe("public marketplace model", () => {
 
     const restaurants = buildCategoryList(snapshot, "restaurantes");
     expect(restaurants?.indexable).toBe(true);
+    expect(restaurants?.focus).toBe("establishments");
     expect(restaurants?.businesses[0]?.name).toBe("Restaurante Mares");
   });
 
@@ -222,9 +227,21 @@ describe("public marketplace model", () => {
     });
 
     expect(buildEstablishmentsList(snapshot).canonicalPath).toBe("/estabelecimentos");
+    expect(buildEstablishmentsList(snapshot).focus).toBe("establishments");
+    expect(buildCategoriesIndex(snapshot).focus).toBe("categories");
+    expect(buildCitiesIndex(snapshot).focus).toBe("cities");
+    expect(buildOffersIndex(snapshot).focus).toBe("offers");
     expect(buildBusinessDetail(snapshot, "restaurante-mares")?.canonicalPath).toBe(
       "/estabelecimentos/restaurante-mares"
     );
     expect(getPointValueLabel(program)).toBe("1 YELA = 1,00 MZN promocional");
+  });
+
+  it("normalizes public currency copy without changing other words", () => {
+    expect(normalizePublicCurrencyCopy("Poupe 250 MT hoje")).toBe("Poupe 250 MZN hoje");
+    expect(normalizePublicCurrencyCopy("Pagamento em MT, válido em Maputo")).toBe(
+      "Pagamento em MZN, válido em Maputo"
+    );
+    expect(normalizePublicCurrencyCopy("Montante em MZN")).toBe("Montante em MZN");
   });
 });

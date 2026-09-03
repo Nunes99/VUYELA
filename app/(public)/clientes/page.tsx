@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bell, Heart, MapPin, Scissors, Utensils } from "lucide-react";
+import { ArrowRight, Bell } from "lucide-react";
 
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
 import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
+import { OfferCard } from "@/features/public-marketplace/marketplace";
 
 export const revalidate = 3600;
 
@@ -12,8 +13,6 @@ export const metadata: Metadata = {
   description: "Todos os cartões, YELAS, ofertas e movimentos VUYELA numa área digital simples.",
   alternates: { canonical: "/clientes" }
 };
-
-const offerIcons = [Utensils, Heart, Scissors];
 
 export default async function CustomersPage() {
   const marketplace = await getPublicMarketplaceSnapshot();
@@ -67,27 +66,10 @@ export default async function CustomersPage() {
             <h2 id="offers-title">Poupe hoje mesmo nestes parceiros</h2>
           </div>
           {offers.length > 0 ? (
-            <div className="marketing-offer-grid">
-              {offers.map((offer, index) => {
-                const Icon = offerIcons[index % offerIcons.length];
-                const href = offer.uniquePublicSlug
-                  ? `/ofertas/${offer.slug}`
-                  : `/estabelecimentos/${offer.businessSlug}`;
-                return (
-                  <Link href={href} key={offer.id}>
-                    <div>
-                      <span>{offer.businessName}</span>
-                      <Icon size={19} />
-                    </div>
-                    <h3>{offer.title}</h3>
-                    <p>{offer.description}</p>
-                    <small>
-                      <MapPin size={14} />
-                      {offer.city ?? "Moçambique"}
-                    </small>
-                  </Link>
-                );
-              })}
+            <div className="marketplace-offer-grid marketing-public-offers__grid">
+              {offers.map((offer) => (
+                <OfferCard offer={offer} key={offer.id} />
+              ))}
             </div>
           ) : (
             <div className="marketing-empty-state marketing-empty-state--dark">
@@ -98,6 +80,11 @@ export default async function CustomersPage() {
               </Link>
             </div>
           )}
+          <div className="marketing-centered-action marketing-centered-action--inverse">
+            <Link className="marketing-text-link" href="/ofertas">
+              Explorar todas as ofertas <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
     </PublicSiteShell>

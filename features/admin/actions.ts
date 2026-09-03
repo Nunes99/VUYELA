@@ -9,6 +9,7 @@ import { AdminAccessDeniedError, requireAdminCapability } from "@/lib/auth/admin
 import { isProfileRole } from "@/lib/auth/rbac";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 import type { AdminActionState } from "@/features/admin/state";
+import { revalidatePublicMarketplacePaths } from "@/features/public-marketplace/revalidation";
 
 export async function reviewBusinessAction(
   _previousState: AdminActionState,
@@ -47,6 +48,7 @@ export async function reviewBusinessAction(
   }
 
   revalidateAdmin();
+  revalidatePublicMarketplacePaths();
   return adminSuccess("Estado do negócio atualizado e auditado.");
 }
 
@@ -96,8 +98,7 @@ export async function saveBusinessCategoryAction(
   }
 
   revalidateAdmin();
-  revalidatePath("/estabelecimentos");
-  revalidatePath("/");
+  revalidatePublicMarketplacePaths();
   return adminSuccess(
     categoryId ? "Categoria atualizada e auditada." : "Categoria criada e auditada."
   );

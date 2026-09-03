@@ -8,6 +8,10 @@ const migration = readFileSync(
   "utf8"
 );
 const action = readFileSync(join(process.cwd(), "features/business-settings/actions.ts"), "utf8");
+const publicRevalidation = readFileSync(
+  join(process.cwd(), "features/public-marketplace/revalidation.ts"),
+  "utf8"
+);
 
 describe("business settings contract", () => {
   it("updates profile, loyalty and branch data in one tenant-scoped function", () => {
@@ -28,7 +32,13 @@ describe("business settings contract", () => {
 
   it("revalidates private and public pages after configuration", () => {
     expect(action).toContain('revalidatePath("/negocio")');
-    expect(action).toContain('revalidatePath("/estabelecimentos")');
+    expect(action).toContain("revalidatePublicMarketplacePaths()");
+    expect(publicRevalidation).toContain('"/clientes"');
+    expect(publicRevalidation).toContain('"/estabelecimentos"');
+    expect(publicRevalidation).toContain('"/categorias"');
+    expect(publicRevalidation).toContain('"/locais"');
+    expect(publicRevalidation).toContain('"/ofertas"');
+    expect(publicRevalidation).toContain('revalidatePath(path, "page")');
     expect(action).toContain('supabase.rpc("update_business_configuration"');
   });
 });

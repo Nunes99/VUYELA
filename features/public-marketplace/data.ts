@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { isSupabaseConfigured } from "@/lib/env";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 
@@ -20,7 +22,8 @@ import {
   buildMarketplaceSnapshot,
   buildOfferDetail,
   buildOffersIndex,
-  normalizeCityName
+  normalizeCityName,
+  normalizePublicCurrencyCopy
 } from "./model";
 import type {
   BranchOpeningHours,
@@ -108,7 +111,7 @@ const emptySnapshot: PublicMarketplaceSnapshot = {
   cityCategories: []
 };
 
-export async function getPublicMarketplaceSnapshot(): Promise<PublicMarketplaceState> {
+export const getPublicMarketplaceSnapshot = cache(async (): Promise<PublicMarketplaceState> => {
   if (!isSupabaseConfigured()) {
     return { status: "empty", snapshot: emptySnapshot };
   }
@@ -198,7 +201,7 @@ export async function getPublicMarketplaceSnapshot(): Promise<PublicMarketplaceS
   }
 
   return { status: "ready", snapshot };
-}
+});
 
 export async function getEstablishmentsList(): Promise<MarketplaceListViewModel> {
   const state = await getPublicMarketplaceSnapshot();
@@ -341,8 +344,8 @@ function mapOffer(row: OfferRow, business: MarketplaceBusiness | null): Marketpl
   return {
     id: row.id,
     slug: row.slug,
-    title: row.title,
-    description: row.description,
+    title: normalizePublicCurrencyCopy(row.title),
+    description: normalizePublicCurrencyCopy(row.description),
     imageUrl: row.image_url,
     startsAt: row.starts_at,
     endsAt: row.ends_at,

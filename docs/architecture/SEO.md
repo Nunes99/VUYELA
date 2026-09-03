@@ -69,6 +69,11 @@ Every indexable marketplace page has canonical metadata, OpenGraph metadata, bre
 - `LocalBusiness` and `FAQPage` for establishment detail pages;
 - `Offer` for unique active offer pages.
 
+Campaigns are private tenant workflows. Public marketing pages may only expose their approved
+projection through active records in `offers` with `is_public = true`; they must not query private
+campaign audiences, targeting rules or delivery history. Offer images, titles and descriptions use
+that same server-rendered projection across the homepage, customer page and discovery routes.
+
 The sitemap includes only meaningful public marketplace URLs and excludes dashboards, POS, admin, auth internals, and low-value generated combinations.
 
 ## Search SEO

@@ -11,11 +11,18 @@ six independent page copies:
 - `/clientes` presents the customer value and reads active offers from the public marketplace;
 - `/negocios` presents the operational dashboard, POS and management capabilities;
 - `/precos` reads the public plan catalogue and compares database-owned entitlements;
-- `/ajuda` provides searchable, category-filtered FAQs and working support destinations.
+- `/ajuda` provides searchable, category-filtered FAQs and working support destinations;
+- `/estabelecimentos`, `/categorias`, `/locais`, `/ofertas` and `/pesquisar` reuse the same public
+  shell and provide the discovery layer for published marketplace content.
 
-All six pages reuse `PublicSiteShell`, the official `VuyelaLogo`, the exported Capulana textures,
+All public pages reuse `PublicSiteShell`, the official `VuyelaLogo`, the exported Capulana textures,
 Outfit for public display typography and Inter for body copy. Navigation links resolve to real
 routes, while unavailable payment-provider integrations are not advertised as active capabilities.
+
+The primary navigation has one `Descobrir` entry. Inside discovery routes, a compact contextual
+navigation exposes establishments, categories, locations, offers and search. The mobile version
+uses five stable icon-and-label destinations so the complete public flow remains visible without
+page-level horizontal overflow.
 
 The mobile layouts follow the approved 390 px Figma frames (nodes `546:4269`, `546:4441`,
 `546:4546`, `546:4670`, `546:4843`, `546:5042` and `552:4266`). The menu is a full-screen surface,
@@ -31,11 +38,16 @@ generic financial imagery.
 The information order is:
 
 1. core promise and customer/business entry points;
-2. direct discovery of establishments, categories, locations, offers, and search;
+2. verified public counts and direct discovery of establishments, categories, locations, offers,
+   and search;
 3. the four-step loyalty loop;
 4. customer benefits and partner proof;
 5. dedicated customer and business paths;
 6. pricing, programme rules, resources, and footer.
+
+Public metrics must be derived from published marketplace records. Uploaded promotional images
+and active public offers are reused on the homepage, the customer page and marketplace routes;
+private campaign audiences, rules and internal workflow data must never be projected publicly.
 
 ## Interaction rules
 
