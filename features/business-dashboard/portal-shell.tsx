@@ -21,9 +21,11 @@ import type { ReactNode } from "react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { FlowBreadcrumbs } from "@/components/navigation/flow-navigation";
+import { ProfileAvatar } from "@/components/profile/profile-avatar";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
+import { getOwnProfileAvatarUrl } from "@/lib/profile-media";
 
 export type BusinessPortalSection =
   | "dashboard"
@@ -65,7 +67,7 @@ const sectionLabels: Record<BusinessPortalSection, string> = Object.fromEntries(
   navigation.map((item) => [item.id, item.label])
 ) as Record<BusinessPortalSection, string>;
 
-export function BusinessPortalShell({
+export async function BusinessPortalShell({
   principal,
   activeSection,
   title,
@@ -83,6 +85,7 @@ export function BusinessPortalShell({
   children: ReactNode;
 }) {
   const dashboardHref = withBusinessContext("/negocio", businessId);
+  const avatarUrl = await getOwnProfileAvatarUrl(principal.profileId);
 
   return (
     <div className="business-portal">
@@ -94,9 +97,11 @@ export function BusinessPortalShell({
           </summary>
           <div className="business-portal__mobile-menu-panel">
             <div className="business-portal__mobile-identity">
-              <span className="business-portal__avatar" aria-hidden="true">
-                {initials(identityLabel)}
-              </span>
+              <ProfileAvatar
+                className="business-portal__avatar"
+                displayName={identityLabel}
+                src={avatarUrl}
+              />
               <span>
                 <strong>{identityLabel}</strong>
                 <small>{businessRoleLabel(principal)}</small>
@@ -188,9 +193,11 @@ export function BusinessPortalShell({
             <p>{subtitle ?? "Controlo e auditoria operacional de negócio parceiro"}</p>
           </div>
           <div className="business-portal__identity">
-            <span className="business-portal__avatar" aria-hidden="true">
-              {initials(identityLabel)}
-            </span>
+            <ProfileAvatar
+              className="business-portal__avatar"
+              displayName={identityLabel}
+              src={avatarUrl}
+            />
             <span>
               <strong>{identityLabel}</strong>
               <small>{businessRoleLabel(principal)}</small>
@@ -223,9 +230,4 @@ function businessRoleLabel(principal: AuthPrincipal): string {
   } as const;
 
   return role ? labels[role] : "Gestão do negócio";
-}
-
-function initials(value: string): string {
-  const parts = value.split(/\s+/).filter(Boolean);
-  return `${parts[0]?.[0] ?? "V"}${parts[1]?.[0] ?? parts[0]?.[1] ?? "Y"}`.toUpperCase();
 }

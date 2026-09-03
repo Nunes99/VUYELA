@@ -94,6 +94,9 @@ export default async function CustomerAreaPage({
 
   return (
     <ProtectedRouteStateView
+      customerAvatarUrl={
+        dashboardState?.status !== "error" ? dashboardState?.dashboard.profile.avatarUrl : undefined
+      }
       customerName={
         dashboardState?.status !== "error"
           ? dashboardState?.dashboard.profile.displayName

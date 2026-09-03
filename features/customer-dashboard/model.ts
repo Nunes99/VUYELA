@@ -35,6 +35,7 @@ export interface CustomerProfileSummary {
   displayName: string;
   email: string | null;
   phone: string | null;
+  avatarUrl: string | null;
   locale: string;
   marketingConsent: boolean;
   dateOfBirth: string | null;

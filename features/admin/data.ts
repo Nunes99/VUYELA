@@ -7,6 +7,7 @@ import { getAdminCapabilities, hasAdminCapability } from "@/lib/auth/admin-permi
 import type { AdminCapability } from "@/lib/auth/admin-permissions";
 import { isProfileRole } from "@/lib/auth/rbac";
 import type { AuthPrincipal } from "@/lib/auth/rbac";
+import { createProfileAvatarUrl } from "@/lib/profile-media";
 import { getSiteUrl, isNotificationEmailConfigured, isSupabaseConfigured } from "@/lib/env";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase/admin";
 
@@ -354,7 +355,7 @@ export async function getAdminDashboardState(
 async function loadViewer(supabase: SupabaseClient, profileId: string): Promise<AdminViewer> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("display_name, email")
+    .select("display_name, email, avatar_path")
     .eq("id", profileId)
     .maybeSingle();
 
@@ -362,11 +363,17 @@ async function loadViewer(supabase: SupabaseClient, profileId: string): Promise<
     throw error;
   }
 
-  const row = data as { display_name: string | null; email: string | null } | null;
+  const row = data as {
+    display_name: string | null;
+    email: string | null;
+    avatar_path: string | null;
+  } | null;
+  const avatarUrl = await createProfileAvatarUrl(supabase, profileId, row?.avatar_path);
 
   return {
     displayName: row?.display_name ?? "Admin VUYELA",
-    email: row?.email ?? "Administração da plataforma"
+    email: row?.email ?? "Administração da plataforma",
+    avatarUrl
   };
 }
 

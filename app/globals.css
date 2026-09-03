@@ -16341,6 +16341,12 @@
   min-width: 0;
 }
 
+#customer-profile-edit-form .vy-field__label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15rem;
+}
+
 @media (max-width: 47.5rem) {
   .customer-mobile-header__logo {
     display: grid;
@@ -21166,8 +21172,19 @@
   grid-template-columns: 7.5rem minmax(0, 1fr);
 }
 
+.business-image-field--avatar {
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+}
+
 .business-image-field--square .business-image-field__preview {
   aspect-ratio: 1;
+}
+
+.business-image-field--avatar .business-image-field__preview {
+  width: 7.5rem;
+  aspect-ratio: 1;
+  border: 4px solid #d4f0ed;
+  border-radius: 50%;
 }
 
 .business-image-field__preview img {
@@ -21177,6 +21194,20 @@
 .business-image-field--square .business-image-field__preview img {
   object-fit: contain;
   padding: 0.5rem;
+}
+
+.business-image-field--avatar .business-image-field__preview img {
+  object-fit: cover;
+}
+
+.profile-avatar {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.profile-avatar > img {
+  object-fit: cover;
 }
 
 .business-image-field__preview > span {
@@ -21382,11 +21413,13 @@
 
 @media (max-width: 40rem) {
   .business-image-field,
-  .business-image-field--square {
+  .business-image-field--square,
+  .business-image-field--avatar {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .business-image-field--square .business-image-field__preview {
+  .business-image-field--square .business-image-field__preview,
+  .business-image-field--avatar .business-image-field__preview {
     width: 8rem;
   }
 

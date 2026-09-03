@@ -46,5 +46,6 @@ Apply them in this exact order:
 40. `harden_pos_operator_provisioning.sql`
 41. `implement_cart_first_pos_checkout.sql`
 42. `manage_business_media.sql`
+43. `manage_profile_media.sql`
 
 Do not rely on alphabetical order. The Supabase plugin migration names should match the file names without `.sql`.

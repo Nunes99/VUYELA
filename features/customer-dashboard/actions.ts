@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAuthenticatedUser } from "@/lib/auth/session";
+import {
+  ProfileMediaError,
+  profileMediaFile,
+  removeProfileAvatar,
+  uploadProfileAvatar
+} from "@/lib/profile-media";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function value(formData: FormData, key: string): string {
@@ -16,6 +22,8 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
   const displayName = value(formData, "displayName");
   const phone = value(formData, "phone");
   const dateOfBirth = normalizeDateOfBirth(value(formData, "dateOfBirth"));
+  const avatarFile = profileMediaFile(formData, "profileImage");
+  const removeAvatar = value(formData, "removeProfileImage") === "on";
 
   if (displayName.length < 2 || displayName.length > 100) {
     redirect("/cliente?vista=perfil&editar=1&perfil=erro");
@@ -30,11 +38,41 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
   }
 
   const supabase = await createSupabaseServerClient();
+  const { data: currentProfileData, error: currentProfileError } = await supabase
+    .from("profiles")
+    .select("avatar_path")
+    .eq("id", principal.profileId)
+    .maybeSingle();
+
+  if (currentProfileError) {
+    redirect("/cliente?vista=perfil&editar=1&perfil=erro");
+  }
+
+  const currentProfile = currentProfileData as { avatar_path: string | null } | null;
+  const previousAvatarPath = currentProfile?.avatar_path ?? null;
+  let nextAvatarPath = previousAvatarPath;
+  let uploadedAvatarPath: string | null = null;
+
+  if (avatarFile) {
+    try {
+      uploadedAvatarPath = await uploadProfileAvatar(supabase, principal.profileId, avatarFile);
+      nextAvatarPath = uploadedAvatarPath;
+    } catch (error) {
+      if (error instanceof ProfileMediaError && error.code === "invalid-file") {
+        redirect("/cliente?vista=perfil&editar=1&perfil=imagem-invalida");
+      }
+      redirect("/cliente?vista=perfil&editar=1&perfil=imagem-erro");
+    }
+  } else if (removeAvatar) {
+    nextAvatarPath = null;
+  }
+
   const { error } = await supabase
     .from("profiles")
     .update({
       display_name: displayName,
       phone: phone || null,
+      avatar_path: nextAvatarPath,
       date_of_birth: dateOfBirth,
       locale: "pt-MZ",
       marketing_consent_at:
@@ -43,7 +81,14 @@ export async function updateCustomerProfileAction(formData: FormData): Promise<v
     .eq("id", principal.profileId);
 
   if (error) {
+    if (uploadedAvatarPath) {
+      await removeProfileAvatar(supabase, principal.profileId, uploadedAvatarPath);
+    }
     redirect("/cliente?vista=perfil&editar=1&perfil=erro");
+  }
+
+  if (previousAvatarPath !== nextAvatarPath) {
+    await removeProfileAvatar(supabase, principal.profileId, previousAvatarPath);
   }
 
   revalidatePath("/cliente");

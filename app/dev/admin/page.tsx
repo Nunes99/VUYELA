@@ -25,7 +25,8 @@ const previewState: AdminDashboardReadyState = {
   capabilities: getAdminCapabilities("super_admin"),
   viewer: {
     displayName: "Admin Vuyela",
-    email: "admin@vuyela.co.mz"
+    email: "admin@vuyela.co.mz",
+    avatarUrl: null
   },
   metrics: {
     totalBusinesses: 2,

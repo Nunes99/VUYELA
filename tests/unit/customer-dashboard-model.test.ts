@@ -55,6 +55,7 @@ describe("customer dashboard model", () => {
         displayName: "Ana Mucavele",
         email: "ana@example.com",
         phone: null,
+        avatarUrl: null,
         locale: "pt-MZ",
         marketingConsent: true,
         dateOfBirth: null

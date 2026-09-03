@@ -18,7 +18,7 @@ export function ImageUploadField({
   label: string;
   currentUrl?: string | null | undefined;
   removeName: string;
-  shape?: "landscape" | "square";
+  shape?: "landscape" | "square" | "avatar";
   hint?: string;
 }) {
   const inputId = useId();
@@ -42,7 +42,7 @@ export function ImageUploadField({
           <Image
             alt=""
             fill
-            sizes={shape === "square" ? "160px" : "420px"}
+            sizes={shape === "landscape" ? "420px" : "160px"}
             src={previewUrl}
             unoptimized
           />

@@ -8,6 +8,7 @@ import {
   uniqueValues
 } from "@/features/customer-cards/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createProfileAvatarUrl } from "@/lib/profile-media";
 import type { CustomerNotification } from "@/features/notifications/model";
 
 import {
@@ -29,6 +30,7 @@ interface ProfileRow {
   display_name: string | null;
   email: string | null;
   phone: string | null;
+  avatar_path: string | null;
   locale: string | null;
   marketing_consent_at: string | null;
   date_of_birth: string | null;
@@ -165,7 +167,9 @@ export async function getCustomerDashboard(
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, display_name, email, phone, locale, marketing_consent_at, date_of_birth")
+      .select(
+        "id, display_name, email, phone, avatar_path, locale, marketing_consent_at, date_of_birth"
+      )
       .eq("id", profileId)
       .maybeSingle(),
     ledgerRequest,
@@ -279,6 +283,8 @@ export async function getCustomerDashboard(
     ...card,
     isFavorite: favoriteBusinessIds.has(card.businessId)
   }));
+  const profile = rowFrom<ProfileRow>(profileData);
+  const avatarUrl = await createProfileAvatarUrl(supabase, profileId, profile?.avatar_path);
   const dashboard = buildCustomerDashboardViewModel({
     cards: cardsWithPreferences,
     activity: buildActivity(rowsFrom<LedgerRow>(resolvedLedgerData), businessById, cardById),
@@ -291,7 +297,7 @@ export async function getCustomerDashboard(
       engagement.claims
     ),
     notifications: buildNotifications(notificationRows, businessById),
-    profile: buildProfile(rowFrom<ProfileRow>(profileData)),
+    profile: buildProfile(profile, avatarUrl),
     activityFilters,
     activityPagination: buildPagination(resolvedActivityPage, activityPageSize, ledgerCount ?? 0),
     notificationCategory,
@@ -404,7 +410,7 @@ function parseEngagement(data: unknown): {
   };
 }
 
-function buildProfile(profile: ProfileRow | null): CustomerProfileSummary {
+function buildProfile(profile: ProfileRow | null, avatarUrl: string | null): CustomerProfileSummary {
   return {
     displayName:
       profile?.display_name?.trim() ||
@@ -413,6 +419,7 @@ function buildProfile(profile: ProfileRow | null): CustomerProfileSummary {
       "Cliente VUYELA",
     email: profile?.email?.trim() || null,
     phone: profile?.phone?.trim() || null,
+    avatarUrl,
     locale: profile?.locale?.trim() || "pt-MZ",
     marketingConsent: Boolean(profile?.marketing_consent_at),
     dateOfBirth: profile?.date_of_birth ?? null

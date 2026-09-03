@@ -28,6 +28,8 @@ import {
 import { Button } from "../../vuyela-design-system/src/components/Button";
 import { Input } from "../../vuyela-design-system/src/components/Field";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { ImageUploadField } from "@/components/forms/image-upload-field";
+import { ProfileAvatar } from "@/components/profile/profile-avatar";
 import { CustomerCardVisual } from "@/features/customer-cards/customer-card-visual";
 import { formatCustomerCardValueMzn } from "@/features/customer-cards/model";
 import { markAllNotificationsReadAction } from "@/features/notifications/actions";
@@ -670,6 +672,16 @@ function CustomerProfile({
             Não foi possível atualizar o perfil. Confirme o nome, o telefone e a data de nascimento.
           </p>
         ) : null}
+        {profileStatus === "imagem-invalida" ? (
+          <p className="customer-profile-message customer-profile-message--error" role="alert">
+            Use uma fotografia JPEG, PNG ou WebP com no máximo 5 MB.
+          </p>
+        ) : null}
+        {profileStatus === "imagem-erro" ? (
+          <p className="customer-profile-message customer-profile-message--error" role="alert">
+            Não foi possível guardar a fotografia. Tente novamente dentro de instantes.
+          </p>
+        ) : null}
         <CustomerProfileForm dashboard={dashboard} />
       </section>
     );
@@ -687,9 +699,12 @@ function CustomerProfile({
       />
       <div className="customer-profile-layout">
         <div className="customer-profile-card">
-          <span className="customer-profile-avatar" aria-hidden="true">
-            {initials(dashboard.profile.displayName)}
-          </span>
+          <ProfileAvatar
+            className="customer-profile-avatar"
+            decorative={false}
+            displayName={dashboard.profile.displayName}
+            src={dashboard.profile.avatarUrl}
+          />
           <h3>{dashboard.profile.displayName}</h3>
           <p>Cliente VUYELA</p>
           <strong>Membro desde {formatMemberDate(dashboard.cards[0]?.joinedAt)}</strong>
@@ -789,6 +804,14 @@ function CustomerProfileForm({ dashboard }: { dashboard: CustomerDashboardViewMo
       id="customer-profile-edit-form"
     >
       <h3>Editar Dados Pessoais</h3>
+      <ImageUploadField
+        currentUrl={dashboard.profile.avatarUrl}
+        hint="JPEG, PNG ou WebP. Máximo 5 MB. Recomendado: fotografia quadrada."
+        label="Fotografia de perfil"
+        name="profileImage"
+        removeName="removeProfileImage"
+        shape="avatar"
+      />
       <div className="customer-profile-form__grid">
         <Input
           autoComplete="name"
@@ -1050,11 +1073,6 @@ function SectionEmpty({
       <p>{body}</p>
     </div>
   );
-}
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  return `${parts[0]?.[0] ?? "C"}${parts[1]?.[0] ?? "V"}`.toUpperCase();
 }
 
 function formatMemberDate(value: string | undefined): string {

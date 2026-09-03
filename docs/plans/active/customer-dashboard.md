@@ -12,6 +12,7 @@ Implemented.
 - `features/customer-dashboard/data.ts` loads profile, cards, public offers, and recent transactions through Supabase/RLS.
 - `features/customer-dashboard/dashboard.tsx` renders loading, empty, error, and populated dashboard surfaces.
 - Customers can maintain their display name, optional telephone number, and marketing preference from Perfil.
+- Customers can upload, preview, replace and remove a private profile photograph from Perfil.
 - Mobile quick actions only expose working destinations: cards, QR identification, activity, and offers.
 - The five-item bottom navigation and all dedicated customer views follow the approved 402px NEW PHAS composition without horizontal page overflow down to 320px.
 

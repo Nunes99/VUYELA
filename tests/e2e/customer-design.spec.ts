@@ -228,6 +228,12 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await expect(page.getByText("Segurança e preferências", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=perfil&editar=1");
+  await expect(page.getByText("Fotografia de perfil", { exact: true })).toBeVisible();
+  await expect(page.getByText("Carregar imagem", { exact: true })).toBeVisible();
+  await expect(page.locator('input[name="profileImage"]')).toHaveAttribute(
+    "accept",
+    "image/jpeg,image/png,image/webp"
+  );
   const consent = page.getByRole("checkbox", { name: "Comunicações de benefícios" });
   await expect(consent).toBeVisible();
   const checkboxSize = await consent.evaluate((element) => {

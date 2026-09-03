@@ -14,6 +14,7 @@ import {
 
 import { AuthStandalone } from "@/components/auth/auth-standalone";
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { ProfileAvatar } from "@/components/profile/profile-avatar";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import type { PwaArea } from "@/features/pwa/apps";
@@ -28,6 +29,7 @@ interface ProtectedRouteStateViewProps {
   children: ReactNode;
   variant?: "default" | "customer" | "admin" | "business" | "pos";
   customerName?: string | undefined;
+  customerAvatarUrl?: string | null | undefined;
 }
 
 function AuthNotice({
@@ -82,7 +84,8 @@ export function ProtectedRouteStateView({
   title,
   children,
   variant = "default",
-  customerName
+  customerName,
+  customerAvatarUrl
 }: ProtectedRouteStateViewProps) {
   const installArea =
     variant === "customer"
@@ -133,6 +136,7 @@ export function ProtectedRouteStateView({
               </Link>
             ) : null}
             <DashboardAreaMenu
+              customerAvatarUrl={customerAvatarUrl}
               customerName={customerName}
               principal={state.principal}
               variant={variant}
@@ -221,11 +225,13 @@ export function DashboardAreaMenu({
   principal,
   variant,
   customerName,
+  customerAvatarUrl,
   includePosSettings = false
 }: {
   principal: AuthPrincipal;
   variant: "default" | "customer";
   customerName?: string | undefined;
+  customerAvatarUrl?: string | null | undefined;
   includePosSettings?: boolean;
 }) {
   const areas = [
@@ -271,9 +277,11 @@ export function DashboardAreaMenu({
       <summary title="Mudar de área">
         {variant === "customer" ? (
           <>
-            <span className="dashboard-area-menu__avatar" aria-hidden="true">
-              {initials(customerName)}
-            </span>
+            <ProfileAvatar
+              className="dashboard-area-menu__avatar"
+              displayName={customerName || "Cliente VUYELA"}
+              src={customerAvatarUrl}
+            />
             <span className="dashboard-area-menu__identity">
               <strong>{customerName || "Cliente VUYELA"}</strong>
               <small>Cliente</small>
@@ -310,14 +318,4 @@ export function DashboardAreaMenu({
       </nav>
     </details>
   );
-}
-
-function initials(name: string | undefined): string {
-  const parts = name?.trim().split(/\s+/).filter(Boolean) ?? [];
-
-  if (parts.length === 0) {
-    return "CV";
-  }
-
-  return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
 }

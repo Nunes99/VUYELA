@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
+import { ProfileAvatar } from "@/components/profile/profile-avatar";
 import { signOutAction } from "@/features/auth/actions";
 import { PwaInstallAction } from "@/features/pwa/pwa-install-action";
 import { hasAdminCapability } from "@/lib/auth/admin-permissions";
@@ -60,7 +61,11 @@ export function AdminDashboard({
   const viewer =
     state.status === "ready"
       ? state.viewer
-      : { displayName: "Admin VUYELA", email: profileRoleLabel(principal.profileRole) };
+      : {
+          displayName: "Admin VUYELA",
+          email: profileRoleLabel(principal.profileRole),
+          avatarUrl: null
+        };
 
   return (
     <div className="admin-console">
@@ -127,9 +132,11 @@ export function AdminDashboard({
               <Bell aria-hidden="true" size={21} />
               <span aria-hidden="true" />
             </Link>
-            <span className="admin-console__avatar" aria-hidden="true">
-              {initials(viewer.displayName)}
-            </span>
+            <ProfileAvatar
+              className="admin-console__avatar"
+              displayName={viewer.displayName}
+              src={viewer.avatarUrl}
+            />
             <span className="admin-console__user">
               <strong>{viewer.displayName}</strong>
               <small>{profileRoleLabel(principal.profileRole)}</small>
@@ -206,9 +213,4 @@ function profileRoleLabel(role: AuthPrincipal["profileRole"]): string {
     super_admin: "Super Administrador"
   };
   return labels[role];
-}
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  return `${parts[0]?.[0] ?? "A"}${parts[1]?.[0] ?? "V"}`.toUpperCase();
 }

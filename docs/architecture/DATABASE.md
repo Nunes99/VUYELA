@@ -381,3 +381,14 @@ The bucket accepts JPEG, PNG and WebP files up to 5 MB. Unique object names avoi
 and stale CDN content. `set_business_media_url` validates tenant ownership and records audited URL
 changes for catalogue items, offers, business covers and business logos. Replacement first commits
 the new URL and only then removes the previous object.
+
+## Profile Media
+
+User photographs live in the private Supabase Storage bucket `profile-media`. The database stores
+only `profiles.avatar_path`; authenticated pages create a one-hour signed URL when rendering the
+current user's avatar. Public URLs and image binaries are never persisted in `profiles`.
+
+Object paths follow `<profile-id>/avatar/<random-id>.<extension>`. Storage RLS grants SELECT,
+INSERT, UPDATE and DELETE only when the first path segment equals `auth.uid()`. The bucket accepts
+JPEG, PNG and WebP files up to 5 MB. Replacement uploads a unique object, commits the new path and
+then removes the previous object; a failed profile update removes the newly uploaded object.

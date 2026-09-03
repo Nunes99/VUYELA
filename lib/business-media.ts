@@ -3,6 +3,12 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { businessMediaMaxBytes } from "@/lib/business-media-config";
+import {
+  ImageUploadError,
+  imageFile,
+  imageFileExtension,
+  validateImageFile
+} from "@/lib/image-upload";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type BusinessMediaEntity =
@@ -16,12 +22,6 @@ type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient
 
 const storageBucket = "business-media";
 const publicObjectMarker = `/storage/v1/object/public/${storageBucket}/`;
-const allowedTypes = new Map([
-  ["image/jpeg", "jpg"],
-  ["image/png", "png"],
-  ["image/webp", "webp"]
-]);
-
 export class BusinessMediaError extends Error {
   constructor(
     public readonly code: "invalid-file" | "upload-failed" | "save-failed",
@@ -33,17 +33,14 @@ export class BusinessMediaError extends Error {
 }
 
 export function mediaFile(formData: FormData, fieldName: string): File | null {
-  const value = formData.get(fieldName);
-  return value instanceof File && value.size > 0 ? value : null;
+  return imageFile(formData, fieldName);
 }
 
 export async function validateBusinessMediaFile(file: File | null): Promise<void> {
-  if (!file) return;
-
-  const declaredType = allowedTypes.has(file.type);
-  const detectedType = detectImageType(new Uint8Array(await file.slice(0, 12).arrayBuffer()));
-
-  if (!declaredType || detectedType !== file.type || file.size > businessMediaMaxBytes) {
+  try {
+    await validateImageFile(file, businessMediaMaxBytes);
+  } catch (error) {
+    if (!(error instanceof ImageUploadError)) throw error;
     throw new BusinessMediaError(
       "invalid-file",
       "A imagem deve ser JPEG, PNG ou WebP e ter no máximo 5 MB."
@@ -84,10 +81,7 @@ export async function updateBusinessMedia({
   }
 
   await validateBusinessMediaFile(file);
-  const extension = allowedTypes.get(file.type);
-  if (!extension) {
-    throw new BusinessMediaError("invalid-file", "O formato da imagem não é suportado.");
-  }
+  const extension = imageFileExtension(file);
 
   const folder = mediaFolder(entityType);
   const objectPath = `${businessId}/${folder}/${randomUUID()}.${extension}`;
@@ -163,33 +157,4 @@ function mediaFolder(entityType: BusinessMediaEntity): BusinessMediaFolder {
   if (entityType === "offer") return "offers";
   if (entityType === "business_logo") return "logo";
   return "profile";
-}
-
-function detectImageType(bytes: Uint8Array): string | null {
-  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
-  if (
-    bytes[0] === 0x89 &&
-    bytes[1] === 0x50 &&
-    bytes[2] === 0x4e &&
-    bytes[3] === 0x47 &&
-    bytes[4] === 0x0d &&
-    bytes[5] === 0x0a &&
-    bytes[6] === 0x1a &&
-    bytes[7] === 0x0a
-  ) {
-    return "image/png";
-  }
-  if (
-    bytes[0] === 0x52 &&
-    bytes[1] === 0x49 &&
-    bytes[2] === 0x46 &&
-    bytes[3] === 0x46 &&
-    bytes[8] === 0x57 &&
-    bytes[9] === 0x45 &&
-    bytes[10] === 0x42 &&
-    bytes[11] === 0x50
-  ) {
-    return "image/webp";
-  }
-  return null;
 }

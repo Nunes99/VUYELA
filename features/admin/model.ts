@@ -36,6 +36,7 @@ export interface PlatformMetrics {
 export interface AdminViewer {
   displayName: string;
   email: string;
+  avatarUrl: string | null;
 }
 
 export interface AdminAnalyticsPoint {
