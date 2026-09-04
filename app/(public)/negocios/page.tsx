@@ -31,7 +31,7 @@ const capabilities = [
     title: "Regras simples para atribuir YELAS"
   },
   {
-    body: "Mantenha um registo limpo e transparente de todas as transações, YELAS emitidas e resgatados para uma reconciliação contabilística diária impecável.",
+    body: "Mantenha um registo limpo e transparente de todas as transações, YELAS emitidas e resgatadas para uma reconciliação contabilística diária impecável.",
     icon: ClipboardList,
     title: "Histórico preparado para auditoria"
   },
@@ -75,7 +75,7 @@ export default function BusinessesPage() {
           >
             <div className="marketing-dashboard-visual__top">
               <strong>Painel de Gestão</strong>
-              <span>Live</span>
+              <span>Atualizado</span>
             </div>
             <dl>
               <div>

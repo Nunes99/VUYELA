@@ -49,6 +49,22 @@ Public metrics must be derived from published marketplace records. Uploaded prom
 and active public offers are reused on the homepage, the customer page and marketplace routes;
 private campaign audiences, rules and internal workflow data must never be projected publicly.
 
+The visual composition is intentionally editorial rather than a sequence of identical card grids:
+
+- the hero combines concise copy with the real VUYELA product visual and keeps the cultural pattern
+  concentrated as a signature field;
+- the discovery rail provides direct routes to establishments, offers, categories and search;
+- public campaigns appear near the top of the page so the visitor sees live value before product
+  explanation;
+- process and capability sections use connected steps, dividers and data rails instead of floating
+  cards with decorative shadows;
+- reward gold communicates value, teal communicates action and coral is reserved for small visual
+  accents.
+
+Capulana geometry must support hierarchy rather than behave as a permanent wallpaper. On wide
+screens it can occupy one side of a hero or define the edge of a section. On small screens it may
+fill a dark surface at low opacity, provided that contrast and content legibility remain intact.
+
 ## Interaction rules
 
 - Keep discovery destinations visible and fully readable from 320px upwards.
@@ -58,6 +74,10 @@ private campaign audiences, rules and internal workflow data must never be proje
 - Preserve one dominant registration action and a clear secondary business action.
 - Keep the public experience visually related to the customer application through the same dark
   indigo, teal, reward gold, typography, borders, and compact geometry.
+- Prefer real public content, product demonstrations, timelines and data rails to generic feature
+  cards or ornamental dashboard mock-ups.
+- Use compact corner radii, visible focus states and restrained motion. Public navigation must
+  remain usable without horizontal page scrolling at 320 px.
 
 ## Reference principles
 

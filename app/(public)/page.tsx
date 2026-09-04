@@ -4,15 +4,18 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowRight,
+  BadgePercent,
   BarChart3,
   Check,
   CircleDollarSign,
+  Compass,
   CreditCard,
   Gift,
   MapPin,
   Megaphone,
   QrCode,
   RefreshCcw,
+  Search,
   ShieldCheck,
   Smartphone,
   Sparkles,
@@ -91,6 +94,33 @@ const benefits = [
     body: "Receba campanhas relevantes dos negócios que acompanha.",
     icon: Megaphone,
     title: "Ofertas personalizadas"
+  }
+];
+
+const discoveryLinks = [
+  {
+    body: "Conheça os negócios que já fazem parte da rede.",
+    href: "/estabelecimentos",
+    icon: Store,
+    label: "Encontrar negócios"
+  },
+  {
+    body: "Veja benefícios válidos e campanhas em destaque.",
+    href: "/ofertas",
+    icon: BadgePercent,
+    label: "Explorar ofertas"
+  },
+  {
+    body: "Navegue por atividade, serviço ou produto.",
+    href: "/categorias",
+    icon: Compass,
+    label: "Ver categorias"
+  },
+  {
+    body: "Procure pelo nome, cidade ou categoria.",
+    href: "/pesquisar",
+    icon: Search,
+    label: "Pesquisar na VUYELA"
   }
 ];
 
@@ -197,7 +227,65 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="marketing-section marketing-section--light" aria-labelledby="steps-title">
+      <nav className="marketing-quick-access" aria-label="Acesso rápido à rede VUYELA">
+        <div className="marketing-container marketing-quick-access__grid">
+          {discoveryLinks.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <Link href={item.href} key={item.href}>
+                <Icon aria-hidden="true" size={20} />
+                <span>
+                  <strong>{item.label}</strong>
+                  <small>{item.body}</small>
+                </span>
+                <ArrowRight aria-hidden="true" size={17} />
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      <section
+        className="marketing-section marketing-section--light marketing-public-offers"
+        aria-labelledby="public-offers-title"
+      >
+        <div className="marketing-container">
+          <div className="marketing-section-lead">
+            <div className="marketing-heading">
+              <span>Agora na rede</span>
+              <h2 id="public-offers-title">Benefícios preparados pelos negócios para si.</h2>
+            </div>
+            <div className="marketing-section-lead__aside">
+              <p>Promoções ativas, com o estabelecimento responsável e a respetiva validade.</p>
+              <Link className="marketing-text-link" href="/ofertas">
+                Ver todas as ofertas <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+          {offers.length > 0 ? (
+            <div className="marketplace-offer-grid marketing-public-offers__grid">
+              {offers.map((offer) => (
+                <OfferCard offer={offer} key={offer.id} />
+              ))}
+            </div>
+          ) : (
+            <div className="marketing-empty-state">
+              <strong>
+                {marketplace.status === "error"
+                  ? "Não foi possível carregar as ofertas neste momento."
+                  : "Ainda não existem ofertas públicas ativas."}
+              </strong>
+              <p>Entretanto, pode conhecer os estabelecimentos já publicados.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section
+        className="marketing-section marketing-section--soft marketing-how-section"
+        aria-labelledby="steps-title"
+      >
         <div className="marketing-container">
           <div className="marketing-heading marketing-heading--center">
             <span>Como funciona a VUYELA</span>
@@ -272,40 +360,6 @@ export default async function HomePage() {
                 : "O diretório de parceiros será apresentado quando existirem negócios publicados."}
             </p>
           )}
-        </div>
-      </section>
-
-      <section
-        className="marketing-section marketing-section--light marketing-public-offers"
-        aria-labelledby="public-offers-title"
-      >
-        <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
-            <span>Ofertas públicas</span>
-            <h2 id="public-offers-title">Benefícios preparados pelos negócios para si.</h2>
-            <p>Consulte promoções ativas, o estabelecimento responsável e a respetiva validade.</p>
-          </div>
-          {offers.length > 0 ? (
-            <div className="marketplace-offer-grid marketing-public-offers__grid">
-              {offers.map((offer) => (
-                <OfferCard offer={offer} key={offer.id} />
-              ))}
-            </div>
-          ) : (
-            <div className="marketing-empty-state">
-              <strong>
-                {marketplace.status === "error"
-                  ? "Não foi possível carregar as ofertas neste momento."
-                  : "Ainda não existem ofertas públicas ativas."}
-              </strong>
-              <p>Entretanto, pode conhecer os estabelecimentos já publicados.</p>
-            </div>
-          )}
-          <div className="marketing-centered-action">
-            <Link className="marketing-text-link" href="/ofertas">
-              Ver todas as ofertas <ArrowRight size={16} />
-            </Link>
-          </div>
         </div>
       </section>
 
