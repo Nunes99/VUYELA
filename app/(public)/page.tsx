@@ -16,8 +16,6 @@ import {
   QrCode,
   RefreshCcw,
   Search,
-  ShieldCheck,
-  Smartphone,
   Sparkles,
   Store,
   UsersRound
@@ -99,25 +97,21 @@ const benefits = [
 
 const discoveryLinks = [
   {
-    body: "Conheça os negócios que já fazem parte da rede.",
     href: "/estabelecimentos",
     icon: Store,
     label: "Encontrar negócios"
   },
   {
-    body: "Veja benefícios válidos e campanhas em destaque.",
     href: "/ofertas",
     icon: BadgePercent,
     label: "Explorar ofertas"
   },
   {
-    body: "Navegue por atividade, serviço ou produto.",
     href: "/categorias",
     icon: Compass,
     label: "Ver categorias"
   },
   {
-    body: "Procure pelo nome, cidade ou categoria.",
     href: "/pesquisar",
     icon: Search,
     label: "Pesquisar na VUYELA"
@@ -171,20 +165,10 @@ export default async function HomePage() {
       <section className="marketing-home-hero marketing-pattern" aria-labelledby="home-title">
         <div className="marketing-container marketing-home-hero__inner">
           <div className="marketing-home-hero__copy">
-            <div className="marketing-proof" aria-label="Características principais">
-              <span>
-                <Smartphone size={14} />
-                100% Digital
-              </span>
-              <span>
-                <ShieldCheck size={14} />
-                Seguro &amp; Confiável
-              </span>
-              <span>
-                <MapPin size={14} />
-                Feito em Moçambique
-              </span>
-            </div>
+            <p className="marketing-home-hero__kicker">
+              <span>VUYELA</span>
+              Fidelização digital para Moçambique
+            </p>
             <h1 id="home-title">
               Cada compra cria uma razão para <em>voltar.</em>
             </h1>
@@ -200,6 +184,11 @@ export default async function HomePage() {
                 Quero um cartão
               </Link>
             </div>
+            <ul className="marketing-home-hero__assurances" aria-label="Características principais">
+              <li>100% digital</li>
+              <li>Dados protegidos</li>
+              <li>Feito em Moçambique</li>
+            </ul>
           </div>
 
           <div className="marketing-home-hero__visual">
@@ -229,20 +218,23 @@ export default async function HomePage() {
 
       <nav className="marketing-quick-access" aria-label="Acesso rápido à rede VUYELA">
         <div className="marketing-container marketing-quick-access__grid">
-          {discoveryLinks.map((item) => {
-            const Icon = item.icon;
+          <div className="marketing-quick-access__intro">
+            <span>Descobrir</span>
+            <strong>A rede VUYELA perto de si.</strong>
+          </div>
+          <div className="marketing-quick-access__links">
+            {discoveryLinks.map((item) => {
+              const Icon = item.icon;
 
-            return (
-              <Link href={item.href} key={item.href}>
-                <Icon aria-hidden="true" size={20} />
-                <span>
+              return (
+                <Link href={item.href} key={item.href}>
+                  <Icon aria-hidden="true" size={19} />
                   <strong>{item.label}</strong>
-                  <small>{item.body}</small>
-                </span>
-                <ArrowRight aria-hidden="true" size={17} />
-              </Link>
-            );
-          })}
+                  <ArrowRight aria-hidden="true" size={17} />
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </nav>
 
@@ -315,7 +307,7 @@ export default async function HomePage() {
       </section>
 
       <section
-        className="marketing-section marketing-section--navy marketing-pattern marketing-mobile-omit"
+        className="marketing-section marketing-section--navy marketing-pattern"
         aria-labelledby="benefits-title"
       >
         <div className="marketing-container">
@@ -338,10 +330,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section
-        className="marketing-partners marketing-mobile-omit"
-        aria-labelledby="partners-title"
-      >
+      <section className="marketing-partners" aria-labelledby="partners-title">
         <div className="marketing-container">
           <div className="marketing-ornament" aria-hidden="true" />
           <h2 id="partners-title">Negócios disponíveis na VUYELA</h2>
@@ -427,7 +416,7 @@ export default async function HomePage() {
       </section>
 
       <section
-        className="marketing-section marketing-business-preview marketing-pattern marketing-mobile-omit"
+        className="marketing-section marketing-business-preview marketing-pattern"
         aria-labelledby="business-title"
       >
         <div className="marketing-container">
@@ -493,10 +482,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section
-        className="marketing-section marketing-section--faq marketing-mobile-omit"
-        aria-labelledby="faq-title"
-      >
+      <section className="marketing-section marketing-section--faq" aria-labelledby="faq-title">
         <div className="marketing-container marketing-faq-preview">
           <div className="marketing-heading">
             <span>Perguntas frequentes</span>

@@ -92,7 +92,7 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
     expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
     expect(layout.productVisible, `product visual outside viewport at ${width}px`).toBe(true);
     expect(layout.pageLinksWork, `missing navigation target at ${width}px`).toBe(true);
-    expect(layout.headingFont).toContain("Outfit");
+    expect(layout.headingFont).toContain("Sora");
     expect(layout.bodyFont).toContain("Inter");
   }
 });

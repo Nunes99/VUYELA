@@ -1,9 +1,9 @@
 @font-face {
-  font-family: "Outfit";
+  font-family: "Sora";
   font-style: normal;
   font-weight: 400 900;
   font-display: swap;
-  src: url("/fonts/outfit-latin-ext.woff2") format("woff2");
+  src: url("/fonts/sora-latin-ext.woff2") format("woff2");
   unicode-range:
     U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
     U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
@@ -11,11 +11,11 @@
 }
 
 @font-face {
-  font-family: "Outfit";
+  font-family: "Sora";
   font-style: normal;
   font-weight: 400 900;
   font-display: swap;
-  src: url("/fonts/outfit-latin.woff2") format("woff2");
+  src: url("/fonts/sora-latin.woff2") format("woff2");
   unicode-range:
     U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
@@ -24,8 +24,7 @@
 .marketing-site {
   --marketing-card: #163b46;
   --marketing-cloud: #f4f7f7;
-  --marketing-coral: #dc665d;
-  --marketing-display: "Outfit", Arial, sans-serif;
+  --marketing-display: "Sora", Arial, sans-serif;
   --marketing-gold: #d8a84c;
   --marketing-ink: #102c36;
   --marketing-line: #d9e4e5;
@@ -160,7 +159,7 @@
   min-height: 2.75rem;
   align-items: center;
   color: rgba(255, 255, 255, 0.68);
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -200,19 +199,14 @@
   border: 1px solid transparent;
   border-radius: 0.375rem;
   padding: 0.75rem 1.15rem;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 750;
   line-height: 1.2;
   text-align: center;
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
-}
-
-.marketing-button:hover {
-  transform: translateY(-1px);
+    color 160ms ease;
 }
 
 .marketing-button--teal {
@@ -282,15 +276,11 @@
   background: var(--marketing-navy);
 }
 
-.marketing-home-hero::after {
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  bottom: 0;
-  left: calc(50% + 6rem);
-  width: 1px;
-  background: rgba(255, 255, 255, 0.09);
-  content: "";
+.marketing-home-hero::before {
+  right: 3vw;
+  width: min(38%, 34rem);
+  clip-path: none;
+  opacity: 0.12;
 }
 
 .marketing-home-hero__inner {
@@ -308,34 +298,26 @@
   max-width: 35rem;
 }
 
-.marketing-home-hero__copy::before {
-  display: block;
-  width: 3rem;
-  height: 0.2rem;
-  margin-bottom: 1.5rem;
-  background: var(--marketing-coral);
-  content: "";
-}
-
-.marketing-proof {
+.marketing-home-hero__kicker {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
-}
-
-.marketing-proof span {
-  display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
+  gap: 0.75rem;
+  margin-bottom: 1.4rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
-.marketing-proof svg {
-  color: #f2b544;
+.marketing-home-hero__kicker span {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.28);
+  padding-right: 0.75rem;
+  color: #4fc2b9;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .marketing-home-hero h1 {
@@ -352,7 +334,7 @@
   font-style: normal;
 }
 
-.marketing-home-hero__copy > p {
+.marketing-home-hero__copy > p:not(.marketing-home-hero__kicker) {
   max-width: 33rem;
   margin-top: 1.5rem;
   color: rgba(255, 255, 255, 0.7);
@@ -362,6 +344,31 @@
 
 .marketing-home-hero__copy .marketing-actions {
   margin-top: 1.75rem;
+}
+
+.marketing-home-hero__assurances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.78rem;
+  list-style: none;
+}
+
+.marketing-home-hero__assurances li {
+  display: flex;
+  align-items: center;
+}
+
+.marketing-home-hero__assurances li + li::before {
+  width: 0.2rem;
+  height: 0.2rem;
+  margin-inline: 0.75rem;
+  border-radius: 50%;
+  background: var(--marketing-gold);
+  content: "";
 }
 
 .marketing-home-hero__visual {
@@ -412,72 +419,93 @@
 
 .marketing-facts span {
   color: #687b83;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 
 .marketing-quick-access {
   border-bottom: 1px solid var(--marketing-line);
-  background: var(--marketing-cloud);
+  background: #ffffff;
 }
 
 .marketing-quick-access__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 8.5rem;
+  grid-template-columns: minmax(13rem, 0.72fr) minmax(0, 2.28fr);
+  align-items: stretch;
+  border-inline: 1px solid var(--marketing-line);
 }
 
-.marketing-quick-access a {
+.marketing-quick-access__intro {
+  display: grid;
+  align-content: center;
+  gap: 0.5rem;
+  border-right: 1px solid var(--marketing-line);
+  padding: 1.5rem 2rem;
+}
+
+.marketing-quick-access__intro span {
+  color: var(--marketing-teal);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.marketing-quick-access__intro strong {
+  max-width: 12rem;
+  color: var(--marketing-ink);
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.marketing-quick-access__links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.marketing-quick-access__links a {
   display: grid;
   min-width: 0;
-  min-height: 7.75rem;
+  min-height: 4.25rem;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.9rem;
-  border-right: 1px solid var(--marketing-line);
-  padding: 1.4rem 1.25rem;
+  gap: 0.85rem;
+  padding: 1rem 1.5rem;
   color: var(--marketing-ink);
   transition:
     background-color 160ms ease,
     color 160ms ease;
 }
 
-.marketing-quick-access a:first-child {
-  border-left: 1px solid var(--marketing-line);
+.marketing-quick-access__links a:nth-child(odd) {
+  border-right: 1px solid var(--marketing-line);
 }
 
-.marketing-quick-access a > svg:first-child {
+.marketing-quick-access__links a:nth-child(-n + 2) {
+  border-bottom: 1px solid var(--marketing-line);
+}
+
+.marketing-quick-access__links a > svg:first-child {
   color: var(--marketing-teal);
 }
 
-.marketing-quick-access a > svg:last-child {
+.marketing-quick-access__links a > svg:last-child {
   color: #8ba0a7;
   transition: transform 160ms ease;
 }
 
-.marketing-quick-access a:hover,
-.marketing-quick-access a:focus-visible {
-  background: #ffffff;
+.marketing-quick-access__links a:hover,
+.marketing-quick-access__links a:focus-visible {
+  background: var(--marketing-cloud);
   color: #176f68;
 }
 
-.marketing-quick-access a:hover > svg:last-child,
-.marketing-quick-access a:focus-visible > svg:last-child {
+.marketing-quick-access__links a:hover > svg:last-child,
+.marketing-quick-access__links a:focus-visible > svg:last-child {
   transform: translateX(0.2rem);
 }
 
-.marketing-quick-access span {
-  display: grid;
-  min-width: 0;
-  gap: 0.35rem;
-}
-
-.marketing-quick-access strong {
-  font-size: 0.84rem;
-}
-
-.marketing-quick-access small {
-  color: #687b83;
-  font-size: 0.7rem;
-  line-height: 1.45;
+.marketing-quick-access__links strong {
+  font-size: 0.875rem;
 }
 
 .marketing-section {
@@ -522,7 +550,7 @@
   background: transparent;
   padding: 0 0 0 0.65rem;
   color: var(--marketing-teal);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -552,14 +580,14 @@
 
 .marketing-section-lead__aside p {
   color: #64748b;
-  font-size: 0.86rem;
+  font-size: 0.9375rem;
   line-height: 1.65;
 }
 
 .marketing-heading p {
   margin-top: 1rem;
   color: #64748b;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.7;
 }
 
@@ -632,7 +660,7 @@
 .marketing-control-grid p {
   margin-top: 0.65rem;
   color: #64748b;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.65;
 }
 
@@ -648,7 +676,7 @@
   align-items: center;
   gap: 0.5rem;
   color: #207b74;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 750;
 }
 
@@ -713,12 +741,11 @@
   height: 1px;
   margin: 0 0 1rem;
   background: var(--marketing-gold);
-  box-shadow: 1.25rem 0 0 var(--marketing-teal);
 }
 
 .marketing-partners h2 {
   color: #647780;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 
@@ -737,7 +764,7 @@
   border-right: 1px solid var(--marketing-line);
   color: #405760;
   font-family: var(--vy-font-display);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
@@ -791,7 +818,7 @@
   align-items: flex-start;
   gap: 0.65rem;
   color: #475569;
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
 }
 
@@ -813,14 +840,26 @@
   border: 1px solid rgba(212, 168, 83, 0.42);
   border-radius: 0.375rem;
   background-color: #0f2832;
-  background-image: url("/brand/textures/capulana-primary.jpg");
-  background-blend-mode: multiply;
-  background-position: center;
-  background-size: cover;
+  background-image: none;
   padding: 2rem;
   color: #ffffff;
-  box-shadow: 1.25rem 1.25rem 0 var(--marketing-mint);
-  transform: rotate(-1deg);
+  box-shadow: 0 1.5rem 4rem rgba(16, 44, 54, 0.14);
+}
+
+.marketing-loyalty-card::before {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 42%;
+  background-image: url("/brand/textures/capulana-primary.jpg");
+  background-position: center;
+  background-size: cover;
+  content: "";
+  opacity: 0.18;
+}
+
+.marketing-loyalty-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .marketing-loyalty-card > div:first-child,
@@ -939,13 +978,13 @@
 
 .pricing-card--featured {
   border: 2px solid #2c8b82;
-  box-shadow: 0 1rem 2.5rem rgba(15, 40, 50, 0.1);
+  box-shadow: none;
 }
 
 .pricing-card__badge {
   width: fit-content;
   margin-bottom: 0.75rem;
-  border-radius: 999px;
+  border-radius: 0.25rem;
   background: #2c8b82;
   padding: 0.3rem 0.55rem;
   color: #ffffff;
@@ -963,7 +1002,7 @@
   min-height: 2.5rem;
   margin-top: 0.4rem;
   color: #64748b;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 
@@ -977,7 +1016,7 @@
 
 .pricing-card > small {
   color: #94a3b8;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
 }
 
 .pricing-card ul {
@@ -996,7 +1035,7 @@
   align-items: flex-start;
   gap: 0.5rem;
   color: #52636c;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.45;
 }
 
@@ -1095,20 +1134,6 @@
 .marketing-help-hero p {
   max-width: 45rem;
   margin-inline: 0;
-}
-
-.marketing-page-hero::after,
-.marketing-help-hero::after {
-  position: absolute;
-  right: clamp(1.5rem, 8vw, 8rem);
-  bottom: 0;
-  width: clamp(8rem, 17vw, 15rem);
-  height: 0.35rem;
-  background: var(--marketing-gold);
-  box-shadow:
-    3rem -0.7rem 0 var(--marketing-teal),
-    -2rem -1.4rem 0 var(--marketing-coral);
-  content: "";
 }
 
 .marketing-journey {
@@ -1383,7 +1408,7 @@
   border-radius: 0.375rem;
   background: var(--marketing-navy);
   padding: 1.5rem;
-  box-shadow: 1rem 1rem 0 rgba(37, 141, 132, 0.2);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.16);
 }
 
 .marketing-dashboard-visual__top {
@@ -1457,7 +1482,7 @@
   border-radius: 0.375rem;
   background: var(--marketing-panel);
   padding: 1.5rem;
-  box-shadow: 0 1.25rem 3rem rgba(15, 40, 50, 0.15);
+  box-shadow: none;
 }
 
 .marketing-metrics-panel div {
@@ -1876,7 +1901,7 @@
   }
 
   .marketing-header__nav a {
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
   }
 
   .marketing-header__actions .marketing-button {
@@ -1894,20 +1919,7 @@
   }
 
   .marketing-quick-access__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .marketing-quick-access a:nth-child(2) {
-    border-right: 1px solid var(--marketing-line);
-  }
-
-  .marketing-quick-access a:nth-child(3) {
-    border-left: 1px solid var(--marketing-line);
-    border-top: 1px solid var(--marketing-line);
-  }
-
-  .marketing-quick-access a:nth-child(4) {
-    border-top: 1px solid var(--marketing-line);
+    grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 2.2fr);
   }
 
   .marketing-step-grid,
@@ -2051,6 +2063,15 @@
     border-left: 1px solid #d8e2e4;
   }
 
+  .marketing-quick-access__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-quick-access__intro {
+    border-right: 0;
+    border-bottom: 1px solid var(--marketing-line);
+  }
+
   .marketing-business-preview__top,
   .marketing-section-lead,
   .marketing-split,
@@ -2130,6 +2151,113 @@
     font-size: 0.875rem;
   }
 
+  .marketing-menu summary {
+    position: relative;
+    z-index: 102;
+    border: 0;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .marketing-menu__close {
+    display: none;
+  }
+
+  .marketing-menu[open] {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    background: var(--marketing-navy);
+  }
+
+  .marketing-menu[open] summary {
+    position: fixed;
+    top: 0.75rem;
+    right: 1rem;
+  }
+
+  .marketing-menu[open] .marketing-menu__open {
+    display: none;
+  }
+
+  .marketing-menu[open] .marketing-menu__close {
+    display: block;
+  }
+
+  .marketing-menu nav {
+    position: fixed;
+    z-index: 101;
+    inset: 0;
+    display: flex;
+    width: 100%;
+    min-height: 100dvh;
+    flex-direction: column;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+    background-color: var(--marketing-navy);
+    background-image:
+      linear-gradient(rgba(3, 31, 41, 0.9), rgba(3, 31, 41, 0.96)),
+      url("/brand/textures/capulana-primary.jpg");
+    background-position: center;
+    background-size: cover;
+    padding: 1rem 1.25rem 1.5rem;
+    box-shadow: none;
+  }
+
+  .marketing-menu__logo {
+    margin-bottom: 1.5rem;
+  }
+
+  .marketing-menu nav > a:not(.marketing-menu__logo) {
+    min-height: 3.25rem;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0;
+    padding-inline: 0;
+    font-family: var(--marketing-display);
+    font-size: 0.9375rem;
+  }
+
+  .marketing-menu nav > a[aria-current="page"] {
+    background: transparent;
+    color: #55c8bf;
+  }
+
+  .marketing-menu nav .marketing-menu__logo {
+    min-height: auto;
+    border: 0;
+    padding: 0;
+  }
+
+  .marketing-menu__actions {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
+  }
+
+  .marketing-menu nav .marketing-menu__actions a {
+    min-height: 2.75rem;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 0.375rem;
+    padding-inline: 1rem;
+    font-size: 0.875rem;
+    font-weight: 750;
+  }
+
+  .marketing-menu nav .marketing-menu__register {
+    margin-top: 0;
+    border-color: var(--marketing-teal);
+  }
+
+  .marketing-menu__social {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    padding-top: 1.25rem;
+  }
+
   .marketing-section {
     padding-block: 4.5rem;
   }
@@ -2139,33 +2267,33 @@
   }
 
   .marketing-home-hero::before {
+    right: 0;
     width: 100%;
     clip-path: none;
-    opacity: 0.07;
-  }
-
-  .marketing-home-hero::after {
-    display: none;
-  }
-
-  .marketing-home-hero__copy::before {
-    margin-bottom: 1rem;
-  }
-
-  .marketing-proof {
-    gap: 0.6rem;
-  }
-
-  .marketing-proof span {
-    font-size: 0.5625rem;
+    opacity: 0.055;
   }
 
   .marketing-home-hero h1 {
     font-size: 2.65rem;
   }
 
-  .marketing-home-hero__copy > p {
-    font-size: 0.875rem;
+  .marketing-home-hero__kicker {
+    align-items: flex-start;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .marketing-home-hero__kicker span {
+    font-size: 0.6875rem;
+  }
+
+  .marketing-home-hero__copy > p:not(.marketing-home-hero__kicker) {
+    font-size: 0.9375rem;
+  }
+
+  .marketing-home-hero__assurances {
+    font-size: 0.75rem;
+    line-height: 1.6;
   }
 
   .marketing-actions {
@@ -2194,21 +2322,34 @@
 
   .marketing-quick-access__grid {
     grid-template-columns: 1fr;
+    border-inline: 0;
   }
 
-  .marketing-quick-access a,
-  .marketing-quick-access a:nth-child(2),
-  .marketing-quick-access a:nth-child(3),
-  .marketing-quick-access a:nth-child(4) {
-    min-height: 5.5rem;
+  .marketing-quick-access__intro {
+    padding: 1.25rem 1rem;
+  }
+
+  .marketing-quick-access__intro strong {
+    max-width: none;
+    font-size: 1.05rem;
+  }
+
+  .marketing-quick-access__links {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-quick-access__links a,
+  .marketing-quick-access__links a:nth-child(odd),
+  .marketing-quick-access__links a:nth-child(-n + 2) {
+    min-height: 3.75rem;
     border-top: 0;
-    border-right: 1px solid var(--marketing-line);
+    border-right: 0;
     border-bottom: 1px solid var(--marketing-line);
-    border-left: 1px solid var(--marketing-line);
-    padding: 1rem 0.9rem;
+    border-left: 0;
+    padding: 0.8rem 1rem;
   }
 
-  .marketing-quick-access a:last-child {
+  .marketing-quick-access__links a:last-child {
     border-bottom: 0;
   }
 
@@ -2251,12 +2392,6 @@
     padding: 1.5rem 0;
   }
 
-  .marketing-page-hero::after,
-  .marketing-help-hero::after {
-    right: 1.25rem;
-    width: 6rem;
-  }
-
   .marketing-partners__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2268,7 +2403,7 @@
   .marketing-loyalty-card {
     min-height: 18rem;
     padding: 1.25rem;
-    box-shadow: 0.75rem 0.75rem 0 var(--marketing-mint);
+    box-shadow: 0 1rem 2.5rem rgba(16, 44, 54, 0.12);
     transform: none;
   }
 
@@ -2490,13 +2625,13 @@
   box-shadow: 0 0.25rem 1rem rgba(15, 40, 50, 0.05);
   transition:
     border-color 160ms ease,
-    transform 160ms ease;
+    background-color 160ms ease;
 }
 
 .marketplace-discovery-card:hover,
 .marketplace-discovery-card:focus-visible {
-  transform: translateY(-2px);
   border-color: #2c8b82;
+  background: #f7fbfa;
 }
 
 .marketplace-discovery-card > svg:first-child {
@@ -2540,13 +2675,10 @@
   border-radius: 0.375rem;
   background: #ffffff;
   box-shadow: none;
-  transition:
-    border-color 160ms ease,
-    transform 160ms ease;
+  transition: border-color 160ms ease;
 }
 
 .marketing-site .marketplace-offer-card:hover {
-  transform: translateY(-0.2rem);
   border-color: var(--marketing-teal);
 }
 
@@ -2562,7 +2694,7 @@
   background-position: center;
   background-size: cover;
   color: #ffffff;
-  font-family: "Outfit", Arial, sans-serif;
+  font-family: "Sora", Arial, sans-serif;
   font-weight: 800;
   text-align: center;
 }
@@ -2589,7 +2721,7 @@
   }
 
   .marketing-header__nav a {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
   }
 
   .marketing-site .marketplace-offer-grid.marketing-public-offers__grid {
@@ -2616,7 +2748,7 @@
     flex-direction: column;
     gap: 0.15rem;
     padding-inline: 0.2rem;
-    font-size: 0.65rem;
+    font-size: 0.75rem;
   }
 
   .marketing-discovery__label {
@@ -2643,7 +2775,7 @@
     border-radius: 0.375rem;
     padding-inline: 0.75rem;
     color: rgba(255, 255, 255, 0.76);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
   }
 
   .marketplace-discovery-grid {
@@ -2674,7 +2806,7 @@
 
   .marketing-discovery a {
     min-height: 3rem;
-    font-size: 0.58rem;
+    font-size: 0.6875rem;
   }
 
   .marketing-site .marketplace-hero,
@@ -2697,7 +2829,7 @@
   }
 
   .marketing-site .marketplace-hero p {
-    font-size: 0.78rem;
+    font-size: 0.9375rem;
   }
 
   .marketing-site .marketplace-section {
@@ -2761,7 +2893,7 @@
 
 .marketing-success-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: 1.25rem;
   margin-top: 3rem;
 }
@@ -2782,20 +2914,20 @@
 .marketing-success-grid p {
   margin-top: 0.8rem;
   color: #64748b;
-  font-size: 0.78rem;
+  font-size: 0.9375rem;
   line-height: 1.65;
 }
 
 .marketing-success-grid strong {
   margin-top: 1rem;
   color: #0f2832;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 
 .marketing-success-grid small {
   margin-top: 0.2rem;
   color: #94a3b8;
-  font-size: 0.66rem;
+  font-size: 0.8125rem;
 }
 
 .marketing-cta form {
@@ -2815,7 +2947,7 @@
   padding-inline: 1rem;
   color: #ffffff;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
 }
 
 .marketing-cta form input::placeholder {
@@ -2847,860 +2979,4 @@
 
 .faq-browser--page .faq-browser__body {
   max-width: 58rem;
-}
-
-@media (max-width: 39.9375rem) {
-  .marketing-container {
-    width: calc(100% - 2.5rem);
-  }
-
-  .marketing-header,
-  .marketing-header__inner {
-    min-height: 3.75rem;
-  }
-
-  .marketing-header {
-    position: sticky;
-    background: #0f2832;
-  }
-
-  .marketing-header__inner {
-    width: calc(100% - 2.5rem);
-  }
-
-  .marketing-header__logo img,
-  .marketing-menu__logo img {
-    width: 1.7rem;
-    height: 1.7rem;
-  }
-
-  .marketing-header__logo .vuyela-logo__wordmark strong,
-  .marketing-menu__logo .vuyela-logo__wordmark strong {
-    font-size: 0.78rem;
-  }
-
-  .marketing-menu summary {
-    width: 2rem;
-    height: 2rem;
-    border: 0;
-    border-radius: 0.25rem;
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  .marketing-menu__close {
-    display: none;
-  }
-
-  .marketing-menu[open] {
-    position: fixed;
-    z-index: 100;
-    inset: 0;
-    background: #021e28;
-  }
-
-  .marketing-menu[open] summary {
-    position: fixed;
-    z-index: 102;
-    top: 0.9rem;
-    right: 1.25rem;
-  }
-
-  .marketing-menu[open] .marketing-menu__open {
-    display: none;
-  }
-
-  .marketing-menu[open] .marketing-menu__close {
-    display: block;
-  }
-
-  .marketing-menu nav {
-    position: fixed;
-    z-index: 101;
-    inset: 0;
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    border: 0;
-    border-radius: 0;
-    background-color: var(--marketing-navy);
-    background-image: url("/brand/textures/capulana-primary.jpg");
-    background-blend-mode: multiply;
-    background-position: center;
-    background-size: cover;
-    padding: 1rem 1.25rem 1.75rem;
-    box-shadow: none;
-  }
-
-  .marketing-menu nav .marketing-menu__logo {
-    min-height: 2rem;
-    margin-bottom: 2.6rem;
-    padding: 0;
-    background: transparent;
-  }
-
-  .marketing-menu nav > a:not(.marketing-menu__logo) {
-    min-height: 3.25rem;
-    gap: 0.8rem;
-    border-radius: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0;
-    color: rgba(255, 255, 255, 0.72);
-    font-family: var(--marketing-display);
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  .marketing-menu nav > a[aria-current="page"] {
-    background: transparent;
-    color: #ffffff;
-    font-weight: 700;
-  }
-
-  .marketing-menu nav > a svg {
-    color: #94a3b8;
-  }
-
-  .marketing-menu nav > a[aria-current="page"] svg {
-    color: #2db4aa;
-  }
-
-  .marketing-menu__actions {
-    display: grid;
-    gap: 0.75rem;
-    margin-top: auto;
-  }
-
-  .marketing-menu nav .marketing-menu__actions a {
-    display: flex;
-    min-height: 2.8rem;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255, 255, 255, 0.52);
-    border-radius: 0.35rem;
-    padding: 0.65rem;
-    color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  .marketing-menu nav .marketing-menu__actions .marketing-menu__register {
-    border-color: #2c8b82;
-    background: #2c8b82;
-  }
-
-  .marketing-menu__social,
-  .marketing-footer__social {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .marketing-menu__social {
-    justify-content: center;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-menu__social img,
-  .marketing-footer__social img {
-    width: 1rem;
-    height: 1rem;
-    opacity: 0.8;
-  }
-
-  .marketing-section {
-    padding-block: 2.75rem;
-  }
-
-  .marketing-heading > span {
-    min-height: 1.35rem;
-    padding: 0.25rem 0.55rem;
-    font-size: 0.5rem;
-  }
-
-  .marketing-heading h1,
-  .marketing-heading h2,
-  .marketing-page-hero h1,
-  .marketing-help-hero h1 {
-    margin-top: 0.65rem;
-    font-size: 1.7rem;
-    line-height: 1.08;
-  }
-
-  .marketing-heading p {
-    margin-top: 0.8rem;
-    font-size: 0.72rem;
-    line-height: 1.6;
-  }
-
-  .marketing-button {
-    min-height: 2.75rem;
-    border-radius: 0.35rem;
-    font-size: 0.7rem;
-  }
-
-  .marketing-home-hero {
-    min-height: 33.25rem;
-  }
-
-  .marketing-home-hero__inner {
-    display: flex;
-    min-height: 33.25rem;
-    flex-direction: column;
-    padding: 1.8rem 0 0;
-  }
-
-  .marketing-proof {
-    gap: 0.7rem;
-    margin-bottom: 1rem;
-  }
-
-  .marketing-proof span {
-    font-size: 0.46rem;
-    text-transform: none;
-  }
-
-  .marketing-proof svg {
-    width: 10px;
-    height: 10px;
-  }
-
-  .marketing-home-hero h1 {
-    max-width: 11ch;
-    font-size: 2rem;
-    line-height: 1.08;
-  }
-
-  .marketing-home-hero__copy > p {
-    max-width: 25rem;
-    margin-top: 0.85rem;
-    font-size: 0.72rem;
-    line-height: 1.58;
-  }
-
-  .marketing-home-hero__copy .marketing-actions {
-    margin-top: 1.15rem;
-  }
-
-  .marketing-actions {
-    gap: 0.6rem;
-  }
-
-  .marketing-home-hero__visual {
-    width: 100%;
-    min-height: 14.8rem;
-    margin-top: auto;
-  }
-
-  .marketing-product-image {
-    width: 112%;
-    height: 112%;
-    inset: -7% -6% -5%;
-  }
-
-  .marketing-facts__grid {
-    min-height: 7.5rem;
-  }
-
-  .marketing-facts__grid div {
-    min-height: 3.75rem;
-    gap: 0.05rem;
-    padding-inline: 0.4rem;
-  }
-
-  .marketing-facts strong {
-    font-size: 1rem;
-  }
-
-  .marketing-facts span {
-    font-size: 0.52rem;
-  }
-
-  .marketing-site--home .marketing-section--light .marketing-heading--center h2 {
-    font-size: 1.45rem;
-  }
-
-  .marketing-step-grid {
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-step-grid li {
-    min-height: 6.6rem;
-    padding: 1.1rem;
-  }
-
-  .marketing-step-grid .marketing-icon {
-    display: none;
-  }
-
-  .marketing-step-grid__number {
-    top: 0.8rem;
-    right: 0.9rem;
-    font-size: 1.1rem;
-  }
-
-  .marketing-step-grid h3 {
-    max-width: calc(100% - 2.25rem);
-    margin-top: 0;
-    font-size: 0.72rem;
-  }
-
-  .marketing-step-grid p {
-    max-width: calc(100% - 1rem);
-    margin-top: 0.45rem;
-    font-size: 0.61rem;
-    line-height: 1.45;
-  }
-
-  .marketing-centered-action {
-    display: none;
-  }
-
-  .marketing-mobile-omit {
-    display: none;
-  }
-
-  .marketing-customer-preview .marketing-split {
-    gap: 1.75rem;
-  }
-
-  .marketing-customer-preview .marketing-heading h2 {
-    font-size: 1.55rem;
-  }
-
-  .marketing-customer-preview .marketing-check-list,
-  .marketing-customer-preview .marketing-text-link {
-    display: none;
-  }
-
-  .marketing-loyalty-card {
-    min-height: 12rem;
-    border-radius: 0.4rem;
-    padding: 1rem;
-  }
-
-  .marketing-loyalty-card .vuyela-logo img {
-    width: 1.45rem;
-    height: 1.45rem;
-  }
-
-  .marketing-loyalty-card .vuyela-logo__wordmark strong {
-    font-size: 0.66rem;
-  }
-
-  .marketing-loyalty-card > small {
-    margin-top: 1.45rem;
-    font-size: 0.48rem;
-  }
-
-  .marketing-loyalty-card > strong {
-    font-size: 1.35rem;
-  }
-
-  .marketing-loyalty-card__bottom {
-    margin-top: 1.35rem;
-    font-size: 0.52rem;
-  }
-
-  .marketing-loyalty-card__bottom svg {
-    width: 3rem;
-    height: 3rem;
-  }
-
-  .marketing-site--home .marketing-section:has(.pricing-grid) {
-    background: #f3f7f8;
-  }
-
-  .marketing-site--home .pricing-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-site--home .pricing-card {
-    display: none;
-  }
-
-  .marketing-site--home .pricing-card[data-plan-slug="free"],
-  .marketing-site--home .pricing-card[data-plan-slug="gratuito"],
-  .marketing-site--home .pricing-card[data-plan-slug="teste"],
-  .marketing-site--home .pricing-card[data-plan-slug="growth"],
-  .marketing-site--home .pricing-card[data-plan-slug="crescimento"] {
-    display: flex;
-  }
-
-  .pricing-card {
-    min-height: 17rem;
-    border-radius: 0.45rem;
-    padding: 1.1rem;
-    scroll-snap-align: center;
-  }
-
-  .pricing-card h3 {
-    font-size: 0.9rem;
-  }
-
-  .pricing-card > p {
-    min-height: auto;
-    font-size: 0.62rem;
-  }
-
-  .pricing-card__price {
-    margin-top: 0.8rem;
-    font-size: 1.35rem;
-  }
-
-  .pricing-card ul {
-    gap: 0.5rem;
-    margin: 0.8rem 0;
-    padding-top: 0.8rem;
-  }
-
-  .pricing-card li {
-    font-size: 0.62rem;
-  }
-
-  .marketing-page-hero,
-  .marketing-help-hero {
-    min-height: 15.5rem;
-    padding-block: 2.2rem;
-  }
-
-  .marketing-page-hero .marketing-heading,
-  .marketing-help-hero .marketing-heading {
-    max-width: 21rem;
-  }
-
-  .marketing-site--how .marketing-page-hero,
-  .marketing-site--customers .marketing-page-hero {
-    min-height: 15.75rem;
-  }
-
-  .marketing-journey {
-    gap: 0.85rem;
-  }
-
-  .marketing-journey article {
-    min-height: 12.3rem;
-    gap: 0.7rem;
-    border-radius: 0.45rem;
-    padding: 1rem;
-  }
-
-  .marketing-journey__number {
-    width: 2.7rem;
-    height: 2.7rem;
-    font-size: 1rem;
-  }
-
-  .marketing-journey h2 {
-    font-size: 0.75rem;
-  }
-
-  .marketing-journey p {
-    margin-top: 0.4rem;
-    font-size: 0.61rem;
-    line-height: 1.52;
-  }
-
-  .marketing-journey .marketing-button {
-    min-height: 2.4rem;
-  }
-
-  .marketing-perspectives {
-    gap: 0.85rem;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-perspectives article {
-    padding: 1.25rem;
-  }
-
-  .marketing-perspectives h3 {
-    font-size: 1rem;
-  }
-
-  .marketing-perspectives p,
-  .marketing-perspectives li {
-    font-size: 0.61rem;
-  }
-
-  .marketing-quote {
-    padding-block: 3.75rem;
-  }
-
-  .marketing-quote span {
-    font-size: 2.5rem;
-  }
-
-  .marketing-quote blockquote {
-    margin-top: 0.7rem;
-    font-size: 0.95rem;
-    line-height: 1.45;
-  }
-
-  .marketing-quote strong {
-    display: block;
-    margin-top: 1rem;
-    font-size: 0.68rem;
-  }
-
-  .marketing-quote p {
-    margin-top: 0.15rem;
-    font-size: 0.58rem;
-  }
-
-  .marketing-alert-banner {
-    min-height: 10rem;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding: 1.1rem;
-  }
-
-  .marketing-alert-banner h3 {
-    font-size: 0.9rem;
-  }
-
-  .marketing-alert-banner p {
-    font-size: 0.62rem;
-  }
-
-  .marketing-alert-banner .marketing-button {
-    width: fit-content;
-    margin-top: 0.8rem;
-  }
-
-  .marketing-alert-banner__signal {
-    display: none;
-  }
-
-  .marketing-offer-grid {
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-offer-grid > a {
-    min-height: 9.8rem;
-    padding: 1rem;
-  }
-
-  .marketing-offer-grid h3 {
-    margin-top: 0.75rem;
-    font-size: 0.82rem;
-  }
-
-  .marketing-offer-grid p {
-    display: none;
-  }
-
-  .marketing-business-hero__inner {
-    min-height: 35rem;
-    gap: 1.6rem;
-    padding-block: 2rem;
-  }
-
-  .marketing-business-hero h1 {
-    font-size: 2rem;
-  }
-
-  .marketing-business-hero .marketing-actions {
-    margin-top: 1rem;
-  }
-
-  .marketing-dashboard-visual {
-    padding: 1rem;
-  }
-
-  .marketing-dashboard-visual dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .marketing-dashboard-visual dl div {
-    padding: 0.7rem;
-  }
-
-  .marketing-dashboard-visual dd {
-    font-size: 1rem;
-  }
-
-  .marketing-chart {
-    height: 6.5rem;
-    padding: 1rem;
-  }
-
-  .marketing-capability-grid {
-    gap: 0.8rem;
-    margin-top: 1.6rem;
-  }
-
-  .marketing-capability-grid article {
-    min-height: 10.5rem;
-    padding: 1.2rem;
-  }
-
-  .marketing-capability-grid h3 {
-    margin-top: 0.8rem;
-    font-size: 0.75rem;
-  }
-
-  .marketing-capability-grid p {
-    font-size: 0.62rem;
-  }
-
-  .marketing-feature-row {
-    gap: 1.6rem;
-  }
-
-  .marketing-feature-row--reverse > :first-child {
-    order: 2;
-  }
-
-  .marketing-metrics-panel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 1rem;
-  }
-
-  .marketing-metrics-panel div {
-    min-height: 7rem;
-    padding: 0.8rem;
-  }
-
-  .marketing-metrics-panel span {
-    margin-top: 1rem;
-    font-size: 0.55rem;
-  }
-
-  .marketing-metrics-panel strong {
-    font-size: 1.15rem;
-  }
-
-  .marketing-integration-panel {
-    min-height: 8.5rem;
-    padding: 1.25rem;
-  }
-
-  .marketing-success-grid {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-success-grid article {
-    padding: 1.1rem;
-  }
-
-  .marketing-cta {
-    padding-block: 2.75rem;
-  }
-
-  .marketing-cta h2 {
-    font-size: 1.25rem;
-  }
-
-  .marketing-cta p {
-    font-size: 0.65rem;
-  }
-
-  .marketing-cta form {
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-top: 1rem;
-  }
-
-  .marketing-cta form input,
-  .marketing-cta form .marketing-button {
-    width: 100%;
-  }
-
-  .marketing-site--pricing .marketing-page-hero {
-    min-height: 17.5rem;
-    padding-bottom: 4rem;
-  }
-
-  .marketing-pricing-plans {
-    padding-top: 0;
-  }
-
-  .marketing-pricing-plans > .marketing-container {
-    width: 100%;
-  }
-
-  .marketing-pricing-plans .pricing-period {
-    position: relative;
-    z-index: 2;
-    margin: -3.3rem auto 2.5rem;
-    border-color: rgba(255, 255, 255, 0.08);
-    background: rgba(15, 40, 50, 0.72);
-  }
-
-  .marketing-pricing-plans .pricing-period button:not([aria-pressed="true"]) {
-    color: rgba(255, 255, 255, 0.72);
-  }
-
-  .marketing-pricing-plans .pricing-grid {
-    display: grid;
-    overflow-x: auto;
-    grid-auto-columns: calc(100vw - 2.5rem);
-    grid-auto-flow: column;
-    grid-template-columns: none;
-    gap: 0.8rem;
-    margin-top: 0;
-    padding: 0 1.25rem 0.8rem;
-    scroll-padding-inline: 1.25rem;
-    scroll-snap-type: x mandatory;
-  }
-
-  .marketing-site--pricing .marketing-section--light {
-    padding-block: 2.75rem;
-  }
-
-  .pricing-table-wrap {
-    margin-top: 1.2rem;
-    border-radius: 0.4rem;
-  }
-
-  .pricing-table-wrap table {
-    min-width: 36rem;
-    font-size: 0.61rem;
-  }
-
-  .pricing-table-wrap th,
-  .pricing-table-wrap td {
-    padding: 0.7rem;
-  }
-
-  .marketing-pricing-faq .marketing-heading {
-    margin-bottom: 1.25rem;
-  }
-
-  .marketing-pricing-faq details {
-    margin-bottom: 0.7rem;
-    padding: 1rem;
-  }
-
-  .marketing-pricing-faq details:nth-of-type(3) {
-    display: none;
-  }
-
-  .faq-browser--page .marketing-help-hero {
-    min-height: 17.5rem;
-  }
-
-  .faq-browser--page .marketing-help-hero .faq-browser__search {
-    min-height: 2.65rem;
-    margin-top: 1.25rem;
-  }
-
-  .faq-browser--page .faq-browser__body {
-    width: 100%;
-  }
-
-  .faq-browser--page .marketing-section--plain {
-    padding: 1.35rem 1.25rem 2.75rem;
-  }
-
-  .faq-browser__filters {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.45rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .faq-browser__filters button {
-    min-height: 2.15rem;
-    padding: 0.4rem;
-    font-size: 0.62rem;
-  }
-
-  .faq-browser__items {
-    display: grid;
-    gap: 0.7rem;
-  }
-
-  .faq-browser__items details,
-  .faq-browser__items details:nth-child(even) {
-    border: 1px solid #dce5e7;
-    border-radius: 0.4rem;
-    background: #ffffff;
-    padding: 0.9rem;
-  }
-
-  .faq-browser__items summary {
-    font-size: 0.67rem;
-  }
-
-  .faq-browser__items p {
-    margin-top: 0.5rem;
-    font-size: 0.59rem;
-    line-height: 1.55;
-  }
-
-  .marketing-support-grid,
-  .marketing-resource-links {
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-  }
-
-  .marketing-support-grid article {
-    min-height: 8.5rem;
-    padding: 1rem;
-  }
-
-  .marketing-resource-links a {
-    min-height: 3.5rem;
-    padding: 0.8rem 1rem;
-    font-size: 0.68rem;
-  }
-
-  .marketing-footer__main {
-    gap: 2.5rem;
-    padding-block: 3rem 2.2rem;
-  }
-
-  .marketing-footer__brand {
-    max-width: 16.5rem;
-  }
-
-  .marketing-footer__brand .vuyela-logo img {
-    width: 1.85rem;
-    height: 1.85rem;
-  }
-
-  .marketing-footer__brand p {
-    margin-top: 1rem;
-    font-size: 0.65rem;
-  }
-
-  .marketing-footer__brand > strong {
-    font-size: 0.72rem;
-  }
-
-  .marketing-footer__links {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem;
-  }
-
-  .marketing-footer__links nav:nth-child(3) {
-    display: none;
-  }
-
-  .marketing-footer__links strong {
-    font-size: 0.68rem;
-  }
-
-  .marketing-footer__links a {
-    font-size: 0.61rem;
-  }
-
-  .marketing-footer__bottom {
-    min-height: 6.5rem;
-    gap: 1rem;
-  }
-
-  .marketing-footer__bottom small {
-    max-width: 18rem;
-    font-size: 0.56rem;
-    line-height: 1.5;
-  }
 }

@@ -16,7 +16,7 @@ six independent page copies:
   shell and provide the discovery layer for published marketplace content.
 
 All public pages reuse `PublicSiteShell`, the official `VuyelaLogo`, the exported Capulana textures,
-Outfit for public display typography and Inter for body copy. Navigation links resolve to real
+Sora for public display typography and Inter for body copy. Navigation links resolve to real
 routes, while unavailable payment-provider integrations are not advertised as active capabilities.
 
 The primary navigation has one `Descobrir` entry. Inside discovery routes, a compact contextual
@@ -58,8 +58,8 @@ The visual composition is intentionally editorial rather than a sequence of iden
   explanation;
 - process and capability sections use connected steps, dividers and data rails instead of floating
   cards with decorative shadows;
-- reward gold communicates value, teal communicates action and coral is reserved for small visual
-  accents.
+- reward gold communicates value and teal communicates action; additional accent colours are used
+  only when they carry meaning.
 
 Capulana geometry must support hierarchy rather than behave as a permanent wallpaper. On wide
 screens it can occupy one side of a hero or define the edge of a section. On small screens it may
@@ -85,3 +85,8 @@ The structure is informed by mature loyalty experiences that prioritize unified 
 immediate benefit comprehension, scan/earn/redeem clarity, and quick access to a digital member
 card. References are used for information architecture only; VUYELA assets and tokens remain the
 visual source of truth.
+
+The implementation follows four review principles: brand before trend, editorial hierarchy over
+equal-card repetition, real platform content before decorative mock data, and culture expressed
+through structure and material rather than permanent background ornament. Mobile rules live in one
+responsive cascade so late overrides cannot silently replace the approved composition.
