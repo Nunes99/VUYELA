@@ -72,7 +72,7 @@ export default function HowItWorksPage() {
         aria-labelledby="perspectives-title"
       >
         <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center marketing-heading--inverse">
+          <div className="marketing-heading marketing-heading--inverse">
             <span>Vantagem mútua</span>
             <h2 id="perspectives-title">Duas perspetivas para o mesmo ecossistema.</h2>
           </div>

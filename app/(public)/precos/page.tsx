@@ -95,7 +95,7 @@ export default async function PricingPage() {
         aria-labelledby="pricing-faq-title"
       >
         <div className="marketing-container marketing-pricing-faq">
-          <div className="marketing-heading marketing-heading--center">
+          <div className="marketing-heading">
             <span>FAQ de preços</span>
             <h2 id="pricing-faq-title">Dúvidas sobre os nossos planos</h2>
           </div>

@@ -23,7 +23,6 @@ import {
 
 import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
-import { PricingSelector } from "@/features/marketing/pricing-selector";
 import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
 import { OfferCard } from "@/features/public-marketplace/marketplace";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
@@ -127,6 +126,18 @@ const organizationJsonLd = {
   description: "Plataforma de fidelização digital para Moçambique."
 };
 
+function formatPlanPrice(valueMznMinor: number | null): string {
+  if (valueMznMinor === null) {
+    return "Sob consulta";
+  }
+
+  if (valueMznMinor === 0) {
+    return "0 MZN";
+  }
+
+  return `${Math.round(valueMznMinor / 100).toLocaleString("pt-MZ")} MZN/mês`;
+}
+
 export default async function HomePage() {
   const [plans, marketplace] = await Promise.all([
     getPublicSubscriptionPlans(),
@@ -205,137 +216,131 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="marketing-facts" aria-label="Diretório VUYELA em números">
-        <div className="marketing-container marketing-facts__grid">
-          {publicFacts.map((fact) => (
-            <div key={fact.label}>
-              <strong>{fact.value}</strong>
-              <span>{fact.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <nav className="marketing-quick-access" aria-label="Acesso rápido à rede VUYELA">
-        <div className="marketing-container marketing-quick-access__grid">
-          <div className="marketing-quick-access__intro">
-            <span>Descobrir</span>
-            <strong>A rede VUYELA perto de si.</strong>
-          </div>
-          <div className="marketing-quick-access__links">
+      <section className="home-network" aria-labelledby="network-title">
+        <div className="marketing-container home-network__layout">
+          <header className="home-chapter home-network__intro">
+            <span>01 / A rede agora</span>
+            <h2 id="network-title">A VUYELA começa onde a vida acontece.</h2>
+            <p>
+              Negócios moçambicanos, benefícios publicados e lugares para onde vale a pena voltar.
+            </p>
+          </header>
+          <dl className="home-network__facts">
+            {publicFacts.map((fact) => (
+              <div key={fact.label}>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <nav className="home-network__routes" aria-label="Explorar a rede VUYELA">
             {discoveryLinks.map((item) => {
               const Icon = item.icon;
 
               return (
                 <Link href={item.href} key={item.href}>
                   <Icon aria-hidden="true" size={19} />
-                  <strong>{item.label}</strong>
+                  <span>{item.label}</span>
                   <ArrowRight aria-hidden="true" size={17} />
                 </Link>
               );
             })}
-          </div>
+          </nav>
         </div>
-      </nav>
+      </section>
 
       <section
         className="marketing-section marketing-section--light marketing-public-offers"
         aria-labelledby="public-offers-title"
       >
-        <div className="marketing-container">
-          <div className="marketing-section-lead">
-            <div className="marketing-heading">
-              <span>Agora na rede</span>
-              <h2 id="public-offers-title">Benefícios preparados pelos negócios para si.</h2>
-            </div>
-            <div className="marketing-section-lead__aside">
-              <p>Promoções ativas, com o estabelecimento responsável e a respetiva validade.</p>
-              <Link className="marketing-text-link" href="/ofertas">
-                Ver todas as ofertas <ArrowRight size={16} />
-              </Link>
-            </div>
+        <div className="marketing-container home-offers__layout">
+          <header className="home-chapter home-offers__intro">
+            <span>02 / Em destaque</span>
+            <h2 id="public-offers-title">Benefícios com nome, lugar e validade.</h2>
+            <p>
+              Nada de promessas abstratas. Aqui encontra campanhas publicadas pelos próprios
+              negócios da rede.
+            </p>
+            <Link className="marketing-text-link" href="/ofertas">
+              Ver todas as ofertas <ArrowRight size={16} />
+            </Link>
+          </header>
+          <div className="home-offers__content">
+            {offers.length > 0 ? (
+              <div className="marketplace-offer-grid marketing-public-offers__grid">
+                {offers.map((offer) => (
+                  <OfferCard offer={offer} key={offer.id} />
+                ))}
+              </div>
+            ) : (
+              <div className="marketing-empty-state">
+                <strong>
+                  {marketplace.status === "error"
+                    ? "Não foi possível carregar as ofertas neste momento."
+                    : "Ainda não existem ofertas públicas ativas."}
+                </strong>
+                <p>Entretanto, pode conhecer os estabelecimentos já publicados.</p>
+              </div>
+            )}
           </div>
-          {offers.length > 0 ? (
-            <div className="marketplace-offer-grid marketing-public-offers__grid">
-              {offers.map((offer) => (
-                <OfferCard offer={offer} key={offer.id} />
-              ))}
-            </div>
-          ) : (
-            <div className="marketing-empty-state">
-              <strong>
-                {marketplace.status === "error"
-                  ? "Não foi possível carregar as ofertas neste momento."
-                  : "Ainda não existem ofertas públicas ativas."}
-              </strong>
-              <p>Entretanto, pode conhecer os estabelecimentos já publicados.</p>
-            </div>
-          )}
         </div>
       </section>
 
       <section
-        className="marketing-section marketing-section--soft marketing-how-section"
+        className="marketing-section marketing-section--navy marketing-pattern home-loop"
         aria-labelledby="steps-title"
       >
-        <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
-            <span>Como funciona a VUYELA</span>
-            <h2 id="steps-title">Simples para clientes, rentável para negócios.</h2>
-          </div>
-          <ol className="marketing-step-grid">
+        <div className="marketing-container home-loop__layout">
+          <header className="home-chapter home-chapter--inverse home-loop__intro">
+            <span>03 / O ciclo VUYELA</span>
+            <h2 id="steps-title">Uma relação que cresce de cada vez que regressa.</h2>
+            <p>
+              A tecnologia fica em segundo plano. Para o cliente, tudo acontece num cartão; para o
+              negócio, tudo fica registado.
+            </p>
+            <Link className="marketing-text-link" href="/como-funciona">
+              Conhecer o percurso completo <ArrowRight size={16} />
+            </Link>
+          </header>
+          <ol className="home-loop__steps">
             {steps.map((step, index) => {
               const Icon = step.icon;
+
               return (
                 <li key={step.title}>
-                  <span className="marketing-step-grid__number">0{index + 1}</span>
-                  <span className="marketing-icon">
-                    <Icon size={19} />
-                  </span>
-                  <h3>{step.title}</h3>
-                  <p>{step.body}</p>
+                  <span className="home-loop__number">0{index + 1}</span>
+                  <Icon aria-hidden="true" size={20} />
+                  <div>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                  </div>
                 </li>
               );
             })}
           </ol>
-          <div className="marketing-centered-action">
-            <Link className="marketing-text-link" href="/como-funciona">
-              Ver o funcionamento completo <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="marketing-section marketing-section--navy marketing-pattern"
-        aria-labelledby="benefits-title"
-      >
-        <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--inverse">
-            <span>Vantagens exclusivas</span>
-            <h2 id="benefits-title">Muito mais do que YELAS, uma experiência completa.</h2>
-          </div>
-          <div className="marketing-benefit-grid">
+          <ul className="home-loop__outcomes" aria-label="Vantagens da rede VUYELA">
             {benefits.map((benefit) => {
               const Icon = benefit.icon;
+
               return (
-                <article key={benefit.title}>
-                  <Icon aria-hidden="true" size={21} />
-                  <h3>{benefit.title}</h3>
-                  <p>{benefit.body}</p>
-                </article>
+                <li key={benefit.title}>
+                  <Icon aria-hidden="true" size={18} />
+                  <div>
+                    <strong>{benefit.title}</strong>
+                    <p>{benefit.body}</p>
+                  </div>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </div>
       </section>
 
-      <section className="marketing-partners" aria-labelledby="partners-title">
-        <div className="marketing-container">
-          <div className="marketing-ornament" aria-hidden="true" />
-          <h2 id="partners-title">Negócios disponíveis na VUYELA</h2>
+      <section className="home-partners" aria-labelledby="partners-title">
+        <div className="marketing-container home-partners__layout">
+          <h2 id="partners-title">Já fazem parte da rede</h2>
           {businesses.length > 0 ? (
-            <div className="marketing-partners__list">
+            <div className="home-partners__list">
               {businesses.map((business) => (
                 <Link href={`/estabelecimentos/${business.slug}`} key={business.id}>
                   {business.name}
@@ -353,12 +358,12 @@ export default async function HomePage() {
       </section>
 
       <section
-        className="marketing-section marketing-customer-preview"
+        className="marketing-section marketing-customer-preview home-customer"
         aria-labelledby="customer-title"
       >
         <div className="marketing-container marketing-split">
-          <div className="marketing-heading">
-            <span>Para os clientes</span>
+          <div className="home-chapter home-customer__intro">
+            <span>04 / Para clientes</span>
             <h2 id="customer-title">Um cartão digital para benefícios que fazem sentido.</h2>
             <p>
               Chega de cartões de papel acumulados na carteira que se perdem facilmente. Com a
@@ -420,72 +425,101 @@ export default async function HomePage() {
         aria-labelledby="business-title"
       >
         <div className="marketing-container">
-          <div className="marketing-business-preview__top">
-            <div className="marketing-heading marketing-heading--inverse">
-              <span>Para negócios</span>
+          <div className="home-business__layout">
+            <div className="home-chapter home-chapter--inverse home-business__intro">
+              <span>05 / Para negócios</span>
               <h2 id="business-title">Clientes que voltam. Negócios que crescem.</h2>
               <p>
-                Configure regras próprias, opere compras no POS e acompanhe o desempenho do seu
-                programa com clareza.
+                Uma operação completa, do balcão à gestão. Configure regras, processe compras no POS
+                e acompanhe o desempenho sem perder o controlo.
               </p>
+              <div className="marketing-actions">
+                <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
+                  Criar programa
+                </Link>
+                <Link className="marketing-text-link" href="/negocios">
+                  Conhecer a solução <ArrowRight size={16} />
+                </Link>
+              </div>
             </div>
-            <div className="marketing-actions">
-              <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
-                Criar programa
-              </Link>
-              <Link className="marketing-button marketing-button--outline" href="/negocios">
-                Saber mais
-              </Link>
-            </div>
-          </div>
-          <div className="marketing-business-grid">
-            <article>
-              <UsersRound size={20} />
-              <h3>Programa próprio</h3>
-              <p>Regras e identidade para cada negócio.</p>
-            </article>
-            <article>
-              <QrCode size={20} />
-              <h3>POS simples</h3>
-              <p>Identificação por QR, cartão ou telefone.</p>
-            </article>
-            <article>
-              <BarChart3 size={20} />
-              <h3>Painel de gestão</h3>
-              <p>Indicadores de clientes, YELAS e transações.</p>
-            </article>
-            <article>
-              <Store size={20} />
-              <h3>Gestão operacional</h3>
-              <p>Filiais, equipa, campanhas e subscrição.</p>
-            </article>
+            <ol className="home-business__index">
+              <li>
+                <span>01</span>
+                <UsersRound size={20} />
+                <div>
+                  <strong>Programa próprio</strong>
+                  <p>Regras e identidade para cada negócio.</p>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <QrCode size={20} />
+                <div>
+                  <strong>POS simples</strong>
+                  <p>Identificação por QR, cartão ou telefone.</p>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <BarChart3 size={20} />
+                <div>
+                  <strong>Painel de gestão</strong>
+                  <p>Indicadores de clientes, YELAS e transações.</p>
+                </div>
+              </li>
+              <li>
+                <span>04</span>
+                <Store size={20} />
+                <div>
+                  <strong>Gestão operacional</strong>
+                  <p>Filiais, equipa, campanhas e subscrição.</p>
+                </div>
+              </li>
+            </ol>
           </div>
         </div>
       </section>
 
       <section
-        className="marketing-section marketing-section--light"
+        className="marketing-section marketing-section--light home-plans"
         aria-labelledby="pricing-title"
       >
-        <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
-            <span>Preços VUYELA</span>
+        <div className="marketing-container home-plans__layout">
+          <header className="home-chapter home-plans__intro">
+            <span>06 / Planos VUYELA</span>
             <h2 id="pricing-title">Planos para começar pequeno e crescer com controlo.</h2>
             <p>Escolha o plano adequado ao número de filiais, utilizadores e campanhas.</p>
-          </div>
-          <PricingSelector hidePeriod plans={plans} />
-          <div className="marketing-centered-action">
             <Link className="marketing-text-link" href="/precos">
               Comparar todos os recursos <ArrowRight size={16} />
             </Link>
+          </header>
+          <div className="home-plans__list">
+            {plans.length > 0 ? (
+              plans.map((plan, index) => (
+                <Link href="/cadastrar/negocio" key={plan.id}>
+                  <span>0{index + 1}</span>
+                  <div>
+                    <strong>{plan.name}</strong>
+                    <small>{plan.description}</small>
+                  </div>
+                  <b>{formatPlanPrice(plan.monthlyPriceMznMinor)}</b>
+                  <ArrowRight aria-hidden="true" size={18} />
+                </Link>
+              ))
+            ) : (
+              <div className="marketing-empty-state">
+                <strong>O catálogo de planos está temporariamente indisponível.</strong>
+                <p>Fale com a equipa VUYELA para preparar o seu programa.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       <section className="marketing-section marketing-section--faq" aria-labelledby="faq-title">
         <div className="marketing-container marketing-faq-preview">
-          <div className="marketing-heading">
-            <span>Perguntas frequentes</span>
+          <div className="home-chapter">
+            <span>07 / Perguntas frequentes</span>
             <h2 id="faq-title">Esclareça as suas dúvidas mais comuns.</h2>
           </div>
           <div>

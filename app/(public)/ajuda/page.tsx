@@ -59,7 +59,7 @@ export default function HelpPage() {
         aria-labelledby="support-title"
       >
         <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
+          <div className="marketing-heading">
             <span>Suporte humano</span>
             <h2 id="support-title">Ainda tem dúvidas? Fale connosco.</h2>
           </div>
@@ -91,7 +91,7 @@ export default function HelpPage() {
         aria-labelledby="resources-title"
       >
         <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
+          <div className="marketing-heading">
             <h2 id="resources-title">Recursos úteis</h2>
           </div>
           <div className="marketing-resource-links">

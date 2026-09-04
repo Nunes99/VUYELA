@@ -65,13 +65,19 @@ export function PricingSelector({ hidePeriod = false, plans }: PricingSelectorPr
               data-plan-slug={plan.slug}
               key={plan.id}
             >
-              {recommended ? <span className="pricing-card__badge">Recomendado</span> : null}
-              <h3>{plan.name}</h3>
-              <p>{plan.description}</p>
-              <strong className="pricing-card__price">
-                {monthlyPrice === null ? "Sob consulta" : `${formatMonthlyPrice(monthlyPrice)} MZN`}
-              </strong>
-              <small>{monthlyPrice === null ? "Plano personalizado" : "/mês"}</small>
+              <header className="pricing-card__identity">
+                {recommended ? <span className="pricing-card__badge">Recomendado</span> : null}
+                <h3>{plan.name}</h3>
+                <p>{plan.description}</p>
+              </header>
+              <div className="pricing-card__billing">
+                <strong className="pricing-card__price">
+                  {monthlyPrice === null
+                    ? "Sob consulta"
+                    : `${formatMonthlyPrice(monthlyPrice)} MZN`}
+                </strong>
+                <small>{monthlyPrice === null ? "Plano personalizado" : "/mês"}</small>
+              </div>
               <ul>
                 <li>
                   <Check aria-hidden="true" size={15} />

@@ -38,12 +38,11 @@ generic financial imagery.
 The information order is:
 
 1. core promise and customer/business entry points;
-2. verified public counts and direct discovery of establishments, categories, locations, offers,
-   and search;
-3. the four-step loyalty loop;
-4. customer benefits and partner proof;
-5. dedicated customer and business paths;
-6. pricing, programme rules, resources, and footer.
+2. a live network index combining verified public counts with direct discovery;
+3. real offers published by participating businesses;
+4. the four-step loyalty loop and its practical outcomes;
+5. partner proof and distinct customer and business paths;
+6. a concise plan index, programme rules, resources, and footer.
 
 Public metrics must be derived from published marketplace records. Uploaded promotional images
 and active public offers are reused on the homepage, the customer page and marketplace routes;
@@ -53,11 +52,12 @@ The visual composition is intentionally editorial rather than a sequence of iden
 
 - the hero combines concise copy with the real VUYELA product visual and keeps the cultural pattern
   concentrated as a signature field;
-- the discovery rail provides direct routes to establishments, offers, categories and search;
+- the network chapter combines public facts and discovery routes without duplicating two utility
+  bands;
 - public campaigns appear near the top of the page so the visitor sees live value before product
   explanation;
-- process and capability sections use connected steps, dividers and data rails instead of floating
-  cards with decorative shadows;
+- process, capability and plan sections use connected steps, numbered indexes, dividers and data
+  rails instead of floating cards with decorative shadows;
 - reward gold communicates value and teal communicates action; additional accent colours are used
   only when they carry meaning.
 

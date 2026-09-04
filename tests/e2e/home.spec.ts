@@ -18,9 +18,9 @@ test("shows the public homepage", async ({ page }) => {
   await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toBeVisible();
   await expect(page.getByText("Feito em Moçambique")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Simples para clientes, rentável para negócios." })
+    page.getByRole("heading", { name: "A VUYELA começa onde a vida acontece." })
   ).toBeVisible();
-  await expect(page.locator("#benefits-title")).toBeAttached();
+  await expect(page.locator("#steps-title")).toBeAttached();
   await expect(page.locator("#partners-title")).toBeAttached();
   expect(browserErrors).toEqual([]);
 });

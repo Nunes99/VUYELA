@@ -101,7 +101,7 @@ export default function BusinessesPage() {
         aria-labelledby="capabilities-title"
       >
         <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center marketing-heading--inverse">
+          <div className="marketing-heading marketing-heading--inverse">
             <span>Proposta de valor</span>
             <h2 id="capabilities-title">Tudo o que precisa para fidelizar e reter clientes.</h2>
           </div>
@@ -195,7 +195,7 @@ export default function BusinessesPage() {
         aria-labelledby="success-title"
       >
         <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
+          <div className="marketing-heading">
             <span>Casos de sucesso</span>
             <h2 id="success-title">Histórias de crescimento em Moçambique</h2>
           </div>

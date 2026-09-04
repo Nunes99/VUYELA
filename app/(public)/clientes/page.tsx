@@ -36,7 +36,7 @@ export default async function CustomersPage() {
         aria-labelledby="rewards-title"
       >
         <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--center">
+          <div className="marketing-heading">
             <span>Vantagens no seu bolso</span>
             <h2 id="rewards-title">Consiga recompensas reais em cada compra</h2>
           </div>
