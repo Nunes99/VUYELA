@@ -94,6 +94,9 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
       const title = document.querySelector("h1");
       const productVisual = document.querySelector(".rv-wallet__image");
       const productRect = productVisual?.getBoundingClientRect();
+      const businessPlaces = Array.from(
+        document.querySelectorAll<HTMLElement>(".rv-movement__events > a > b")
+      );
       const body = document.body;
 
       return {
@@ -105,6 +108,18 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
           productRect!.width > 0 &&
           productRect!.right > 0 &&
           productRect!.left < window.innerWidth,
+        businessPlacesContained: businessPlaces.every((place) => {
+          const card = place.closest("a")?.getBoundingClientRect();
+          const placeRect = place.getBoundingClientRect();
+
+          return Boolean(
+            card &&
+            placeRect.left >= card.left &&
+            placeRect.right <= card.right + 0.5 &&
+            placeRect.top >= card.top &&
+            placeRect.bottom <= card.bottom + 0.5
+          );
+        }),
         pageLinksWork: Array.from(
           document.querySelectorAll<HTMLAnchorElement>(".marketing-header a")
         ).every((link) => Boolean(link.getAttribute("href")))
@@ -113,6 +128,7 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
 
     expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
     expect(layout.productVisible, `product visual outside viewport at ${width}px`).toBe(true);
+    expect(layout.businessPlacesContained, `business city outside card at ${width}px`).toBe(true);
     expect(layout.pageLinksWork, `missing navigation target at ${width}px`).toBe(true);
     expect(layout.headingFont).toContain("Sora");
     expect(layout.bodyFont).toContain("Inter");
