@@ -25,9 +25,13 @@ test("shows the public homepage", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Hoje, a rede tem isto para oferecer." })
   ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Tudo" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Oferta anterior" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Oferta seguinte" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Não é um cartão. É a sua relação com cada negócio." })
   ).toBeVisible();
+  await expect(page.getByText("Disponível no telemóvel e no navegador")).toBeVisible();
   await expect(page.locator("#steps-title")).toBeAttached();
   await expect(page.locator("#partners-title")).toBeAttached();
   expect(browserErrors).toEqual([]);
@@ -84,11 +88,11 @@ test("keeps the approved hierarchy across core responsive widths", async ({ page
           requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
         })
     );
-    await expect(page.locator(".marketing-product-image")).toBeVisible();
+    await expect(page.locator(".rv-wallet__image")).toBeVisible();
 
     const layout = await page.evaluate(() => {
       const title = document.querySelector("h1");
-      const productVisual = document.querySelector(".marketing-product-image");
+      const productVisual = document.querySelector(".rv-wallet__image");
       const productRect = productVisual?.getBoundingClientRect();
       const body = document.body;
 

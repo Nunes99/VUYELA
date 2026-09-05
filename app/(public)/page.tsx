@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeDollarSign,
-  BadgePercent,
   ChartNoAxesCombined,
   CircleDollarSign,
   Gift,
@@ -19,8 +18,8 @@ import {
 
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
 import { BusinessDashboardDemo } from "@/features/marketing/business-dashboard-demo";
+import { OfferEditorialCarousel } from "@/features/marketing/offer-editorial-carousel";
 import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
-import { OfferCard } from "@/features/public-marketplace/marketplace";
 import type { MarketplaceBusiness } from "@/features/public-marketplace/model";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
 import { getSiteUrl } from "@/lib/env";
@@ -102,13 +101,6 @@ const businessActions = [
   }
 ] as const;
 
-const platformBenefits = [
-  "Descontos exclusivos",
-  "YELAS que valem",
-  "Válido em vários lugares",
-  "Ofertas personalizadas"
-] as const;
-
 function formatPlanPrice(valueMznMinor: number | null): string {
   if (valueMznMinor === null) return "Sob consulta";
   if (valueMznMinor === 0) return "0 MZN";
@@ -137,7 +129,7 @@ export default async function HomePage() {
   ]);
   const businesses = marketplace.snapshot.businesses.slice(0, 6);
   const movementBusinesses = businesses.slice(0, 3);
-  const offers = marketplace.snapshot.offers.slice(0, 4);
+  const offers = marketplace.snapshot.offers;
   const publicMetric = (value: number) =>
     marketplace.status === "error" ? "-" : value.toLocaleString("pt-MZ");
 
@@ -291,33 +283,7 @@ export default async function HomePage() {
         </section>
 
         <section className="rv-offers" aria-labelledby="offers-title">
-          <div className="rv-container">
-            <div className="rv-section-heading rv-section-heading--inverse">
-              <div>
-                <p className="rv-eyebrow">SELECIONADO PARA SI</p>
-                <h2 id="offers-title">Hoje, a rede tem isto para oferecer.</h2>
-              </div>
-              <Link href="/ofertas">
-                Ver todas as ofertas <ArrowRight aria-hidden="true" size={16} />
-              </Link>
-            </div>
-            {offers.length > 0 ? (
-              <div className="rv-offers__flow">
-                {offers.map((offer) => (
-                  <OfferCard key={offer.id} offer={offer} />
-                ))}
-              </div>
-            ) : (
-              <div className="rv-empty rv-empty--inverse">
-                <BadgePercent aria-hidden="true" size={22} />
-                <strong>
-                  {marketplace.status === "error"
-                    ? "Não foi possível carregar as ofertas neste momento."
-                    : "Ainda não existem ofertas públicas ativas."}
-                </strong>
-              </div>
-            )}
-          </div>
+          <OfferEditorialCarousel offers={offers} unavailable={marketplace.status === "error"} />
           {businesses.length > 0 ? (
             <div className="rv-partner-marquee" id="partners-title" aria-label="Negócios da rede">
               <div>
@@ -342,42 +308,40 @@ export default async function HomePage() {
             <p className="rv-eyebrow rv-eyebrow--teal">A SUA VUYELA</p>
             <h2 id="wallet-title">Não é um cartão. É a sua relação com cada negócio.</h2>
             <p>
-              Saldo, movimentos, ofertas e identificação vivem no mesmo lugar. Cada YELA mostra o
-              seu valor e o negócio que a atribuiu.
+              Saldo, movimentos, ofertas e identificação vivem no mesmo lugar. Cada gesto tem
+              contexto; cada YELA mostra o seu valor.
             </p>
-            <ul className="rv-wallet__benefits" aria-label="Benefícios VUYELA">
-              {platformBenefits.map((benefit) => (
-                <li key={benefit}>{benefit}</li>
-              ))}
-            </ul>
-            <Link className="rv-button rv-button--dark" href="/clientes">
-              Explorar a experiência <ArrowRight aria-hidden="true" size={16} />
-            </Link>
+            <div className="rv-wallet__links">
+              <Link className="rv-button rv-button--dark" href="/clientes">
+                Explorar a experiência <ArrowRight aria-hidden="true" size={16} />
+              </Link>
+              <span>Disponível no telemóvel e no navegador</span>
+            </div>
           </div>
-          <div className="rv-wallet__visual">
+          <div className="rv-wallet__product">
             <Image
               alt="Aplicação VUYELA e cartão digital com saldo em YELAS"
-              className="marketing-product-image rv-wallet__image"
+              className="rv-wallet__image"
               height={1086}
               sizes="(max-width: 800px) 100vw, 54vw"
               src="/images/vuyela-product-yl.png"
               width={1448}
             />
-            <div className="rv-wallet__steps" id="steps-title">
-              {customerJourney.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <article key={item.number}>
-                    <div>
-                      <span>{item.number}</span>
-                      <Icon aria-hidden="true" size={19} />
-                    </div>
-                    <strong>{item.title}</strong>
-                    <p>{item.body}</p>
-                  </article>
-                );
-              })}
-            </div>
+          </div>
+          <div className="rv-wallet__rail" id="steps-title">
+            {customerJourney.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article key={item.number}>
+                  <div>
+                    <span>{item.number}</span>
+                    <Icon aria-hidden="true" size={19} />
+                  </div>
+                  <strong>{item.title}</strong>
+                  <p>{item.body}</p>
+                </article>
+              );
+            })}
           </div>
         </section>
 

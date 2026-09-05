@@ -9,6 +9,10 @@ const pageStyles = readFileSync(join(root, "app/globals.css"), "utf8");
 const marketingStyles = readFileSync(join(root, "app/marketing.css"), "utf8");
 const networkStyles = readFileSync(join(root, "app/rede-viva.css"), "utf8");
 const homepage = readFileSync(join(root, "app/(public)/page.tsx"), "utf8");
+const offerCarousel = readFileSync(
+  join(root, "features/marketing/offer-editorial-carousel.tsx"),
+  "utf8"
+);
 const publicShell = readFileSync(join(root, "components/marketing/public-site-shell.tsx"), "utf8");
 const customerDashboard = readFileSync(
   join(root, "features/customer-dashboard/dashboard.tsx"),
@@ -39,11 +43,15 @@ describe("approved VUYELA design contract", () => {
     expect(homepage).toContain("<em>voltar.</em>");
   });
 
-  it("includes the four documented benefit categories", () => {
-    expect(homepage).toContain("Descontos exclusivos");
-    expect(homepage).toContain("YELAS que valem");
-    expect(homepage).toContain("Válido em vários lugares");
-    expect(homepage).toContain("Ofertas personalizadas");
+  it("implements the editorial offer filters and automatic carousel from the prototype", () => {
+    for (const label of ["Tudo", "Comer", "Cuidar", "Comprar", "Descobrir"]) {
+      expect(offerCarousel).toContain(`label: "${label}"`);
+    }
+
+    expect(offerCarousel).toContain("5200");
+    expect(offerCarousel).not.toContain("scroll-snap-type: x mandatory");
+    expect(networkStyles).toContain("scroll-snap-type: x mandatory");
+    expect(networkStyles).not.toContain(".rv-offers__flow");
   });
 
   it("retains the five documented customer mobile navigation destinations", () => {
@@ -67,7 +75,11 @@ describe("approved VUYELA design contract", () => {
     expect(homepage).toContain("BusinessDashboardDemo");
     expect(homepage).toContain("rv-business-identity");
     expect(homepage).toContain("business.logoUrl");
-    expect(networkStyles).toContain(".rv-wallet__steps");
+    expect(homepage).toContain("OfferEditorialCarousel");
+    expect(homepage).toContain("Disponível no telemóvel e no navegador");
+    expect(networkStyles).toContain(".rv-wallet__rail");
+    expect(networkStyles).not.toContain(".rv-wallet__steps");
+    expect(networkStyles).not.toContain(".rv-wallet__benefits");
     expect(networkStyles).toContain(".rv-dashboard__chart");
     expect(customerDashboard).toContain("CustomerSummaryCard");
     expect(customerDashboard).toContain("Seus Cartões Digitais");

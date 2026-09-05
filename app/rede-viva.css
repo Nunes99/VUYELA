@@ -527,57 +527,307 @@
 }
 
 .rv-offers {
-  position: relative;
   overflow: hidden;
   background: var(--rv-ink);
   padding: 7rem 0 0;
   color: #ffffff;
 }
 
-.rv-offers::after {
-  position: absolute;
-  top: 0;
-  right: -8rem;
-  width: 34rem;
-  height: 34rem;
-  background: url("/brand/textures/capulana-primary.jpg") center / cover;
-  content: "";
-  opacity: 0.06;
-  pointer-events: none;
+.rv-offers__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3rem;
 }
 
-.rv-offers .rv-container {
-  position: relative;
-  z-index: 1;
+.rv-offers__heading h2 {
+  max-width: 40rem;
+  margin-top: 1.15rem;
+  color: #ffffff;
+  font-size: 3.0625rem;
+  font-weight: 750;
+  line-height: 1.13;
 }
 
-.rv-offers__flow {
+.rv-offers__tools {
   display: grid;
-  grid-template-columns: repeat(4, minmax(16rem, 1fr));
-  gap: 0.8rem;
-  margin-top: 3.25rem;
+  justify-items: end;
+  gap: 0.875rem;
+}
+
+.rv-offers__filters,
+.rv-offers__controls {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.rv-offers__filters button {
+  min-height: 2.5rem;
+  border: 1px solid #49636c;
+  border-radius: 1.25rem;
+  background: transparent;
+  padding-inline: 1.125rem;
+  color: #c1d2d6;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.rv-offers__filters button:hover,
+.rv-offers__filters button:focus-visible,
+.rv-offers__filters button.is-active {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: var(--rv-ink);
+}
+
+.rv-offers__controls button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid #49636c;
+  border-radius: 50%;
+  background: transparent;
+  color: #ffffff;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.rv-offers__controls button:hover:not(:disabled),
+.rv-offers__controls button:focus-visible:not(:disabled) {
+  background: #ffffff;
+  color: var(--rv-ink);
+}
+
+.rv-offers__controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.rv-offers__viewport {
+  margin-top: 3.375rem;
   overflow-x: auto;
-  padding-bottom: 0.75rem;
   scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
-.rv-offers__flow .marketplace-offer-card {
-  min-width: 16rem;
-  scroll-snap-align: start;
-  border-color: #31505a;
+.rv-offers__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.rv-offers__track {
+  display: flex;
+  width: max-content;
+  height: 33.75rem;
+  gap: 0.875rem;
+}
+
+.rv-editorial-card,
+.rv-editorial-empty {
+  position: relative;
+  overflow: hidden;
   border-radius: 0.5rem;
+  scroll-snap-align: start;
+}
+
+.rv-editorial-card--featured,
+.rv-editorial-empty {
+  flex: 0 0 45rem;
+}
+
+.rv-editorial-card--gold,
+.rv-editorial-card--photo,
+.rv-editorial-card--teal {
+  flex: 0 0 18.75rem;
+}
+
+.rv-editorial-card > img {
+  object-fit: cover;
+  transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.rv-editorial-card:hover > img {
+  transform: scale(1.035);
+}
+
+.rv-editorial-card__placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  background: #123c46 url("/brand/textures/capulana-primary.jpg") center / cover;
+  color: #ffffff;
+  font-family: var(--vy-font-display);
+  font-weight: 800;
+}
+
+.rv-editorial-card__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(3, 27, 35, 0.04) 20%, rgba(3, 27, 35, 0.92) 100%);
+}
+
+.rv-editorial-card__content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.rv-editorial-card__content p,
+.rv-editorial-card--gold > p,
+.rv-editorial-card--teal > p {
+  margin: 0 0 0.8rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.rv-editorial-card__content p {
+  color: #b8c9cd;
+}
+
+.rv-editorial-card__content strong {
+  display: block;
+  color: var(--rv-gold);
+  font-family: var(--vy-font-display);
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.rv-editorial-card h3 {
+  margin: 0.7rem 0 1.35rem;
+  font-size: 1.5rem;
+  line-height: 1.22;
+}
+
+.rv-editorial-card--featured h3 {
+  max-width: 32rem;
+  font-size: 2.25rem;
+}
+
+.rv-editorial-card--featured h3,
+.rv-editorial-card--photo h3 {
+  color: #ffffff;
+}
+
+.rv-editorial-card a,
+.rv-editorial-empty a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  border-radius: 0.35rem;
+  background: #ffffff;
+  padding-inline: 1.15rem;
+  color: var(--rv-ink);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.rv-editorial-card--gold,
+.rv-editorial-card--teal {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+}
+
+.rv-editorial-card--gold {
+  background: var(--rv-gold);
+  color: var(--rv-ink);
+}
+
+.rv-editorial-card--teal {
+  background: var(--rv-teal);
+  color: #ffffff;
+}
+
+.rv-editorial-card__word {
+  display: block;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid rgba(7, 31, 41, 0.3);
+  padding-bottom: 1.125rem;
+  font-family: var(--vy-font-display);
+  font-size: 4.625rem;
+  font-weight: 900;
+  line-height: 0.95;
+}
+
+.rv-editorial-card--teal .rv-editorial-card__word {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.rv-editorial-card--gold > p,
+.rv-editorial-card--teal > p {
+  margin-top: 1.5rem;
+  color: currentColor;
+  opacity: 0.72;
+}
+
+.rv-editorial-card--gold h3,
+.rv-editorial-card--teal h3 {
+  margin-top: 0;
+}
+
+.rv-editorial-card--gold small,
+.rv-editorial-card--teal small {
+  margin-top: auto;
+  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.rv-editorial-card--teal a {
+  background: #ffffff;
+  color: var(--rv-ink);
+}
+
+.rv-editorial-card--gold a {
+  background: var(--rv-ink);
+  color: #ffffff;
+}
+
+.rv-editorial-empty {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  border: 1px solid #31505a;
   background: #103640;
-  color: #ffffff;
+  padding: 2rem;
+  color: #b6c9cd;
 }
 
-.rv-offers__flow .marketplace-offer-card h3,
-.rv-offers__flow .marketplace-offer-card p {
-  color: #ffffff;
+.rv-editorial-empty > svg {
+  flex: 0 0 auto;
+  color: var(--rv-aqua);
 }
 
-.rv-offers__flow .marketplace-offer-card small {
-  color: #a9bec3;
+.rv-editorial-empty div {
+  min-width: 0;
+}
+
+.rv-editorial-empty strong {
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.rv-editorial-empty p {
+  margin: 0.4rem 0 0;
+  font-size: 0.8125rem;
+}
+
+.rv-editorial-empty a {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .rv-partner-marquee {
@@ -613,18 +863,16 @@
 }
 
 .rv-wallet {
+  position: relative;
   display: grid;
-  min-height: 47rem;
+  min-height: 47.5rem;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  overflow: hidden;
   background: #ffffff;
 }
 
 .rv-wallet__copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 6.5rem 4rem 6.5rem max(1.5rem, calc((100vw - var(--rv-width)) / 2));
+  padding: 7.8rem 3.75rem 7.5rem max(2rem, calc((100vw - var(--rv-width)) / 2));
 }
 
 .rv-wallet h2 {
@@ -632,39 +880,25 @@
 }
 
 .rv-wallet__copy > p:not(.rv-eyebrow) {
-  max-width: 34rem;
-  margin: 1.5rem 0;
+  max-width: 31.875rem;
+  margin: 1.55rem 0 2.2rem;
   color: var(--rv-muted);
+  font-size: 0.9375rem;
   line-height: 1.75;
 }
 
-.rv-wallet__benefits {
+.rv-wallet__links {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem 1.25rem;
-  margin: 0 0 2rem;
-  padding: 0;
-  list-style: none;
+  justify-items: start;
+  gap: 0.875rem;
 }
 
-.rv-wallet__benefits li {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  color: #435860;
-  font-size: 0.8125rem;
+.rv-wallet__links > span {
+  color: var(--rv-muted);
+  font-size: 0.6875rem;
 }
 
-.rv-wallet__benefits li::before {
-  width: 0.45rem;
-  height: 0.45rem;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--rv-teal);
-  content: "";
-}
-
-.rv-wallet__visual {
+.rv-wallet__product {
   position: relative;
   display: flex;
   min-width: 0;
@@ -672,39 +906,41 @@
   justify-content: center;
   overflow: hidden;
   background: var(--rv-soft);
-  padding-bottom: 7rem;
 }
 
 .rv-wallet__image {
   position: relative;
-  z-index: 1;
-  width: min(52rem, 112%);
+  z-index: 2;
+  width: min(51.25rem, 112%);
   max-width: none;
   height: auto;
+  transform: translateX(-1%);
   filter: drop-shadow(0 1.5rem 1.8rem rgba(2, 25, 34, 0.13));
   animation: rv-product-float 6s ease-in-out infinite;
 }
 
-.rv-wallet__steps {
+.rv-wallet__rail {
   position: absolute;
-  z-index: 2;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  left: 1.5rem;
+  z-index: 3;
+  bottom: 1.125rem;
+  left: 50%;
   display: grid;
+  width: 50%;
+  height: 7rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.6rem;
+  gap: 0.5rem;
+  padding-inline: 1.125rem;
 }
 
-.rv-wallet__steps article {
+.rv-wallet__rail article {
   min-width: 0;
   border: 1px solid var(--rv-line);
   border-radius: 0.5rem;
   background: #ffffff;
-  padding: 1rem;
+  padding: 1.05rem;
 }
 
-.rv-wallet__steps article > div,
+.rv-wallet__rail article > div,
 .rv-business__actions article > div {
   display: flex;
   align-items: center;
@@ -712,19 +948,19 @@
   color: var(--rv-teal);
 }
 
-.rv-wallet__steps article > div span {
+.rv-wallet__rail article > div span {
   font-family: var(--vy-font-display);
   font-size: 1rem;
   font-weight: 800;
 }
 
-.rv-wallet__steps strong {
+.rv-wallet__rail strong {
   display: block;
   margin-top: 0.75rem;
   font-size: 0.8125rem;
 }
 
-.rv-wallet__steps p {
+.rv-wallet__rail p {
   margin: 0.3rem 0 0;
   color: var(--rv-muted);
   font-size: 0.6875rem;
@@ -1464,8 +1700,86 @@
     padding-top: 5.5rem;
   }
 
-  .rv-offers__flow {
-    grid-template-columns: repeat(4, calc(100vw - 3rem));
+  .rv-offers__heading {
+    display: block;
+    width: calc(100% - 2.25rem);
+  }
+
+  .rv-offers__heading h2 {
+    max-width: 25rem;
+    font-size: 2rem;
+  }
+
+  .rv-offers__tools {
+    display: block;
+  }
+
+  .rv-offers__filters {
+    width: 100%;
+    margin-top: 1.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .rv-offers__filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rv-offers__filters button {
+    min-height: 2.75rem;
+  }
+
+  .rv-offers__controls {
+    margin-top: 1rem;
+  }
+
+  .rv-offers__controls button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .rv-offers__viewport {
+    width: calc(100% - 2.25rem);
+    margin-top: 2.125rem;
+  }
+
+  .rv-offers__track {
+    height: 29.375rem;
+    gap: 0.625rem;
+  }
+
+  .rv-editorial-card--featured,
+  .rv-editorial-card--gold,
+  .rv-editorial-card--photo,
+  .rv-editorial-card--teal,
+  .rv-editorial-empty {
+    width: calc(100vw - 2.25rem);
+    height: 29.375rem;
+    flex-basis: calc(100vw - 2.25rem);
+  }
+
+  .rv-editorial-card__content,
+  .rv-editorial-card--gold,
+  .rv-editorial-card--teal {
+    padding: 1.75rem;
+  }
+
+  .rv-editorial-card--featured h3 {
+    font-size: 1.75rem;
+  }
+
+  .rv-editorial-card__word {
+    font-size: 4rem;
+  }
+
+  .rv-editorial-empty {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rv-editorial-empty a {
+    margin: 1rem 0 0;
   }
 
   .rv-partner-marquee > div {
@@ -1484,24 +1798,31 @@
   }
 
   .rv-wallet__copy {
-    padding: 5.5rem 1.125rem 3.5rem;
+    padding: 5.3rem 1.125rem 2.8rem;
   }
 
-  .rv-wallet__benefits {
-    grid-template-columns: 1fr;
-  }
-
-  .rv-wallet__visual {
-    min-height: 37rem;
-    padding-bottom: 16rem;
+  .rv-wallet__product {
+    height: 29.375rem;
+    flex: 0 0 29.375rem;
   }
 
   .rv-wallet__image {
-    width: 37rem;
+    width: 35.625rem;
+    transform: translateX(-2%);
   }
 
-  .rv-wallet__steps {
+  .rv-wallet__rail {
+    position: static;
+    width: 100%;
+    height: auto;
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+    background: var(--rv-paper);
+    padding: 0.875rem 1.125rem 1.25rem;
+  }
+
+  .rv-wallet__rail article {
+    padding: 1.125rem;
   }
 
   .rv-business {
@@ -1654,12 +1975,13 @@
     white-space: nowrap;
   }
 
-  .rv-wallet__visual {
-    min-height: 35rem;
+  .rv-wallet__product {
+    height: 27rem;
+    flex-basis: 27rem;
   }
 
   .rv-wallet__image {
-    width: 34rem;
+    width: 33rem;
   }
 }
 
