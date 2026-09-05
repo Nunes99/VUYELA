@@ -16,7 +16,7 @@ VUYELA represents returning:
 ```text
 Customer
 Purchase
-Points
+YELAS (YL)
 Return
 New purchase
 Growth
@@ -27,20 +27,20 @@ Growth
 Slogan:
 
 ```text
-Volte. Ganhe. Cresca.
+Volta. Ganha. Cresce.
 ```
 
 Positioning:
 
 ```text
-Cada compra cria uma razao para voltar.
+Cada compra cria uma razão para voltar.
 ```
 
 Business message:
 
 ```text
 Clientes que voltam.
-Negocios que crescem.
+Negócios que crescem.
 ```
 
 ## Cultural Direction

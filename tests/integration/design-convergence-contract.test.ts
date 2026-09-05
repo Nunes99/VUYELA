@@ -7,6 +7,7 @@ const root = process.cwd();
 const baseStyles = readFileSync(join(root, "vuyela-design-system/src/styles/base.css"), "utf8");
 const pageStyles = readFileSync(join(root, "app/globals.css"), "utf8");
 const marketingStyles = readFileSync(join(root, "app/marketing.css"), "utf8");
+const networkStyles = readFileSync(join(root, "app/rede-viva.css"), "utf8");
 const homepage = readFileSync(join(root, "app/(public)/page.tsx"), "utf8");
 const publicShell = readFileSync(join(root, "components/marketing/public-site-shell.tsx"), "utf8");
 const customerDashboard = readFileSync(
@@ -28,9 +29,11 @@ describe("approved VUYELA design contract", () => {
 
   it("uses the official mark and cultural pattern instead of text-only branding", () => {
     expect(marketingStyles).toContain("/brand/textures/capulana-primary.jpg");
+    expect(networkStyles).toContain("/brand/textures/capulana-primary.jpg");
     expect(marketingStyles).toContain('font-family: "Sora"');
-    expect(homepage).toContain("VuyelaLogo");
     expect(publicShell).toContain("VuyelaLogo");
+    expect(homepage).toContain("/images/maputo-vuyela-hero.png");
+    expect(homepage).toContain("/images/vuyela-product-yl.png");
     expect(homepage).toContain("Cada compra");
     expect(homepage).toContain("cria uma razão");
     expect(homepage).toContain("<em>voltar.</em>");
@@ -61,8 +64,11 @@ describe("approved VUYELA design contract", () => {
   });
 
   it("implements the approved member-card and NEW PHAS customer composition", () => {
-    expect(homepage).toContain("marketing-loyalty-card");
-    expect(homepage).toContain("QRCodeSVG");
+    expect(homepage).toContain("BusinessDashboardDemo");
+    expect(homepage).toContain("rv-business-identity");
+    expect(homepage).toContain("business.logoUrl");
+    expect(networkStyles).toContain(".rv-wallet__steps");
+    expect(networkStyles).toContain(".rv-dashboard__chart");
     expect(customerDashboard).toContain("CustomerSummaryCard");
     expect(customerDashboard).toContain("Seus Cartões Digitais");
     expect(customerDashboard).toContain("Histórico de Atividade");

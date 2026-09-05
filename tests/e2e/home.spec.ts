@@ -12,17 +12,35 @@ test("shows the public homepage", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Cada compra cria uma razão para voltar." })
+    page.getByRole("heading", { name: "A cidade recompensa quem escolhe voltar." })
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Quero um cartão" })).toBeVisible();
   await expect(page.getByRole("link", { name: "VUYELA by LEMOTE" }).first()).toBeVisible();
   await expect(page.getByText("Feito em Moçambique")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "A VUYELA começa onde a vida acontece." })
+    page.getByRole("heading", {
+      name: "Uma infraestrutura de relações. Com rosto, lugar e retorno."
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Hoje, a rede tem isto para oferecer." })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Não é um cartão. É a sua relação com cada negócio." })
   ).toBeVisible();
   await expect(page.locator("#steps-title")).toBeAttached();
   await expect(page.locator("#partners-title")).toBeAttached();
   expect(browserErrors).toEqual([]);
+});
+
+test("switches the animated business indicator without changing the layout", async ({ page }) => {
+  await page.goto("/");
+
+  const dashboard = page.getByLabel("Demonstração do painel do negócio");
+  await expect(dashboard).toBeVisible();
+  await dashboard.getByRole("tab", { name: "Retenção" }).click();
+  await expect(dashboard.getByText("Taxa de retorno")).toBeVisible();
+  await expect(dashboard.getByText("68%", { exact: true })).toBeVisible();
 });
 
 test("opens every NEW PHAS public page through real routes", async ({ page }) => {

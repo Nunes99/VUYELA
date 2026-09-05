@@ -31,17 +31,18 @@ repeating substitute.
 
 ## Experience direction
 
-The public homepage is product-led and keeps the VUYELA message, services, and Mozambican identity
-intact. It uses the real customer product visual as the first-viewport signal instead of introducing
-generic financial imagery.
+The public homepage follows the `Rede Viva` direction and keeps the VUYELA message, services, and
+Mozambican identity intact. The first viewport uses an authentic commerce scene as a full-bleed
+background; the VUYELA product visual becomes the centre of the customer chapter instead of
+competing with the primary promise.
 
 The information order is:
 
-1. core promise and customer/business entry points;
-2. a live network index combining verified public counts with direct discovery;
-3. real offers published by participating businesses;
-4. the four-step loyalty loop and its practical outcomes;
-5. partner proof and distinct customer and business paths;
+1. core promise, customer/business entry points and three brand principles;
+2. a command dock for discovery, active offers and transparent YELAS/MZN value;
+3. the live network with real business identities, locations and public offers;
+4. the customer wallet and its discover, identify, earn and use journey;
+5. the animated business workspace and its three operational outcomes;
 6. a concise plan index, programme rules, resources, and footer.
 
 Public metrics must be derived from published marketplace records. Uploaded promotional images
@@ -50,16 +51,21 @@ private campaign audiences, rules and internal workflow data must never be proje
 
 The visual composition is intentionally editorial rather than a sequence of identical card grids:
 
-- the hero combines concise copy with the real VUYELA product visual and keeps the cultural pattern
-  concentrated as a signature field;
+- the hero places concise copy over an authentic commercial scene and keeps the product visual for
+  the customer chapter;
 - the network chapter combines public facts and discovery routes without duplicating two utility
   bands;
 - public campaigns appear near the top of the page so the visitor sees live value before product
   explanation;
-- process, capability and plan sections use connected steps, numbered indexes, dividers and data
-  rails instead of floating cards with decorative shadows;
+- process, capability and plan sections use numbered indexes, compact cards, restrained borders and
+  clear data hierarchy without cards nested inside cards;
 - reward gold communicates value and teal communicates action; additional accent colours are used
   only when they carry meaning.
+
+The business dashboard demonstration is interactive and rotates between visits, retention and
+campaign indicators. It must stop rotating when reduced motion is requested, retain manual tab
+control and remain illustrative: operational figures shown there are not presented as live public
+metrics.
 
 Capulana geometry must support hierarchy rather than behave as a permanent wallpaper. On wide
 screens it can occupy one side of a hero or define the edge of a section. On small screens it may

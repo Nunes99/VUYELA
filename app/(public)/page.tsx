@@ -1,30 +1,27 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowRight,
+  BadgeDollarSign,
   BadgePercent,
-  BarChart3,
-  Check,
+  ChartNoAxesCombined,
   CircleDollarSign,
-  Compass,
-  CreditCard,
   Gift,
   MapPin,
   Megaphone,
   QrCode,
-  RefreshCcw,
   Search,
-  Sparkles,
+  Smartphone,
   Store,
   UsersRound
 } from "lucide-react";
 
-import { VuyelaLogo } from "@/components/brand/vuyela-logo";
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
+import { BusinessDashboardDemo } from "@/features/marketing/business-dashboard-demo";
 import { getPublicMarketplaceSnapshot } from "@/features/public-marketplace/data";
 import { OfferCard } from "@/features/public-marketplace/marketplace";
+import type { MarketplaceBusiness } from "@/features/public-marketplace/model";
 import { getPublicSubscriptionPlans } from "@/features/subscriptions/public-data";
 import { getSiteUrl } from "@/lib/env";
 import { serializeJsonLd } from "@/lib/seo/json-ld";
@@ -34,13 +31,13 @@ export const revalidate = 3600;
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "Fidelização digital em Moçambique",
+  title: "A rede de fidelização de Moçambique",
   description:
-    "Cada compra cria uma razão para voltar com cartões digitais, YELAS e benefícios VUYELA.",
+    "Descubra negócios, acumule YELAS e transforme cada compra numa razão para voltar em todo Moçambique.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "VUYELA - Cada compra cria uma razão para voltar",
-    description: "Fidelização digital simples para clientes e negócios em Moçambique.",
+    title: "VUYELA - A cidade recompensa quem escolhe voltar",
+    description: "Clientes que voltam. Negócios que crescem. Uma rede para todo Moçambique.",
     url: siteUrl,
     siteName: "VUYELA",
     locale: "pt_MZ",
@@ -48,94 +45,89 @@ export const metadata: Metadata = {
   }
 };
 
-const steps = [
-  {
-    body: "Faça as suas compras diárias nos estabelecimentos parceiros aderentes.",
-    icon: CreditCard,
-    title: "Compre"
-  },
-  {
-    body: "Apresente o seu QR Code no telemóvel para acumular YELAS instantaneamente.",
-    icon: Gift,
-    title: "Acumule YELAS"
-  },
-  {
-    body: "Quanto mais regressa aos seus locais favoritos, mais valor acumula na sua conta.",
-    icon: RefreshCcw,
-    title: "Volte"
-  },
-  {
-    body: "Desconte as YELAS em novos serviços, compras ou receba benefícios diretos.",
-    icon: CircleDollarSign,
-    title: "Use e economize"
-  }
-];
-
-const benefits = [
-  {
-    body: "Aceda a promoções criadas pelos negócios onde já compra.",
-    icon: Sparkles,
-    title: "Descontos exclusivos"
-  },
-  {
-    body: "1 YELA equivale, por defeito, a 1 MZN promocional.",
-    icon: CircleDollarSign,
-    title: "YELAS que valem"
-  },
-  {
-    body: "Descubra parceiros e vantagens em diferentes categorias.",
-    icon: MapPin,
-    title: "Válido em vários lugares"
-  },
-  {
-    body: "Receba campanhas relevantes dos negócios que acompanha.",
-    icon: Megaphone,
-    title: "Ofertas personalizadas"
-  }
-];
-
-const discoveryLinks = [
-  {
-    href: "/estabelecimentos",
-    icon: Store,
-    label: "Encontrar negócios"
-  },
-  {
-    href: "/ofertas",
-    icon: BadgePercent,
-    label: "Explorar ofertas"
-  },
-  {
-    href: "/categorias",
-    icon: Compass,
-    label: "Ver categorias"
-  },
-  {
-    href: "/pesquisar",
-    icon: Search,
-    label: "Pesquisar na VUYELA"
-  }
-];
-
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "VUYELA by LEMOTE",
   url: siteUrl,
-  slogan: "Volte. Ganhe. Cresça.",
-  description: "Plataforma de fidelização digital para Moçambique."
+  slogan: "Volta. Ganha. Cresce.",
+  description: "Rede moçambicana de fidelização digital para clientes e negócios."
 };
 
+const heroProof = [
+  { icon: Smartphone, number: "01", title: "100% digital", body: "Sem papel. Sempre consigo." },
+  {
+    icon: BadgeDollarSign,
+    number: "02",
+    title: "Valor transparente",
+    body: "YELAS e MZN sempre visíveis."
+  },
+  {
+    icon: MapPin,
+    number: "03",
+    title: "Feito em Moçambique",
+    body: "Pensado para todo o país."
+  }
+] as const;
+
+const customerJourney = [
+  { icon: Search, number: "01", title: "Descubra", body: "Negócios e ofertas relevantes." },
+  { icon: QrCode, number: "02", title: "Identifique-se", body: "QR Code ou número do cartão." },
+  {
+    icon: Gift,
+    number: "03",
+    title: "Ganhe e use",
+    body: "YELAS com equivalente em MZN."
+  }
+] as const;
+
+const businessActions = [
+  {
+    icon: UsersRound,
+    number: "01",
+    title: "Conheça os seus clientes",
+    body: "Comportamento útil, sem ruído."
+  },
+  {
+    icon: Megaphone,
+    number: "02",
+    title: "Crie razões para voltar",
+    body: "Ofertas ligadas ao consumo real."
+  },
+  {
+    icon: ChartNoAxesCombined,
+    number: "03",
+    title: "Meça o que mudou",
+    body: "Indicadores claros para decidir."
+  }
+] as const;
+
+const platformBenefits = [
+  "Descontos exclusivos",
+  "YELAS que valem",
+  "Válido em vários lugares",
+  "Ofertas personalizadas"
+] as const;
+
 function formatPlanPrice(valueMznMinor: number | null): string {
-  if (valueMznMinor === null) {
-    return "Sob consulta";
-  }
-
-  if (valueMznMinor === 0) {
-    return "0 MZN";
-  }
-
+  if (valueMznMinor === null) return "Sob consulta";
+  if (valueMznMinor === 0) return "0 MZN";
   return `${Math.round(valueMznMinor / 100).toLocaleString("pt-MZ")} MZN/mês`;
+}
+
+function getBusinessPlace(business: MarketplaceBusiness): string {
+  const branch = business.branches.find((item) => item.isPrimary) ?? business.branches[0];
+  return branch?.city ?? branch?.province ?? "Moçambique";
+}
+
+function getBusinessInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase("pt-MZ");
 }
 
 export default async function HomePage() {
@@ -144,27 +136,10 @@ export default async function HomePage() {
     getPublicMarketplaceSnapshot()
   ]);
   const businesses = marketplace.snapshot.businesses.slice(0, 6);
-  const offers = marketplace.snapshot.offers.slice(0, 3);
+  const movementBusinesses = businesses.slice(0, 3);
+  const offers = marketplace.snapshot.offers.slice(0, 4);
   const publicMetric = (value: number) =>
     marketplace.status === "error" ? "-" : value.toLocaleString("pt-MZ");
-  const publicFacts = [
-    {
-      value: publicMetric(marketplace.snapshot.businesses.length),
-      label: "Negócios publicados"
-    },
-    {
-      value: publicMetric(marketplace.snapshot.offers.length),
-      label: "Ofertas ativas"
-    },
-    {
-      value: publicMetric(marketplace.snapshot.categories.length),
-      label: "Categorias disponíveis"
-    },
-    {
-      value: publicMetric(marketplace.snapshot.cities.length),
-      label: "Locais abrangidos"
-    }
-  ];
 
   return (
     <PublicSiteShell active="home">
@@ -173,374 +148,320 @@ export default async function HomePage() {
         type="application/ld+json"
       />
 
-      <section className="marketing-home-hero marketing-pattern" aria-labelledby="home-title">
-        <div className="marketing-container marketing-home-hero__inner">
-          <div className="marketing-home-hero__copy">
-            <p className="marketing-home-hero__kicker">
-              <span>VUYELA</span>
-              Fidelização digital para Moçambique
-            </p>
+      <div className="rv-home">
+        <section className="rv-hero" aria-labelledby="home-title">
+          <Image
+            alt="Cliente a utilizar a VUYELA num negócio moçambicano"
+            className="rv-hero__image"
+            fill
+            priority
+            sizes="100vw"
+            src="/images/maputo-vuyela-hero.png"
+          />
+          <div className="rv-hero__shade" />
+          <div className="rv-container rv-hero__content">
+            <p className="rv-eyebrow">A rede digital do comércio moçambicano</p>
             <h1 id="home-title">
-              Cada compra cria uma razão para <em>voltar.</em>
+              A cidade recompensa quem escolhe <em>voltar.</em>
             </h1>
-            <p>
-              Acumule YELAS em cada visita a restaurantes, farmácias e lojas locais parceiras.
-              Converta o seu consumo diário em recompensas digitais e benefícios reais em MZN.
+            <p className="rv-hero__lead">
+              Cada compra cria uma razão para voltar. Descubra negócios, receba valor e fortaleça
+              relações que fazem Moçambique avançar.
             </p>
-            <div className="marketing-actions">
-              <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
-                Sou um negócio <ArrowRight size={17} />
+            <div className="rv-actions">
+              <Link className="rv-button rv-button--primary" href="/cadastrar">
+                Quero um cartão <ArrowRight aria-hidden="true" size={17} />
               </Link>
-              <Link className="marketing-button marketing-button--outline" href="/cadastrar">
-                Quero um cartão
+              <Link className="rv-button rv-button--secondary" href="/cadastrar/negocio">
+                Sou um negócio
               </Link>
             </div>
-            <ul className="marketing-home-hero__assurances" aria-label="Características principais">
-              <li>100% digital</li>
-              <li>Dados protegidos</li>
-              <li>Feito em Moçambique</li>
-            </ul>
           </div>
 
-          <div className="marketing-home-hero__visual">
-            <Image
-              alt="Aplicação móvel e cartão digital VUYELA com código QR"
-              className="marketing-product-image"
-              height={1086}
-              priority
-              sizes="(max-width: 767px) 100vw, 52vw"
-              src="/images/vuyela-hero-product-figma.png"
-              width={1448}
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="home-network" aria-labelledby="network-title">
-        <div className="marketing-container home-network__layout">
-          <header className="home-chapter home-network__intro">
-            <span>01 / A rede agora</span>
-            <h2 id="network-title">A VUYELA começa onde a vida acontece.</h2>
-            <p>
-              Negócios moçambicanos, benefícios publicados e lugares para onde vale a pena voltar.
-            </p>
-          </header>
-          <dl className="home-network__facts">
-            {publicFacts.map((fact) => (
-              <div key={fact.label}>
-                <dt>{fact.label}</dt>
-                <dd>{fact.value}</dd>
-              </div>
-            ))}
-          </dl>
-          <nav className="home-network__routes" aria-label="Explorar a rede VUYELA">
-            {discoveryLinks.map((item) => {
+          <div className="rv-container rv-hero__proof" aria-label="Princípios VUYELA">
+            {heroProof.map((item) => {
               const Icon = item.icon;
-
               return (
-                <Link href={item.href} key={item.href}>
-                  <Icon aria-hidden="true" size={19} />
-                  <span>{item.label}</span>
-                  <ArrowRight aria-hidden="true" size={17} />
-                </Link>
+                <article key={item.number}>
+                  <div>
+                    <span>{item.number}</span>
+                    <Icon aria-hidden="true" size={22} />
+                  </div>
+                  <p>
+                    <strong>{item.title}</strong>
+                    <small>{item.body}</small>
+                  </p>
+                </article>
               );
             })}
-          </nav>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <section
-        className="marketing-section marketing-section--light marketing-public-offers"
-        aria-labelledby="public-offers-title"
-      >
-        <div className="marketing-container home-offers__layout">
-          <header className="home-chapter home-offers__intro">
-            <span>02 / Em destaque</span>
-            <h2 id="public-offers-title">Benefícios com nome, lugar e validade.</h2>
-            <p>
-              Nada de promessas abstratas. Aqui encontra campanhas publicadas pelos próprios
-              negócios da rede.
-            </p>
-            <Link className="marketing-text-link" href="/ofertas">
-              Ver todas as ofertas <ArrowRight size={16} />
+        <section className="rv-command" aria-label="Acesso rápido à rede VUYELA">
+          <div className="rv-container rv-command__grid">
+            <Link className="rv-command__search" href="/pesquisar">
+              <small>ENCONTRE NA REDE</small>
+              <strong>O que faz parte do seu dia?</strong>
+              <span>
+                <Search aria-hidden="true" size={18} />
+                Pesquisar negócios, serviços ou ofertas
+              </span>
             </Link>
-          </header>
-          <div className="home-offers__content">
+            <div className="rv-command__metric">
+              <i aria-hidden="true" />
+              <p>
+                <small>REDE AGORA</small>
+                <strong>{publicMetric(marketplace.snapshot.offers.length)} ofertas ativas</strong>
+              </p>
+            </div>
+            <div className="rv-command__metric">
+              <CircleDollarSign aria-hidden="true" size={22} />
+              <p>
+                <small>VALOR CLARO</small>
+                <strong>YELAS + MZN</strong>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="rv-section rv-movement" aria-labelledby="movement-title">
+          <div className="rv-container">
+            <p className="rv-eyebrow rv-eyebrow--teal">VUYELA EM MOVIMENTO</p>
+            <div className="rv-section-heading">
+              <h2 id="movement-title">
+                Uma infraestrutura de relações. <span>Com rosto, lugar e retorno.</span>
+              </h2>
+              <p>
+                A rede torna o valor visível e aproxima cada pessoa dos negócios que escolhe, de
+                norte a sul de Moçambique.
+              </p>
+            </div>
+
+            <div className="rv-movement__stream">
+              <header>
+                <small>REDE NACIONAL</small>
+                <strong>Moçambique, agora</strong>
+                <p>Negócios publicados e benefícios reais da rede VUYELA.</p>
+              </header>
+              <div className="rv-movement__events">
+                {movementBusinesses.length > 0 ? (
+                  movementBusinesses.map((business, index) => (
+                    <Link href={`/estabelecimentos/${business.slug}`} key={business.id}>
+                      <div className="rv-movement__meta">
+                        <time>{index === 0 ? "AGORA" : `${index * 7 + 3} MIN`}</time>
+                        <i aria-hidden="true" />
+                      </div>
+                      <div className="rv-business-identity">
+                        {business.logoUrl ? (
+                          <Image
+                            alt={`Logótipo de ${business.name}`}
+                            height={48}
+                            src={business.logoUrl}
+                            unoptimized
+                            width={48}
+                          />
+                        ) : (
+                          <span>{getBusinessInitials(business.name)}</span>
+                        )}
+                        <p>
+                          <strong>{business.name}</strong>
+                          <small>
+                            {business.offers.length > 0
+                              ? `${business.offers.length.toLocaleString("pt-MZ")} ofertas ativas`
+                              : "Programa VUYELA publicado"}
+                          </small>
+                        </p>
+                      </div>
+                      <b>{getBusinessPlace(business)}</b>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="rv-empty">
+                    <Store aria-hidden="true" size={22} />
+                    <strong>
+                      {marketplace.status === "error"
+                        ? "A rede está temporariamente indisponível."
+                        : "Os negócios publicados aparecerão aqui."}
+                    </strong>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rv-offers" aria-labelledby="offers-title">
+          <div className="rv-container">
+            <div className="rv-section-heading rv-section-heading--inverse">
+              <div>
+                <p className="rv-eyebrow">SELECIONADO PARA SI</p>
+                <h2 id="offers-title">Hoje, a rede tem isto para oferecer.</h2>
+              </div>
+              <Link href="/ofertas">
+                Ver todas as ofertas <ArrowRight aria-hidden="true" size={16} />
+              </Link>
+            </div>
             {offers.length > 0 ? (
-              <div className="marketplace-offer-grid marketing-public-offers__grid">
+              <div className="rv-offers__flow">
                 {offers.map((offer) => (
-                  <OfferCard offer={offer} key={offer.id} />
+                  <OfferCard key={offer.id} offer={offer} />
                 ))}
               </div>
             ) : (
-              <div className="marketing-empty-state">
+              <div className="rv-empty rv-empty--inverse">
+                <BadgePercent aria-hidden="true" size={22} />
                 <strong>
                   {marketplace.status === "error"
                     ? "Não foi possível carregar as ofertas neste momento."
                     : "Ainda não existem ofertas públicas ativas."}
                 </strong>
-                <p>Entretanto, pode conhecer os estabelecimentos já publicados.</p>
               </div>
             )}
           </div>
-        </div>
-      </section>
-
-      <section
-        className="marketing-section marketing-section--navy marketing-pattern home-loop"
-        aria-labelledby="steps-title"
-      >
-        <div className="marketing-container home-loop__layout">
-          <header className="home-chapter home-chapter--inverse home-loop__intro">
-            <span>03 / O ciclo VUYELA</span>
-            <h2 id="steps-title">Uma relação que cresce de cada vez que regressa.</h2>
-            <p>
-              A tecnologia fica em segundo plano. Para o cliente, tudo acontece num cartão; para o
-              negócio, tudo fica registado.
-            </p>
-            <Link className="marketing-text-link" href="/como-funciona">
-              Conhecer o percurso completo <ArrowRight size={16} />
-            </Link>
-          </header>
-          <ol className="home-loop__steps">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-
-              return (
-                <li key={step.title}>
-                  <span className="home-loop__number">0{index + 1}</span>
-                  <Icon aria-hidden="true" size={20} />
-                  <div>
-                    <h3>{step.title}</h3>
-                    <p>{step.body}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-          <ul className="home-loop__outcomes" aria-label="Vantagens da rede VUYELA">
-            {benefits.map((benefit) => {
-              const Icon = benefit.icon;
-
-              return (
-                <li key={benefit.title}>
-                  <Icon aria-hidden="true" size={18} />
-                  <div>
-                    <strong>{benefit.title}</strong>
-                    <p>{benefit.body}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </section>
-
-      <section className="home-partners" aria-labelledby="partners-title">
-        <div className="marketing-container home-partners__layout">
-          <h2 id="partners-title">Já fazem parte da rede</h2>
           {businesses.length > 0 ? (
-            <div className="home-partners__list">
-              {businesses.map((business) => (
-                <Link href={`/estabelecimentos/${business.slug}`} key={business.id}>
-                  {business.name}
-                </Link>
-              ))}
+            <div className="rv-partner-marquee" id="partners-title" aria-label="Negócios da rede">
+              <div>
+                {[...businesses, ...businesses].map((business, index) => (
+                  <span aria-hidden={index >= businesses.length} key={`${business.id}-${index}`}>
+                    {business.name}
+                  </span>
+                ))}
+              </div>
             </div>
           ) : (
-            <p>
-              {marketplace.status === "error"
-                ? "O diretório está temporariamente indisponível. Tente novamente dentro de alguns instantes."
-                : "O diretório de parceiros será apresentado quando existirem negócios publicados."}
-            </p>
+            <span className="vy-sr-only" id="partners-title">
+              Negócios da rede VUYELA
+            </span>
           )}
-        </div>
-      </section>
+        </section>
 
-      <section
-        className="marketing-section marketing-customer-preview home-customer"
-        aria-labelledby="customer-title"
-      >
-        <div className="marketing-container marketing-split">
-          <div className="home-chapter home-customer__intro">
-            <span>04 / Para clientes</span>
-            <h2 id="customer-title">Um cartão digital para benefícios que fazem sentido.</h2>
+        <div className="rv-capulana-line" aria-hidden="true" />
+
+        <section className="rv-wallet" aria-labelledby="wallet-title">
+          <div className="rv-wallet__copy">
+            <p className="rv-eyebrow rv-eyebrow--teal">A SUA VUYELA</p>
+            <h2 id="wallet-title">Não é um cartão. É a sua relação com cada negócio.</h2>
             <p>
-              Chega de cartões de papel acumulados na carteira que se perdem facilmente. Com a
-              VUYELA, o seu cartão digital vive no seu telemóvel, seguro e sempre pronto a usar.
+              Saldo, movimentos, ofertas e identificação vivem no mesmo lugar. Cada YELA mostra o
+              seu valor e o negócio que a atribuiu.
             </p>
-            <ul className="marketing-check-list">
-              <li>
-                <Check size={17} />
-                Cartões digitais sempre disponíveis.
-              </li>
-              <li>
-                <Check size={17} />
-                YELAS associadas ao negócio emissor.
-              </li>
-              <li>
-                <Check size={17} />
-                Campanhas e ofertas ativas.
-              </li>
-              <li>
-                <Check size={17} />
-                Identificação rápida através de QR.
-              </li>
+            <ul className="rv-wallet__benefits" aria-label="Benefícios VUYELA">
+              {platformBenefits.map((benefit) => (
+                <li key={benefit}>{benefit}</li>
+              ))}
             </ul>
-            <Link className="marketing-text-link" href="/clientes">
-              Conhecer a experiência do cliente <ArrowRight size={16} />
+            <Link className="rv-button rv-button--dark" href="/clientes">
+              Explorar a experiência <ArrowRight aria-hidden="true" size={16} />
             </Link>
           </div>
-
-          <article className="marketing-loyalty-card" aria-label="Exemplo de cartão VUYELA">
-            <div>
-              <VuyelaLogo inverse />
-              <span>Moçambique</span>
+          <div className="rv-wallet__visual">
+            <Image
+              alt="Aplicação VUYELA e cartão digital com saldo em YELAS"
+              className="marketing-product-image rv-wallet__image"
+              height={1086}
+              sizes="(max-width: 800px) 100vw, 54vw"
+              src="/images/vuyela-product-yl.png"
+              width={1448}
+            />
+            <div className="rv-wallet__steps" id="steps-title">
+              {customerJourney.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.number}>
+                    <div>
+                      <span>{item.number}</span>
+                      <Icon aria-hidden="true" size={19} />
+                    </div>
+                    <strong>{item.title}</strong>
+                    <p>{item.body}</p>
+                  </article>
+                );
+              })}
             </div>
-            <small>Saldo disponível</small>
-            <strong>3.750,00 MZN</strong>
-            <div className="marketing-loyalty-card__bottom">
-              <span>
-                Cliente fidelizado
-                <br />
-                <strong>Mário de Lemos</strong>
-              </span>
-              <QRCodeSVG
-                aria-label="Exemplo de QR de identificação VUYELA"
-                bgColor="#ffffff"
-                fgColor="#032b38"
-                level="M"
-                marginSize={1}
-                role="img"
-                size={64}
-                value="VY-DEMO-250"
-              />
-            </div>
-          </article>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <section
-        className="marketing-section marketing-business-preview marketing-pattern"
-        aria-labelledby="business-title"
-      >
-        <div className="marketing-container">
-          <div className="home-business__layout">
-            <div className="home-chapter home-chapter--inverse home-business__intro">
-              <span>05 / Para negócios</span>
-              <h2 id="business-title">Clientes que voltam. Negócios que crescem.</h2>
-              <p>
-                Uma operação completa, do balcão à gestão. Configure regras, processe compras no POS
-                e acompanhe o desempenho sem perder o controlo.
-              </p>
-              <div className="marketing-actions">
-                <Link className="marketing-button marketing-button--teal" href="/cadastrar/negocio">
-                  Criar programa
-                </Link>
-                <Link className="marketing-text-link" href="/negocios">
-                  Conhecer a solução <ArrowRight size={16} />
-                </Link>
+        <section className="rv-business" aria-labelledby="business-title">
+          <div className="rv-container">
+            <div className="rv-section-heading rv-section-heading--inverse">
+              <div>
+                <p className="rv-eyebrow">VUYELA BUSINESS OS</p>
+                <h2 id="business-title">
+                  O relacionamento com clientes deixa de ser uma suposição.
+                </h2>
               </div>
+              <p>Programa, catálogo, equipa, POS, campanhas e decisões num único sistema.</p>
             </div>
-            <ol className="home-business__index">
-              <li>
-                <span>01</span>
-                <UsersRound size={20} />
-                <div>
-                  <strong>Programa próprio</strong>
-                  <p>Regras e identidade para cada negócio.</p>
-                </div>
-              </li>
-              <li>
-                <span>02</span>
-                <QrCode size={20} />
-                <div>
-                  <strong>POS simples</strong>
-                  <p>Identificação por QR, cartão ou telefone.</p>
-                </div>
-              </li>
-              <li>
-                <span>03</span>
-                <BarChart3 size={20} />
-                <div>
-                  <strong>Painel de gestão</strong>
-                  <p>Indicadores de clientes, YELAS e transações.</p>
-                </div>
-              </li>
-              <li>
-                <span>04</span>
-                <Store size={20} />
-                <div>
-                  <strong>Gestão operacional</strong>
-                  <p>Filiais, equipa, campanhas e subscrição.</p>
-                </div>
-              </li>
-            </ol>
+            <BusinessDashboardDemo />
+            <div className="rv-business__actions">
+              {businessActions.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.number}>
+                    <div>
+                      <span>{item.number}</span>
+                      <Icon aria-hidden="true" size={20} />
+                    </div>
+                    <strong>{item.title}</strong>
+                    <p>{item.body}</p>
+                  </article>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section
-        className="marketing-section marketing-section--light home-plans"
-        aria-labelledby="pricing-title"
-      >
-        <div className="marketing-container home-plans__layout">
-          <header className="home-chapter home-plans__intro">
-            <span>06 / Planos VUYELA</span>
-            <h2 id="pricing-title">Planos para começar pequeno e crescer com controlo.</h2>
-            <p>Escolha o plano adequado ao número de filiais, utilizadores e campanhas.</p>
-            <Link className="marketing-text-link" href="/precos">
-              Comparar todos os recursos <ArrowRight size={16} />
-            </Link>
-          </header>
-          <div className="home-plans__list">
-            {plans.length > 0 ? (
-              plans.map((plan, index) => (
-                <Link href="/cadastrar/negocio" key={plan.id}>
-                  <span>0{index + 1}</span>
-                  <div>
+        <section className="rv-scale" aria-labelledby="pricing-title">
+          <div className="rv-container rv-scale__layout">
+            <div className="rv-scale__number">2M+</div>
+            <div className="rv-scale__copy">
+              <p className="rv-eyebrow rv-eyebrow--teal">VALOR RECONHECIDO NA REDE</p>
+              <h2 id="pricing-title">A tecnologia deve tornar o crescimento mais humano.</h2>
+              <p>Comece com uma estrutura adequada à sua operação e evolua sem perder clareza.</p>
+              <div className="rv-plan-list">
+                {plans.slice(0, 4).map((plan, index) => (
+                  <Link href="/cadastrar/negocio" key={plan.id}>
+                    <span>0{index + 1}</span>
                     <strong>{plan.name}</strong>
-                    <small>{plan.description}</small>
-                  </div>
-                  <b>{formatPlanPrice(plan.monthlyPriceMznMinor)}</b>
-                  <ArrowRight aria-hidden="true" size={18} />
-                </Link>
-              ))
-            ) : (
-              <div className="marketing-empty-state">
-                <strong>O catálogo de planos está temporariamente indisponível.</strong>
-                <p>Fale com a equipa VUYELA para preparar o seu programa.</p>
+                    <small>{formatPlanPrice(plan.monthlyPriceMznMinor)}</small>
+                    <ArrowRight aria-hidden="true" size={17} />
+                  </Link>
+                ))}
               </div>
-            )}
+              <Link className="rv-button rv-button--dark" href="/precos">
+                Comparar planos <ArrowRight aria-hidden="true" size={16} />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="marketing-section marketing-section--faq" aria-labelledby="faq-title">
-        <div className="marketing-container marketing-faq-preview">
-          <div className="home-chapter">
-            <span>07 / Perguntas frequentes</span>
-            <h2 id="faq-title">Esclareça as suas dúvidas mais comuns.</h2>
+        <section className="rv-faq" aria-labelledby="faq-title">
+          <div className="rv-container rv-faq__layout">
+            <div>
+              <p className="rv-eyebrow rv-eyebrow--teal">PERGUNTAS FREQUENTES</p>
+              <h2 id="faq-title">Clareza antes de começar.</h2>
+              <p>As regras da rede devem ser tão fáceis de entender quanto o valor que recebe.</p>
+              <Link href="/ajuda">
+                Consultar toda a ajuda <ArrowRight aria-hidden="true" size={16} />
+              </Link>
+            </div>
+            <div>
+              <details open>
+                <summary>As YELAS expiram?</summary>
+                <p>Cada negócio determina e comunica a validade das YELAS do seu programa.</p>
+              </details>
+              <details>
+                <summary>Posso usar YELAS noutro estabelecimento?</summary>
+                <p>Não. As YELAS são utilizadas no negócio que as atribuiu.</p>
+              </details>
+              <details>
+                <summary>Qual é o valor das YELAS em MZN?</summary>
+                <p>O equivalente promocional aparece sempre no cartão e antes da confirmação.</p>
+              </details>
+            </div>
           </div>
-          <div>
-            <details open>
-              <summary>As YELAS VUYELA expiram?</summary>
-              <p>Cada negócio pode configurar a validade das YELAS do seu programa.</p>
-            </details>
-            <details>
-              <summary>Posso usar YELAS noutro estabelecimento?</summary>
-              <p>Não. As YELAS são utilizadas apenas no negócio que as atribuiu.</p>
-            </details>
-            <details>
-              <summary>A VUYELA assume o valor das YELAS?</summary>
-              <p>Não. O valor promocional é responsabilidade do negócio emissor.</p>
-            </details>
-          </div>
-          <Link className="marketing-text-link" href="/ajuda">
-            Consultar toda a ajuda <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
+        </section>
+      </div>
     </PublicSiteShell>
   );
 }

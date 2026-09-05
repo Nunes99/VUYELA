@@ -23,6 +23,12 @@ starting Phase 19.
 - Keep the customer mobile navigation aligned to Inicio, Cartoes, Explorar, Actividade, and Perfil.
 - Present the complete business and administration navigation as an in-page grid on small screens
   instead of an overlapping fixed bar.
+- Adopt the `Rede Viva` public direction: authentic full-bleed commerce photography, a compact
+  discovery dock, real public business identities and offers, and Capulana used as a signature
+  accent instead of permanent wallpaper.
+- Use YELAS (`YL`) with the MZN equivalent in customer-facing product imagery and copy.
+- Keep the customer, business, POS and administration applications operationally independent while
+  aligning their surface geometry, typography and navigation states through shared tokens.
 
 ## Verification
 
@@ -31,3 +37,5 @@ starting Phase 19.
 - Playwright checks the homepage at 320, 375, 390, 430, 768, 1024, 1280, and 1440 pixels.
 - Visual review covers homepage, authentication, marketplace, customer, business, POS, admin, and
   offline surfaces on desktop and mobile.
+- Homepage interaction coverage includes manual dashboard indicator switching and reduced-motion
+  behaviour.
