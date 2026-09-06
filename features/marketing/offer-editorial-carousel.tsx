@@ -207,7 +207,7 @@ export function OfferEditorialCarousel({
       <div className="rv-container rv-offers__heading">
         <div>
           <p className="rv-eyebrow">SELECCIONADO PARA SI</p>
-          <h2 id="offers-title">Hoje, a rede tem isto para oferecer.</h2>
+          <h2 id="offers-title">Hoje, a VUYELA tem isto para si.</h2>
         </div>
         <div className="rv-offers__tools">
           <div className="rv-offers__filters" aria-label="Filtrar ofertas" role="group">
@@ -256,7 +256,7 @@ export function OfferEditorialCarousel({
               <div>
                 <strong>
                   {unavailable
-                    ? "A rede de ofertas está temporariamente indisponível."
+                    ? "As ofertas estão temporariamente indisponíveis."
                     : activeFilter === "all"
                       ? "As próximas ofertas estão a caminho."
                       : "Ainda não existem ofertas nesta categoria."}
@@ -264,7 +264,7 @@ export function OfferEditorialCarousel({
                 <p>Explore os negócios VUYELA enquanto preparamos novas vantagens para si.</p>
               </div>
               <Link href="/ofertas">
-                Explorar a rede <ArrowRight aria-hidden="true" size={16} />
+                Explorar ofertas <ArrowRight aria-hidden="true" size={16} />
               </Link>
             </article>
           )}

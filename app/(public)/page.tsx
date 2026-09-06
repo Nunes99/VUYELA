@@ -30,13 +30,13 @@ export const revalidate = 3600;
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  title: "A rede de fidelização de Moçambique",
+  title: "A plataforma de fidelização de Moçambique",
   description:
     "Descubra negócios, acumule YELAS e transforme cada compra numa razão para voltar em todo Moçambique.",
   alternates: { canonical: "/" },
   openGraph: {
     title: "VUYELA - A cidade recompensa quem escolhe voltar",
-    description: "Clientes que voltam. Negócios que crescem. Uma rede para todo Moçambique.",
+    description: "Clientes que voltam. Negócios que crescem. Uma plataforma para todo Moçambique.",
     url: siteUrl,
     siteName: "VUYELA",
     locale: "pt_MZ",
@@ -50,7 +50,7 @@ const organizationJsonLd = {
   name: "VUYELA by LEMOTE",
   url: siteUrl,
   slogan: "Volta. Ganha. Cresce.",
-  description: "Rede moçambicana de fidelização digital para clientes e negócios."
+  description: "Plataforma moçambicana de fidelização digital para clientes e negócios."
 };
 
 const heroProof = [
@@ -152,7 +152,7 @@ export default async function HomePage() {
           />
           <div className="rv-hero__shade" />
           <div className="rv-container rv-hero__content">
-            <p className="rv-eyebrow">A rede digital do comércio moçambicano</p>
+            <p className="rv-eyebrow">Fidelização digital feita em Moçambique</p>
             <h1 id="home-title">
               A cidade recompensa quem escolhe <em>voltar.</em>
             </h1>
@@ -189,10 +189,10 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="rv-command" aria-label="Acesso rápido à rede VUYELA">
+        <section className="rv-command" aria-label="Acesso rápido à VUYELA">
           <div className="rv-container rv-command__grid">
             <Link className="rv-command__search" href="/pesquisar">
-              <small>ENCONTRE NA REDE</small>
+              <small>DESCUBRA NA VUYELA</small>
               <strong>O que faz parte do seu dia?</strong>
               <span>
                 <Search aria-hidden="true" size={18} />
@@ -202,7 +202,7 @@ export default async function HomePage() {
             <div className="rv-command__metric">
               <i aria-hidden="true" />
               <p>
-                <small>REDE AGORA</small>
+                <small>EM DESTAQUE</small>
                 <strong>{publicMetric(marketplace.snapshot.offers.length)} ofertas ativas</strong>
               </p>
             </div>
@@ -224,16 +224,16 @@ export default async function HomePage() {
                 Uma infraestrutura de relações. <span>Com rosto, lugar e retorno.</span>
               </h2>
               <p>
-                A rede torna o valor visível e aproxima cada pessoa dos negócios que escolhe, de
+                A VUYELA torna o valor visível e aproxima cada pessoa dos negócios que escolhe, de
                 norte a sul de Moçambique.
               </p>
             </div>
 
             <div className="rv-movement__stream">
               <header>
-                <small>REDE NACIONAL</small>
+                <small>EM TODO MOÇAMBIQUE</small>
                 <strong>Moçambique, agora</strong>
-                <p>Negócios publicados e benefícios reais da rede VUYELA.</p>
+                <p>Negócios publicados e benefícios reais na plataforma VUYELA.</p>
               </header>
               <div className="rv-movement__events">
                 {movementBusinesses.length > 0 ? (
@@ -272,7 +272,7 @@ export default async function HomePage() {
                     <Store aria-hidden="true" size={22} />
                     <strong>
                       {marketplace.status === "error"
-                        ? "A rede está temporariamente indisponível."
+                        ? "A plataforma está temporariamente indisponível."
                         : "Os negócios publicados aparecerão aqui."}
                     </strong>
                   </div>
@@ -285,7 +285,7 @@ export default async function HomePage() {
         <section className="rv-offers" aria-labelledby="offers-title">
           <OfferEditorialCarousel offers={offers} unavailable={marketplace.status === "error"} />
           {businesses.length > 0 ? (
-            <div className="rv-partner-marquee" id="partners-title" aria-label="Negócios da rede">
+            <div className="rv-partner-marquee" id="partners-title" aria-label="Negócios parceiros">
               <div>
                 {[...businesses, ...businesses].map((business, index) => (
                   <span aria-hidden={index >= businesses.length} key={`${business.id}-${index}`}>
@@ -296,7 +296,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <span className="vy-sr-only" id="partners-title">
-              Negócios da rede VUYELA
+              Negócios parceiros VUYELA
             </span>
           )}
         </section>
@@ -379,7 +379,7 @@ export default async function HomePage() {
           <div className="rv-container rv-scale__layout">
             <div className="rv-scale__number">2M+</div>
             <div className="rv-scale__copy">
-              <p className="rv-eyebrow rv-eyebrow--teal">VALOR RECONHECIDO NA REDE</p>
+              <p className="rv-eyebrow rv-eyebrow--teal">VALOR GERADO COM A VUYELA</p>
               <h2 id="pricing-title">A tecnologia deve tornar o crescimento mais humano.</h2>
               <p>Comece com uma estrutura adequada à sua operação e evolua sem perder clareza.</p>
               <div className="rv-plan-list">
@@ -404,7 +404,10 @@ export default async function HomePage() {
             <div>
               <p className="rv-eyebrow rv-eyebrow--teal">PERGUNTAS FREQUENTES</p>
               <h2 id="faq-title">Clareza antes de começar.</h2>
-              <p>As regras da rede devem ser tão fáceis de entender quanto o valor que recebe.</p>
+              <p>
+                As regras de cada programa devem ser tão fáceis de entender quanto o valor que
+                recebe.
+              </p>
               <Link href="/ajuda">
                 Consultar toda a ajuda <ArrowRight aria-hidden="true" size={16} />
               </Link>

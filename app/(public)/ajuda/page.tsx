@@ -20,9 +20,9 @@ const faqItems: MarketingFaqItem[] = [
   },
   {
     category: "Clientes",
-    question: "As YELAS têm valor monetário fora da rede?",
+    question: "As YELAS têm valor monetário fora do negócio que as atribuiu?",
     answer:
-      "Não. As YELAS representam descontos promocionais exclusivos e benefícios em compras futuras nos parceiros."
+      "Não. As YELAS representam benefícios promocionais para compras futuras no negócio que as atribuiu."
   },
   {
     category: "Clientes",

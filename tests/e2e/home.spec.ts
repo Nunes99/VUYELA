@@ -23,7 +23,7 @@ test("shows the public homepage", async ({ page }) => {
     })
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Hoje, a rede tem isto para oferecer." })
+    page.getByRole("heading", { name: "Hoje, a VUYELA tem isto para si." })
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Tudo" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("button", { name: "Oferta anterior" })).toBeVisible();
@@ -74,6 +74,55 @@ test("opens every NEW PHAS public page through real routes", async ({ page }) =>
       "href",
       "/"
     );
+  }
+});
+
+test("keeps the public how-it-works journey usable across responsive widths", async ({ page }) => {
+  await page.goto("/como-funciona");
+
+  await expect(page.locator(".rv-how__journey-grid article")).toHaveCount(4);
+  await expect(page.getByRole("link", { name: /Criar conta gratuita/ }).first()).toHaveAttribute(
+    "href",
+    "/cadastrar"
+  );
+  await expect(page.getByRole("link", { name: /Descobrir estabelecimentos/ })).toHaveAttribute(
+    "href",
+    "/estabelecimentos"
+  );
+
+  for (const width of [320, 390, 768, 1280, 1440]) {
+    await page.setViewportSize({ width, height: width < 640 ? 844 : 1000 });
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        })
+    );
+
+    const layout = await page.evaluate(() => {
+      const cards = Array.from(
+        document.querySelectorAll<HTMLElement>(".rv-how__journey-grid article")
+      );
+      const product = document.querySelector<HTMLElement>(".rv-how__hero-product");
+      const productRect = product?.getBoundingClientRect();
+
+      return {
+        cardsContained: cards.every((card) => {
+          const rect = card.getBoundingClientRect();
+          return rect.left >= 0 && rect.right <= window.innerWidth + 0.5;
+        }),
+        overflow: document.documentElement.scrollWidth - window.innerWidth,
+        productVisible:
+          Boolean(productRect) &&
+          productRect!.width > 0 &&
+          productRect!.right > 0 &&
+          productRect!.left < window.innerWidth
+      };
+    });
+
+    expect(layout.overflow, `horizontal overflow at ${width}px`).toBeLessThanOrEqual(0);
+    expect(layout.cardsContained, `journey card outside viewport at ${width}px`).toBe(true);
+    expect(layout.productVisible, `hero product outside viewport at ${width}px`).toBe(true);
   }
 });
 

@@ -31,8 +31,8 @@ repeating substitute.
 
 ## Experience direction
 
-The public homepage follows the `Rede Viva` direction and keeps the VUYELA message, services, and
-Mozambican identity intact. The first viewport uses an authentic commerce scene as a full-bleed
+The public homepage follows the approved editorial VUYELA direction and keeps the product message,
+services, and Mozambican identity intact. The first viewport uses an authentic commerce scene as a full-bleed
 background; the VUYELA product visual becomes the centre of the customer chapter instead of
 competing with the primary promise.
 
@@ -40,7 +40,7 @@ The information order is:
 
 1. core promise, customer/business entry points and three brand principles;
 2. a command dock for discovery, active offers and transparent YELAS/MZN value;
-3. the live network with real business identities, locations and public offers;
+3. published partner businesses with real identities, locations and public offers;
 4. the customer wallet and its discover, identify, earn and use journey;
 5. the animated business workspace and its three operational outcomes;
 6. a concise plan index, programme rules, resources, and footer.

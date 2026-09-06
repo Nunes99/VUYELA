@@ -9,6 +9,13 @@ const pageStyles = readFileSync(join(root, "app/globals.css"), "utf8");
 const marketingStyles = readFileSync(join(root, "app/marketing.css"), "utf8");
 const networkStyles = readFileSync(join(root, "app/rede-viva.css"), "utf8");
 const homepage = readFileSync(join(root, "app/(public)/page.tsx"), "utf8");
+const howItWorksPage = readFileSync(join(root, "app/(public)/como-funciona/page.tsx"), "utf8");
+const pricingPage = readFileSync(join(root, "app/(public)/precos/page.tsx"), "utf8");
+const helpPage = readFileSync(join(root, "app/(public)/ajuda/page.tsx"), "utf8");
+const publicConvergencePlan = readFileSync(
+  join(root, "docs/design/PUBLIC_UI_CONVERGENCE.md"),
+  "utf8"
+);
 const offerCarousel = readFileSync(
   join(root, "features/marketing/offer-editorial-carousel.tsx"),
   "utf8"
@@ -52,6 +59,32 @@ describe("approved VUYELA design contract", () => {
     expect(offerCarousel).not.toContain("scroll-snap-type: x mandatory");
     expect(networkStyles).toContain("scroll-snap-type: x mandatory");
     expect(networkStyles).not.toContain(".rv-offers__flow");
+  });
+
+  it("uses the current visual foundation for the public how-it-works journey", () => {
+    expect(howItWorksPage).toContain('className="rv-how"');
+    expect(howItWorksPage).toContain("/images/vuyela-product-yl.png");
+    expect(howItWorksPage).toContain("journey.map");
+    expect(howItWorksPage).not.toContain("marketing-journey");
+    expect(networkStyles).toContain(".rv-how__journey-grid");
+    expect(networkStyles).toContain(".rv-how__audiences");
+    expect(publicConvergencePlan).toContain("## Inventário de rotas públicas");
+    expect(publicConvergencePlan).toContain("`/locais/[cidade]/[categoria]`");
+  });
+
+  it("preserves the established VUYELA product terminology in public communication", () => {
+    const publicCommunication = [
+      homepage,
+      howItWorksPage,
+      pricingPage,
+      helpPage,
+      offerCarousel
+    ].join("\n");
+
+    expect(publicCommunication).not.toMatch(/\brede\b/i);
+    expect(homepage).toContain("Plataforma moçambicana de fidelização digital");
+    expect(howItWorksPage).toContain("negócio parceiro");
+    expect(publicConvergencePlan).toContain("A renovação visual não altera a voz do produto");
   });
 
   it("retains the five documented customer mobile navigation destinations", () => {

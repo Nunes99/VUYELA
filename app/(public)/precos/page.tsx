@@ -25,7 +25,7 @@ export default async function PricingPage() {
           <h1 id="prices-title">Planos para começar pequeno e crescer com controlo.</h1>
           <p>
             Escolha o plano ideal para a escala atual do seu negócio. Pode subir de nível à medida
-            que o número de clientes fidelizados aumenta na rede VUYELA.
+            que o seu programa VUYELA conquista mais clientes.
           </p>
         </div>
       </section>

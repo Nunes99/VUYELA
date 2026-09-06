@@ -1406,6 +1406,532 @@
   content: "";
 }
 
+/* How it works */
+.rv-how {
+  overflow: clip;
+  background: #ffffff;
+  color: var(--rv-ink);
+}
+
+.rv-how__hero {
+  position: relative;
+  min-height: 44rem;
+  overflow: hidden;
+  background: var(--rv-ink-deep);
+  color: #ffffff;
+}
+
+.rv-how__texture {
+  position: absolute;
+  z-index: 0;
+  top: -8rem;
+  right: -5rem;
+  width: 34rem;
+  height: 34rem;
+  background: url("/brand/textures/capulana-primary.jpg") center / cover;
+  clip-path: polygon(26% 0, 100% 0, 100% 100%, 0 72%);
+  opacity: 0.1;
+}
+
+.rv-how__hero-content {
+  position: relative;
+  z-index: 2;
+  padding-block: 8.25rem 6rem;
+}
+
+.rv-how__hero-content > * {
+  max-width: 39rem;
+}
+
+.rv-how__hero h1 {
+  margin: 1.2rem 0 0;
+  color: #ffffff;
+  font-size: clamp(3.5rem, 5.5vw, 5.4rem);
+  font-weight: 760;
+  line-height: 0.98;
+}
+
+.rv-how__hero-lead {
+  margin: 1.65rem 0 2rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
+.rv-how__hero-note {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin: 5rem 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.875rem;
+}
+
+.rv-how__hero-note strong {
+  color: var(--rv-gold);
+  font-family: var(--vy-font-display);
+  font-size: 1.35rem;
+}
+
+.rv-how__hero-product {
+  position: absolute;
+  z-index: 1;
+  right: -3rem;
+  bottom: -3.5rem;
+  width: min(58vw, 52rem);
+  height: min(43.5vw, 39rem);
+  filter: drop-shadow(0 2rem 3rem rgba(0, 0, 0, 0.28));
+  animation: rv-product-float 7s ease-in-out infinite;
+}
+
+.rv-how__hero-product img {
+  object-fit: contain;
+}
+
+.rv-how__journey {
+  padding-block: 7.5rem;
+  background: var(--rv-paper);
+}
+
+.rv-how__section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(16rem, 0.75fr);
+  align-items: end;
+  gap: 3rem;
+  margin-bottom: 3.5rem;
+}
+
+.rv-how__section-heading h2,
+.rv-how__network h2,
+.rv-how__next h2 {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2.3rem, 4vw, 4rem);
+  line-height: 1.04;
+}
+
+.rv-how__section-heading > p,
+.rv-how__network header > p:last-child {
+  margin: 0;
+  color: var(--rv-muted);
+  line-height: 1.7;
+}
+
+.rv-how__journey-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rv-how__journey-grid article {
+  display: flex;
+  min-height: 20.5rem;
+  grid-column: span 5;
+  flex-direction: column;
+  border: 1px solid var(--rv-line);
+  border-radius: 0.5rem;
+  background: #ffffff;
+  padding: 2.25rem;
+}
+
+.rv-how__journey-grid article:nth-child(4n + 1),
+.rv-how__journey-grid article:nth-child(4n) {
+  grid-column: span 7;
+}
+
+.rv-how__step-head,
+.rv-how__audience-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rv-how__step-head span {
+  color: var(--rv-ink);
+  font-family: var(--vy-font-display);
+  font-size: 3.75rem;
+  font-weight: 780;
+  line-height: 1;
+}
+
+.rv-how__step-head svg {
+  color: var(--rv-teal);
+}
+
+.rv-how__journey-grid h3 {
+  max-width: 28rem;
+  margin: 2.3rem 0 0.8rem;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+.rv-how__journey-grid article > p {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--rv-muted);
+  line-height: 1.65;
+}
+
+.rv-how__journey-grid article > a,
+.rv-how__audiences article > a {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.55rem;
+  margin-top: auto;
+  padding-top: 2rem;
+  color: var(--rv-teal-dark);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.rv-how__network {
+  position: relative;
+  overflow: hidden;
+  padding-block: 7.5rem;
+  background: var(--rv-ink);
+  color: #ffffff;
+}
+
+.rv-how__network::after {
+  position: absolute;
+  right: -10rem;
+  bottom: -13rem;
+  width: 34rem;
+  height: 34rem;
+  background: url("/brand/textures/capulana-primary.jpg") center / cover;
+  clip-path: polygon(28% 0, 100% 0, 100% 100%, 0 70%);
+  content: "";
+  opacity: 0.08;
+}
+
+.rv-how__network-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.68fr) minmax(0, 1.32fr);
+  gap: 4rem;
+}
+
+.rv-how__network h2 {
+  color: #ffffff;
+}
+
+.rv-how__network header > p:last-child {
+  max-width: 31rem;
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.rv-how__audiences {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rv-how__audiences article {
+  display: flex;
+  min-width: 0;
+  min-height: 32rem;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.5rem;
+  background: #0a3541;
+  padding: 2rem;
+}
+
+.rv-how__audience-title span {
+  color: var(--rv-gold);
+  font-family: var(--vy-font-display);
+  font-size: 2.4rem;
+  font-weight: 780;
+}
+
+.rv-how__audience-title svg {
+  color: var(--rv-aqua);
+}
+
+.rv-how__audiences h3 {
+  margin: 2rem 0 0.55rem;
+  color: #ffffff;
+  font-size: 1.55rem;
+}
+
+.rv-how__audiences article > p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.6;
+}
+
+.rv-how__audiences ul {
+  display: grid;
+  gap: 0.85rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rv-how__audiences li {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  gap: 0.6rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.rv-how__audiences li svg {
+  margin-top: 0.1rem;
+  color: var(--rv-gold);
+}
+
+.rv-how__audiences article > a {
+  color: var(--rv-aqua);
+}
+
+.rv-how__proof {
+  padding-block: 7rem;
+  background: #ffffff;
+}
+
+.rv-how__proof-layout {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.45fr) minmax(0, 1.55fr);
+  align-items: stretch;
+  gap: 4rem;
+}
+
+.rv-how__proof-layout > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rv-how__proof-layout > div > strong {
+  color: var(--rv-teal);
+  font-family: var(--vy-font-display);
+  font-size: clamp(5rem, 10vw, 8.5rem);
+  line-height: 0.8;
+}
+
+.rv-how__proof figure {
+  margin: 0;
+  border-left: 1px solid var(--rv-line);
+  padding: 0.4rem 0 0.4rem 4rem;
+}
+
+.rv-how__proof blockquote {
+  max-width: 49rem;
+  margin: 0;
+  font-family: var(--vy-font-display);
+  font-size: clamp(1.65rem, 3vw, 2.65rem);
+  font-weight: 720;
+  line-height: 1.3;
+}
+
+.rv-how__proof figcaption {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 2.3rem;
+}
+
+.rv-how__proof figcaption span {
+  color: var(--rv-muted);
+  font-size: 0.875rem;
+}
+
+.rv-how__next {
+  padding-block: 4.5rem;
+  background: var(--rv-ink-deep);
+  color: #ffffff;
+}
+
+.rv-how__next-layout {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+.rv-how__next h2 {
+  max-width: 38rem;
+  color: #ffffff;
+  font-size: clamp(2rem, 3.5vw, 3.35rem);
+}
+
+@media (max-width: 67.5rem) {
+  .rv-how__hero-product {
+    right: -9rem;
+    width: 46rem;
+    height: 34.5rem;
+    opacity: 0.8;
+  }
+
+  .rv-how__hero-content > * {
+    max-width: 34rem;
+  }
+
+  .rv-how__network-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rv-how__network header {
+    max-width: 48rem;
+  }
+}
+
+@media (max-width: 50rem) {
+  .rv-how__hero {
+    min-height: 51rem;
+  }
+
+  .rv-how__hero-content {
+    padding-block: 5rem 24rem;
+  }
+
+  .rv-how__hero-content > * {
+    max-width: none;
+  }
+
+  .rv-how__hero h1 {
+    max-width: 31rem;
+    font-size: clamp(2.7rem, 12vw, 4rem);
+  }
+
+  .rv-how__hero-lead {
+    max-width: 34rem;
+    font-size: 1rem;
+  }
+
+  .rv-how__hero-note {
+    margin-top: 2.5rem;
+  }
+
+  .rv-how__hero-product {
+    right: auto;
+    bottom: -1rem;
+    left: 50%;
+    width: 35rem;
+    height: 26.25rem;
+    opacity: 1;
+    transform: translateX(-50%);
+    animation: none;
+  }
+
+  .rv-how__journey,
+  .rv-how__network,
+  .rv-how__proof {
+    padding-block: 5rem;
+  }
+
+  .rv-how__section-heading {
+    display: block;
+    margin-bottom: 2.5rem;
+  }
+
+  .rv-how__section-heading > p {
+    margin-top: 1.25rem;
+  }
+
+  .rv-how__journey-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .rv-how__journey-grid article,
+  .rv-how__journey-grid article:nth-child(4n + 1),
+  .rv-how__journey-grid article:nth-child(4n) {
+    min-height: 18rem;
+    grid-column: auto;
+    padding: 1.5rem;
+  }
+
+  .rv-how__step-head span {
+    font-size: 3rem;
+  }
+
+  .rv-how__journey-grid h3 {
+    margin-top: 1.65rem;
+  }
+
+  .rv-how__network-layout {
+    gap: 2.5rem;
+  }
+
+  .rv-how__audiences {
+    grid-template-columns: 1fr;
+  }
+
+  .rv-how__audiences article {
+    min-height: 30rem;
+  }
+
+  .rv-how__proof-layout {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .rv-how__proof-layout > div {
+    min-height: 7rem;
+    flex-direction: row;
+    align-items: end;
+  }
+
+  .rv-how__proof figure {
+    border-top: 1px solid var(--rv-line);
+    border-left: 0;
+    padding: 2rem 0 0;
+  }
+
+  .rv-how__next-layout {
+    display: block;
+  }
+
+  .rv-how__next .rv-actions {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 30rem) {
+  .rv-how__hero {
+    min-height: 55rem;
+  }
+
+  .rv-how__hero-content {
+    padding-top: 4rem;
+  }
+
+  .rv-how__hero .rv-actions,
+  .rv-how__next .rv-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .rv-how__hero .rv-button,
+  .rv-how__next .rv-button {
+    width: 100%;
+  }
+
+  .rv-how__hero-note {
+    display: block;
+    line-height: 1.5;
+  }
+
+  .rv-how__hero-note strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .rv-how__hero-product {
+    width: 30rem;
+    height: 22.5rem;
+  }
+
+  .rv-how__section-heading h2,
+  .rv-how__network h2 {
+    font-size: 2.25rem;
+  }
+}
+
 /* Shared application surfaces */
 .auth-page,
 .customer-dashboard,
@@ -1995,7 +2521,8 @@
   .rv-partner-marquee > div,
   .rv-wallet__image,
   .rv-dashboard__metrics article,
-  .rv-dashboard__chart polyline {
+  .rv-dashboard__chart polyline,
+  .rv-how__hero-product {
     animation: none;
   }
 }

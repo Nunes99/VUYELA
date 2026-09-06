@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Gift,
+  QrCode,
+  Store,
+  UserPlus,
+  UsersRound,
+  WalletCards
+} from "lucide-react";
 
 import { PublicSiteShell } from "@/components/marketing/public-site-shell";
 
@@ -13,130 +23,206 @@ export const metadata: Metadata = {
 const journey = [
   {
     action: { href: "/cadastrar", label: "Registar agora" },
-    body: "Faça o registo no navegador. Introduza o seu contacto e crie de imediato o seu primeiro cartão digital gratuito.",
-    title: "Crie a sua conta em 2 minutos"
+    body: "Faça o registo no navegador, confirme o seu contacto e reúna os seus cartões digitais numa única área.",
+    icon: UserPlus,
+    title: "Crie a sua conta em poucos minutos"
   },
   {
-    action: { href: "/estabelecimentos", label: "Ver parceiros" },
-    body: "Visite os estabelecimentos parceiros, incluindo restaurantes, spas, clínicas e lojas em Maputo e noutras províncias aderentes.",
-    title: "Faça compras no comércio local"
+    action: { href: "/estabelecimentos", label: "Ver estabelecimentos" },
+    body: "Encontre restaurantes, lojas, clínicas e serviços aderentes em todo o território moçambicano.",
+    icon: Store,
+    title: "Escolha um negócio parceiro"
   },
   {
-    action: { href: "/clientes", label: "Ver demo QR" },
-    body: "No momento de efetuar o pagamento, mostre o seu cartão no ecrã. O lojista lê o código QR para creditar as YELAS automaticamente.",
-    title: "Apresente o QR Code no pagamento"
+    action: { href: "/clientes", label: "Conhecer o cartão" },
+    body: "Apresente o QR Code do cartão no pagamento. O negócio identifica a compra e credita as suas YELAS.",
+    icon: QrCode,
+    title: "Use o cartão no pagamento"
   },
   {
-    action: { href: "/ofertas", label: "Conhecer recompensas" },
-    body: "Converta as YELAS acumuladas em descontos nas próximas compras ou em benefícios definidos pelo negócio emissor.",
-    title: "Troque por benefícios diretos"
+    action: { href: "/ofertas", label: "Explorar benefícios" },
+    body: "Acompanhe o saldo, consulte o equivalente em MZN e use as YELAS nas condições definidas pelo negócio.",
+    icon: Gift,
+    title: "Volte e transforme fidelidade em valor"
   }
+];
+
+const customerBenefits = [
+  "Registo gratuito e uma carteira para vários cartões.",
+  "YELAS e equivalente promocional sempre visíveis.",
+  "Histórico completo de créditos, débitos e compras.",
+  "Ofertas relevantes dos negócios que escolheu."
+];
+
+const businessBenefits = [
+  "Programa configurado de acordo com cada operação.",
+  "Regras claras para emissão e utilização de YELAS.",
+  "POS, campanhas, equipa e catálogo no mesmo fluxo.",
+  "Dados auditáveis para compreender e reter clientes."
 ];
 
 export default function HowItWorksPage() {
   return (
     <PublicSiteShell active="how">
-      <section className="marketing-page-hero marketing-pattern" aria-labelledby="how-title">
-        <div className="marketing-container marketing-heading marketing-heading--center marketing-heading--inverse">
-          <span>Guia do utilizador</span>
-          <h1 id="how-title">Como funciona a VUYELA?</h1>
-          <p>
-            Descubra o ciclo completo da fidelização inteligente. Desde o primeiro registo gratuito
-            no seu telemóvel até ao momento em que poupa dinheiro real.
-          </p>
-        </div>
-      </section>
-
-      <section className="marketing-section marketing-section--soft marketing-pattern marketing-pattern--light">
-        <div className="marketing-container marketing-journey">
-          {journey.map((step, index) => (
-            <article key={step.title}>
-              <strong className="marketing-journey__number">0{index + 1}</strong>
-              <div>
-                <h2>{step.title}</h2>
-                <p>{step.body}</p>
-              </div>
-              <Link
-                className="marketing-button marketing-button--gold-outline"
-                href={step.action.href}
-              >
-                {step.action.label} <ArrowRight size={15} />
+      <main className="rv-how">
+        <section className="rv-how__hero" aria-labelledby="how-title">
+          <div className="rv-how__texture" aria-hidden="true" />
+          <div className="rv-container rv-how__hero-content">
+            <p className="rv-eyebrow">O ciclo VUYELA</p>
+            <h1 id="how-title">Como funciona a VUYELA?</h1>
+            <p className="rv-how__hero-lead">
+              Uma compra deixa de ser apenas uma transação. Torna-se o início de uma relação que
+              recompensa o cliente e ajuda o negócio a crescer.
+            </p>
+            <div className="rv-actions">
+              <Link className="rv-button rv-button--primary" href="/cadastrar">
+                Criar conta gratuita <ArrowRight aria-hidden="true" size={17} />
               </Link>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section
-        className="marketing-section marketing-section--navy marketing-pattern"
-        aria-labelledby="perspectives-title"
-      >
-        <div className="marketing-container">
-          <div className="marketing-heading marketing-heading--inverse">
-            <span>Vantagem mútua</span>
-            <h2 id="perspectives-title">Duas perspetivas para o mesmo ecossistema.</h2>
+              <Link className="rv-button rv-button--secondary" href="/estabelecimentos">
+                Descobrir estabelecimentos
+              </Link>
+            </div>
+            <p className="rv-how__hero-note">
+              <strong>04 etapas.</strong> Um percurso simples, do primeiro registo ao próximo
+              regresso.
+            </p>
           </div>
-          <div className="marketing-perspectives">
-            <article>
-              <h3>Para os clientes</h3>
-              <p>Uma forma clara de valorizar compras recorrentes sem cartões físicos.</p>
-              <ul>
-                <li>
-                  <Check size={16} />
-                  Registo gratuito e imediato.
-                </li>
-                <li>
-                  <Check size={16} />
-                  Vários cartões numa única área.
-                </li>
-                <li>
-                  <Check size={16} />
-                  YELAS e equivalente promocional em MZN.
-                </li>
-                <li>
-                  <Check size={16} />
-                  Histórico de movimentos.
-                </li>
-              </ul>
-            </article>
-            <article>
-              <h3>Para os negócios</h3>
-              <p>Ferramentas para criar relações duradouras e acompanhar o programa.</p>
-              <ul>
-                <li>
-                  <Check size={16} />
-                  Configuração do programa próprio.
-                </li>
-                <li>
-                  <Check size={16} />
-                  Regras de YELAS e utilização.
-                </li>
-                <li>
-                  <Check size={16} />
-                  Painel e histórico auditável.
-                </li>
-                <li>
-                  <Check size={16} />
-                  POS, campanhas e gestão da equipa.
-                </li>
-              </ul>
-            </article>
+          <div className="rv-how__hero-product" aria-hidden="true">
+            <Image
+              alt=""
+              fill
+              priority
+              sizes="(max-width: 768px) 34rem, 54vw"
+              src="/images/vuyela-product-yl.png"
+            />
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="marketing-quote marketing-pattern marketing-pattern--light">
-        <div className="marketing-container">
-          <span aria-hidden="true">“</span>
-          <blockquote>
-            “Com o programa da VUYELA, conseguimos crescer a taxa de retorno dos clientes em mais de
-            35% nos primeiros três meses. O facto de ser digital e no telemóvel facilitou a adesão
-            imediata.”
-          </blockquote>
-          <strong>Délio Manjate</strong>
-          <p>Proprietário, Restaurante Marés</p>
-        </div>
-      </section>
+        <section className="rv-how__journey" aria-labelledby="journey-title">
+          <div className="rv-container">
+            <header className="rv-how__section-heading">
+              <div>
+                <p className="rv-eyebrow rv-eyebrow--teal">Da adesão ao benefício</p>
+                <h2 id="journey-title">Começa numa compra. Cresce em cada regresso.</h2>
+              </div>
+              <p>
+                Cada etapa conduz naturalmente à seguinte. Sem cartões físicos, processos opacos ou
+                tarefas desnecessárias.
+              </p>
+            </header>
+
+            <div className="rv-how__journey-grid">
+              {journey.map((step, index) => {
+                const Icon = step.icon;
+
+                return (
+                  <article key={step.title}>
+                    <div className="rv-how__step-head">
+                      <span>0{index + 1}</span>
+                      <Icon aria-hidden="true" size={24} strokeWidth={1.8} />
+                    </div>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                    <Link href={step.action.href}>
+                      {step.action.label} <ArrowRight aria-hidden="true" size={16} />
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="rv-how__network" aria-labelledby="perspectives-title">
+          <div className="rv-container rv-how__network-layout">
+            <header>
+              <p className="rv-eyebrow">Dois percursos, uma plataforma</p>
+              <h2 id="perspectives-title">O cliente vê valor. O negócio constrói relação.</h2>
+              <p>
+                A VUYELA liga os dois percursos sem os confundir. Cada pessoa encontra apenas as
+                ferramentas de que precisa, no momento certo.
+              </p>
+            </header>
+
+            <div className="rv-how__audiences">
+              <article>
+                <div className="rv-how__audience-title">
+                  <span>01</span>
+                  <WalletCards aria-hidden="true" size={25} />
+                </div>
+                <h3>Para clientes</h3>
+                <p>Uma carteira digital para descobrir, acompanhar e aproveitar benefícios.</p>
+                <ul>
+                  {customerBenefits.map((benefit) => (
+                    <li key={benefit}>
+                      <Check aria-hidden="true" size={15} /> {benefit}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/clientes">
+                  Conhecer a experiência <ArrowRight aria-hidden="true" size={16} />
+                </Link>
+              </article>
+
+              <article>
+                <div className="rv-how__audience-title">
+                  <span>02</span>
+                  <UsersRound aria-hidden="true" size={25} />
+                </div>
+                <h3>Para negócios</h3>
+                <p>Uma operação integrada para transformar visitas em relações duradouras.</p>
+                <ul>
+                  {businessBenefits.map((benefit) => (
+                    <li key={benefit}>
+                      <Check aria-hidden="true" size={15} /> {benefit}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/negocios">
+                  Explorar as soluções <ArrowRight aria-hidden="true" size={16} />
+                </Link>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section className="rv-how__proof" aria-labelledby="proof-title">
+          <div className="rv-container rv-how__proof-layout">
+            <div>
+              <p className="rv-eyebrow rv-eyebrow--teal">Impacto que se mede</p>
+              <strong aria-hidden="true">35%</strong>
+            </div>
+            <figure>
+              <blockquote id="proof-title">
+                “Com o programa da VUYELA, conseguimos aumentar o regresso dos clientes em mais de
+                35% nos primeiros três meses. Por ser digital e estar no telemóvel, a adesão foi
+                imediata.”
+              </blockquote>
+              <figcaption>
+                <strong>Délio Manjate</strong>
+                <span>Proprietário, Restaurante Marés</span>
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section className="rv-how__next" aria-labelledby="next-title">
+          <div className="rv-container rv-how__next-layout">
+            <div>
+              <p className="rv-eyebrow">Próximo passo</p>
+              <h2 id="next-title">Escolha como quer usar a VUYELA.</h2>
+            </div>
+            <div className="rv-actions">
+              <Link className="rv-button rv-button--primary" href="/cadastrar">
+                Quero aderir como cliente <ArrowRight aria-hidden="true" size={17} />
+              </Link>
+              <Link className="rv-button rv-button--secondary" href="/cadastrar/negocio">
+                Quero registar um negócio
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
     </PublicSiteShell>
   );
 }
