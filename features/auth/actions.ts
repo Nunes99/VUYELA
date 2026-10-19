@@ -576,7 +576,7 @@ export async function requestPasswordResetAction(
   const next = getPortalNextPath(portal, getFormString(formData, "next"));
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
-    redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(
+    redirectTo: `${getSiteUrl()}/auth/callback?type=recovery&next=${encodeURIComponent(
       getDefinePasswordPath(portal, next)
     )}`
   });

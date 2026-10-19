@@ -113,3 +113,18 @@ e-mail identities must use the invitation flow instead of having their password 
 Password recovery returns through `/auth/callback` to `/definir-senha`, where the authenticated
 recovery session can set the new password. Invalid or expired callback codes return to the login
 screen with an explicit error state.
+
+Recovery requests include `type=recovery` and the portal-specific `/definir-senha` destination.
+The callback supports both PKCE `code` links and `token_hash` links with `type=recovery`.
+The recovery email template in `supabase/templates/recovery.html` uses `.RedirectTo` and
+`.TokenHash`, allowing recovery in a different browser without the original PKCE verifier.
+
+For hosted Supabase, deploy this template under Authentication → Email Templates → Reset Password.
+Set Site URL to the production origin and allow that origin's `/auth/callback` and
+`/auth/callback?**` under Authentication → URL Configuration → Redirect URLs. Set
+`NEXT_PUBLIC_SITE_URL` to the same production origin. Local `supabase/config.toml` does not
+update hosted Auth settings. A template using only `.SiteURL` loses the recovery destination;
+an unapproved redirect falls back to Site URL. Request a new email after changing these settings.
+For existing recovery links pointing at Site URL, middleware forwards root `?code=` requests
+to the callback with `/definir-senha` as destination. Normal homepage requests remain public.
+All other email flows explicitly use `/auth/callback` with their own `next` destination.

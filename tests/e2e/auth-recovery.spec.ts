@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test("routes recovery codes arriving at the homepage to password completion", async ({
+  request
+}) => {
+  const response = await request.get("/?code=recovery-code", { maxRedirects: 0 });
+  expect(response.status()).toBe(307);
+  const target = new URL(response.headers().location);
+  expect(target.pathname).toBe("/auth/callback");
+  expect(target.searchParams.get("code")).toBe("recovery-code");
+  expect(target.searchParams.get("next")).toBe("/definir-senha");
+  expect(target.searchParams.get("type")).toBe("recovery");
+});
+
 test("hides phone authentication while no SMS provider is configured", async ({ page }) => {
   await page.goto("/entrar");
 

@@ -89,6 +89,19 @@ function protectResponse(response: NextResponse): NextResponse {
 }
 
 export async function middleware(request: NextRequest) {
+  // Supabase falls back to Site URL when an email has no allowed redirect path.
+  if (request.nextUrl.pathname === "/") {
+    const code = request.nextUrl.searchParams.get("code");
+    if (code) {
+      const callbackUrl = new URL("/auth/callback", request.url);
+      callbackUrl.searchParams.set("code", code);
+      callbackUrl.searchParams.set("type", "recovery");
+      callbackUrl.searchParams.set("next", "/definir-senha");
+      return protectResponse(NextResponse.redirect(callbackUrl));
+    }
+    return NextResponse.next({ request });
+  }
+
   if (isPublicPortalPath(request.nextUrl.pathname)) {
     return NextResponse.next({ request });
   }
@@ -141,5 +154,13 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/mfa", "/conta", "/cliente/:path*", "/negocio/:path*", "/pos/:path*", "/admin/:path*"]
+  matcher: [
+    "/",
+    "/mfa",
+    "/conta",
+    "/cliente/:path*",
+    "/negocio/:path*",
+    "/pos/:path*",
+    "/admin/:path*"
+  ]
 };
