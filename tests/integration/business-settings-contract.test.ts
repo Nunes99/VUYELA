@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/manage_business_configuration.sql"),
   "utf8"
-);
+).replace(/\r\n/g, "\n");
 const action = readFileSync(join(process.cwd(), "features/business-settings/actions.ts"), "utf8");
 const publicRevalidation = readFileSync(
   join(process.cwd(), "features/public-marketplace/revalidation.ts"),

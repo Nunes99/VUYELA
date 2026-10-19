@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/secure_operational_flow_foundation.sql"),
   "utf8"
-);
+).replace(/\r\n/g, "\n");
 const posPaymentSettings = readFileSync(
   join(process.cwd(), "features/pos/pos-payment-settings.tsx"),
   "utf8"

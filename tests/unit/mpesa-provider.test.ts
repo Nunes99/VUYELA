@@ -28,16 +28,17 @@ describe("M-Pesa provider adapter", () => {
   });
 
   it("sends the official C2B field structure without exposing the plain API key", async () => {
-    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) =>
-      new Response(
-        JSON.stringify({
-          output_ResponseCode: "INS-0",
-          output_ResponseDesc: "Request processed successfully",
-          output_TransactionID: "MPESA-123",
-          output_ConversationID: "CONV-123"
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      )
+    const fetcher = vi.fn<typeof fetch>(
+      async () =>
+        new Response(
+          JSON.stringify({
+            output_ResponseCode: "INS-0",
+            output_ResponseDesc: "Request processed successfully",
+            output_TransactionID: "MPESA-123",
+            output_ConversationID: "CONV-123"
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        )
     );
 
     const result = await createMpesaC2BPayment(

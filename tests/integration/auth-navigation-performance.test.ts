@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 function source(path: string) {
-  return readFileSync(join(process.cwd(), path), "utf8");
+  return readFileSync(join(process.cwd(), path), "utf8").replace(/\r\n/g, "\n");
 }
 
 const middleware = source("middleware.ts");

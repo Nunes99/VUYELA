@@ -44,6 +44,18 @@ test("shows the complete password recovery forms", async ({ page }) => {
   await expect(page.getByLabel("Confirmar nova palavra-passe")).toBeVisible();
 });
 
+test("shows a send failure instead of reporting that an email was sent", async ({ page }) => {
+  await page.goto("/recuperar-acesso");
+  await page.getByLabel("E-mail").fill("ana@vuyela.co.mz");
+  await page.getByRole("button", { name: "Enviar link" }).click();
+
+  await expect(page.locator(".auth-form").getByRole("alert")).toContainText(
+    "A autenticação ainda não está configurada"
+  );
+  await expect(page.getByRole("button", { name: "Enviar link" })).toBeEnabled();
+  await expect(page.getByText("Se existir uma conta com este e-mail")).toHaveCount(0);
+});
+
 test("preserves the originating portal throughout password recovery", async ({ page }) => {
   await page.goto("/negocio/entrar?next=%2Fnegocio%3Fvista%3Dequipa");
 

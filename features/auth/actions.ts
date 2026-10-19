@@ -8,6 +8,7 @@ import {
   normalizeBusinessPhone
 } from "@/features/auth/business-registration";
 import { getDefinePasswordPath, getPortalNextPath, parseAuthPortal } from "@/features/auth/portal";
+import { passwordRecoveryErrorMessage } from "@/features/auth/password-recovery";
 import type { AuthActionState } from "@/features/auth/state";
 import { getSiteUrl, isPhoneAuthEnabled, isSupabaseConfigured } from "@/lib/env";
 import { clearSupabaseAuthCookies, createSupabaseServerClient } from "@/lib/supabase/server";
@@ -40,7 +41,7 @@ function getRequiredFormString(formData: FormData, key: string, label: string) {
 function getSafeNextPath(formData: FormData, fallback = "/conta") {
   const next = getFormString(formData, "next");
 
-  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\s]/.test(next)) {
     return fallback;
   }
 
@@ -574,23 +575,38 @@ export async function requestPasswordResetAction(
 
   const portal = parseAuthPortal(getFormString(formData, "portal"));
   const next = getPortalNextPath(portal, getFormString(formData, "next"));
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
-    redirectTo: `${getSiteUrl()}/auth/callback?type=recovery&next=${encodeURIComponent(
-      getDefinePasswordPath(portal, next)
-    )}`
-  });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    return { status: "error", message: "Introduza um endereço de e-mail válido." };
+  }
 
-  if (error) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
+      redirectTo: `${getSiteUrl()}/auth/callback?type=recovery&next=${encodeURIComponent(
+        getDefinePasswordPath(portal, next)
+      )}`
+    });
+
+    if (error) {
+      // Do not log the email, raw provider message, tokens or recovery URL.
+      console.error("Password recovery request failed", {
+        code: error.code,
+        status: error.status
+      });
+      return { status: "error", message: passwordRecoveryErrorMessage(error) };
+    }
+  } catch {
+    console.error("Password recovery request failed", { code: "request_failed" });
     return {
       status: "error",
-      message: "Não foi possível enviar o link de recuperação."
+      message:
+        "Não foi possível contactar o serviço de recuperação. Tente novamente dentro de instantes."
     };
   }
 
   return {
     status: "success",
-    message: "Enviamos as instruções de recuperação para o e-mail indicado."
+    message: "Se existir uma conta com este e-mail, receberá as instruções de recuperação."
   };
 }
 

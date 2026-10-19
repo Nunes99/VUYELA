@@ -128,3 +128,17 @@ an unapproved redirect falls back to Site URL. Request a new email after changin
 For existing recovery links pointing at Site URL, middleware forwards root `?code=` requests
 to the callback with `/definir-senha` as destination. Normal homepage requests remain public.
 All other email flows explicitly use `/auth/callback` with their own `next` destination.
+
+Recovery request failures are mapped from Supabase error codes to Portuguese guidance for email
+quotas, request limits, invalid addresses, provider unavailability and transport errors. Server logs
+record only the error code and HTTP status, without the submitted email, raw error or recovery link.
+Successful requests use a neutral response that does not disclose whether an account exists.
+Shared post-login destinations reject backslashes and whitespace as well as protocol-relative
+URLs, preventing browser URL normalization from turning an internal-looking path into an external redirect.
+
+Auth email delivery is configured in hosted Supabase Authentication → SMTP, separately from the
+application notification worker's `RESEND_API_KEY` and `NOTIFICATION_EMAIL_FROM`. Configuring
+those application variables does not configure Supabase Auth delivery. The default Supabase mail
+service restricts recipients to organization members and has a low email quota; production customer
+recovery requires custom SMTP. Diagnose a failed send using the `Password recovery request failed`
+log entry and Supabase Auth logs before changing credentials, limits or templates.

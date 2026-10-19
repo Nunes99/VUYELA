@@ -7,7 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/implement_platform_operations.sql"),
   "utf8"
 );
-const actions = readFileSync(join(process.cwd(), "features/admin/actions.ts"), "utf8");
+const actions = readFileSync(join(process.cwd(), "features/admin/actions.ts"), "utf8").replace(
+  /\r\n/g,
+  "\n"
+);
 const session = readFileSync(join(process.cwd(), "lib/auth/session.ts"), "utf8");
 const exportRoute = readFileSync(join(process.cwd(), "app/admin/export/route.ts"), "utf8");
 
