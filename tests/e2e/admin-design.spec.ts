@@ -56,6 +56,7 @@ test.describe("admin overview design", () => {
     await page.setViewportSize({ width: 768, height: 1209 });
     await page.goto("/dev/admin");
 
+    await expect(page.locator(".admin-sidebar")).toBeVisible();
     const sidebar = await page.locator(".admin-sidebar").boundingBox();
     expect(sidebar).not.toBeNull();
     expect(sidebar?.width ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(80);

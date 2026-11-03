@@ -52,7 +52,7 @@ function getSupabaseNotConfiguredState(): AuthActionState {
   return {
     status: "error",
     message:
-      "A autenticação ainda não está configurada neste ambiente. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      "O acesso à conta está temporariamente indisponível. Tente mais tarde ou contacte o suporte VUYELA."
   };
 }
 
@@ -350,10 +350,7 @@ export async function signUpBusinessWithEmailAction(
 
   const branchPhone = getRequiredFormString(formData, "branchPhone", "Telefone da filial");
   if (!branchPhone.ok) return branchPhone.state;
-  const normalizedBranchPhone = normalizeBusinessPhone(
-    branchPhone.value,
-    "O telefone da filial"
-  );
+  const normalizedBranchPhone = normalizeBusinessPhone(branchPhone.value, "O telefone da filial");
   if (!normalizedBranchPhone.ok) {
     return { status: "error", message: normalizedBranchPhone.message };
   }
