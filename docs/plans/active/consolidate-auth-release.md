@@ -15,8 +15,9 @@ preserve same-browser recovery, as agreed with the owner.
 - [x] Review changes and complete public-key configuration in the live CI job.
 - [x] Pass lint, typecheck, 337 unit/integration tests and production build.
 - [ ] Pass the complete desktop/mobile Playwright suite.
-- [ ] Review the final staged diff and create the release commit.
-- [ ] Push the branch, open a PR and verify its exact commit passes CI.
+- [x] Review the final staged diff and create the release commit.
+- [x] Push the branch and open PR #2.
+- [ ] Verify the final PR commit passes CI.
 - [ ] Merge the approved change and verify the matching production deployment.
 
 ## Release constraints
@@ -29,3 +30,18 @@ production deployment identifiers once they exist.
 
 The local production build passed on 3 November 2026. The complete Playwright run
 is required before merging; authenticated live tests still need dedicated accounts.
+
+## Validation follow-up
+
+PR: https://github.com/Nunes99/VUYELA/pull/2
+
+The first CI run passed lint, typecheck, all 337 unit/integration tests and the
+production build. Browser tests reported 107 passes, four intentional skips and a
+tablet-layout failure caused by measuring the sidebar before it became visible.
+The test now waits for visibility before measuring, retaining the layout assertions.
+
+The first Windows browser run reported 102 passes, four skips and six timeouts:
+four service-worker installation checks and two subsequent referral navigations.
+These failures are being checked on a fresh local server; they must not be reported
+as passing. The PWA checks passed in the first Linux CI run. No PWA implementation
+has been changed to mask the local timeouts.
