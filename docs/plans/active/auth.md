@@ -73,6 +73,22 @@ pnpm test:e2e
 
 # Progress
 
+## Protected onboarding session refresh — 3 November 2026
+
+- Added `/onboarding/cliente` to the middleware matcher so refreshed Auth cookies reach
+  both the browser and Server Components before onboarding authorization runs.
+- Added seven executable middleware tests covering onboarding, public portal login
+  routes, stale chunked-cookie expiration, private caching and unauthenticated redirects.
+- Verified project `ytumxecywfxpwlisgvee` matches `.env.local`. PowerShell requests
+  returned HTTP 200 for Auth settings and a zero-row profiles query: email Auth and
+  email confirmation are enabled, while phone Auth is disabled.
+- Node requests failed DNS resolution and the CLI login code exchange failed with a
+  transport error, although PowerShell could reach both project and management APIs.
+  CLI login and linking remain pending; no hosted Auth settings were changed.
+- Validation passed: lint, typecheck, 330 existing unit/integration tests, seven new
+  middleware tests, production build, and 21 desktop/mobile Auth Playwright tests
+  (one desktop case intentionally skipped because it only applies to mobile).
+
 Completed Phase 05 implementation.
 
 - Added Supabase server-only authenticated and service-role helpers.
@@ -85,3 +101,22 @@ Completed Phase 05 implementation.
 - Forced protected routes to dynamic rendering; the production build now marks `/cliente`, `/negocio`, `/pos`, `/admin`, and onboarding routes as server-rendered on demand.
 - Increased Playwright test timeout to match the slower first Next dev load now that the app has more routes.
 - Final checks passed: `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm ds:build`, `pnpm build`, and `pnpm test:e2e`.
+
+## Auth configuration compatibility — November 2026
+
+Existing Auth and RBAC remain the implementation baseline. Accept the modern
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` throughout browser/server clients and middleware,
+with the legacy anon key as fallback. Keep deterministic Playwright configuration
+isolated from both public keys. Verify configuration precedence and absence of a
+privileged-key fallback, then run lint, typecheck, unit/integration tests, relevant
+Playwright tests and production build. Hosted settings and live sign-in require a
+connected Supabase project and dedicated test credentials. The supplied project URL and
+publishable key are configured in ignored `.env.local`. A live read-only Auth settings
+request confirmed email Auth and email confirmation are enabled, with phone Auth disabled.
+A zero-row profiles REST query returned HTTP 200. Dedicated test account credentials
+remain unavailable, so live authenticated portal isolation is not yet verified.
+
+Validation: lint and typecheck passed; 72 unit/integration files passed (330 tests);
+production build passed outside the sandbox after sandbox EPERM directory failures;
+all 16 relevant desktop/mobile Auth Playwright checks passed outside the sandbox.
+The deterministic browser suite intentionally runs without Supabase credentials.

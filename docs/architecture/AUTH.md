@@ -48,7 +48,8 @@ Protected routes use server-side route state instead of duplicating permission c
 - `/onboarding/negocio`
 
 The protected application middleware refreshes cookie sessions before Server Components render,
-because Server Components cannot persist renewed cookies. It uses verified JWT claims for the hot
+including `/onboarding/cliente`, because Server Components cannot persist renewed cookies.
+It uses verified JWT claims for the hot
 navigation path, clears obsolete chunked Auth cookies when a refresh token is no longer valid, and
 marks authenticated responses `private, no-store`. Page-level RBAC also derives identity and AAL
 from verified claims, while sensitive mutations continue to use a fresh Supabase user check.
@@ -75,8 +76,13 @@ Local auth UI degrades to an explicit configuration state when Supabase is not c
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 ```
+
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` remains supported as a legacy fallback. When both
+public keys exist, the publishable key takes precedence. Privileged keys are never
+used as a public-client fallback. Configuration details belong in server diagnostics,
+while public forms show a Portuguese service-unavailable message.
 
 Phone OTP is exposed only when `SUPABASE_PHONE_AUTH_ENABLED=true` and an SMS provider is configured
 in Supabase Auth. It remains hidden and blocked by the server actions while the provider is absent.
@@ -125,6 +131,9 @@ Set Site URL to the production origin and allow that origin's `/auth/callback` a
 `NEXT_PUBLIC_SITE_URL` to the same production origin. Local `supabase/config.toml` does not
 update hosted Auth settings. A template using only `.SiteURL` loses the recovery destination;
 an unapproved redirect falls back to Site URL. Request a new email after changing these settings.
+The confirmed production-domain correction and deployment checks are documented in
+`docs/qa/AUTH_RECOVERY_PRODUCTION.md`. A Vercel SSO redirect occurs before application middleware;
+email links must target the public production domain.
 For existing recovery links pointing at Site URL, middleware forwards root `?code=` requests
 to the callback with `/definir-senha` as destination. Normal homepage requests remain public.
 All other email flows explicitly use `/auth/callback` with their own `next` destination.

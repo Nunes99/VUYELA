@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   getSiteUrl,
+  getSupabaseAnonKey,
+  isSupabaseConfigured,
   getSupabaseServiceRoleKey,
   isNotificationEmailConfigured,
   isPhoneAuthEnabled
@@ -120,3 +122,32 @@ function restoreEnvironmentValue(key: string, value: string | undefined) {
     process.env[key] = value;
   }
 }
+
+describe("Supabase public configuration", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("accepts a publishable key without a legacy anon key", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", " sb_publishable_test ");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
+    expect(isSupabaseConfigured()).toBe(true);
+    expect(getSupabaseAnonKey()).toBe("sb_publishable_test");
+  });
+
+  it("prefers the publishable key and falls back to legacy configuration", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "sb_publishable_test");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "legacy-anon");
+    expect(getSupabaseAnonKey()).toBe("sb_publishable_test");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "  ");
+    expect(getSupabaseAnonKey()).toBe("legacy-anon");
+  });
+
+  it("does not use privileged credentials for a public client", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
+    vi.stubEnv("SUPABASE_SECRET_KEY", "server-only-secret");
+    expect(isSupabaseConfigured()).toBe(false);
+    expect(() => getSupabaseAnonKey()).toThrow("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY");
+  });
+});

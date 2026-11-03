@@ -50,7 +50,7 @@ test("shows a send failure instead of reporting that an email was sent", async (
   await page.getByRole("button", { name: "Enviar link" }).click();
 
   await expect(page.locator(".auth-form").getByRole("alert")).toContainText(
-    "A autenticação ainda não está configurada"
+    "O acesso à conta está temporariamente indisponível"
   );
   await expect(page.getByRole("button", { name: "Enviar link" })).toBeEnabled();
   await expect(page.getByText("Se existir uma conta com este e-mail")).toHaveCount(0);

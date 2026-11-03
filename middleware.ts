@@ -111,7 +111,9 @@ export async function middleware(request: NextRequest) {
   signInUrl.searchParams.set("next", nextPath);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+  const supabaseKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
   if (!supabaseUrl || !supabaseKey) {
     return NextResponse.next({ request });
   }
@@ -158,6 +160,7 @@ export const config = {
     "/",
     "/mfa",
     "/conta",
+    "/onboarding/cliente",
     "/cliente/:path*",
     "/negocio/:path*",
     "/pos/:path*",
