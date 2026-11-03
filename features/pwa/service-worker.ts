@@ -3,7 +3,7 @@ const safeVersionPattern = /^[a-zA-Z0-9._-]+$/;
 export function buildServiceWorkerSource(version: string): string {
   const safeVersion = safeVersionPattern.test(version) ? version : "unknown";
 
-  return `"use strict";
+  return String.raw`"use strict";
 
 const CACHE_PREFIX = "vuyela-public-shell-";
 const CACHE_NAME = CACHE_PREFIX + ${JSON.stringify(safeVersion)};
@@ -48,10 +48,12 @@ async function precachePublicShell() {
     )
   );
 
-  const buildAssets = html
-    .split(/["']/)
-    .filter((asset) => asset.startsWith("/_next/static/"))
-    .filter((asset, index, assets) => assets.indexOf(asset) === index);
+  const buildAssets = [...new Set(
+    Array.from(
+      html.matchAll(/\b(?:src|href)=["'](\/_next\/static\/[^"'<>\\\s]+)["']/g),
+      (match) => match[1]
+    )
+  )];
 
   await Promise.allSettled(buildAssets.map((asset) => cacheResponse(cache, asset)));
 }

@@ -18,6 +18,10 @@ public `/offline` shell, its build assets, the four web manifests, the legacy cu
 and PWA icons. Navigations remain network-first and authenticated HTML responses are never written
 to Cache Storage.
 
+Build assets are extracted from actual HTML `src` and `href` attributes only.
+Hydration payload fragments are excluded so escaped or truncated Next.js paths
+cannot delay service-worker installation with invalid requests.
+
 The platform exposes four independent installable identities:
 
 - VUYELA Cliente: `id`, start URL, and scope `/cliente`;

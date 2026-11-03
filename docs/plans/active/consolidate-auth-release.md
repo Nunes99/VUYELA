@@ -42,6 +42,9 @@ The test now waits for visibility before measuring, retaining the layout asserti
 
 The first Windows browser run reported 102 passes, four skips and six timeouts:
 four service-worker installation checks and two subsequent referral navigations.
-These failures are being checked on a fresh local server; they must not be reported
-as passing. The PWA checks passed in the first Linux CI run. No PWA implementation
-has been changed to mask the local timeouts.
+These failures were checked on a fresh local server. Inspection of the offline
+HTML found that the worker also requested escaped and truncated hydration payload
+fragments as build assets. Asset extraction now reads only HTML `src` and `href`
+attributes. An executable worker-installation regression test verifies the requested
+URLs and deduplication. The PWA checks passed in the first Linux CI run; the updated
+implementation requires fresh browser and production-build validation.

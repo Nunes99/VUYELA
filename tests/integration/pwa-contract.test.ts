@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { runInNewContext } from "node:vm";
 
 import { describe, expect, it } from "vitest";
 
@@ -84,5 +85,48 @@ describe("PWA contract", () => {
     expect(sync).not.toContain("valueMzn");
     expect(offlinePage).toContain("OfflineCardList");
     expect(offlinePage).toContain("index: false");
+  });
+
+  it("precaches real HTML assets without requesting escaped or truncated hydration paths", async () => {
+    const requested: string[] = [];
+    let install: (() => void) | undefined;
+    let installation: Promise<unknown> | undefined;
+    const html = String.raw`<link href="/_next/static/app.css" rel="stylesheet">
+      <script src="/_next/static/app.js"></script>
+      <script src="/_next/static/app.js"></script>
+      <script>self.__next_f.push([1,"\"/_next/static/app.js\""])</script>
+      <script>self.__next_f.push([1,"/_next/static/chunk"])</script>`;
+
+    runInNewContext(buildServiceWorkerSource("test"), {
+      caches: { open: async () => ({ put: async () => undefined }) },
+      fetch: async (url: string) => {
+        requested.push(url);
+        return new Response(url === "/offline" ? html : "asset");
+      },
+      self: {
+        skipWaiting: async () => undefined,
+        addEventListener: (
+          type: string,
+          listener: (event: { waitUntil: (value: Promise<unknown>) => void }) => void
+        ) => {
+          if (type === "install") {
+            install = () =>
+              listener({
+                waitUntil: (value) => {
+                  installation = value;
+                }
+              });
+          }
+        }
+      }
+    });
+
+    expect(install).toBeDefined();
+    install?.();
+    await installation;
+    expect(requested.filter((url) => url.startsWith("/_next/"))).toEqual([
+      "/_next/static/app.css",
+      "/_next/static/app.js"
+    ]);
   });
 });
