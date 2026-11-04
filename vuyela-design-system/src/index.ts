@@ -1,4 +1,6 @@
 export * from "./tokens";
+export * from "./components/GlassSurface";
+export * from "./components/MotionPreferences";
 export * from "./components/Button";
 export * from "./components/IconButton";
 export * from "./components/Badge";

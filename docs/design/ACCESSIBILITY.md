@@ -16,3 +16,9 @@ Requirements:
 - QR codes provide manual fallback codes or numbers.
 
 Automated testing is not enough. Representative flows need interactive inspection.
+
+Fluid materials are opt-in and solid by default. Reduced transparency and forced colours disable
+blur. `MotionPreferences` can further reduce effects, never override OS reductions. The shared
+Modal contains Tab/Shift+Tab focus, closes with Escape, restores the invoking control, and restores
+the previous body overflow. Review light/dark examples and actual image backgrounds visually;
+automated checks alone do not establish WCAG conformance.

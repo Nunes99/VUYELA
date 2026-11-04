@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { SurfaceMaterial } from "./GlassSurface";
 
 export type ButtonVariant = "primary" | "reward" | "secondary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -10,6 +11,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
+  material?: SurfaceMaterial;
 }
 
 const variantClass: Record<ButtonVariant, string> = {
@@ -28,6 +30,7 @@ export function Button({
   loading = false,
   leadingIcon,
   trailingIcon,
+  material,
   className = "",
   disabled,
   children,
@@ -47,6 +50,7 @@ export function Button({
   return (
     <button
       className={classes}
+      data-material={variant === "reward" || variant === "danger" ? undefined : material}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...props}

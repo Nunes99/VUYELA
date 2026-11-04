@@ -65,3 +65,14 @@ Um componente entra no design system quando:
 2. possui estados e comportamento repetíveis;
 3. precisa de consistência transversal;
 4. pode ser documentado sem depender de uma página específica.
+# Fluid 2.0 additions
+
+- `GlassSurface`: `as` (`div`, `section`, `article`, `aside`), semantic HTML attributes, ref,
+  `material` (`solid` by default, `frosted`, `liquid`).
+- `MotionPreferences`: Portuguese controls for OS defaults or reduced motion/transparency;
+  versioned non-sensitive local storage, optional when storage is blocked.
+- `Card`, `Button`, `Navbar`, `BottomNavigation`, `Modal`: optional `material`; omitting it
+  preserves the previous presentation. Reward/danger Button variants ignore material.
+- `Card dark material="frosted"` scopes dark tokens to its own contents.
+
+Use `/dev/design-system` for demonstrations. These APIs do not read or write loyalty data.

@@ -8,6 +8,7 @@ import "../vuyela-design-system/src/styles/utilities.css";
 import "./globals.css";
 import "./marketing.css";
 import "./rede-viva.css";
+import "../vuyela-design-system/src/styles/fluid.css";
 import { NavigationProgress } from "@/components/navigation/navigation-progress";
 import { PwaRegistration } from "@/features/pwa/pwa-registration";
 import { getSiteUrl } from "@/lib/env";

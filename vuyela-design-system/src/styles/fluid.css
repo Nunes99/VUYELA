@@ -1,0 +1,122 @@
+/* Opt-in materials. Solid is also the fallback when blur is unavailable. */
+[data-material] {
+  background: var(--vy-surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--vy-text);
+  border: 1px solid var(--vy-glass-border);
+  box-shadow: var(--vy-glass-shadow);
+}
+
+.vy-material {
+  min-width: 0;
+  border-radius: var(--vy-radius-lg);
+  padding: var(--vy-space-6);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-material="frosted"],
+  [data-material="liquid"] {
+    background: var(--vy-glass-bg);
+    -webkit-backdrop-filter: blur(var(--vy-glass-blur));
+    backdrop-filter: blur(var(--vy-glass-blur));
+  }
+  /* Avoid stacked blur in nested compositions. */
+  [data-material] [data-material] {
+    background: var(--vy-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+[data-material="liquid"] {
+  background-image: linear-gradient(135deg, var(--vy-glass-highlight), transparent 55%);
+  transition: transform var(--vy-motion-enter) var(--vy-ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button[data-material="liquid"]:not(:disabled):hover,
+  .vy-card--interactive[data-material="liquid"]:hover {
+    transform: translateY(-2px);
+  }
+}
+
+[data-material]:focus-visible,
+[data-material] :focus-visible {
+  outline: 3px solid var(--vy-text);
+  outline-offset: 3px;
+}
+
+button[data-material] {
+  min-height: var(--vy-touch-target);
+  min-width: var(--vy-touch-target);
+}
+button[data-material]:disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+button[data-material]:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.vy-visual-preferences {
+  display: grid;
+  gap: var(--vy-space-4);
+  min-width: 0;
+}
+
+.vy-modal[data-material] .vy-modal__close {
+  min-width: var(--vy-touch-target);
+  min-height: var(--vy-touch-target);
+}
+
+[data-vy-motion="reduce"] {
+  scroll-behavior: auto !important;
+}
+.vy-visual-preferences label {
+  display: grid;
+  gap: var(--vy-space-2);
+}
+.vy-visual-preferences select {
+  min-height: var(--vy-touch-target);
+  max-width: 100%;
+  background: var(--vy-surface);
+  color: var(--vy-text);
+  border: 1px solid var(--vy-border-strong);
+}
+
+[data-vy-transparency="reduce"] [data-material] {
+  background: var(--vy-surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-vy-motion="reduce"] *,
+[data-vy-motion="reduce"] *::before,
+[data-vy-motion="reduce"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+[data-vy-motion="reduce"] [data-material="liquid"] {
+  transform: none !important;
+}
+
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  [data-material] {
+    background: var(--vy-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-material] {
+    transition: none !important;
+    animation: none !important;
+  }
+  [data-material="liquid"]:hover {
+    transform: none !important;
+  }
+}

@@ -1,5 +1,26 @@
 # Design System
 
+## Fluid 2.0 foundations
+
+`GlassSurface` supports semantic `as`, refs, and `solid` (default), `frosted`, `liquid` materials.
+Existing `Card`, `Button`, `Navbar`, `BottomNavigation` and `Modal` accept an optional `material`.
+Omitting it preserves the existing presentation. No consumer migration is required.
+Reward and danger buttons keep their original tone and ignore `material`; use an enclosing
+surface for these actions. This preserves the meaning of reward and destructive states.
+
+Import the package styles including `fluid.css` after legacy overrides. The app imports it in
+the root layout; the standalone package styles entry includes it too. New material tokens are
+synchronised in CSS, TS and JSON. Existing radius/breakpoint discrepancies remain a separate issue.
+
+Use solid for tables, forms, QR regions and POS confirmations. Frosted is for secondary surfaces;
+liquid is reserved for a few interactive highlights. Never nest blur, animate balances before
+server confirmation, or use glass as a substitute for readable contrast. Gold stays reward-only.
+
+The `/dev/design-system` route contains clearly labelled demonstrations in light and dark themes.
+`MotionPreferences` offers OS defaults or explicit reductions, storing only a versioned visual
+preference locally; unavailable storage is tolerated. CSS supports OS reduced motion/transparency,
+forced colours, solid fallback without backdrop support, and visible focus.
+
 ## Principles
 
 - Technology with proximity.

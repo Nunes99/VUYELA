@@ -98,6 +98,13 @@
   --vy-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Layering */
+  --vy-glass-bg: rgba(255, 255, 255, 0.92);
+  --vy-glass-border: #b9cbcf;
+  --vy-glass-shadow: 0 12px 32px rgba(3, 43, 56, 0.1);
+  --vy-glass-blur: 12px;
+  --vy-glass-highlight: rgba(255, 255, 255, 0.55);
+  --vy-motion-enter: var(--vy-motion-normal);
+  --vy-motion-emphasis: var(--vy-motion-slow);
   --vy-z-sticky: 40;
   --vy-z-header: 50;
   --vy-z-sidebar: 80;
@@ -106,6 +113,9 @@
 }
 
 [data-theme="dark"] {
+  --vy-glass-bg: rgba(3, 43, 56, 0.94);
+  --vy-glass-border: #78959d;
+  --vy-glass-highlight: rgba(255, 255, 255, 0.08);
   color-scheme: dark;
   --vy-bg: #021f29;
   --vy-surface: #073b4c;

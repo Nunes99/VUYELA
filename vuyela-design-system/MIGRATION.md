@@ -55,3 +55,10 @@ No `styles.css` actual, substituir gradualmente:
 4. Dashboard e tabelas.
 5. Cartão de fidelização e fluxo POS.
 6. Modais, alertas e empty states.
+# Fluid 2.0 migration
+
+Existing consumers require no changes. Opt in with `material="solid"`, `"frosted"` or `"liquid"`.
+Standalone CSS consumers should load the package `styles.css` entry, which includes fluid styles.
+Apps importing individual styles must import `src/styles/fluid.css` after legacy overrides.
+Use solid material for operational data and QR backgrounds. Keep reward/destructive buttons in
+their original tone. No new dependency, database migration or storage of loyalty information.

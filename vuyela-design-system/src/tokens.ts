@@ -1,4 +1,19 @@
 export const tokens = {
+  glass: {
+    light: {
+      bg: "rgba(255, 255, 255, 0.92)",
+      border: "#b9cbcf",
+      highlight: "rgba(255, 255, 255, 0.55)"
+    },
+    dark: {
+      bg: "rgba(3, 43, 56, 0.94)",
+      border: "#78959d",
+      highlight: "rgba(255, 255, 255, 0.08)"
+    },
+    blur: "12px",
+    shadow: "0 12px 32px rgba(3, 43, 56, 0.10)"
+  },
+  motion: { fast: "150ms", normal: "220ms", slow: "400ms", enter: "220ms", emphasis: "400ms" },
   color: {
     indigo: "#073B4C",
     indigo900: "#032B38",
