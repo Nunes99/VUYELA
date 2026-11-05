@@ -22,8 +22,16 @@ export function Modal({ open, title, onClose, children, footer, material }: Moda
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
       if (event.key === "Tab") {
-        const controls = dialogRef.current?.querySelectorAll<HTMLElement>(
-          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+        const controls = Array.from(
+          dialogRef.current?.querySelectorAll<HTMLElement>(
+            'button:not(:disabled), a[href], input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+          ) ?? []
+        ).filter(
+          (control) =>
+            control.tabIndex >= 0 &&
+            !control.closest('[hidden], [inert], [aria-hidden="true"]') &&
+            getComputedStyle(control).display !== "none" &&
+            getComputedStyle(control).visibility !== "hidden"
         );
         const first = controls?.[0];
         const last = controls?.[controls.length - 1];

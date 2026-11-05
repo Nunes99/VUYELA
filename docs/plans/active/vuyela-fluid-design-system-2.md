@@ -29,8 +29,8 @@ Branch: `codex/vuyela-fluid-design-system-2`. Sem merge ou deploy automático.
 
 ## Fases e gates
 
-- [ ] 0 — Baseline e inventário: inventário feito; baseline browser não aprovado por timeouts.
-- [ ] 1 — Fundamentos e demonstrador: alterações locais implementadas; QA/aceitação pendentes.
+- [x] 0 — Baseline e inventário: arquitetura auditada; baseline da continuação em `6e51706`.
+- [x] 1 — Fundamentos e demonstrador: gates locais aprovados e evidências arquivadas em 05/11/2026.
 - [ ] 2 — Público/Rede Viva: depende da validação da fase 1.
 - [ ] 3 — Cliente/cartão: depende da validação visual e QR.
 - [ ] 4 — Negócio/Admin: superfícies secundárias, tabelas sólidas.
@@ -40,6 +40,24 @@ Branch: `codex/vuyela-fluid-design-system-2`. Sem merge ou deploy automático.
 Não declarar fases concluídas sem gates e revisão visual. Staging autenticado e dispositivos
 físicos devem ser registados separadamente de testes determinísticos locais.
 
-Relatório: `docs/qa/FLUID_DESIGN_SYSTEM_2_PHASE_0_1.md`. A fase 1 não está concluída e as fases
-seguintes não foram iniciadas. E2E falhou por timeout de arranque e timeout no teste de login;
-capturas e comparação visual não executadas. Não efetuar rollout com base apenas nos testes unitários.
+Relatório: `docs/qa/FLUID_DESIGN_SYSTEM_2_PHASE_0_1.md`. Fase 1 aprovada: lint, typecheck,
+347 testes unit/integration, DS build, produção e Playwright (120 PASS, 0 FAIL, 0 flaky,
+4 exclusões preexistentes por perfil). Revisão visual em oito larguras; 52 capturas finais e
+índice SHA-256 arquivados. A falha transitória `ERR_NO_BUFFER_SPACE` da execução anterior
+fica documentada separadamente. A fase 2 está desbloqueada; fases seguintes não iniciadas.
+
+## Fase 2 — proposta por ficheiro, condicionada ao gate da fase 1
+
+- `src/components/MotionPreferences.tsx`: partilhar e inicializar preferências visuais no layout,
+  mantendo uso isolado do demonstrador e apenas persistência local não sensível.
+- `app/layout.tsx`: provider cliente recebe os Server Components como children; preservar metadata.
+- `components/marketing/public-site-shell.tsx`: material seletivo no header/descoberta e controlos
+  de conforto visual no footer; menu móvel mantém o seu viewport fixo.
+- `app/fluid-public.css`: estilos públicos delimitados. O blur do header fica numa camada
+  decorativa irmã, sem criar containing block para a navegação móvel fixa.
+- `features/marketing/offer-editorial-carousel.tsx`, `business-dashboard-demo.tsx`: respeitar
+  alterações das preferências do SO/aplicação e identificar visualmente dados demonstrativos.
+- Testes: preferências partilhadas, carrossel sem movimento, navegação por teclado/menu,
+  conteúdo/SEO público, oito larguras e capturas comparáveis com a fase 1.
+- Gate próprio: lint, typecheck, unit/integration, DS build, produção, Playwright relevante e
+  revisão visual antes de qualquer fase 3. Não alterar dados, autenticação ou contratos PWA.

@@ -74,5 +74,7 @@ Um componente entra no design system quando:
 - `Card`, `Button`, `Navbar`, `BottomNavigation`, `Modal`: optional `material`; omitting it
   preserves the previous presentation. Reward/danger Button variants ignore material.
 - `Card dark material="frosted"` scopes dark tokens to its own contents.
+- `Tabs material="frosted"`: ArrowLeft/ArrowRight, Home/End and one tab stop;
+  only the active panel is mounted, preserving the existing content lifecycle.
 
 Use `/dev/design-system` for demonstrations. These APIs do not read or write loyalty data.

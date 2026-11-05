@@ -125,7 +125,7 @@ export function DesignSystemShowcase() {
         </div>
       </section>
 
-      <section className="vy-container ds-section" aria-labelledby="fluid-heading">
+      <section className="vy-container ds-section ds-fluid" aria-labelledby="fluid-heading">
         <h2 id="fluid-heading">Fluid Design 2.0 — demonstração</h2>
         <p>Exemplos visuais sem operações reais. O material sólido é o padrão seguro.</p>
         <MotionPreferences />
@@ -295,6 +295,7 @@ export function DesignSystemShowcase() {
           <article className="ds-example ds-wide">
             <Breadcrumb items={[{ label: "Início", href: "/" }, { label: "Design System" }]} />
             <Navbar
+              material="frosted"
               brand="VUYELA"
               links={navLinks}
               actions={
@@ -317,6 +318,7 @@ export function DesignSystemShowcase() {
           </article>
           <article className="ds-example">
             <BottomNavigation
+              material="frosted"
               items={[
                 { label: "Início", href: "#", active: true, icon: <Home size={16} /> },
                 { label: "Cartões", href: "#", icon: <CreditCard size={16} /> },
@@ -358,6 +360,7 @@ export function DesignSystemShowcase() {
           <article className="ds-example">
             <h3>Tabs e accordion</h3>
             <Tabs
+              material="frosted"
               tabs={[
                 {
                   value: "cliente",

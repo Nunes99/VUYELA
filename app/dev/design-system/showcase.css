@@ -1,0 +1,52 @@
+/* Demo layout only: preserve the package's default tooltip alignment elsewhere. */
+.ds-page .vy-tooltip {
+  margin-inline-start: auto;
+}
+
+.ds-page .vy-tooltip__content {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+  transform: none;
+}
+
+.ds-page .vy-dropdown__menu {
+  min-width: 0;
+  width: 10rem;
+}
+
+.ds-fluid {
+  display: grid;
+  gap: var(--vy-space-6);
+}
+
+.ds-fluid > h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
+}
+
+.ds-fluid .vy-visual-preferences {
+  border: 1px solid var(--vy-border-strong);
+  border-radius: var(--vy-radius-lg);
+  padding: var(--vy-space-4);
+}
+
+.ds-fluid .vy-visual-preferences legend {
+  padding-inline: var(--vy-space-2);
+  font-weight: 700;
+}
+
+.ds-fluid .vy-material h3 {
+  margin-bottom: var(--vy-space-3);
+  font-size: var(--vy-text-xl);
+  font-weight: 700;
+}
+
+.ds-fluid .vy-material .vy-button {
+  display: flex;
+  width: 100%;
+  white-space: normal;
+}
+
+.ds-fluid .vy-material .vy-button + .vy-button {
+  margin-top: var(--vy-space-3);
+}

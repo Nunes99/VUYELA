@@ -35,6 +35,11 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .vy-button[data-material]:not(:disabled):hover {
+    border-color: var(--vy-text);
+    box-shadow: var(--vy-shadow-sm);
+  }
+
   button[data-material="liquid"]:not(:disabled):hover,
   .vy-card--interactive[data-material="liquid"]:hover {
     transform: translateY(-2px);
@@ -48,6 +53,7 @@
 }
 
 button[data-material] {
+  border-color: var(--vy-text-muted);
   min-height: var(--vy-touch-target);
   min-width: var(--vy-touch-target);
 }
@@ -57,6 +63,7 @@ button[data-material]:disabled {
 }
 button[data-material]:not(:disabled):active {
   transform: translateY(0);
+  box-shadow: var(--vy-shadow-xs);
 }
 
 .vy-visual-preferences {
@@ -68,6 +75,24 @@ button[data-material]:not(:disabled):active {
 .vy-modal[data-material] .vy-modal__close {
   min-width: var(--vy-touch-target);
   min-height: var(--vy-touch-target);
+}
+
+.vy-tabs[data-material] {
+  border-radius: var(--vy-radius-lg);
+  padding: var(--vy-space-4);
+}
+
+.vy-navbar[data-material] a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--vy-touch-target);
+}
+
+.vy-navbar[data-material] a[aria-current="page"],
+.vy-bottom-nav[data-material] a[aria-current="page"] {
+  color: var(--vy-text);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 [data-vy-motion="reduce"] {
@@ -83,6 +108,11 @@ button[data-material]:not(:disabled):active {
   background: var(--vy-surface);
   color: var(--vy-text);
   border: 1px solid var(--vy-border-strong);
+}
+
+.vy-visual-preferences :focus-visible {
+  outline: 3px solid var(--vy-text);
+  outline-offset: 3px;
 }
 
 [data-vy-transparency="reduce"] [data-material] {

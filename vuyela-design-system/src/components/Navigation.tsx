@@ -59,7 +59,11 @@ export function Navbar({ brand, links, actions, material, className = "", ...pro
       <div className="vy-navbar__brand">{brand}</div>
       <nav className="vy-navbar__links" aria-label="Navegação principal">
         {links.map((link) => (
-          <a key={link.href} href={link.href} aria-current={link.active ? "page" : undefined}>
+          <a
+            key={`${link.href}-${link.label}`}
+            href={link.href}
+            aria-current={link.active ? "page" : undefined}
+          >
             {link.label}
           </a>
         ))}
@@ -81,7 +85,11 @@ export function Sidebar({ title, items, footer, className = "", ...props }: Side
       <strong>{title}</strong>
       <nav aria-label={title}>
         {items.map((item) => (
-          <a key={item.href} href={item.href} aria-current={item.active ? "page" : undefined}>
+          <a
+            key={`${item.href}-${item.label}`}
+            href={item.href}
+            aria-current={item.active ? "page" : undefined}
+          >
             {item.icon}
             {item.label}
           </a>
@@ -111,7 +119,11 @@ export function BottomNavigation({
       {...props}
     >
       {items.map((item) => (
-        <a key={item.href} href={item.href} aria-current={item.active ? "page" : undefined}>
+        <a
+          key={`${item.href}-${item.label}`}
+          href={item.href}
+          aria-current={item.active ? "page" : undefined}
+        >
           {item.icon ? <span aria-hidden="true">{item.icon}</span> : null}
           <span>{item.label}</span>
         </a>

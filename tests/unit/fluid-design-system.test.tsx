@@ -6,6 +6,8 @@ import {
   Card,
   GlassSurface,
   Modal,
+  BottomNavigation,
+  Tabs,
   MotionPreferences,
   tokens
 } from "@lemote/vuyela-design-system";
@@ -18,6 +20,45 @@ afterEach(() => {
 });
 
 describe("Fluid foundations", () => {
+  it("navigates tabs with arrows, Home and End while retaining one tab stop", () => {
+    render(
+      <Tabs
+        material="frosted"
+        tabs={[
+          { value: "cards", label: "Cartões", content: <p>Cartões disponíveis</p> },
+          { value: "activity", label: "Atividade", content: <p>Movimentos confirmados</p> }
+        ]}
+      />
+    );
+    const first = screen.getByRole("tab", { name: "Cartões" });
+    const last = screen.getByRole("tab", { name: "Atividade" });
+    fireEvent.keyDown(first, { key: "ArrowLeft" });
+    expect(last).toHaveFocus();
+    expect(last).toHaveAttribute("aria-selected", "true");
+    expect(first).toHaveAttribute("tabindex", "-1");
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("Movimentos confirmados");
+    fireEvent.keyDown(last, { key: "Home" });
+    expect(first).toHaveFocus();
+    fireEvent.keyDown(first, { key: "End" });
+    expect(last).toHaveFocus();
+    fireEvent.keyDown(last, { key: "ArrowRight" });
+    expect(first).toHaveFocus();
+  });
+  it("supports distinct navigation labels sharing the same destination", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(
+      <BottomNavigation
+        items={[
+          { label: "Início", href: "#" },
+          { label: "Cartões", href: "#" }
+        ]}
+      />
+    );
+    expect(screen.getByRole("link", { name: "Início" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Cartões" })).toBeVisible();
+    expect(error).not.toHaveBeenCalled();
+    error.mockRestore();
+  });
   it("preserves reward and destructive action colours over material effects", () => {
     render(
       <>
@@ -101,6 +142,10 @@ describe("Fluid foundations", () => {
         <button>Origem</button>
         <Modal open title="Rever" material="frosted" onClose={close}>
           <button>Último</button>
+          <input type="hidden" value="identificação" readOnly />
+          <div hidden>
+            <button>Indisponível</button>
+          </div>
         </Modal>
       </>
     );

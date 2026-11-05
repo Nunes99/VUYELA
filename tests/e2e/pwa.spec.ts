@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+test.use({ serviceWorkers: "allow" });
+
 test("exposes four independently installable applications and one safe worker", async ({
   page
 }) => {

@@ -22,3 +22,7 @@ blur. `MotionPreferences` can further reduce effects, never override OS reductio
 Modal contains Tab/Shift+Tab focus, closes with Escape, restores the invoking control, and restores
 the previous body overflow. Review light/dark examples and actual image backgrounds visually;
 automated checks alone do not establish WCAG conformance.
+
+Material button boundaries use the semantic muted-text colour for stronger contrast. Material
+navigation exposes the active item through an underline as well as `aria-current`, and Navbar
+links use the shared 44px touch target. Tabs support roving focus, arrows and Home/End.

@@ -2,82 +2,141 @@
 
 ## Fase / PR
 
-- Nome: auditoria e fundamentos optativos.
-- Branch: `codex/vuyela-fluid-design-system-2`.
-- Commit/PR: não criado; gate Playwright reprovado, revisão visual pendente.
-- Objetivo: materiais adaptativos na biblioteca existente, sem alterar operações dos portais.
+- Nome: auditoria, fundamentos e estabilização da validação.
+- Branch: `codex/vuyela-fluid-design-system-2`; base da continuação: `6e51706`.
+- Estado em 5 de novembro de 2026: fase 1 aprovada após todos os gates locais e revisão visual.
+- Objetivo: biblioteca optativa e demonstrador, preservando fluxos e limites transacionais.
 
 ## Diagnóstico e decisões
 
-- Pacote workspace existente, Next 15.5.23 e React 19 reutilizados.
-- APIs Card, Button, Navbar, BottomNavigation e Modal estendidas por `material` opcional.
-- GlassSurface admite elemento semântico, atributos HTML e ref; material padrão solid.
-- MotionPreferences usa armazenamento local versionado, sem dados pessoais/financeiros.
-- Preferências do SO mantêm precedência; preferência da aplicação apenas reduz efeitos.
-- Reward/danger mantêm a apresentação existente; não recebem materiais de vidro.
-- Tokens novos sincronizados em CSS/TS/JSON; sem corrigir raios/breakpoints legados globalmente.
-- Fonte `app/globals.css`: 558 370 bytes; não alterada. Este valor não é tamanho transferido.
-- CSS de materiais isolado; nenhum novo pacote instalado.
-- Modal existente reforçado para Tab/Shift+Tab e restauro do overflow anterior.
+- Reutilizados Next 15.5.23, React 19, pacote workspace, tokens e componentes existentes.
+- Card, Button, Navbar, BottomNavigation, Modal e Tabs têm `material` opcional; APIs anteriores preservadas.
+- GlassSurface admite HTML semântico/ref; solid é o padrão seguro.
+- MotionPreferences guarda apenas preferências visuais versionadas. Reduções do SO prevalecem.
+- Botões reward/danger mantêm a apresentação original. Tokens Light/Dark sincronizados em CSS/TS/JSON.
+- Modal contém foco, ignora campos ocultos, fecha com Escape e restaura foco/overflow.
+- Tabs têm roving focus, setas, Home/End e preservam a montagem apenas do painel ativo.
+- Corrigidas chaves duplicadas quando ligações têm o mesmo destino e rótulos distintos.
+- Sem novas dependências. Raios/breakpoints legados não foram refatorados globalmente.
+
+### Timeouts e evidências
+
+O arranque anterior compilava rotas durante cada teste. O launcher agora invoca Node diretamente,
+valida um build isolado e inicia Next dev. O setup pré-compila páginas e JS/CSS antes dos deadlines.
+Asserções e timeouts por teste foram preservados; o arranque tem 15 minutos porque inclui o build.
+
+Uma tentativa sobre Next start revelou 404 nos demonstradores operacionais, conforme as proteções
+existentes. Essas proteções foram preservadas. Build e runtime de teste ficam sem credenciais
+Supabase, sem reutilização de servidor arbitrário. `--dev-only` serve apenas a inspeção local e
+não é utilizado pelo gate.
+
+A primeira suite completa com prewarm terminou em 116 PASS, 4 FAIL e 4 skips condicionais
+preexistentes. As falhas revelaram três problemas reais de layout, corrigidos antes da repetição:
+
+- Tooltip alargava o documento para 333 px numa viewport de 320 px.
+- Mínimos do gráfico administrativo alargavam o documento para 1036 px a 1024 px.
+- Margem negativa das categorias POS alargava o documento para 324 px a 320 px.
+
+Só quatro regras diretamente afetadas foram alteradas em `app/globals.css`, incluindo o centro
+proporcional do gráfico. O demonstrador tem CSS próprio. Tabelas/categorias preservam scroll
+interno deliberado; não foi escondido overflow no documento.
+
+A execução seguinte terminou com 119 PASS, 1 FAIL e os mesmos 4 skips preexistentes. Todos os
+testes Fluid desktop/mobile e PWA passaram. A falha no menu POS foi diagnosticada pelo trace:
+o pedido de `next_dist_compiled` terminou com `net::ERR_NO_BUFFER_SPACE`, antes do clique,
+impedindo a hidratação. Não foi uma falha da asserção de navegação nem um timeout de compilação.
+O trace, contexto e JSON dessa execução foram preservados em
+`playwright-report/fluid-evidence/phase1/failed-run-resource/`. A inspeção posterior não encontrou
+Chromium de teste órfão nem esgotamento da faixa de portas; a origem exata do erro transitório
+do Windows/Chromium não está demonstrada. A repetição integral passou: 120 PASS, 0 FAIL,
+0 flaky e os mesmos 4 skips por perfil, em 12,9 minutos. Sem retries, alterações de asserções
+ou mudanças de código da aplicação para contornar esse erro. O menu POS passou em 1,7 segundos.
+
+Capturas exigem HTTP 200 e conteúdo esperado, evitando falsos PASS sobre 404. A captura espera
+hidratação e preserva o caret, evitando mutações prematuras nos campos. O indicador dev fica
+desativado apenas no ambiente de teste; erros de consola continuam verificados.
 
 ## Ficheiros alterados
 
-- `tests/e2e/fluid-surfaces.spec.ts`: verifica cinco superfícies em oito larguras e recolhe capturas antes/depois; ainda não executado.
-
-- `vuyela-design-system/src/styles/tokens.css`, `src/tokens.ts`, `tokens/design-tokens.json`: glass e motion.
-- `src/styles/fluid.css`, `src/styles/index.css`, `app/layout.tsx`: materiais e importação.
-- `src/components/GlassSurface.tsx`, `MotionPreferences.tsx`: novas primitivas.
-- `Card.tsx`, `Button.tsx`, `Navigation.tsx`, `Modal.tsx`, `src/index.ts`: extensão compatível.
-- `app/dev/design-system/showcase.tsx`: demonstrações light/dark, estados e preferências.
-- `tests/unit/fluid-design-system.test.tsx`, `tests/e2e/fluid-design-system.spec.ts`: regressão.
-- `docs/design/DESIGN_SYSTEM.md`, `ACCESSIBILITY.md`: uso e limites.
-- `docs/plans/active/vuyela-fluid-design-system-2.md`: inventário, fases e acompanhamento.
+- Pacote DS: tokens CSS/TS/JSON, GlassSurface, MotionPreferences, Card/Button/Navigation/Modal/Tabs,
+  exports, estilos Fluid e documentação de API/migração.
+- `app/dev/design-system/`: exemplos, estados, preferências, temas e CSS do demonstrador.
+- `app/layout.tsx`: importação Fluid da entrega inicial.
+- `app/globals.css`: correções mínimas do gráfico administrativo e categorias POS.
+- `scripts/playwright-server.mjs`, `tests/e2e-setup.ts`, `playwright.config.ts`: build hermético,
+  prewarm, logs, traces e JSON.
+- `scripts/inspect-fluid.mjs`: capturas e diagnóstico local de geometria/consola.
+- Testes Fluid unitários/E2E: compatibilidade, teclado, foco, preferências e oito larguras.
+- `next.config.mjs`: indicador dev desativado condicionalmente para testes.
+- Documentação de design, QA e plano: decisões e estado verificável.
 
 ## Verificação
 
-| Gate | Estado / evidência |
+| Gate | Resultado da continuação |
 | --- | --- |
-| install frozen | PASS; dependências já atualizadas, lockfile preservado |
-| baseline lint | PASS |
-| baseline typecheck | PASS |
-| baseline unit/integration | PASS, 338 testes / 73 ficheiros |
-| lint após alterações | PASS na revisão final, execução fora da sandbox terminou com exit code 0 |
-| typecheck após alterações | PASS, app e pacote |
-| unit/integration após alterações | PASS na revisão final, 345 testes / 74 ficheiros, incluindo 7 testes dos fundamentos Fluid |
-| ds:build | PASS na revisão final |
-| build | PASS numa revisão intermédia após repetição fora da sandbox; última revisão compilou em 8,6 minutos mas a execução foi interrompida na etapa de lint/tipos; gate final NÃO APROVADO |
-| Playwright | FAIL: timeout de arranque automático (180s). Com servidor isolado pré-iniciado enumerou 114 testes, mas o primeiro teste de autenticação falhou após 2 minutos; execução interrompida. As novas verificações visuais não chegaram a executar |
-| Acessibilidade | testes unitários de semântica, foco, Escape e preferências; revisão visual pendente |
-| Visual QA | NÃO EXECUTADO; Chromium desktop/mobile e oito larguras configurados, sem capturas válidas |
-| Performance | valores atuais abaixo; sem comparação antes/depois válida |
+| lint | PASS |
+| typecheck | PASS, aplicação e pacote |
+| unit/integration | PASS, 347 testes em 74 ficheiros, incluindo 9 dos fundamentos |
+| ds:build | PASS |
+| produção | PASS, build final isolado pelo bootstrap E2E com o CSS atual |
+| Playwright final | PASS, 120 testes, 0 falhas, 0 flaky; 4 exclusões preexistentes por perfil |
+| diff whitespace | PASS |
+| Visual QA | PASS, oito larguras dos fundamentos revistas; 52 capturas finais arquivadas |
 
-O typecheck simultâneo ao primeiro build encontrou tipos gerados em falta. Reexecutado depois
-da geração, passou. Não foram alterados scripts nem excluídos tipos/testes para contornar falhas.
+### Acessibilidade e revisão visual
 
-O build intermédio aprovado reportou: homepage 115 kB First Load JS; Cliente 126 kB; Negócio/Admin 117 kB; POS 127 kB;
-demonstrador 118 kB; partilhado 102 kB. Não são medições de transferência CSS, CWV ou p75.
-Não há dados de campo nem medições em dispositivos físicos nesta fase.
-Não ficou nenhum servidor de validação iniciado por esta tarefa intencionalmente em execução.
+Chromium 151.0.7922.34 confirmou documento dentro de 320 px para demonstrador/POS e dentro de
+1024 px para Administração, sem erros de consola. Revistas as capturas Light/Dark, gráfico e POS.
+O centro do gráfico é verificado para não ocultar o anel ao reduzir a largura. Fundamentos revistos
+em 320/375/390/430/768/1024/1280/1440 px, com controlos, estados e exemplo Dark sem colisões.
+
+Contraste dos tokens de texto sobre glass, com fundos extremos preto/branco e com/sem reflexo:
+mínimo 13,69:1 Light e 9,51:1 Dark. Cobre os novos materiais, não certifica toda a plataforma.
+Teclado, foco, reduced motion, transparência reduzida e forced colours integram a suite Fluid.
+
+Evidência local: `playwright-report/fluid-evidence/phase1-before`, `phase1-after`, `admin-before`,
+`admin-after`, `pos-before`, `pos-after` e a pasta final `phase1`. O arquivo da fase contém:
+
+- `results.json`: resultado integral aprovado, preservado antes das fases seguintes;
+- `foundations/{perfil}-{largura}.png`: 16 recortes Light/Dark, nos dois perfis e oito larguras;
+- `showcase/fluid-{perfil}-{largura}.png`: 16 capturas completas do demonstrador;
+- `{superficie}-{perfil}-{390|1440}.png`: 20 capturas Público/Cliente/Negócio/Admin/POS;
+- `bundle-metrics.json` e `contrast.json`: valores medidos;
+- `evidence-index.json`: índice dos 55 artefactos finais, com tamanho e SHA-256;
+- `failed-run-resource/`: diagnóstico da execução anterior, separado da aceitação final.
+
+As quatro exclusões são casos móveis não aplicáveis ao projeto desktop (menu Negócio, fluxo
+Cliente e dois casos POS); esses casos passaram no perfil móvel. Os artefactos ficam ignorados
+pelo Git; este relatório regista o resultado e os caminhos locais para revisão.
+
+### Performance
+
+Baseline da continuação: CSS 564 956 bytes / gzip estimado 91 612; JS 1 925 225 / gzip 575 947.
+Build final: CSS 566 318 / gzip 92 054; JS 1 926 045 / gzip 576 271. Agregam todos os assets
+emitidos; a diferença inclui CSS exclusivo do demonstrador. Não são transferências por página.
+Delta face ao baseline: CSS +1 362 bytes (+442 gzip); JS +820 bytes (+324 gzip).
+First Load JS: homepage 115 kB; Cliente 126 kB; Negócio/Admin 117 kB; POS 127 kB; demonstrador
+119 kB. CWV p75 e dispositivos físicos não foram medidos.
 
 ## Segurança e regressões
 
-- Mudanças de autenticação, tenant, SQL, POS, pagamentos, ledger, manifestos ou SW: NENHUMA.
-- Dados de exemplos apenas na rota de desenvolvimento, que mantém noindex e bloqueio em produção.
-- Sem testes live, migrações, escrita em produção, merge ou deploy.
-- Risco: CSS legado pode ter maior especificidade; mitigação por importação final e testes de browser.
-- Limitações: ainda sem Safari/iPhone, Android físico, Firefox e CWV p75.
+- Autenticação, permissões, tenant, SQL, pagamentos, ledger e contratos PWA/SW: sem mudanças.
+- POS: correção de largura CSS, sem alterações transacionais.
+- Sem testes live, migrações, credenciais expostas, escrita em produção, merge ou deploy.
+- Safari/iPhone, Android físico e Firefox continuam não testados.
 
 ## Próximo passo
 
-Concluir gate Playwright e inspeção das capturas antes de iniciar rollout público e nos portais.
-As fases 2–6 continuam dependentes da validação desta base.
+A fase 2 pode iniciar: todos os gates locais da fase 1 passaram. Aplicar os materiais seletivos
+ao público e partilhar as preferências, conforme o plano por ficheiro. Fases 3–6 continuam
+dependentes dos seus próprios gates. O piloto comercial mantém as dependências de staging e
+dispositivos físicos, fora desta aceitação determinística local.
 
-Tentativas adicionais: o arranque direto de Next respondeu HTTP 200; no servidor isolado, a
-compilação inicial de `/dev/pos` demorou 165,9s e a de `/cliente/entrar` 81,6s. O teste de
-autenticação excedeu o seu limite de 120s. Foi tentado build determinístico com as mesmas
-variáveis de teste, para reutilizar páginas pré-compiladas, mas essa tentativa não concluiu o
-gate. Não foram aumentados timeouts, removidas asserções nem ignorados testes para obter PASS.
+## Notas de migração / descrição de PR
 
-**Aceitação: não aprovada.** Fase 1 implementada parcialmente e pendente de validação. Nenhum
-rollout das fases 2–5 efetuado; fase 6 pendente. Não há alegação de preservação integral validada
-por browser, de comparação visual ou de melhoria de desempenho.
+Título sugerido: `Introduz materiais Fluid optativos e estabiliza a validação visual`.
+
+Os consumidores existentes mantêm a apresentação sem a prop `material`. Os novos materiais
+exigem os estilos Fluid, já incluídos no layout e no entrypoint CSS do pacote. Ações reward/danger
+mantêm as cores semânticas; solid é o fallback. Não há migração de dados nem dependências novas.
+O PR deve incluir este relatório e anexar as capturas locais indicadas. Sem merge ou deploy.

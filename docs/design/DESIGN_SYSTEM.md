@@ -4,6 +4,8 @@
 
 `GlassSurface` supports semantic `as`, refs, and `solid` (default), `frosted`, `liquid` materials.
 Existing `Card`, `Button`, `Navbar`, `BottomNavigation` and `Modal` accept an optional `material`.
+`Tabs` also accepts `material` and supports arrows, Home/End and roving keyboard focus while
+preserving lazy panel rendering.
 Omitting it preserves the existing presentation. No consumer migration is required.
 Reward and danger buttons keep their original tone and ignore `material`; use an enclosing
 surface for these actions. This preserves the meaning of reward and destructive states.

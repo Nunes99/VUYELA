@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import type { HTMLAttributes, ReactNode } from "react";
+import type { SurfaceMaterial } from "./GlassSurface";
 
 export interface PopoverProps {
   trigger: ReactNode;
@@ -122,14 +123,16 @@ export interface TabItem {
 }
 
 export interface TabsProps extends HTMLAttributes<HTMLDivElement> {
+  material?: SurfaceMaterial;
   tabs: TabItem[];
   defaultValue?: string | undefined;
 }
 
-export function Tabs({ tabs, defaultValue, className = "", ...props }: TabsProps) {
+export function Tabs({ tabs, defaultValue, material, className = "", ...props }: TabsProps) {
   const generatedId = useId();
   const firstValue = tabs[0]?.value;
   const [activeValue, setActiveValue] = useState(defaultValue ?? firstValue);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const activeTab = tabs.find((tab) => tab.value === activeValue) ?? tabs[0];
 
   if (!activeTab) {
@@ -137,9 +140,13 @@ export function Tabs({ tabs, defaultValue, className = "", ...props }: TabsProps
   }
 
   return (
-    <div className={["vy-tabs", className].filter(Boolean).join(" ")} {...props}>
+    <div
+      className={["vy-tabs", className].filter(Boolean).join(" ")}
+      data-material={material}
+      {...props}
+    >
       <div className="vy-tabs__list" role="tablist">
-        {tabs.map((tab) => {
+        {tabs.map((tab, index) => {
           const selected = tab.value === activeTab.value;
           return (
             <button
@@ -149,6 +156,35 @@ export function Tabs({ tabs, defaultValue, className = "", ...props }: TabsProps
               id={`${generatedId}-${tab.value}-tab`}
               aria-selected={selected}
               aria-controls={`${generatedId}-${tab.value}-panel`}
+              tabIndex={selected ? 0 : -1}
+              ref={(element) => {
+                tabRefs.current[index] = element;
+              }}
+              onKeyDown={(event) => {
+                let nextIndex: number;
+                switch (event.key) {
+                  case "ArrowRight":
+                    nextIndex = (index + 1) % tabs.length;
+                    break;
+                  case "ArrowLeft":
+                    nextIndex = (index - 1 + tabs.length) % tabs.length;
+                    break;
+                  case "Home":
+                    nextIndex = 0;
+                    break;
+                  case "End":
+                    nextIndex = tabs.length - 1;
+                    break;
+                  default:
+                    return;
+                }
+                event.preventDefault();
+                const next = tabs[nextIndex];
+                if (next) {
+                  setActiveValue(next.value);
+                  tabRefs.current[nextIndex]?.focus();
+                }
+              }}
               onClick={() => setActiveValue(tab.value)}
             >
               {tab.label}
@@ -159,6 +195,7 @@ export function Tabs({ tabs, defaultValue, className = "", ...props }: TabsProps
       <div
         className="vy-tabs__panel"
         role="tabpanel"
+        tabIndex={0}
         id={`${generatedId}-${activeTab.value}-panel`}
         aria-labelledby={`${generatedId}-${activeTab.value}-tab`}
       >
