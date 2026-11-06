@@ -1,4 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Route } from "@playwright/test";
+
+test.use({ serviceWorkers: "allow" });
 
 test("exposes four independently installable applications and one safe worker", async ({
   page
@@ -133,15 +135,44 @@ test("opens previously loaded card identification while offline", async ({ page,
     });
   });
 
+  const missingAssets = await page.evaluate(async () => {
+    const response = await caches.match("/offline");
+    if (!response) return ["/offline"];
+    const html = new DOMParser().parseFromString(await response.text(), "text/html");
+    const assets = Array.from(html.querySelectorAll("[src], [href]"))
+      .map((element) => element.getAttribute("src") ?? element.getAttribute("href"))
+      .filter((url): url is string => Boolean(url?.startsWith("/_next/static/")));
+    const missing: string[] = [];
+    for (const asset of new Set(assets)) {
+      if (!(await caches.match(asset))) missing.push(asset);
+    }
+    return missing;
+  });
+  expect(
+    missingAssets,
+    "O shell offline deve ter os seus recursos de produção/dev em cache"
+  ).toEqual([]);
+
+  // Enforce the outage for worker-owned requests too; never fulfil a fabricated fallback.
+  const blockedWorkerRequests: string[] = [];
+  const disconnect = async (route: Route) => {
+    if (route.request().serviceWorker()) blockedWorkerRequests.push(route.request().url());
+    await route.abort("internetdisconnected");
+  };
+  await context.route("**/*", disconnect);
   await context.setOffline(true);
   try {
-    await page.goto("/cliente");
+    const response = await page.goto("/cliente");
+    expect(response?.fromServiceWorker()).toBe(true);
+    expect(blockedWorkerRequests.some((url) => new URL(url).pathname === "/cliente")).toBe(true);
     await expect(page.getByRole("heading", { name: "Cartões disponíveis offline" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Cafe Central" })).toBeVisible();
     await expect(page.getByText("VY-OFFLINE-0001", { exact: true })).toBeVisible();
     await expect(page.getByText(/usar YELAS requer ligação/i)).toBeVisible();
     await expect(page.getByRole("button", { name: "Remover deste dispositivo" })).toBeVisible();
+    expect(await page.evaluate(async () => Boolean(await caches.match("/cliente")))).toBe(false);
   } finally {
+    await context.unroute("**/*", disconnect);
     await context.setOffline(false);
   }
 });

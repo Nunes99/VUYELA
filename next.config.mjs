@@ -28,6 +28,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: process.env.NEXT_PUBLIC_PWA_TEST === "true" ? false : undefined,
   reactStrictMode: true,
   poweredByHeader: false,
   // Server Actions carry the image multipart payload before the media validator runs.

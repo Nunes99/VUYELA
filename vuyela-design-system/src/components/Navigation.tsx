@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import type { SurfaceMaterial } from "./GlassSurface";
 
 export interface NavItem {
   label: string;
@@ -42,18 +43,27 @@ export function Breadcrumb({ items, className = "", ...props }: BreadcrumbProps)
 }
 
 export interface NavbarProps extends HTMLAttributes<HTMLElement> {
+  material?: SurfaceMaterial;
   brand: ReactNode;
   links: NavItem[];
   actions?: ReactNode;
 }
 
-export function Navbar({ brand, links, actions, className = "", ...props }: NavbarProps) {
+export function Navbar({ brand, links, actions, material, className = "", ...props }: NavbarProps) {
   return (
-    <header className={["vy-navbar", className].filter(Boolean).join(" ")} {...props}>
+    <header
+      className={["vy-navbar", className].filter(Boolean).join(" ")}
+      data-material={material}
+      {...props}
+    >
       <div className="vy-navbar__brand">{brand}</div>
       <nav className="vy-navbar__links" aria-label="Navegação principal">
         {links.map((link) => (
-          <a key={link.href} href={link.href} aria-current={link.active ? "page" : undefined}>
+          <a
+            key={`${link.href}-${link.label}`}
+            href={link.href}
+            aria-current={link.active ? "page" : undefined}
+          >
             {link.label}
           </a>
         ))}
@@ -75,7 +85,11 @@ export function Sidebar({ title, items, footer, className = "", ...props }: Side
       <strong>{title}</strong>
       <nav aria-label={title}>
         {items.map((item) => (
-          <a key={item.href} href={item.href} aria-current={item.active ? "page" : undefined}>
+          <a
+            key={`${item.href}-${item.label}`}
+            href={item.href}
+            aria-current={item.active ? "page" : undefined}
+          >
             {item.icon}
             {item.label}
           </a>
@@ -87,18 +101,29 @@ export function Sidebar({ title, items, footer, className = "", ...props }: Side
 }
 
 export interface BottomNavigationProps extends HTMLAttributes<HTMLElement> {
+  material?: SurfaceMaterial;
   items: NavItem[];
 }
 
-export function BottomNavigation({ items, className = "", ...props }: BottomNavigationProps) {
+export function BottomNavigation({
+  items,
+  material,
+  className = "",
+  ...props
+}: BottomNavigationProps) {
   return (
     <nav
       className={["vy-bottom-nav", className].filter(Boolean).join(" ")}
       aria-label="Navegação inferior"
+      data-material={material}
       {...props}
     >
       {items.map((item) => (
-        <a key={item.href} href={item.href} aria-current={item.active ? "page" : undefined}>
+        <a
+          key={`${item.href}-${item.label}`}
+          href={item.href}
+          aria-current={item.active ? "page" : undefined}
+        >
           {item.icon ? <span aria-hidden="true">{item.icon}</span> : null}
           <span>{item.label}</span>
         </a>

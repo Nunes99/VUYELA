@@ -14,6 +14,35 @@ The default Playwright suite remains deterministic and intentionally runs withou
 credentials. It validates public routes, protected fallbacks, responsive layout and interaction
 contracts.
 
+The suite validates one isolated production build before starting `next dev` on port 3100
+(`PLAYWRIGHT_PORT` overrides it). `scripts/playwright-server.mjs` clears Supabase credentials at
+build time as well as runtime, including values otherwise loaded from `.env.local`. It does not
+reuse an arbitrary existing server. The operational preview pages deliberately return 404 in
+production, so browser tests use dev mode. `tests/e2e-setup.ts` warms page routes and their JS/CSS
+before per-test deadlines begin; it only issues GETs, excluding API routes and form submissions.
+Do not run another dev server or build against `.next` at
+the same time. The bootstrap has a 15-minute build allowance; test and assertion timeouts remain
+unchanged. Server output, failure traces and `test-results/results.json` provide diagnostics.
+The bootstrap first launches and closes the pinned Chromium, failing before the build if its
+executable is unavailable. Install it with `pnpm exec playwright install chromium` in the same
+execution environment/cache as the suite. For a Windows corporate certificate chain, Node's
+`--use-system-ca` can be used during installation; do not disable TLS certificate verification.
+
+UI cases block service workers to avoid repeating shell precaches in every isolated browser
+context. `pwa.spec.ts` explicitly enables workers and verifies all four manifests/scopes, the
+active root worker and the real offline identification flow in both browser profiles.
+
+React streaming may briefly retain an old HTML copy under a hidden Next segment. Scope raw
+DOM/text locators to the unique visible portal or public shell; do not select an arbitrary first
+copy. Keep counts, headings, values and geometry assertions. Role locators retain their accessible
+visibility semantics, and portalled dialogs are still located by role at page level.
+
+Offline tests verify cached shell assets before disconnecting. They combine `setOffline(true)`
+with aborting actual network requests, including worker-owned fetches, through
+[Playwright's Service Worker routing](https://playwright.dev/docs/service-workers#network-events-and-routing).
+The response must come from the real worker/cache, not fabricated HTML, and private `/cliente`
+HTML must remain absent from Cache Storage.
+
 `pnpm test:e2e:live` is the authenticated reliability suite. It keeps the configured Supabase
 environment, uses dedicated accounts for customer, business, POS and admin, verifies that each
 identity reaches only its own portal, and checks `/api/health`. Configure it with the variables in

@@ -16,6 +16,9 @@ import {
   DropdownMenu,
   EmptyState,
   FilterBar,
+  GlassSurface,
+  MotionPreferences,
+  Modal,
   IconButton,
   Input,
   LoyaltyCard,
@@ -90,6 +93,7 @@ const transactionColumns = [
 
 export function DesignSystemShowcase() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [fluidModalOpen, setFluidModalOpen] = useState(false);
 
   return (
     <main className="ds-page">
@@ -119,6 +123,52 @@ export function DesignSystemShowcase() {
             cardNumber="VY-2408-0025"
           />
         </div>
+      </section>
+
+      <section className="vy-container ds-section ds-fluid" aria-labelledby="fluid-heading">
+        <h2 id="fluid-heading">Fluid Design 2.0 — demonstração</h2>
+        <p>Exemplos visuais sem operações reais. O material sólido é o padrão seguro.</p>
+        <MotionPreferences />
+        <div className="vy-grid vy-grid--3">
+          {(["solid", "frosted", "liquid"] as const).map((material) => (
+            <GlassSurface
+              as="article"
+              key={material}
+              material={material}
+              aria-label={`Material ${material}`}
+            >
+              <h3>{material}</h3>
+              <p>Rede Viva: conteúdo legível, foco visível e resposta ao toque.</p>
+              <Button material={material} onClick={() => setFluidModalOpen(true)}>
+                Abrir exemplo {material}
+              </Button>
+              <Button material={material} disabled>
+                Indisponível
+              </Button>
+              <Button material={material} loading>
+                A guardar exemplo
+              </Button>
+            </GlassSurface>
+          ))}
+        </div>
+        <div data-theme="dark">
+          <GlassSurface material="frosted" aria-label="Material escuro">
+            <h3>Tema escuro</h3>
+            <p>Superfície adaptativa com identidade Índico.</p>
+            <Button material="liquid" onClick={() => setFluidModalOpen(true)}>
+              Abrir exemplo escuro
+            </Button>
+          </GlassSurface>
+        </div>
+        <Modal
+          open={fluidModalOpen}
+          title="Exemplo de superfície"
+          material="frosted"
+          onClose={() => setFluidModalOpen(false)}
+        >
+          <p>Demonstração. Nenhuma transação será criada.</p>
+          <Button onClick={() => setFluidModalOpen(false)}>Concluir exemplo</Button>
+        </Modal>
       </section>
 
       <section className="vy-container ds-section" aria-labelledby="tokens-heading">
@@ -245,6 +295,7 @@ export function DesignSystemShowcase() {
           <article className="ds-example ds-wide">
             <Breadcrumb items={[{ label: "Início", href: "/" }, { label: "Design System" }]} />
             <Navbar
+              material="frosted"
               brand="VUYELA"
               links={navLinks}
               actions={
@@ -267,6 +318,7 @@ export function DesignSystemShowcase() {
           </article>
           <article className="ds-example">
             <BottomNavigation
+              material="frosted"
               items={[
                 { label: "Início", href: "#", active: true, icon: <Home size={16} /> },
                 { label: "Cartões", href: "#", icon: <CreditCard size={16} /> },
@@ -308,6 +360,7 @@ export function DesignSystemShowcase() {
           <article className="ds-example">
             <h3>Tabs e accordion</h3>
             <Tabs
+              material="frosted"
               tabs={[
                 {
                   value: "cliente",

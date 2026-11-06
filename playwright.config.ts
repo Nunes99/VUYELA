@@ -1,24 +1,30 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = process.env.PLAYWRIGHT_PORT ?? "3000";
+const port = process.env.PLAYWRIGHT_PORT ?? "3100";
 const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  globalSetup: "./tests/e2e-setup.ts",
   timeout: 60_000,
   workers: 1,
+  reporter: [["list"], ["json", { outputFile: "test-results/results.json" }]],
   expect: {
     timeout: 5_000
   },
   use: {
     baseURL,
-    trace: "on-first-retry"
+    serviceWorkers: "block",
+    screenshot: "only-on-failure",
+    trace: "retain-on-failure"
   },
   webServer: {
-    command: `pnpm dev --turbopack --hostname 127.0.0.1 --port ${port}`,
-    url: `${baseURL}/dev/pos?etapa=sale`,
-    timeout: 180_000,
-    reuseExistingServer: !process.env.CI,
+    command: `node scripts/playwright-server.mjs ${port}`,
+    url: `${baseURL}/dev/design-system`,
+    // Includes the production build; request/test timeouts remain unchanged.
+    timeout: 900_000,
+    reuseExistingServer: false,
+    stdout: "pipe",
     env: {
       NEXT_PUBLIC_SUPABASE_URL: "",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "",

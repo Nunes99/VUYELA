@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
+import { expectUnavailablePortal } from "./support/protected-state";
 
 for (const view of [
   "overview",
@@ -17,9 +18,6 @@ for (const view of [
   test(`protects the ${view} administration view`, async ({ page }) => {
     await page.goto(`/admin?view=${view}`);
 
-    await expect(
-      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
-    ).toBeVisible();
-    await expect(page.getByText("Configuração necessária")).toBeVisible();
+    await expectUnavailablePortal(page, "Configuração necessária");
   });
 }

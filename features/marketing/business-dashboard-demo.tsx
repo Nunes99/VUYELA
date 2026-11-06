@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useReducedVisualMotion } from "@lemote/vuyela-design-system/visual-preferences";
 import { BarChart3, Grid2X2, Megaphone, PackageSearch, UsersRound } from "lucide-react";
 
 const dashboardModes = [
@@ -45,9 +46,10 @@ const dashboardModes = [
 export function BusinessDashboardDemo() {
   const [activeIndex, setActiveIndex] = useState(0);
   const mode = dashboardModes[activeIndex];
+  const reducedMotion = useReducedVisualMotion();
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion) {
       return;
     }
 
@@ -56,7 +58,7 @@ export function BusinessDashboardDemo() {
     }, 4600);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <div className="rv-dashboard" aria-label="Demonstração do painel do negócio">
@@ -85,15 +87,15 @@ export function BusinessDashboardDemo() {
       </aside>
 
       <div className="rv-dashboard__workspace">
+        <p className="rv-dashboard__disclaimer">Demonstração · dados ilustrativos</p>
         <header>
           <div>
             <small>BOM DIA, MARIA</small>
             <strong>O seu negócio está a ganhar ritmo.</strong>
           </div>
-          <span>Atualizado agora</span>
         </header>
 
-        <div className="rv-dashboard__metrics" aria-live="polite">
+        <div className="rv-dashboard__metrics">
           {mode.metrics.map(([label, value, trend]) => (
             <article key={`${mode.id}-${label}`}>
               <small>{label}</small>

@@ -1,7 +1,9 @@
 import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
+import type { SurfaceMaterial } from "./GlassSurface";
 
 export interface ModalProps {
+  material?: SurfaceMaterial;
   open: boolean;
   title: string;
   onClose: () => void;
@@ -9,22 +11,56 @@ export interface ModalProps {
   footer?: ReactNode;
 }
 
-export function Modal({ open, title, onClose, children, footer }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, material }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
+      if (event.key === "Tab") {
+        const controls = Array.from(
+          dialogRef.current?.querySelectorAll<HTMLElement>(
+            'button:not(:disabled), a[href], input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+          ) ?? []
+        ).filter(
+          (control) =>
+            control.tabIndex >= 0 &&
+            !control.closest('[hidden], [inert], [aria-hidden="true"]') &&
+            getComputedStyle(control).display !== "none" &&
+            getComputedStyle(control).visibility !== "hidden"
+        );
+        const first = controls?.[0];
+        const last = controls?.[controls.length - 1];
+        if (!first || !last) {
+          event.preventDefault();
+          return;
+        }
+        if (
+          event.shiftKey &&
+          (document.activeElement === first || document.activeElement === dialogRef.current)
+        ) {
+          event.preventDefault();
+          last.focus();
+        } else if (
+          !event.shiftKey &&
+          (document.activeElement === last || document.activeElement === dialogRef.current)
+        ) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-    requestAnimationFrame(() => dialogRef.current?.focus());
+    const frame = requestAnimationFrame(() => dialogRef.current?.focus());
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
       previous?.focus();
     };
   }, [open, onClose]);
@@ -40,6 +76,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
       <div
         ref={dialogRef}
         className="vy-modal"
+        data-material={material}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

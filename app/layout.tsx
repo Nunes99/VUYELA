@@ -8,6 +8,9 @@ import "../vuyela-design-system/src/styles/utilities.css";
 import "./globals.css";
 import "./marketing.css";
 import "./rede-viva.css";
+import "../vuyela-design-system/src/styles/fluid.css";
+import "./fluid-public.css";
+import { VisualPreferencesProvider } from "@lemote/vuyela-design-system/visual-preferences";
 import { NavigationProgress } from "@/components/navigation/navigation-progress";
 import { PwaRegistration } from "@/features/pwa/pwa-registration";
 import { getSiteUrl } from "@/lib/env";
@@ -55,11 +58,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html data-scroll-behavior="smooth" lang="pt-MZ">
       <body>
-        <Suspense fallback={null}>
-          <NavigationProgress />
-        </Suspense>
-        {children}
-        <PwaRegistration />
+        <VisualPreferencesProvider>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
+          {children}
+          <PwaRegistration />
+        </VisualPreferencesProvider>
       </body>
     </html>
   );

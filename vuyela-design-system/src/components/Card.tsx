@@ -1,15 +1,18 @@
 import type { HTMLAttributes } from "react";
+import type { SurfaceMaterial } from "./GlassSurface";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   padded?: boolean;
   interactive?: boolean;
   dark?: boolean;
+  material?: SurfaceMaterial;
 }
 
 export function Card({
   padded = true,
   interactive = false,
   dark = false,
+  material,
   className = "",
   ...props
 }: CardProps) {
@@ -22,5 +25,12 @@ export function Card({
   ]
     .filter(Boolean)
     .join(" ");
-  return <div className={classes} {...props} />;
+  return (
+    <div
+      className={classes}
+      data-material={material}
+      data-theme={dark && material ? "dark" : undefined}
+      {...props}
+    />
+  );
 }

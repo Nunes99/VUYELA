@@ -1,0 +1,129 @@
+/* Keep the header's fixed mobile menu outside the blur containing block. */
+.marketing-site .marketing-header {
+  isolation: isolate;
+  border-bottom: 0;
+  background: transparent;
+}
+
+.marketing-header__material {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-width: 0 0 1px;
+  pointer-events: none;
+}
+
+.marketing-site .marketing-discovery[data-material] {
+  border-width: 0 0 1px;
+}
+
+.marketing-site .marketing-header :focus-visible {
+  outline: 3px solid var(--vy-text-inverse);
+  outline-offset: 3px;
+}
+
+.marketing-site :is(.marketplace-offer-card, .rv-editorial-card) {
+  transition:
+    transform var(--vy-motion-enter) var(--vy-ease-standard),
+    box-shadow var(--vy-motion-enter) var(--vy-ease-standard);
+}
+
+.marketing-site :is(.marketplace-offer-card, .rv-editorial-card):hover {
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .marketing-site :is(.marketplace-offer-card, .rv-editorial-card):is(:hover, :focus-within) {
+    transform: translateY(-2px);
+    box-shadow: var(--vy-glass-shadow);
+  }
+}
+
+.rv-visual-preferences {
+  padding-block: var(--vy-space-4);
+  color: var(--vy-text);
+}
+
+.marketing-site .rv-dashboard__disclaimer {
+  margin: 0 0 var(--vy-space-4);
+  color: var(--vy-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.rv-visual-preferences summary {
+  width: fit-content;
+  min-height: var(--vy-touch-target);
+  padding-block: var(--vy-space-3);
+  cursor: pointer;
+}
+
+.rv-visual-preferences :focus-visible {
+  outline: 3px solid var(--vy-text);
+  outline-offset: 3px;
+}
+
+@media (min-width: 640px) and (max-width: 800px) {
+  .marketing-site .marketing-menu nav a {
+    gap: var(--vy-space-2);
+  }
+  .marketing-site .marketing-menu__social {
+    display: flex;
+    align-items: center;
+    gap: var(--vy-space-3);
+    padding: var(--vy-space-3);
+  }
+}
+
+.rv-visual-preferences .vy-visual-preferences {
+  margin: var(--vy-space-4) 0;
+  border: 1px solid var(--vy-glass-border);
+  border-radius: var(--vy-radius-lg);
+  padding: var(--vy-space-4);
+}
+
+@media (min-width: 640px) {
+  .rv-visual-preferences .vy-visual-preferences {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .marketing-site .rv-dashboard__metrics small {
+    min-height: 2.5em;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .marketing-site .rv-dashboard__metrics strong {
+    overflow: visible;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .marketing-site .rv-dashboard__metrics b {
+    position: static;
+    display: block;
+    margin-top: var(--vy-space-2);
+    text-align: right;
+  }
+}
+
+[data-vy-motion="reduce"] .marketing-site :is(.marketplace-offer-card, .rv-editorial-card) {
+  transform: none !important;
+}
+
+[data-vy-motion="reduce"] .marketing-site .rv-dashboard__chart polyline {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-site .rv-dashboard__chart polyline {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .marketing-site :is(.marketplace-offer-card, .rv-editorial-card) {
+    transition: none;
+    transform: none !important;
+  }
+}
