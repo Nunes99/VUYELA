@@ -1,6 +1,7 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MotionPreferences, VisualPreferencesProvider } from "@lemote/vuyela-design-system";
 
 import { OfferEditorialCarousel } from "@/features/marketing/offer-editorial-carousel";
 import type { MarketplaceOffer } from "@/features/public-marketplace/model";
@@ -41,6 +42,13 @@ const offers: MarketplaceOffer[] = [
 ];
 
 describe("homepage editorial offer carousel", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    localStorage.clear();
+    delete document.documentElement.dataset.vyMotion;
+    delete document.documentElement.dataset.vyTransparency;
+  });
   beforeEach(() => {
     Object.defineProperty(window, "matchMedia", {
       configurable: true,
@@ -64,5 +72,33 @@ describe("homepage editorial offer carousel", () => {
       "/estabelecimentos/farmacia-central"
     );
     expect(screen.getByRole("button", { name: "Oferta seguinte" })).toBeDisabled();
+  });
+
+  it("stops autoplay and uses instant manual scrolling when the visitor reduces motion", () => {
+    vi.useFakeTimers();
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: () => ({ matches: false })
+    });
+    const scroll = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", {
+      configurable: true,
+      value: scroll
+    });
+    render(
+      <VisualPreferencesProvider>
+        <MotionPreferences />
+        <OfferEditorialCarousel offers={offers} />
+      </VisualPreferencesProvider>
+    );
+    scroll.mockClear();
+    act(() => vi.advanceTimersByTime(5300));
+    expect(scroll).toHaveBeenCalledWith(expect.objectContaining({ behavior: "smooth" }));
+    fireEvent.change(screen.getByLabelText("Movimento"), { target: { value: "reduce" } });
+    scroll.mockClear();
+    act(() => vi.advanceTimersByTime(11000));
+    expect(scroll).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Oferta seguinte" }));
+    expect(scroll).toHaveBeenCalledWith(expect.objectContaining({ behavior: "instant" }));
   });
 });

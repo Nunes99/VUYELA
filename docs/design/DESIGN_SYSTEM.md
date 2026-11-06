@@ -75,6 +75,14 @@ The design system should grow toward:
 
 Each component should cover relevant default, hover, active, focus, disabled, loading, and error states.
 
+`VisualPreferencesProvider` initializes the versioned visual preferences at the root without
+turning its Server Component children into Client Components. `MotionPreferences` shares that
+state when inside the provider and remains usable on its own. `useReducedVisualMotion` combines
+OS and local reductions and pauses optional JavaScript motion until preferences are ready.
+The public header blurs a decorative sibling layer, preserving the mobile menu's fixed viewport.
+Discovery uses frosted material; editorial content, photographs and offer data retain their
+existing surfaces. The public footer exposes visual comfort controls in normal document flow.
+
 ## Product Surfaces
 
 - Public and authentication surfaces may use the institutional indigo and cultural texture.

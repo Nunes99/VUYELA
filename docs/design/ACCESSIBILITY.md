@@ -26,3 +26,9 @@ automated checks alone do not establish WCAG conformance.
 Material button boundaries use the semantic muted-text colour for stronger contrast. Material
 navigation exposes the active item through an underline as well as `aria-current`, and Navbar
 links use the shared 44px touch target. Tabs support roving focus, arrows and Home/End.
+
+The public footer provides persistent visual comfort controls. JavaScript-driven offer/demo
+carousels respond to OS preference changes and manual reductions, including cancellation of
+autoplay. Manual navigation remains available with instant scrolling when motion is reduced.
+The business dashboard illustration visibly identifies its data as demonstrative and does not
+announce rotating mock metrics as live activity.

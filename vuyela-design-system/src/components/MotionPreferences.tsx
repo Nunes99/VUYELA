@@ -1,14 +1,23 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { createContext, useContext, useEffect, useId, useState, type ReactNode } from "react";
 
 type Preference = "system" | "reduce";
 const storageKey = "vuyela-visual-preferences-v1";
 
-export function MotionPreferences() {
-  const id = useId();
+interface VisualPreferences {
+  motion: Preference;
+  transparency: Preference;
+  ready: boolean;
+  update: (motion: Preference, transparency: Preference) => void;
+}
+
+const VisualPreferencesContext = createContext<VisualPreferences | null>(null);
+
+function usePreferenceState(): VisualPreferences {
   const [motion, setMotion] = useState<Preference>("system");
   const [transparency, setTransparency] = useState<Preference>("system");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
@@ -20,6 +29,7 @@ export function MotionPreferences() {
     } catch {
       /* Storage is optional, including in private browsing. */
     }
+    setReady(true);
   }, []);
 
   function update(nextMotion: Preference, nextTransparency: Preference) {
@@ -36,9 +46,40 @@ export function MotionPreferences() {
   }
 
   useEffect(() => {
+    if (!ready) return;
     document.documentElement.dataset.vyMotion = motion;
     document.documentElement.dataset.vyTransparency = transparency;
-  }, [motion, transparency]);
+  }, [motion, transparency, ready]);
+
+  return { motion, transparency, ready, update };
+}
+
+/** Children can remain Server Components; only visual preference state lives here. */
+export function VisualPreferencesProvider({ children }: { children: ReactNode }) {
+  const preferences = usePreferenceState();
+  return (
+    <VisualPreferencesContext.Provider value={preferences}>
+      {children}
+    </VisualPreferencesContext.Provider>
+  );
+}
+
+/** Stop optional JavaScript motion until preferences are known, and react to OS changes. */
+export function useReducedVisualMotion(): boolean {
+  const preferences = useContext(VisualPreferencesContext);
+  const [systemReduced, setSystemReduced] = useState(true);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setSystemReduced(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+  return systemReduced || preferences?.motion === "reduce" || preferences?.ready === false;
+}
+
+function PreferenceControls({ motion, transparency, update }: VisualPreferences) {
+  const id = useId();
 
   return (
     <fieldset className="vy-visual-preferences">
@@ -71,4 +112,14 @@ export function MotionPreferences() {
       </label>
     </fieldset>
   );
+}
+
+function StandalonePreferences() {
+  const preferences = usePreferenceState();
+  return <PreferenceControls {...preferences} />;
+}
+
+export function MotionPreferences() {
+  const preferences = useContext(VisualPreferencesContext);
+  return preferences ? <PreferenceControls {...preferences} /> : <StandalonePreferences />;
 }

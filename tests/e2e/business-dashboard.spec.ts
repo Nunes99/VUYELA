@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
+import { expectUnavailablePortal } from "./support/protected-state";
 
 test.setTimeout(180_000);
 
@@ -17,9 +18,6 @@ test("protects every business dashboard view", async ({ page }) => {
   for (const view of dashboardViews) {
     await page.goto(`/negocio?vista=${view}`);
 
-    await expect(
-      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
-    ).toBeVisible();
-    await expect(page.getByText("Serviço indisponível")).toBeVisible();
+    await expectUnavailablePortal(page);
   }
 });

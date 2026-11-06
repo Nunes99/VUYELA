@@ -13,11 +13,12 @@ test("routes recovery codes arriving at the homepage to password completion", as
 });
 
 test("hides phone authentication while no SMS provider is configured", async ({ page }) => {
+  const auth = page.locator(".auth-shell:visible");
   await page.goto("/entrar");
 
   await expect(page.getByRole("heading", { name: "Entrar na sua conta" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Telefone com código" })).toHaveCount(0);
-  await expect(page.locator('input[name="next"]')).toHaveValue("/cliente");
+  await expect(auth.locator('input[name="next"]')).toHaveValue("/cliente");
 });
 
 test("protects the account router before choosing the correct dashboard", async ({ page }) => {
@@ -27,12 +28,13 @@ test("protects the account router before choosing the correct dashboard", async 
 });
 
 test("shows the complete password recovery forms", async ({ page }) => {
+  const auth = page.locator(".auth-shell:visible");
   await page.goto("/recuperar-acesso");
 
   await expect(
     page.getByRole("heading", { name: "Recupere o acesso com segurança." })
   ).toBeVisible();
-  await expect(page.getByLabel("E-mail")).toBeVisible();
+  await expect(auth.getByLabel("E-mail")).toBeVisible();
   await expect(page.getByRole("button", { name: "Enviar link" })).toBeVisible();
 
   await page.goto("/definir-senha");
@@ -40,23 +42,25 @@ test("shows the complete password recovery forms", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Defina uma nova palavra-passe segura." })
   ).toBeVisible();
-  await expect(page.getByLabel(/^Nova palavra-passe/)).toBeVisible();
-  await expect(page.getByLabel("Confirmar nova palavra-passe")).toBeVisible();
+  await expect(auth.getByLabel(/^Nova palavra-passe/)).toBeVisible();
+  await expect(auth.getByLabel("Confirmar nova palavra-passe")).toBeVisible();
 });
 
 test("shows a send failure instead of reporting that an email was sent", async ({ page }) => {
+  const auth = page.locator(".auth-shell:visible");
   await page.goto("/recuperar-acesso");
-  await page.getByLabel("E-mail").fill("ana@vuyela.co.mz");
+  await auth.getByLabel("E-mail").fill("ana@vuyela.co.mz");
   await page.getByRole("button", { name: "Enviar link" }).click();
 
-  await expect(page.locator(".auth-form").getByRole("alert")).toContainText(
+  await expect(auth.locator(".auth-form").getByRole("alert")).toContainText(
     "O acesso à conta está temporariamente indisponível"
   );
   await expect(page.getByRole("button", { name: "Enviar link" })).toBeEnabled();
-  await expect(page.getByText("Se existir uma conta com este e-mail")).toHaveCount(0);
+  await expect(auth.getByText("Se existir uma conta com este e-mail")).toHaveCount(0);
 });
 
 test("preserves the originating portal throughout password recovery", async ({ page }) => {
+  const auth = page.locator(".auth-shell:visible");
   await page.goto("/negocio/entrar?next=%2Fnegocio%3Fvista%3Dequipa");
 
   const recoveryLink = page.getByRole("link", { name: "Esqueceu a palavra-passe?" });
@@ -66,12 +70,12 @@ test("preserves the originating portal throughout password recovery", async ({ p
   );
   await recoveryLink.click();
 
-  await expect(page.locator('input[name="portal"]')).toHaveValue("business");
-  await expect(page.locator('input[name="next"]')).toHaveValue("/negocio?vista=equipa");
+  await expect(auth.locator('input[name="portal"]')).toHaveValue("business");
+  await expect(auth.locator('input[name="next"]')).toHaveValue("/negocio?vista=equipa");
 
   await page.goto("/definir-senha?portal=pos&next=%2Fpos%3Fetapa%3Dservices");
-  await expect(page.locator('input[name="portal"]')).toHaveValue("pos");
-  await expect(page.locator('input[name="next"]')).toHaveValue("/pos?etapa=services");
+  await expect(auth.locator('input[name="portal"]')).toHaveValue("pos");
+  await expect(auth.locator('input[name="next"]')).toHaveValue("/pos?etapa=services");
 });
 
 test("rejects an auth callback without a code", async ({ page }) => {

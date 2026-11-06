@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectUnavailablePortal } from "./support/protected-state";
 
 test.setTimeout(180_000);
 
@@ -24,10 +25,7 @@ test("protects the POS transaction and settings routes", async ({ page }) => {
   for (const route of protectedPosRoutes) {
     await page.goto(route);
 
-    await expect(
-      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
-    ).toBeVisible();
-    await expect(page.getByText("Serviço indisponível")).toBeVisible();
+    await expectUnavailablePortal(page);
   }
 });
 
@@ -35,10 +33,7 @@ test("protects payment configuration in the business application", async ({ page
   for (const route of protectedBusinessPaymentRoutes) {
     await page.goto(route);
 
-    await expect(
-      page.getByRole("heading", { name: "Não foi possível iniciar o acesso." })
-    ).toBeVisible();
-    await expect(page.getByText("Serviço indisponível")).toBeVisible();
+    await expectUnavailablePortal(page);
   }
 });
 

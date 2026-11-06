@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { gzipSync } from "node:zlib";
+import { chromium } from "@playwright/test";
 
 const require = createRequire(import.meta.url);
 const nextCli = require.resolve("next/dist/bin/next");
@@ -64,6 +65,10 @@ function run(args) {
 }
 
 try {
+  // Fail before a costly build when the required test browser is unavailable.
+  const browser = await chromium.launch();
+  console.log(`[E2E] Chromium ${browser.version()} disponível.`);
+  await browser.close();
   if (!process.argv.includes("--dev-only")) {
     console.log("[E2E] A compilar a aplicação isolada antes de iniciar os testes.");
     await run(["build"]);

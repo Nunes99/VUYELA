@@ -31,7 +31,7 @@ Branch: `codex/vuyela-fluid-design-system-2`. Sem merge ou deploy automático.
 
 - [x] 0 — Baseline e inventário: arquitetura auditada; baseline da continuação em `6e51706`.
 - [x] 1 — Fundamentos e demonstrador: gates locais aprovados e evidências arquivadas em 05/11/2026.
-- [ ] 2 — Público/Rede Viva: depende da validação da fase 1.
+- [ ] 2 — Público/Rede Viva: em implementação após aprovação da fase 1 (`c399f78`).
 - [ ] 3 — Cliente/cartão: depende da validação visual e QR.
 - [ ] 4 — Negócio/Admin: superfícies secundárias, tabelas sólidas.
 - [ ] 5 — POS/PWA: sem animações transacionais, validar manifestos/cache.
@@ -44,9 +44,9 @@ Relatório: `docs/qa/FLUID_DESIGN_SYSTEM_2_PHASE_0_1.md`. Fase 1 aprovada: lint,
 347 testes unit/integration, DS build, produção e Playwright (120 PASS, 0 FAIL, 0 flaky,
 4 exclusões preexistentes por perfil). Revisão visual em oito larguras; 52 capturas finais e
 índice SHA-256 arquivados. A falha transitória `ERR_NO_BUFFER_SPACE` da execução anterior
-fica documentada separadamente. A fase 2 está desbloqueada; fases seguintes não iniciadas.
+fica documentada separadamente. A fase 2 foi iniciada; fases seguintes não iniciadas.
 
-## Fase 2 — proposta por ficheiro, condicionada ao gate da fase 1
+## Fase 2 — plano por ficheiro, gate da fase 1 aprovado
 
 - `src/components/MotionPreferences.tsx`: partilhar e inicializar preferências visuais no layout,
   mantendo uso isolado do demonstrador e apenas persistência local não sensível.
@@ -61,3 +61,18 @@ fica documentada separadamente. A fase 2 está desbloqueada; fases seguintes nã
   conteúdo/SEO público, oito larguras e capturas comparáveis com a fase 1.
 - Gate próprio: lint, typecheck, unit/integration, DS build, produção, Playwright relevante e
   revisão visual antes de qualquer fase 3. Não alterar dados, autenticação ou contratos PWA.
+
+## Fase 3 — plano condicionado à aprovação da fase 2
+
+- Reutilizar `features/customer-cards/customer-card-visual.tsx`, incluindo frente/verso,
+  emissor, número, valores confirmados e QR. Reflexo decorativo separado, sem filtro sobre o QR.
+- `PointsBalanceMotion`: apresentação dos valores confirmados recebidos, sem contar valores
+  intermédios; animar apenas alterações na mesma identidade de cartão, nunca a montagem inicial
+  ou a troca de cartão/negócio. Cancelar com redução de movimento.
+- `RewardFeedback`: anúncio textual de novos eventos confirmados, com baseline inicial e
+  isolamento de contexto; não celebrar histórico/paginação nem criar eventos financeiros.
+- Consumir apenas os snapshots já lidos pelo servidor. Não adicionar queries, ações, escrita,
+  cache de saldo ou autorização offline. Reutilizar a formatação YL/MZN existente.
+- Perfil cliente: acesso às preferências partilhadas. CSS próprio delimitado à área cliente.
+- Validar alterações reais de props, ausência de feedback inicial, foco/frente/verso, QR,
+  oito larguras e contrato offline antes de avançar para Negócio/Admin.

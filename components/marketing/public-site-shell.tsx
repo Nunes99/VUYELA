@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { MotionPreferences } from "@lemote/vuyela-design-system/visual-preferences";
 import {
   BadgePercent,
   BriefcaseBusiness,
@@ -100,6 +101,12 @@ export function PublicSiteShell({ active, children, discoveryActive }: PublicSit
 function PublicHeader({ active }: { active: PublicNavigationKey }) {
   return (
     <header className="marketing-header" aria-label="Navegação principal">
+      <span
+        aria-hidden="true"
+        className="marketing-header__material"
+        data-material="frosted"
+        data-theme="dark"
+      />
       <div className="marketing-container marketing-header__inner">
         <VuyelaLogo className="marketing-header__logo" inverse />
 
@@ -171,7 +178,11 @@ function PublicHeader({ active }: { active: PublicNavigationKey }) {
 
 function PublicDiscoveryBar({ active }: { active?: PublicDiscoveryKey }) {
   return (
-    <nav className="marketing-discovery" aria-label="Descobrir negócios e ofertas">
+    <nav
+      className="marketing-discovery"
+      data-material="frosted"
+      aria-label="Descobrir negócios e ofertas"
+    >
       <div className="marketing-container marketing-discovery__inner">
         {discoveryNavigation.map((item) => (
           <Link
@@ -223,6 +234,13 @@ function PublicFooter() {
             <Link href="/pesquisar">Pesquisar</Link>
           </nav>
         </div>
+      </div>
+
+      <div className="marketing-container rv-visual-preferences" data-theme="dark">
+        <details>
+          <summary>Conforto visual</summary>
+          <MotionPreferences />
+        </details>
       </div>
 
       <div className="marketing-container marketing-footer__bottom">

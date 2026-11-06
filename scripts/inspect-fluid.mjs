@@ -98,6 +98,58 @@ try {
         caret: "initial"
       });
   }
+  if (route === "/") {
+    await expect(page.locator(".marketing-site:visible .rv-dashboard__chart polyline")).toHaveCSS(
+      "stroke-dashoffset",
+      "0px"
+    );
+    const metrics = [];
+    for (const viewportWidth of [320, 375, 390, 430, 768, 1024, 1280, 1440]) {
+      await page.setViewportSize({ width: viewportWidth, height: 900 });
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      );
+      const cards = await page
+        .locator(".marketing-site:visible .rv-dashboard__metrics article")
+        .evaluateAll((elements) =>
+          elements.map((element) => {
+            const label = element.querySelector("small");
+            const value = element.querySelector("strong");
+            const trend = element.querySelector("b");
+            if (!label || !value || !trend) throw new Error("Indicador incompleto.");
+            const text = document.createRange();
+            text.selectNodeContents(value);
+            const a = text.getBoundingClientRect();
+            const b = trend.getBoundingClientRect();
+            return {
+              label: label.textContent,
+              value: value.textContent,
+              labelFits:
+                label.scrollWidth <= label.clientWidth && label.scrollHeight <= label.clientHeight,
+              valueFits:
+                value.scrollWidth <= value.clientWidth && value.scrollHeight <= value.clientHeight,
+              separated:
+                a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top
+            };
+          })
+        );
+      metrics.push({ width: viewportWidth, cards });
+      await page.locator(".marketing-site:visible .rv-dashboard").screenshot({
+        path: `${output}/demo-${viewportWidth}.png`,
+        scale: "css",
+        caret: "initial"
+      });
+    }
+    await writeFile(`${output}/demo-metrics.json`, JSON.stringify(metrics, null, 2));
+    console.log(JSON.stringify(metrics));
+    expect(
+      metrics.every(
+        (entry) =>
+          entry.cards.length === 3 &&
+          entry.cards.every((card) => card.labelFits && card.valueFits && card.separated)
+      )
+    ).toBe(true);
+  }
   await writeFile(`${output}/layout-${width}.json`, JSON.stringify({ ...layout, errors }, null, 2));
   console.log(JSON.stringify({ browser: browser.version(), ...layout, errors }, null, 2));
   expect(errors).toEqual([]);

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("keeps the NEW PHAS customer composition across desktop and mobile", async ({ page }) => {
+  const customer = page.locator(".customer-dashboard:visible");
   test.setTimeout(120_000);
 
   for (const viewport of [
@@ -12,28 +13,29 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
 
     await expect(page.getByRole("heading", { name: "Olá, Nunes José" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Seus Cartões" })).toBeVisible();
-    await expect(page.getByLabel("Navegação do cliente")).toBeVisible();
+    await expect(customer.getByLabel("Navegação do cliente")).toBeVisible();
     await expect(
-      page.locator(".customer-home-card-link").first().getByText("Equivale a 345 MZN")
+      customer.locator(".customer-home-card-link").first().getByText("Equivale a 345 MZN")
     ).toBeVisible();
-    const equivalentValueFits = await page
+    const equivalentValueFits = await customer
       .locator(".customer-home-card-link")
       .first()
       .locator(".customer-digital-card__balance > b")
-      .evaluate((value) =>
-        value.scrollWidth <= value.clientWidth && value.scrollHeight <= value.clientHeight
+      .evaluate(
+        (value) =>
+          value.scrollWidth <= value.clientWidth && value.scrollHeight <= value.clientHeight
       );
     expect(equivalentValueFits).toBe(true);
 
     if (viewport.mobile) {
-      const customerNavigation = page.getByLabel("Navegação do cliente");
+      const customerNavigation = customer.getByLabel("Navegação do cliente");
       await expect(customerNavigation.locator('a[href="/cliente?vista=ofertas"]')).toBeVisible();
       await expect(customerNavigation.locator('a[href="/cliente?vista=perfil"]')).toBeVisible();
       await expect(customerNavigation.getByRole("link", { name: "POS" })).toHaveCount(0);
 
-      const cardAlignment = await page.evaluate(() => {
-        const heading = document.querySelector<HTMLElement>("#home-cards-title")!;
-        const firstCard = document.querySelector<HTMLElement>(".customer-home-card-link")!;
+      const cardAlignment = await customer.evaluate((root) => {
+        const heading = root.querySelector<HTMLElement>("#home-cards-title")!;
+        const firstCard = root.querySelector<HTMLElement>(".customer-home-card-link")!;
 
         return firstCard.getBoundingClientRect().left - heading.getBoundingClientRect().left;
       });
@@ -42,13 +44,13 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
       expect(cardAlignment).toBeLessThanOrEqual(12);
     }
 
-    const layout = await page.evaluate(() => ({
+    const layout = await customer.evaluate((root) => ({
       overflow: document.documentElement.scrollWidth - window.innerWidth,
       mobileTotalVisible:
-        getComputedStyle(document.querySelector<HTMLElement>(".customer-mobile-total")!).display !==
+        getComputedStyle(root.querySelector<HTMLElement>(".customer-mobile-total")!).display !==
         "none",
       desktopSummaryVisible:
-        getComputedStyle(document.querySelector<HTMLElement>(".customer-summary-grid--wide")!)
+        getComputedStyle(root.querySelector<HTMLElement>(".customer-summary-grid--wide")!)
           .display !== "none"
     }));
 
@@ -57,7 +59,7 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
     expect(layout.desktopSummaryVisible).toBe(!viewport.mobile);
 
     if (!viewport.mobile) {
-      const activityRows = await page
+      const activityRows = await customer
         .locator(".customer-home-activity .customer-activity-preview article")
         .evaluateAll((rows) =>
           rows.map((row) => {
@@ -84,11 +86,12 @@ test("keeps the NEW PHAS customer composition across desktop and mobile", async 
 test("renders the customer activity, notifications and card identification views", async ({
   page
 }, testInfo) => {
+  const customer = page.locator(".customer-dashboard:visible");
   await page.goto("/dev/customer?vista=atividade");
   if (testInfo.project.name === "mobile-chrome") {
     await expect(page.getByRole("heading", { name: "Histórico de YELAS" })).toBeVisible();
     await expect(page.getByRole("searchbox", { name: "Pesquisar atividade" })).toBeVisible();
-    await expect(page.getByText("Barbershop 21", { exact: true }).first()).toBeVisible();
+    await expect(customer.getByText("Barbershop 21", { exact: true }).first()).toBeVisible();
   } else {
     await expect(
       page.getByRole("heading", { name: "Histórico de Atividade" }).last()
@@ -98,14 +101,14 @@ test("renders the customer activity, notifications and card identification views
 
   await page.goto("/dev/customer?vista=notificacoes");
   await expect(page.getByRole("heading", { name: "Avisos e Alertas" }).last()).toBeVisible();
-  await expect(page.getByText("YELAS acumuladas", { exact: true })).toBeVisible();
+  await expect(customer.getByText("YELAS acumuladas", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=cartoes&cartao=card-1");
   const cardDetailSelector =
     testInfo.project.name === "mobile-chrome"
       ? ".customer-mobile-card-detail"
       : ".customer-card-detail-visual";
-  const visibleQr = page.locator('[aria-label^="QR de identificação:"]:visible');
+  const visibleQr = customer.locator('[aria-label^="QR de identificação:"]:visible');
   await expect(visibleQr).toBeVisible();
   const qrGeometry = await visibleQr.evaluate((qr) => {
     const bounds = qr.getBoundingClientRect();
@@ -120,7 +123,7 @@ test("renders the customer activity, notifications and card identification views
   expect(qrGeometry.width).toBeGreaterThanOrEqual(64);
   expect(qrGeometry.height).toBeGreaterThanOrEqual(64);
   expect(qrGeometry.moduleGridWidth).toBeLessThanOrEqual(25);
-  const detailGeometry = await page
+  const detailGeometry = await customer
     .locator(`${cardDetailSelector} .customer-digital-card`)
     .evaluate((card) => {
       const surface = card.querySelector<HTMLElement>(".customer-digital-card__surface")!;
@@ -135,11 +138,11 @@ test("renders the customer activity, notifications and card identification views
     });
   expect(Math.abs(detailGeometry.surfaceHeight - detailGeometry.innerHeight)).toBeLessThan(1);
   expect(Math.abs(detailGeometry.surfaceHeight - detailGeometry.faceHeight)).toBeLessThan(1);
-  await page.locator('button[aria-label="Mostrar o verso do cartão"]:visible').click();
+  await customer.locator('button[aria-label="Mostrar o verso do cartão"]:visible').click();
   await expect(
-    page.locator('[role="img"][aria-label="Verso do cartão Barbershop 21"]:visible')
+    customer.locator('[role="img"][aria-label="Verso do cartão Barbershop 21"]:visible')
   ).toBeVisible();
-  const backFields = await page
+  const backFields = await customer
     .locator(`${cardDetailSelector} .customer-digital-card__back-content > span`)
     .evaluateAll((fields) =>
       fields.map((field) => {
@@ -168,10 +171,12 @@ test("lets customers discover businesses and distinguish existing cards", async 
       name: testInfo.project.name === "mobile-chrome" ? "Descobrir Negócios" : "Negócios VUYELA"
     })
   ).toBeVisible();
-  await expect(page.getByText("3 negócios disponíveis")).toBeVisible();
+  const customer = page.locator(".customer-dashboard:visible");
+  await expect(customer).toHaveCount(1);
+  await expect(customer.getByText("3 negócios disponíveis")).toBeVisible();
   await expect(page.getByRole("link", { name: "Ver meu cartão" })).toHaveCount(2);
   await expect(page.getByRole("button", { name: "Aderir ao cartão" })).toHaveCount(1);
-  await expect(page.getByText("Farmácia Central", { exact: true })).toBeVisible();
+  await expect(customer.getByText("Farmácia Central", { exact: true })).toBeVisible();
 
   const dimensions = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,
@@ -181,24 +186,25 @@ test("lets customers discover businesses and distinguish existing cards", async 
 });
 
 test("matches the referenced mobile customer flow", async ({ page }, testInfo) => {
+  const customer = page.locator(".customer-dashboard:visible");
   test.skip(testInfo.project.name !== "mobile-chrome", "Mobile-only design contract");
   test.setTimeout(180_000);
 
   await page.goto("/dev/customer?vista=cartoes");
   await expect(page.getByRole("heading", { name: "Gerir Cartões" })).toBeVisible();
-  await expect(page.getByText("Adicionar novo cartão digital")).toBeVisible();
+  await expect(customer.getByText("Adicionar novo cartão digital")).toBeVisible();
   await expect(
-    page
-      .locator(".customer-card-hub-item__content")
-      .first()
-      .getByText("Equivale a 345 MZN")
+    customer.locator(".customer-card-hub-item__content").first().getByText("Equivale a 345 MZN")
   ).toBeVisible();
-  await expect(page.getByLabel("Adicionar cartão")).toHaveAttribute(
+  await expect(customer.getByLabel("Adicionar cartão")).toHaveAttribute(
     "href",
     "/cliente?vista=negocios"
   );
-  await expect(page.locator(".customer-mobile-header__logo")).toHaveAttribute("href", "/cliente");
-  const thumbnailGeometry = await page
+  await expect(customer.locator(".customer-mobile-header__logo")).toHaveAttribute(
+    "href",
+    "/cliente"
+  );
+  const thumbnailGeometry = await customer
     .locator(".customer-card-hub-item")
     .first()
     .evaluate((row) => {
@@ -219,18 +225,18 @@ test("matches the referenced mobile customer flow", async ({ page }, testInfo) =
   await expect(page.getByRole("heading", { name: "Explorar Ofertas" }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Todas" })).toBeVisible();
   await page.getByRole("button", { name: "Saúde" }).click();
-  await expect(page.getByText("Farmácia Central", { exact: true })).toBeVisible();
-  await expect(page.getByText("Restaurante Marés", { exact: true })).toHaveCount(0);
+  await expect(customer.getByText("Farmácia Central", { exact: true })).toBeVisible();
+  await expect(customer.getByText("Restaurante Marés", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Ver oferta" }).first()).toBeVisible();
 
   await page.goto("/dev/customer?vista=perfil");
   await expect(page.getByRole("heading", { name: "O Seu Perfil" }).first()).toBeVisible();
-  await expect(page.getByText("Segurança e preferências", { exact: true })).toBeVisible();
+  await expect(customer.getByText("Segurança e preferências", { exact: true })).toBeVisible();
 
   await page.goto("/dev/customer?vista=perfil&editar=1");
-  await expect(page.getByText("Fotografia de perfil", { exact: true })).toBeVisible();
-  await expect(page.getByText("Carregar imagem", { exact: true })).toBeVisible();
-  await expect(page.locator('input[name="profileImage"]')).toHaveAttribute(
+  await expect(customer.getByText("Fotografia de perfil", { exact: true })).toBeVisible();
+  await expect(customer.getByText("Carregar imagem", { exact: true })).toBeVisible();
+  await expect(customer.locator('input[name="profileImage"]')).toHaveAttribute(
     "accept",
     "image/jpeg,image/png,image/webp"
   );

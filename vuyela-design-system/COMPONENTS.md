@@ -78,3 +78,13 @@ Um componente entra no design system quando:
   only the active panel is mounted, preserving the existing content lifecycle.
 
 Use `/dev/design-system` for demonstrations. These APIs do not read or write loyalty data.
+
+`VisualPreferencesProvider` shares the visual controls across a layout and initializes persisted
+preferences even when no controls are visible. Server Component children remain server-rendered.
+`useReducedVisualMotion()` returns true while loading preferences, on OS reduction, or on local
+reduction; use it to cancel optional JavaScript autoplay and choose instant scrolling. Keep the
+CSS reduced-motion rules as the fallback for styling and non-JavaScript content.
+
+In Server Components, import these APIs from
+`@lemote/vuyela-design-system/visual-preferences`. This focused client entry avoids importing
+the legacy interactive barrel into the server module graph. The original exports remain available.

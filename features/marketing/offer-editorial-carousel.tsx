@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, BadgePercent, Gift } from "lucide-react";
 import React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useReducedVisualMotion } from "@lemote/vuyela-design-system/visual-preferences";
 
 import type { MarketplaceOffer } from "@/features/public-marketplace/model";
 
@@ -73,9 +74,9 @@ function getOfferValidity(offer: MarketplaceOffer): string {
   }).format(new Date(offer.endsAt))}`;
 }
 
-function scrollViewportTo(viewport: HTMLDivElement, left: number): void {
+function scrollViewportTo(viewport: HTMLDivElement, left: number, reduced: boolean): void {
   if (typeof viewport.scrollTo === "function") {
-    viewport.scrollTo({ left, behavior: "smooth" });
+    viewport.scrollTo({ left, behavior: reduced ? "instant" : "smooth" });
     return;
   }
 
@@ -155,6 +156,7 @@ export function OfferEditorialCarousel({
 }) {
   const [activeFilter, setActiveFilter] = useState<OfferCategory>("all");
   const viewportRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedVisualMotion();
   const filteredOffers = useMemo(
     () =>
       activeFilter === "all"
@@ -163,44 +165,44 @@ export function OfferEditorialCarousel({
     [activeFilter, offers]
   );
 
-  const move = useCallback((direction: -1 | 1) => {
-    const viewport = viewportRef.current;
-    const firstOffer = viewport?.querySelector<HTMLElement>("article");
-    if (!viewport || !firstOffer) return;
+  const move = useCallback(
+    (direction: -1 | 1) => {
+      const viewport = viewportRef.current;
+      const firstOffer = viewport?.querySelector<HTMLElement>("article");
+      if (!viewport || !firstOffer) return;
 
-    const distance = firstOffer.getBoundingClientRect().width + 14;
-    const reachedEnd = viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 8;
-    const reachedStart = viewport.scrollLeft <= 8;
+      const distance = firstOffer.getBoundingClientRect().width + 14;
+      const reachedEnd = viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 8;
+      const reachedStart = viewport.scrollLeft <= 8;
 
-    if (direction > 0 && reachedEnd) {
-      scrollViewportTo(viewport, 0);
-      return;
-    }
+      if (direction > 0 && reachedEnd) {
+        scrollViewportTo(viewport, 0, reducedMotion);
+        return;
+      }
 
-    if (direction < 0 && reachedStart) {
-      scrollViewportTo(viewport, viewport.scrollWidth);
-      return;
-    }
+      if (direction < 0 && reachedStart) {
+        scrollViewportTo(viewport, viewport.scrollWidth, reducedMotion);
+        return;
+      }
 
-    scrollViewportTo(viewport, viewport.scrollLeft + direction * distance);
-  }, []);
+      scrollViewportTo(viewport, viewport.scrollLeft + direction * distance, reducedMotion);
+    },
+    [reducedMotion]
+  );
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (viewport) scrollViewportTo(viewport, 0);
+    if (viewport) scrollViewportTo(viewport, 0, true);
   }, [activeFilter]);
 
   useEffect(() => {
-    if (
-      filteredOffers.length < 2 ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
+    if (filteredOffers.length < 2 || reducedMotion) {
       return;
     }
 
     const timer = window.setInterval(() => move(1), 5200);
     return () => window.clearInterval(timer);
-  }, [filteredOffers.length, move]);
+  }, [filteredOffers.length, move, reducedMotion]);
 
   return (
     <>

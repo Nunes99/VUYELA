@@ -9,6 +9,7 @@ import {
   BottomNavigation,
   Tabs,
   MotionPreferences,
+  VisualPreferencesProvider,
   tokens
 } from "@lemote/vuyela-design-system";
 import jsonTokens from "../../vuyela-design-system/tokens/design-tokens.json";
@@ -20,6 +21,27 @@ afterEach(() => {
 });
 
 describe("Fluid foundations", () => {
+  it("shares controls and restores persisted preferences even without visible controls", async () => {
+    const { unmount } = render(
+      <VisualPreferencesProvider>
+        <MotionPreferences />
+        <MotionPreferences />
+      </VisualPreferencesProvider>
+    );
+    const controls = screen.getAllByLabelText("Transparência");
+    fireEvent.change(controls[0]!, { target: { value: "reduce" } });
+    expect(controls[1]).toHaveValue("reduce");
+    unmount();
+    delete document.documentElement.dataset.vyTransparency;
+    render(
+      <VisualPreferencesProvider>
+        <p>Outra página</p>
+      </VisualPreferencesProvider>
+    );
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute("data-vy-transparency", "reduce")
+    );
+  });
   it("navigates tabs with arrows, Home and End while retaining one tab stop", () => {
     render(
       <Tabs
